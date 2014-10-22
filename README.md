@@ -12,7 +12,7 @@ the source code of that).
 The aim for our work on FabSim is to create a generalized version of these two toolkits, 
 and to be aplied to other applications as well.
 
-== Installation and usage ==
+## Installation and usage 
 
 FabSim is still under development, and therefore not (yet) easy to use for new users. We will 
 add documentation in the near future, as the toolkit matures.
