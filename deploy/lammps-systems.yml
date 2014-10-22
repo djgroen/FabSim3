@@ -1,0 +1,12 @@
+# LAMMPS system YML file. This is a test version.
+
+pva_hector:
+# fab hector full_ibi_multi:start_iter=10,num_iters=10,config_name=pva,outdir_suffix=_hector_32,cores=32,wall_time=0:20:0,pressure=0.5,atom_dir=/home/derek/Codes/nano/config_files/pva1
+  config_name:pva
+  cores: 32
+  wall_time: 0:20:0
+  pressure: 0.5
+  outdir_suffix: _${machine_name}_${cores}
+  atom_dir: /home/derek/Codes/nano/config_files/pva1
+  start_iter:1
+  num_iters:20

@@ -1,0 +1,28 @@
+module load namd/2.9
+
+# Make sure any symbolic links are resolved to absolute path
+export PBS_O_WORKDIR=$(readlink -f $$PBS_O_WORKDIR)
+
+# Change to the direcotry that the job was submitted from
+cd $$PBS_O_WORKDIR
+
+# Set the number of threads to 1
+#   This prevents any system libraries from automatically
+#   using threading.
+export OMP_NUM_THREADS=1
+
+k=0
+while [ $$k -le $stages ]; do
+    m=1
+    while [ $$m -le $replicas ]; do
+        cd $$PBS_O_WORKDIR/rep$${m}/mineq_confs/
+            $run_ensemble_command $namd_exec eq$${k}.conf > ../equilibration/eq$${k}.log &
+        let m=m+1
+    done
+
+    # Wait for all simulations to complete
+    wait
+
+    let k=k+1
+done
+

@@ -1,0 +1,84 @@
+# 
+# Copyright (C) University College London, 2007-2012, all rights reserved.
+# 
+# This file is part of HemeLB and is CONFIDENTIAL. You may not work 
+# with, install, use, duplicate, modify, redistribute or share this
+# file, or any part thereof, other than as allowed by any agreement
+# specifically made by you with University College London.
+# 
+
+default: 
+  # General default values for all machines live in the default dictionary.
+  # Machine-specific overrides replace these.
+  # Mercurial server to find HemeLB
+  hg: "ssh://hg@entropy.chem.ucl.ac.uk"
+  # Default Modules to load or unload on remote, via module 'foo'
+  # e.g. ['load cmake'].
+  modules: []
+  # Commands to execute as part of remote run jobs.
+  run_prefix_commands: []
+  # Templates to use to find space to checkout and build HemeLB on the remote.
+  # All user- and generally- defined values in these config dictionaries will be interpolated via $foo
+  home_path_template: "/home/$username"
+  # Name for the Project Fabric folder
+  fabric_dir: "FabNano"
+  # Path to runtime accessible filesystem (default is same as build time)
+  runtime_path_template: "$home_path"
+  corespernode: 1
+  # Default options used in the CMake configure step.
+  # Command to use to launch remote jobs
+  # e.g. qsub, empty string to launch interactively.
+  job_dispatch: ''
+  # Path to build filesystem folder
+  # All user-defined values in these config dictionaries will be interpolated via $foo
+  remote_path_template: "$home_path/$fabric_dir"
+  # Path to run filesystem folder
+  work_path_template: "$runtime_path/$fabric_dir"
+  # Normally, the regression test can be run directly out of diffTest, but sometimes needs to be copied to a runtime file area.
+  batch_header: no_batch
+  run_command: "mpirun -np $cores"
+  temp_path_template: "/tmp"
+  job_name_template: '${config}_${machine_name}_${cores}'
+  local_templates_path: "$localroot/deploy/templates"
+  manual_ssh: false
+  local_templates_path: "$localroot/deploy/templates"
+  stat: qstat
+archer:
+  max_job_name_chars: 15
+  job_dispatch: "qsub"
+  run_command: "aprun -n $cores"
+  run_ensemble_command: "aprun -n $cores_per_replica" # Required for BAC ensemble runs!
+  batch_header: pbs-archer
+  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
+  remote: "login.archer.ac.uk"
+  # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
+  home_path_template: "/home/$project/$project/$username"
+  runtime_path_template: "/work/$project/$project/$username"
+  modules: ["load lammps"] #-25Sep11"]
+  temp_path_template: "$work_path/tmp"
+  queue: "parallel"
+  python_build: "lib64/python2.6"
+  corespernode: 24
+oppenheimer:
+  remote: "oppenheimer.chem.ucl.ac.uk"
+  run_command: "/opt/openmpi/gfortran/1.4.3/bin/mpirun -np $cores"
+  batch_header: sge_oppenheimer
+  no_hg: true
+  job_dispatch: "qsub"
+  python_build: "lib/python2.6"
+localhost:
+  remote: "localhost"
+  python_build: "lib/python2.7"
+mavrino:
+  max_job_name_chars: 15
+  # on mavrino, job names can't start with a digit, so we'll just prefix the bloody thing with a 'p' to prevent user annoyance.
+  job_name_template: '${config}_${machine_name}_${cores}'
+  job_dispatch: "qsub"
+  run_command: "/opt/mpich2/gnu/bin/mpirun -np $cores"
+  remote: "mavrino"
+  home_path_template: "/home/$username"
+  runtime_path_template: "/home/$username"
+  temp_path_template: "$work_path/tmp"
+  corespernode: 8 
+  batch_header: sge
+  queue: "parallel2" #"mapper"
