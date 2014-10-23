@@ -21,7 +21,7 @@ default:
   # All user- and generally- defined values in these config dictionaries will be interpolated via $foo
   home_path_template: "/home/$username"
   # Name for the Project Fabric folder
-  fabric_dir: "FabNano"
+  fabric_dir: "FabSim"
   # Path to runtime accessible filesystem (default is same as build time)
   runtime_path_template: "$home_path"
   corespernode: 1
@@ -69,6 +69,8 @@ oppenheimer:
 localhost:
   remote: "localhost"
   python_build: "lib/python2.7"
+  # The setting below can be useful for debugging if you run into problems.
+  # manual_ssh: true
 mavrino:
   max_job_name_chars: 15
   # on mavrino, job names can't start with a digit, so we'll just prefix the bloody thing with a 'p' to prevent user annoyance.
