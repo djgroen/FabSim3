@@ -1,0 +1,71 @@
+-I: Adding /home/shunzhou/amber12/dat/leap/prep to search path.
+-I: Adding /home/shunzhou/amber12/dat/leap/lib to search path.
+-I: Adding /home/shunzhou/amber12/dat/leap/parm to search path.
+-I: Adding /home/shunzhou/amber12/dat/leap/cmd to search path.
+-s: Ignoring startup file: leaprc
+-f: Source tleap.in.
+
+Welcome to LEaP!
+Sourcing: ./tleap.in
+----- Source: /home/shunzhou/amber12/dat/leap/cmd/leaprc.ff99SBildn
+----- Source of /home/shunzhou/amber12/dat/leap/cmd/leaprc.ff99SBildn done
+Log file: ./leap.log
+Loading parameters: /home/shunzhou/amber12/dat/leap/parm/parm99.dat
+Reading title:
+PARM99 for DNA,RNA,AA, organic molecules, TIP3P wat. Polariz.& LP incl.02/04/99
+Loading parameters: /home/shunzhou/amber12/dat/leap/parm/frcmod.ff99SBildn
+Reading force field modification type file (frcmod)
+Reading title:
+Modification/update of parm99.dat (Hornak & Simmerling) + ILDN corrections
+Loading library: /home/shunzhou/amber12/dat/leap/lib/all_nucleic94.lib
+Loading library: /home/shunzhou/amber12/dat/leap/lib/all_amino94ildn.lib
+Loading library: /home/shunzhou/amber12/dat/leap/lib/all_aminoct94ildn.lib
+Loading library: /home/shunzhou/amber12/dat/leap/lib/all_aminont94ildn.lib
+Loading library: /home/shunzhou/amber12/dat/leap/lib/ions94.lib
+Loading library: /home/shunzhou/amber12/dat/leap/lib/solvents.lib
+----- Source: /home/shunzhou/amber12/dat/leap/cmd/leaprc.gaff
+----- Source of /home/shunzhou/amber12/dat/leap/cmd/leaprc.gaff done
+Log file: ./leap.log
+Loading parameters: /home/shunzhou/amber12/dat/leap/parm/gaff.dat
+Reading title:
+AMBER General Force Field for organic molecules (Version 1.5, January 2013)
+Loading PDB file: ./pep.pdb
+  total atoms in file: 23
+addIons: 1st Ion & target are the same charge:
+     can't neutralize.
+ 0.000000 0 1 0
+0 Na+ ion required to neutralize.
+Adding 0 counter ions to "mol" using 1A grid
+  Solute vdw bounding box:              10.335 7.240 6.271
+  Total bounding box for atom centers:  26.335 23.240 22.271
+  Solvent unit box:                     18.774 18.774 18.774
+  Total vdw box size:                   28.912 26.308 25.544 angstroms.
+  Volume: 19429.493 A^3 
+  Total mass 6645.936 amu,  Density 0.568 g/cc
+  Added 360 residues.
+Writing pdb file: mol-solv.pdb
+ Converting N-terminal residue name to PDB format: NALA -> ALA
+ Converting C-terminal residue name to PDB format: CALA -> ALA
+Checking Unit.
+Building topology.
+Building atom parameters.
+Building bond parameters.
+Building angle parameters.
+Building proper torsion parameters.
+Building improper torsion parameters.
+ total 3 improper torsions applied
+Building H-Bond parameters.
+Incorporating Non-Bonded adjustments.
+Not Marking per-residue atom chain types.
+Marking per-residue atom chain types.
+  (Residues lacking connect0/connect1 - 
+   these don't have chain types marked:
+
+	res	total affected
+
+	CALA	1
+	NALA	1
+	WAT	360
+  )
+ (no restraints)
+	Quit
