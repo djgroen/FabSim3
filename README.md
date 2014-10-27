@@ -1,7 +1,7 @@
 FabSim
 ======
 
-FabSim is a Fabric-based automation toolkit for Scientific Simulations. It is under development.
+FabSim is a Fabric-based automation toolkit for Scientific Simulations. It is under development, and therefore not yet fully supported.
 
 Earlier derivative versions of FabSim include:
 * FabHemeLB (previously known as /FabricHemeLB/), which is used to automate workflows involving 
@@ -10,9 +10,8 @@ the source code of that).
 * FabMD, which is used to semi-automatically coarse-grain polymer systems.
 
 The aim for our work on FabSim is to create a generalized version of these two toolkits, 
-and to be aplied to other applications as well.
+and for this toolkit to be aplied to other applications as well.
 
 ## Installation and usage 
 
-FabSim is still under development, and therefore not (yet) easy to use for new users. We will 
-add documentation in the near future, as the toolkit matures.
+For instructions on how to install and test FabSim, please refer to `INSTALL.md`.
