@@ -26,7 +26,7 @@ def namd(config,**args):
   with_config(config)
   execute(put_configs,config)
   job(dict(script='namd',
-  cores=32, wall_time='12:00:00',memory='2G'),args)
+  cores=32, wall_time='1:00:00',memory='2G'),args)
 
 @task
 def namd_eq(config,**args):

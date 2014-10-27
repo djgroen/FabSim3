@@ -54,9 +54,9 @@ archer:
   # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
   home_path_template: "/home/$project/$project/$username"
   runtime_path_template: "/work/$project/$project/$username"
-  modules: ["load lammps"] #-25Sep11"]
+  modules: ["load lammps","load namd"] #-25Sep11"]
   temp_path_template: "$work_path/tmp"
-  queue: "parallel"
+  queue: "standard"
   python_build: "lib64/python2.6"
   corespernode: 24
 oppenheimer:
