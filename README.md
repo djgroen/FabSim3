@@ -15,7 +15,7 @@ Features which I hope to implement in the near future are:
 FabSim is now publicly available (as early-stage software) at: http://www.github.com/djgroen/FabSim
 
 Earlier derivative versions of FabSim include:
-* FabHemeLB (previously known as /FabricHemeLB/), which is used to automate workflows involving 
+* FabHemeLB (previously known as FabricHemeLB), which is used to automate workflows involving 
 the HemeLB lattice-Boltzmann simulation environment (see http://www.github.com/UCL/hemelb for 
 the source code of that).
 * FabMD, which is used to semi-automatically coarse-grain polymer systems.
