@@ -64,7 +64,8 @@ def find_namd_executable():
 
 @task
 def dir_structure(num_rep,path):
-    """ Creates appropriate directory structure for ensemble simulations from the initial directory structure created by BAC builder """
+    """ Creates appropriate directory structure for ensemble simulations from the initial directory structure created by BAC builder.
+        num_rep is number of replicas desired and path is the full path of the original directory created by BAC builder. """
 
     if len(num_rep)<1:
       print "error: number of replicas not defined."
