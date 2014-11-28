@@ -59,6 +59,16 @@ archer:
   queue: "standard"
   python_build: "lib64/python2.6"
   corespernode: 24
+bluejoule:
+  job_dispatch: "llq"
+  run_command: "runjob --env-all -p $corespernode -n $cores"
+  #run_ensemble_command: "runjob -n $cores_per_replica"
+  remote: "login.joule.hartree.stfc.ac.uk"
+  home_path_template: "/gpfs/home/$project/#/$username"
+  runtime_path_template: "/gpfs/home/$project/#/$username"
+  modules: "load namd/2.9"
+  queue: "standard"
+  corespernode: 16
 oppenheimer:
   remote: "oppenheimer.chem.ucl.ac.uk"
   run_command: "/opt/openmpi/gfortran/1.4.3/bin/mpirun -np $cores"
