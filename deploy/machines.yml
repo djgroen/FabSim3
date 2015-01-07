@@ -61,14 +61,16 @@ archer:
   corespernode: 24
 bluejoule:
   job_dispatch: "llq"
-  run_command: "runjob --env-all -p $corespernode -n $cores"
-  #run_ensemble_command: "runjob -n $cores_per_replica"
+  run_command: "runjob --env-all -p $corespernode -n $cores :"
+  run_ensemble_command: "runjob -n $cores_per_replica"
+  batch_header: ll
   remote: "login.joule.hartree.stfc.ac.uk"
-  home_path_template: "/gpfs/home/$project/#/$username"
-  runtime_path_template: "/gpfs/home/$project/#/$username"
+  home_path_template: "/gpfs/home/$project/$groupname/$username"
+  runtime_path_template: "/gpfs/home/$project/$groupname/$username"
   modules: "load namd/2.9"
   queue: "standard"
   corespernode: 16
+  job_name_template_sh: '$job_name_template.sh'
 oppenheimer:
   remote: "oppenheimer.chem.ucl.ac.uk"
   run_command: "/opt/openmpi/gfortran/1.4.3/bin/mpirun -np $cores"
