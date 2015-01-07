@@ -45,6 +45,22 @@ def namd_eq(config,**args):
   job(dict(script='namd-eq',
   cores=480, stages=2, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
+@task
+def namd_sim(config,**args):
+  """Submit a NAMD simulation job to the remote queue.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  stages : this is always equal to 2 for equilibration jobs
+  wall_time : wall-time job limit
+  memory : memory per node
+  """
+  with_config(config)
+  execute(put_configs,config)
+  job(dict(script='namd-sim',
+  cores=480, stages=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def find_namd_executable():
@@ -77,11 +93,14 @@ def dir_structure(num_rep,path):
 
     print "restructuring directory for ensemble simulations"
     local("mkdir %s/replicas; mkdir %s/replicas/rep1" % (path, path))
-    local("mv %s/data %s/replicas/rep1" % (path, path))
-    local("mv %s/dcds %s/replicas/rep1"% (path, path))
-    local("mv %s/equilibration %s/replicas/rep1" % (path, path))
-    local("mv %s/simulation %s/replicas/rep1" % (path, path))
-    local("mv %s/analysis_scripts %s/replicas/rep1" % (path, path))
+    for d in ['data','dcds','equilibration','simulation','analysis_scripts']:
+        local("mv %s/%s %s/replicas/rep1" % (path, d, path))
+
+    #local("mv %s/data %s/replicas/rep1" % (path, path))
+    #local("mv %s/dcds %s/replicas/rep1"% (path, path))
+    #local("mv %s/equilibration %s/replicas/rep1" % (path, path))
+    #local("mv %s/simulation %s/replicas/rep1" % (path, path))
+    #local("mv %s/analysis_scripts %s/replicas/rep1" % (path, path))
     local("mkdir %s/replicas/rep1/fe-calc; mkdir %s/replicas/rep1/fe-calc/build %s/replicas/rep1/fe-calc/amber_traj" % (path, path, path))
     for x in xrange(2, int(num_rep) + 1):
         local("cp -r %s/replicas/rep1 %s/replicas/rep%s" % (path, path, x))
