@@ -1,0 +1,29 @@
+# Copy this file as machines_user.yml, and fill in your details.
+# Details given in the default dictionary will override default settings in machines.yml
+# Details given in per-machine dictionaries will override machine settings in machines.yml
+
+default:
+  local_results: "~/work/fabsim/FabSim/results"
+  local_configs: "~/work/fabsim/FabSim/config_files"
+  ensemble_dir: "rep0/replicas"
+  username: "agastya"
+archer:
+  username: "agastya"
+  project: "e10"
+  ensemble_dir: "rep0/replicas" 
+  budget: "e10-bhati"
+#  lammps_exec: "/home/e10/e10/agastya/lammps-17Jan14/src/lmp_xc30"
+  namd_exec: "/usr/local/packages/namd/namd-2.9/bin/namd2"
+mavrino:
+  username: "agastya"
+  lammps_exec: "/store/clay/james/lammps-14Aug11/src/lmp_openmpi"
+  budget: ""
+localhost:
+  lammps_exec: "/home/james/bin/lmp_serial"
+bluejoule:
+  username: "aab93-sxz04"
+  groupname: "sxz04"
+  project: "HCP056"
+  namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
+  ensemble_dir: "rep0/replicas" 
+  
