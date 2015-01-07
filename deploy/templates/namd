@@ -4,12 +4,12 @@ module load namd/2.9
 #   This prevents any system libraries from automatically
 cp $job_results
 $run_prefix
-rm -rf results
+#rm -rf results
 #cp $job_config_path/* .
 
 #   using threading.
-export OMP_NUM_THREADS=1
+#export OMP_NUM_THREADS=1
 
-cd $$PBS_O_WORKDIR/
-$run_command $namd_exec in.conf
+#cd $$PBS_O_WORKDIR/
+$run_command $namd_exec eq0.conf > ../simulation/eq0.log
 
