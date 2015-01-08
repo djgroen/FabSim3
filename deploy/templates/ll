@@ -15,8 +15,8 @@
 #@executable=$job_name_template_sh
 #@class=prod
 #@environment=COPY_ALL
-#@output=output.txt
-#@error=error.txt
+#@output=$$(jobid).output.txt
+#@error=$$(jobid).error.txt
 #@wall_clock_limit=$wall_time
 #@notification=complete
 #@queue
@@ -24,4 +24,5 @@
 ## commands to be executed
 ######################################################################
 source /etc/profile.d/modules.sh
+
 

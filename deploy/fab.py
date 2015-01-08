@@ -64,6 +64,7 @@ def with_job(name):
     env.job_results_contents=env.pather.join(env.job_results,'*')
     env.job_results_contents_local=os.path.join(env.job_results_local,'*')
 
+    env.job_name_template_sh=template("%s.sh" % env.job_name_template)
 
 def with_template_config():
     """
@@ -194,10 +195,12 @@ def update_environment(*dicts):
 
 def calc_nodes():
   # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
+
   env.coresusedpernode=env.corespernode
   if int(env.coresusedpernode)>int(env.cores):
     env.coresusedpernode=env.cores
-    env.nodes=int(env.cores)/int(env.coresusedpernode)
+  env.nodes=int(env.cores)/int(env.coresusedpernode)
+
 
 def job(*option_dictionaries):
     """Internal low level job launcher.

@@ -17,4 +17,9 @@ mavrino:
   budget: ""
 localhost:
   lammps_exec: "/home/james/bin/lmp_serial"
-  
+bluejoule:
+  username: "dxg12-dxg01"
+  groupname: "dxg01"
+  project: "HCBG049" #"HCP056"
+  namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
+  ensemble_dir: "rep0/replicas"   
