@@ -60,7 +60,7 @@ archer:
   python_build: "lib64/python2.6"
   corespernode: 24
 bluejoule:
-  job_dispatch: "llq"
+  job_dispatch: "llsubmit"
   run_command: "runjob --env-all -p $corespernode -n $cores :"
   run_ensemble_command: "runjob -n $cores_per_replica"
   batch_header: ll
