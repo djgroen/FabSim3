@@ -2,14 +2,14 @@ module load namd/2.9
 
 # Set the number of threads to 1
 #   This prevents any system libraries from automatically
-cp $job_results
+cd $job_results
 $run_prefix
 #rm -rf results
-#cp $job_config_path/* .
+cp -r $job_config_path/* .
 
 #   using threading.
 #export OMP_NUM_THREADS=1
 
 #cd $$PBS_O_WORKDIR/
-$run_command $namd_exec eq0.conf > ../simulation/eq0.log
+$run_command $namd_exec ./sim_confs/eq0.conf > ./simulation/eq0.log
 
