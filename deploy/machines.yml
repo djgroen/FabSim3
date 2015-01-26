@@ -58,6 +58,7 @@ archer:
   temp_path_template: "$work_path/tmp"
   queue: "standard"
   python_build: "lib64/python2.6"
+  pwd: "export PBS_O_WORKDIR=$(readlink -f $$PBS_O_WORKDIR)"
   corespernode: 24
 bluejoule:
   job_dispatch: "llsubmit"
@@ -70,6 +71,7 @@ bluejoule:
   modules: "load namd/2.9"
   queue: "standard"
   corespernode: 16
+  pwd: "#"
 oppenheimer:
   remote: "oppenheimer.chem.ucl.ac.uk"
   run_command: "/opt/openmpi/gfortran/1.4.3/bin/mpirun -np $cores"
