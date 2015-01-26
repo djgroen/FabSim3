@@ -1,0 +1,45 @@
+module load namd/2.9
+
+# Make sure any symbolic links are resolved to absolute path
+$pwd
+
+# Change to the direcotry that the job was submitted from
+cd $job_results
+$run_prefix
+cp -r $job_config_path/* .
+
+# Set the number of threads to 1
+#   This prevents any system libraries from automatically
+#   using threading.
+#export OMP_NUM_THREADS=1
+
+k=0
+while [ $$k -lt $stages_eq ]; do
+    m=1
+    while [ $$m -le $replicas ]; do
+        cd $job_results/mineq_confs/
+            $run_ensemble_command $namd_exec eq$$k.conf > ../replicas/rep$$m/equilibration/eq$$k.log &
+        let m=m+1
+    done
+
+    # Wait for all simulations to complete
+    wait
+
+    let k=k+1
+done
+
+k=1
+while [ $$k -le $stages_sim ]; do
+    m=1
+    while [ $$m -le $replicas ]; do
+        cd $job_results/sim_confs/
+            $run_ensemble_command $namd_exec sim$$k.conf > ../replicas/rep$$m/simulation/sim$$k.log &
+        let m=m+1
+    done
+
+    # Wait for all simulations to complete
+    wait
+
+    let k=k+1
+done
+
