@@ -122,6 +122,7 @@ def put_configs(config=''):
     i.e. /store4/blood/username/config_files
     If you can't mount entropy, 'fetch_configs' can be useful, via 'fab entropy fetch_configs; fab legion put_configs'
     """
+
     with_config(config)
     run(template("mkdir -p $job_config_path"))
     rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
@@ -213,11 +214,11 @@ def job(*option_dictionaries):
     # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
     # cores per replica by dividing up the total core count.
     if env.get('replicas'):
-        env.cores_per_replica = env.cores / env.replicas
+        env.cores_per_replica = int(env.cores) / int(env.replicas)
 
     # Use this to request more cores than we use, to measure performance without sharing impact
     if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
-        env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*env.corespernode
+        env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*int(env.corespernode)
     # If cores_reserved is not specified, temporarily set it based on the same as the number of cores
     # Needs to be temporary if there's another job with a different number of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
@@ -226,10 +227,12 @@ def job(*option_dictionaries):
             env.node_type_restriction=template(env.node_type_restriction_template)
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):
-          calc_nodes()
-          env.run_command_one_proc=template(env.run_command)
+            calc_nodes()
+            env.run_command_one_proc=template(env.run_command)
         calc_nodes()
         env.run_command=template(env.run_command)
+        if env.get('run_ensemble_command'):
+            env.run_ensemble_command=template(env.run_ensemble_command)
         env.job_script=script_templates(env.batch_header,env.script)
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
