@@ -29,8 +29,26 @@ def namd(config,**args):
   cores=32, wall_time='1:00:00',memory='2G'),args)
 
 @task
+def bac_archer(config,**args):
+  """Submit ensemble NAMD equilibration-simulation jobs to the ARCHER.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  stages : this is usually 11 for equilibration (WT case) and 4 for simulation
+  wall_time : wall-time job limit
+  memory : memory per node
+  """
+  with_config(config)
+  execute(put_configs,config)
+  job(dict(script='bac-archer',
+  cores=480, stages_eq=11, stages_sim=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
+
+
+@task
 def namd_eq(config,**args):
-  """Submit a NAMD equilibration job to the remote queue.
+  """Submit ensemble NAMD equilibration job to the remote queue.
   The job results will be stored with a name pattern as defined in the environment,
   e.g. cylinder-abcd1234-legion-256
   config : config directory to use to define geometry, e.g. config=cylinder
@@ -42,12 +60,12 @@ def namd_eq(config,**args):
   """
   with_config(config)
   execute(put_configs,config)
-  job(dict(script='namd-eq',
+  job(dict(script='namd-eq-archer',
   cores=480, stages=2, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def namd_sim(config,**args):
-  """Submit a NAMD simulation job to the remote queue.
+  """Submit ensemble NAMD simulation job to the remote queue.
   The job results will be stored with a name pattern as defined in the environment,
   e.g. cylinder-abcd1234-legion-256
   config : config directory to use to define geometry, e.g. config=cylinder
@@ -59,7 +77,7 @@ def namd_sim(config,**args):
   """
   with_config(config)
   execute(put_configs,config)
-  job(dict(script='namd-sim',
+  job(dict(script='namd-sim-archer',
   cores=480, stages=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
 @task
