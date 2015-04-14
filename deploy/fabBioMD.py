@@ -26,7 +26,7 @@ def namd(config,**args):
   with_config(config)
   execute(put_configs,config)
   job(dict(script='namd',
-  cores=32, wall_time='1:00:00',memory='2G'),args)
+  cores=32, wall_time='1:00:00',memory='2G',jobname='NAMD'),args)
 
 @task
 def bac_archer(config,**args):
@@ -45,6 +45,38 @@ def bac_archer(config,**args):
   job(dict(script='bac-archer',
   cores=480, stages_eq=11, stages_sim=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
+@task
+def bac_archer_nmode(config,**args):
+  """Submit ensemble NMODE/MMPB(GB)SA jobs to the ARCHER.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  wall_time : wall-time job limit
+  memory : memory per node
+  """
+  with_config(config)
+  execute(put_configs,config)
+  job(dict(script='bac-archer-nmode',
+  cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
+
+@task
+def bac_archer_nm_remote(**args):
+  """Submit ensemble NMODE/MMPB(GB)SA jobs to the ARCHER.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  wall_time : wall-time job limit
+  memory : memory per node
+  """
+  with_config('')
+  #execute(put_configs,config)
+
+  job(dict(config='',script='bac-archer-nm-remote',
+  cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
 
 @task
 def namd_eq(config,**args):
