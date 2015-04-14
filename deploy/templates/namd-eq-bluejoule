@@ -1,0 +1,7 @@
+module load namd/2.9
+
+cd rep0/mineq_confs/
+for i in {0..$stages}; do
+$run_command $namd_exe eq$${i}.conf > $ensemble_dir/rep$${m}/equilibration/eq$${i}.log
+done
+

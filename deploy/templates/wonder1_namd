@@ -1,17 +1,10 @@
 module load namd/2.9
 
-# Make sure any symbolic links are resolved to absolute path
-$pwd
-
 # Change to the direcotry that the job was submitted from
 cd $job_results
 $run_prefix
 cp -r $job_config_path/* .
 
-# Set the number of threads to 1
-#   This prevents any system libraries from automatically
-#   using threading.
-#export OMP_NUM_THREADS=1
 cd $job_results/mineq_confs/
 k=0
 while [ $$k -lt $stages_eq ]; do
@@ -50,4 +43,5 @@ while [ $$k -le $stages_sim ]; do
 done
 
 rm temp.conf
-rm sim*temp*conf
+rm sim*temp*confmpiexec.hydra -n 128 namd2 sim.conf > sim8.log 
+

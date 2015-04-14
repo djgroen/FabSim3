@@ -1,0 +1,33 @@
+##########################BAC-ARCHER-NMODE##########################################################
+# This is a different version of NMODE submission script template for ARCHER where                 #
+# all required files and inputs are located on the remote machine and accessed directly from there.#
+# The standard FabBioMD scripts copy all the data from the local machine.                          #
+####################################################################################################
+module load intel
+module load amber
+module load python
+export AMBERHOME=/work/y07/y07/amber/12
+
+# Make sure any symbolic links are resolved to absolute path
+$pwd
+
+# Change to the direcotry that the job was submitted from
+cd $remote_path
+$run_prefix
+#cp -r $job_config_path/* .
+
+# Set the number of threads to 1
+#   This prevents any system libraries from automatically
+#   using threading.
+#export OMP_NUM_THREADS=1
+m=1
+while [ $$m -le $replicas ]; do
+     cd $remote_path/replicas/rep$$m/fe-calc/
+     cp ../../../build/com.top complex_prmtop
+     $run_ensemble_command $mmpbsa_exec -i ../../../nmode.in -y ../simulation/sim.dcd &
+   #  $run_ensemble_command $mmpbsa_exec -i ../../../nmode.in -rp ../../../build/rec.top -lp ../../../build/lig.top -y ../simulation/sim.dcd &
+     let m=m+1
+done
+
+# Wait for all simulations to complete
+wait

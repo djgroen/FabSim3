@@ -1,0 +1,26 @@
+#!/bin/bash
+# 
+# Copyright (C) University College London, 2007-2012, all rights reserved.
+# 
+# This file is part of HemeLB and is CONFIDENTIAL. You may not work 
+# with, install, use, duplicate, modify, redistribute or share this
+# file, or any part thereof, other than as allowed by any agreement
+# specifically made by you with University College London.
+# 
+
+##job requirements
+#######################################################################
+#LSBATCH: User input
+#BSUB -J $jobname
+#BSUB -o stdout.%J.txt
+#BSUB -e stderr.%J.txt
+#BSUB -R "span[ptile=24]"
+#BSUB -n $cores
+#BSUB -W $wall_time
+
+# setup modules
+. /etc/profile.d/modules.sh
+
+## commands to be executed
+######################################################################
+s

@@ -1,0 +1,7 @@
+module load namd/2.9
+
+cd rep0/sim_confs/
+for i in {0..$stages}; do
+$run_command $namd_exe sim$${i}.conf > $ensemble_dir/rep$${m}/simulation/sim$${i}.log
+done
+

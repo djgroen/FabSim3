@@ -1,0 +1,34 @@
+#BSUB -J NAMD_64
+#BSUB -o stdout.64.txt
+#BSUB -e stderr.64.txt
+#BSUB -R "span[ptile=24]"
+#BSUB -n 1536
+#BSUB -W 24:00
+
+cd $LS_SUBCWD
+
+# setup modules
+. /etc/profile.d/modules.sh
+module load namd/2.9
+
+# count how many processors are allocated
+NP=0
+for TOKEN in $LSB_HOSTS
+do
+   ((NP++))
+done
+
+echo $NP
+
+#echo "checking /dev/shm 1"
+#ls /dev/shm
+
+# run CHARM and NAMD
+#./charmrun ++local +p4 ./namd2 apoa1/apoa1.namd
+mkdir 64
+cp sim.conf 64
+cp eq* 64
+cp complex.top 64
+cd 64
+mpiexec.hydra -n 1536 namd2 sim.conf > sim64.log 
+
