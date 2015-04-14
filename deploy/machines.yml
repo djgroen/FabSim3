@@ -25,6 +25,7 @@ default:
   # Path to runtime accessible filesystem (default is same as build time)
   runtime_path_template: "$home_path"
   corespernode: 1
+  cores_per_replica: "${cores}"
   # Default options used in the CMake configure step.
   # Command to use to launch remote jobs
   # e.g. qsub, empty string to launch interactively.
@@ -71,6 +72,30 @@ bluejoule:
   modules: "load namd/2.9"
   queue: "standard"
   corespernode: 16
+  pwd: "#"
+bluewonder1:
+  job_dispatch: "bsub <"
+  run_command: "mpiexec.hydra -np $cores"
+  run_ensemble_command: "mpiexec.hydra -np $cores_per_replica"
+  batch_header: lsf1
+  remote: "phase1.wonder.hartree.stfc.ac.uk"
+  home_path_template: "/gpfs/home/$project/$groupname/$username"
+  runtime_path_template: "/gpfs/home/$project/$groupname/$username"
+  modules: "load namd/2.9"
+  queue: "standard"
+  corespernode: 16
+  pwd: "#"
+bluewonder2:
+  job_dispatch: "bsub <"
+  run_command: "mpiexec.hydra -np $cores"
+  run_ensemble_command: "mpiexec.hydra -np $cores_per_replica"
+  batch_header: lsf2
+  remote: "phase2.wonder.hartree.stfc.ac.uk"
+  home_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
+  runtime_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
+  modules: "load namd/2.9"
+  queue: "standard"
+  corespernode: 24
   pwd: "#"
 oppenheimer:
   remote: "oppenheimer.chem.ucl.ac.uk"
