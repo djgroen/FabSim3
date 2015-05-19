@@ -43,7 +43,7 @@ def bac_namd_archerlike(config,**args):
   with_config(config)
   execute(put_configs,config)
   job(dict(script=env.bac_ensemble_namd_script,
-  cores=480, stages_eq=11, stages_sim=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
+  cores=480, stages_eq=11, stages_sim=1, replicas=25, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def bac_namd_hartreelike(config,**args):
@@ -56,23 +56,20 @@ def bac_namd_hartreelike(config,**args):
   stages : this is usually 11 for equilibration (WT case) and 4 for simulation
   wall_time : wall-time job limit
   memory : memory per node
+  mem : memory of nodes requested for Bluewonder Phase 1. By default is 32000,
+  but higher memory nodes can be requested by using other values. For eg. use 64000 for >64 GB memory nodes.
   """
   with_config(config)
   execute(put_configs,config)
   update_environment(args)
- # env.job_name_template_sh=template("%s%s.sh" % env.job_name_template,$replica_index)
   if not env.get('replicas'):
     env.update(dict(replicas=25)) 
     print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
   #  sys.exit()
 
   for ri in xrange(1,int(env.replicas)+1):
-    env.job_name_template_sh=template("%s_%s.sh" % (env.job_name_template,str(ri)))
-    print env.job_name_template_sh
-    env.job_script=script_templates(env.batch_header,env.script,str(ri))
-    print env.job_script
     job(dict(script=env.bac_ensemble_namd_script,
-    cores=384, stages_eq=11, stages_sim=4, wall_time='6:00', memory='2G', replicas=env.replicas, replica_index=ri),args)
+    cores=384, stages_eq=11, stages_sim=1, wall_time='6:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
 
 @task
 def bac_nmode_archerlike(config,**args):
@@ -91,6 +88,32 @@ def bac_nmode_archerlike(config,**args):
   cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
 
 @task
+def bac_nmode_hartreelike(config,**args):
+  """Submits ensemble NMODE/MMPB(GB)SA equilibration-simulation jobs to HARTREE or similar machines.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  stages : this is usually 11 for equilibration (WT case) and 4 for simulation
+  wall_time : wall-time job limit
+  memory : memory per node
+  mem : memory of nodes requested for Bluewonder Phase 1. By default is 32000,
+  but higher memory nodes can be requested by using other values. For eg. use 64000 for >64 GB memory nodes.
+  """
+  with_config(config)
+  execute(put_configs,config)
+  update_environment(args)
+  if not env.get('replicas'):
+    env.update(dict(replicas=25)) 
+    print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
+  #  sys.exit()
+
+  for ri in xrange(1,int(env.replicas)+1):
+    job(dict(script=env.bac_ensemble_nmode_script,
+    cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
+
+@task
 def bac_nm_remote_archerlike(**args):
   """Submit ensemble NMODE/MMPB(GB)SA jobs to the ARCHER or similar machines, 
   when the simulation data is already on the remote machine.
@@ -101,12 +124,43 @@ def bac_nm_remote_archerlike(**args):
   cores : number of compute cores to request
   wall_time : wall-time job limit
   memory : memory per node
+  remote_path : The path of root directory where all data of ensemble jobs is located; 
+                to be provided by user as an argument
   """
   with_config('')
   #execute(put_configs,config)
-
+  #print "$results_path"
   job(dict(config='',script=env.bac_ensemble_nm_remote_script,
   cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
+
+@task
+def bac_nm_remote_hartreelike(**args):
+  """Submits ensemble NMODE/MMPB(GB)SA equilibration-simulation jobs to HARTREE or similar machines,
+  when the simulation data is already on the remote machine.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  stages : this is usually 11 for equilibration (WT case) and 4 for simulation
+  wall_time : wall-time job limit
+  memory : memory per node
+  mem : memory of nodes requested for Bluewonder Phase 1. By default is 32000,
+  but higher memory nodes can be requested by using other values. For eg. use 64000 for >64 GB memory nodes.
+  remote_path : The path of root directory where all data of ensemble jobs is located;
+                to be provided by user as an argument
+  """
+  with_config('')
+  #execute(put_configs,config)
+  update_environment(args)
+  if not env.get('replicas'):
+    env.update(dict(replicas=25)) 
+    print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
+  #  sys.exit()
+
+  for ri in xrange(1,int(env.replicas)+1):
+    job(dict(config='',script=env.bac_ensemble_nm_remote_script,
+    cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
 
 @task
 def namd_eq(config,**args):
