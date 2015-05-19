@@ -207,9 +207,13 @@ def job(*option_dictionaries):
     """Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
+    
+    print option_dictionaries
 
     update_environment(*option_dictionaries)
     with_template_job()
+
+    print option_dictionaries
 
     # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
     # cores per replica by dividing up the total core count.
@@ -225,6 +229,13 @@ def job(*option_dictionaries):
         calc_nodes()
         if env.node_type:
             env.node_type_restriction=template(env.node_type_restriction_template)
+        
+        if 'replica_index' in option_dictionaries[0].keys():
+            print "replica_index found."
+            env.name = env.name + "_" + str(env.replica_index)
+        else:
+            print "replica_index not found."
+    
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):
             calc_nodes()
