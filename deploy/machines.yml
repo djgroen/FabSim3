@@ -50,6 +50,9 @@ archer:
   run_command: "aprun -n $cores"
   run_ensemble_command: "aprun -n $cores_per_replica" # Required for BAC ensemble runs!
   batch_header: pbs-archer
+  bac_ensemble_namd_script: bac-archer
+  bac_ensemble_nmode_script: bac-archer-nmode
+  bac_ensemble_nm_remote_script: bac-archer-nm-remote
   no_ssh: true # Hector doesn't allow outgoing ssh sessions.
   remote: "login.archer.ac.uk"
   # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
@@ -75,9 +78,13 @@ bluejoule:
   pwd: "#"
 bluewonder1:
   job_dispatch: "bsub <"
-  run_command: "mpiexec.hydra -np $cores"
-  run_ensemble_command: "mpiexec.hydra -np $cores_per_replica"
+  run_command: "mpiexec.hydra -n $cores"
+  run_ensemble_command: "mpiexec.hydra -n $cores_per_replica"
   batch_header: lsf1
+  bac_ensemble_namd_script: bac-wonder-namd
+  bac_ensemble_nmode_script: bac-wonder1-nmode
+#  bac_ensemble_nmode_script: bac-wonder1-nmode-test
+  bac_ensemble_nm_remote_script: bac-wonder1-nm-remote
   remote: "phase1.wonder.hartree.stfc.ac.uk"
   home_path_template: "/gpfs/home/$project/$groupname/$username"
   runtime_path_template: "/gpfs/home/$project/$groupname/$username"
@@ -87,9 +94,13 @@ bluewonder1:
   pwd: "#"
 bluewonder2:
   job_dispatch: "bsub <"
-  run_command: "mpiexec.hydra -np $cores"
-  run_ensemble_command: "mpiexec.hydra -np $cores_per_replica"
+  run_command: "mpiexec.hydra -n $cores"
+  run_ensemble_command: "mpiexec.hydra -n $cores_per_replica"
   batch_header: lsf2
+  bac_ensemble_namd_script: bac-wonder-namd
+  bac_ensemble_nmode_script: bac-wonder2-nmode
+#  bac_ensemble_nmode_script: bac-wonder2-nmode-test
+  bac_ensemble_nm_remote_script: bac-wonder2-nm-remote
   remote: "phase2.wonder.hartree.stfc.ac.uk"
   home_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
   runtime_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
