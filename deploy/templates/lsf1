@@ -10,11 +10,11 @@
 ##job requirements
 ##########################################################################
 #LSBATCH: User input
-#BSUB -J $jobname 
+#BSUB -J $job_name 
 #BSUB -o stdout.%J.txt
 #BSUB -e stderr.%J.txt
 #BSUB -R "span[ptile=16]"
-##BSUB -R "rusage[mem=64000]"
+#BSUB -R "rusage[mem=$mem]"
 #BSUB -n $cores
 #BSUB -W $wall_time
 

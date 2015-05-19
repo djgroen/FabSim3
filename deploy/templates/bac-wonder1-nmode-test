@@ -1,0 +1,30 @@
+#cd $$LS_SUBCWD
+module load amber/14
+
+# Change to the direcotry that the job was submitted from
+cd $job_results
+$run_prefix
+cp -r $job_config_path/* .
+
+echo "checking /dev/shm 1"
+ls /dev/shm
+
+cd replicas/rep$replica_index/fe-calc
+# run MMPBSA
+$run_command $mmpbsa_exec -prefix /dev/shm/_MMPBSA_ -i ../../nmode.in -cp ../../../build/com.top -y ../simulation/sim.dcd
+
+# cat files onto disk
+export My_WD=$$PWD
+cd /dev/shm
+/gpfs/packages/gcc/utilities/bin/zip $$My_WD/MMPBSA.zip _MMPBSA_*
+
+echo "checking /dev/shm 2"
+ls
+
+# next delete files
+rm _MMPBSA_*
+
+echo "checking /dev/shm 3"
+ls
+
+

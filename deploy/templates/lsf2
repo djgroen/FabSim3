@@ -11,7 +11,7 @@
 ##job requirements
 #######################################################################
 #LSBATCH: User input
-#BSUB -J $jobname
+#BSUB -J $job_name
 #BSUB -o stdout.%J.txt
 #BSUB -e stderr.%J.txt
 #BSUB -R "span[ptile=24]"
@@ -23,4 +23,4 @@
 
 ## commands to be executed
 ######################################################################
-s
+

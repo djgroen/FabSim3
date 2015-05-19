@@ -11,7 +11,7 @@ export AMBERHOME=/work/y07/y07/amber/12
 # Make sure any symbolic links are resolved to absolute path
 $pwd
 
-# Change to the direcotry that the job was submitted from
+# Change to the direcotry where data is located provided by user on command line
 cd $remote_path
 $run_prefix
 #cp -r $job_config_path/* .
