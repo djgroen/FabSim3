@@ -248,6 +248,11 @@ def job(*option_dictionaries):
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
         put(env.job_script,env.dest_name)
+        
+        if 'remote_path' in option_dictionaries[1].keys():
+            print "remote_path found."
+            env.job_results = env.remote_path
+        
         run(template("mkdir -p $job_results && cp $dest_name $job_results && chmod u+x $dest_name")) #bundled 3 ssh sessions into one to improve performance.
         with tempfile.NamedTemporaryFile() as tempf:
             tempf.write(yaml.dump(dict(env)))
