@@ -92,6 +92,7 @@ bluewonder1:
   queue: "standard"
   corespernode: 16
   pwd: "#"
+  stat: "bjobs -W"
 bluewonder2:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
