@@ -138,13 +138,11 @@ def complete_environment():
     env.local_templates_path=os.path.expanduser(template(env.local_templates_path))
   
     module_commands=["module %s"%module for module in env.modules]
+    env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'
 
     if env.temp_path_template:
         env.temp_path=template(env.temp_path_template)
-#        run_prefix_commands.append(template("export TMP=$temp_path"))
-#        run_prefix_commands.append(template("export TMPDIR=$temp_path"))
 
-#    env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'
     #env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
     cmd=os.popen(template("hg id -q -i"))
