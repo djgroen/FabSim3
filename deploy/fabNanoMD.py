@@ -86,9 +86,13 @@ def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.
     fetch_results(regex="*%s*" % (config_name))
 
 @task
-def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0.3, script="ibi.sh", atom_dir=os.path.join(env.localroot,'python'), **args):
+def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0.3, script="ibi.sh", atom_dir="default", **args):
     """ Do multiple IBI iterations in one command. 
     Example use: fab hector full_ibi_multi:start_iter=7,num_iters=3,config_name=2peg,outdir_suffix=_hector_32,cores=32,wall_time=3:0:0 """
+
+    if atom_dir == "default":
+        atom_dir =  os.path.join(env.localroot,"results","%s%d%s" % (config_name,1,outdir_suffix))
+
     si = int(start_iter)
     ni = int(num_iters)
     
@@ -109,7 +113,7 @@ def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0
         #        print "(FabMD:) Pressure has converged. OPTIMIZATION COMPLETE"
         #        break  
 
-### Utitility Functions
+### Utility Functions
 
 def lammps_get_pressure(log_dir,number):
     steps = []
