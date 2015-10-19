@@ -1,0 +1,71 @@
+# This file is for a LAMMPS simulation created by James Suter  
+# Initialization settings  
+  
+units real # default  
+  
+atom_style full  
+  
+dimension 3 # default  
+  
+  
+  
+boundary p p p  
+  
+  
+  
+neighbor 3.0 bin  
+  
+neigh_modify every 1 delay 2 check yes  
+  
+pair_style table linear 1000  
+  
+bond_style hybrid table spline 200 harmonic  
+  
+angle_style hybrid table linear 200 harmonic cosine  
+  
+dihedral_style multi/harmonic  
+  
+improper_style none  
+  
+special_bonds lj/coul 0.0 0.0 0.0  
+  
+read_data lammps_data_file  
+  
+bond_coeff 1 table bond.3.new.1 bond.3.new.1 
+  
+pair_coeff 1 1 pot.1.new.1.1 TABLE_1.1  
+  
+angle_coeff 1 table angle.1.extrap.end angle.1.extrap # no_iterate 
+  
+dihedral_coeff 1 0.475781965281184 -0.314256605389516 0.159091697004323 -0.0323325128930865 -0.122284482594338 
+  
+  
+  
+compute myRDF all rdf 398 1 1  
+fix 1 all ave/time 1000 1 1000 c_myRDF file tmp.1.rdf mode vector  
+  
+#dump            5 all custom 1000000 new_CG.prod3.pos id type xs ys zs vx vy vz 
+  
+restart 2500000 new_CG.prod1.restart1  
+  
+thermo 100  
+  
+thermo_style custom step cpu temp press pe ke evdwl ecoul epair ebond eangle edihed lx ly lz vol pxx pyy pzz pxy pxz pyz  
+  
+thermo_modify flush yes line multi format float %g format 3 %15.8g  
+  
+log  new_CG.prod1.log 
+  
+# Pression and temperature controls  
+  
+  
+fix 3 all nvt temp 500.0 500.0 100.0  
+  
+#reset_timestep 0  
+timestep 5  
+run_style verlet  
+  
+run  250000 
+  
+  
+  
