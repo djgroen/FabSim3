@@ -7,6 +7,8 @@ $run_prefix
 #rm -rf results
 cp -r $job_config_path/* .
 
+/usr/bin/env > env.log
+
 #   using threading.
 #export OMP_NUM_THREADS=1
 
