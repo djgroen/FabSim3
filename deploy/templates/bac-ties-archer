@@ -4,17 +4,19 @@ module load namd/2.9
 $pwd
 
 # Change to the direcotry that the job was submitted from
-cd $job_results
+mkdir -p $job_results/LAMBDA_$lambda_index
+cd $job_results/LAMBDA_$lambda_index
 $run_prefix
-cp -r $job_config_path/* .
+cp -r $job_config_path/LAMBDA_$lambda_index/* .
 
 # Set the number of threads to 1
 #   This prevents any system libraries from automatically
 #   using threading.
 #export OMP_NUM_THREADS=1
-cd $job_results/mineq_confs/
+cd $job_results/LAMBDA_$lambda_index/mineq_confs/
 k=0
 while [ $$k -le $stages_eq ]; do
+    sed -i "s/LAMBDA/$lambda_index/g" eq$$k.conf
     sed "s/equilibration/replicas\/REP\/equilibration/" eq$$k.conf > eq$$k-new.conf
     m=1
     while [ $$m -le $replicas ]; do
@@ -32,9 +34,10 @@ done
 rm eq*temp*conf
 rm eq*-new.conf
 
-cd $job_results/sim_confs/
+cd $job_results/LAMBDA_$lambda_index/sim_confs/
 k=1
 while [ $$k -le $stages_sim ]; do
+    sed -i "s/LAMBDA/$lambda_index/g" sim$$k.conf
     sed "s/equilibration/replicas\/REP\/equilibration/" sim$$k.conf > temp.conf
     sed "s/simulation/replicas\/REP\/simulation/" temp.conf > sim$$k-new.conf
     m=1

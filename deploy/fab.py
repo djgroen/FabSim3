@@ -235,6 +235,12 @@ def job(*option_dictionaries):
             env.name = env.name + "_" + str(env.replica_index)
         else:
             print "replica_index not found."
+
+        if 'lambda_index' in option_dictionaries[0].keys():
+            print "lambda_index found."
+            env.name = env.name + "_" + str(env.lambda_index)
+        else:
+            print "lambda_index not found."
     
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):

@@ -43,7 +43,7 @@ def bac_namd_archerlike(config,**args):
   with_config(config)
   execute(put_configs,config)
   job(dict(script=env.bac_ensemble_namd_script,
-  cores=480, stages_eq=11, stages_sim=1, replicas=25, wall_time='24:00:00',memory='2G'),args)
+  cores=2400, stages_eq=11, stages_sim=1, replicas=25, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def bac_namd_hartreelike(config,**args):
@@ -70,6 +70,21 @@ def bac_namd_hartreelike(config,**args):
   for ri in xrange(1,int(env.replicas)+1):
     job(dict(script=env.bac_ensemble_namd_script,
     cores=384, stages_eq=11, stages_sim=1, wall_time='6:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
+
+@task
+def bac_ties_archerlike(config,**args):
+  """Creates appropriate directory structure for TIES calculation given that it is already restructured using dir_structure function of FabSim.
+  """
+  with_config(config)
+  execute(put_configs,config)
+  update_environment(args)
+  if not env.get('lambda_list'):
+    env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
+    print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
+
+  for i in env.lambda_list.split(" "):
+    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, x))
+    job(dict(script=env.bac_ties_script,cores=960, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, lambda_index='%.2f' % i, wall_time='10:00:00', memory='2G'),args)
 
 @task
 def bac_nmode_archerlike(config,**args):
@@ -131,7 +146,7 @@ def bac_nm_remote_archerlike(**args):
   #execute(put_configs,config)
   #print "$results_path"
   job(dict(config='',script=env.bac_ensemble_nm_remote_script,
-  cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
+  cores=1200, replicas=25, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def bac_nm_remote_hartreelike(**args):
@@ -215,7 +230,7 @@ def find_namd_executable():
 @task
 def dir_structure(num_rep,path):
     """ Creates appropriate directory structure for ensemble simulations from the initial directory structure created by BAC builder.
-        num_rep is number of replicas desired and path is the full path of the original directory created by BAC builder. """
+        num_rep is number of replicas desired and path is the full path (upto rep0) of the original directory created by BAC builder. """
 
     if len(num_rep)<1:
       print "error: number of replicas not defined."
@@ -226,11 +241,13 @@ def dir_structure(num_rep,path):
       sys.exit()
 
     print "restructuring directory for ensemble simulations"
-    local("mkdir %s/replicas; mkdir %s/replicas/rep1" % (path, path))
-    for d in ['data','dcds','equilibration','simulation','analysis_scripts']:
-        local("mv %s/%s %s/replicas/rep1" % (path, d, path))
+    local("mkdir -p %s/replicas/rep1" % path)
+    for d in ['data', 'dcds', 'analysis_scripts', 'run_scripts']:
+        local("rm -r %s/%s" % (path, d))
+    for d in ['equilibration','simulation']:
+        local("mv %s/%s %s/replicas/rep1 2>/dev/null; true" % (path, d, path))
     local("mv %s/fe-calc/build/* %s/build/ ; rm -r %s/fe-calc" % (path, path, path))
-    local("mkdir %s/replicas/rep1/fe-calc" % path)
+    local("mkdir -p %s/replicas/rep1/fe-calc" % path)
     for x in xrange(2, int(num_rep) + 1):
         local("cp -r %s/replicas/rep1 %s/replicas/rep%s" % (path, path, x))
 
