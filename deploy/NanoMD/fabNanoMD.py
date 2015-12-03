@@ -108,10 +108,10 @@ def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.
 def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python'), **args): 
     """ Performs both do_ibi and runs lammps with the newly created config file. 
     Example use: fab hector full_ibi:config=2peg4,number=3,outdir=2peg3_hector_32,config_name=2peg,cores=32,wall_time=3:0:0 """
-    print "HERE"
+    print "Starting PMF script."
     do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
-    print "NOW HERE"
-    env.lammps_args = "-partition %sx%s" % (int(env.replicas), int(env.cores)/int(env.replicas))
+    print "PMF script finished. Launching LAMMPS."
+    env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(env.cores_per_replica), int(env.cores_per_replica))
     lammps(config, **args)
     wait_complete()
     fetch_results(regex="*%s*" % (config_name))
