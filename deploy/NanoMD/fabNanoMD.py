@@ -111,6 +111,7 @@ def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_sc
     print "HERE"
     do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
     print "NOW HERE"
+    env.lammps_args = "-partition %sx%s" % (int(env.replicas), int(env.cores)/int(env.replicas))
     lammps(config, **args)
     wait_complete()
     fetch_results(regex="*%s*" % (config_name))
