@@ -8,7 +8,7 @@
 # specifically made by you with University College London.
 # 
 
-from fab import *
+from ..fab import *
 
 @task
 def namd(config,**args):
