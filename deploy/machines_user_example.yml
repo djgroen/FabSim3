@@ -5,14 +5,14 @@
 default:
   local_results: "~/Codes/FabSim/results"
   local_configs: "~/Codes/FabSim/config_files"
-  username: "derek"
+  username: "james"
 archer:
-  username: "dgroen"
+  username: "ucljames"
   project: "e283"
-  budget: "e283-groen"
-  lammps_exec: "/home/e283/e283/dgroen/lammps-17Jan14/src/lmp_xc30"
+  budget: "e283-suter"
+  lammps_exec: "/home/e283/e283/ucljames/lmp_xc30"
 mavrino:
-  username: "derek"
+  username: "james"
   lammps_exec: "/store/clay/james/lammps-14Aug11/src/lmp_openmpi"
   budget: ""
 localhost:
