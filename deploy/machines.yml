@@ -44,6 +44,7 @@ default:
   manual_ssh: false
   local_templates_path: "$localroot/deploy/templates"
   stat: qstat
+  lammps_args: ""
 archer:
   max_job_name_chars: 15
   job_dispatch: "qsub"
