@@ -179,39 +179,6 @@ def bac_nm_remote_hartreelike(**args):
     job(dict(config='',script=env.bac_ensemble_nm_remote_script,
     cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
 
-@task
-def namd_eq(config,**args):
-  """Submit ensemble NAMD equilibration job to the remote queue.
-  The job results will be stored with a name pattern as defined in the environment,
-  e.g. cylinder-abcd1234-legion-256
-  config : config directory to use to define geometry, e.g. config=cylinder
-  Keyword arguments:
-  cores : number of compute cores to request
-  stages : this is always equal to 2 for equilibration jobs
-  wall_time : wall-time job limit
-  memory : memory per node
-  """
-  with_config(config)
-  execute(put_configs,config)
-  job(dict(script='namd-eq-archer',
-  cores=480, stages=2, replicas=5, wall_time='24:00:00',memory='2G'),args)
-
-@task
-def namd_sim(config,**args):
-  """Submit ensemble NAMD simulation job to the remote queue.
-  The job results will be stored with a name pattern as defined in the environment,
-  e.g. cylinder-abcd1234-legion-256
-  config : config directory to use to define geometry, e.g. config=cylinder
-  Keyword arguments:
-  cores : number of compute cores to request
-  stages : this is always equal to 2 for equilibration jobs
-  wall_time : wall-time job limit
-  memory : memory per node
-  """
-  with_config(config)
-  execute(put_configs,config)
-  job(dict(script='namd-sim-archer',
-  cores=480, stages=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def find_namd_executable():
