@@ -45,6 +45,7 @@ default:
   manual_gsissh: false
   local_templates_path: "$localroot/deploy/templates"
   stat: qstat
+  lammps_args: ""
 archer:
   max_job_name_chars: 15
   job_dispatch: "qsub"
@@ -75,7 +76,7 @@ bluejoule:
   remote: "login.joule.hartree.stfc.ac.uk"
   home_path_template: "/gpfs/home/$project/$groupname/$username"
   runtime_path_template: "/gpfs/home/$project/$groupname/$username"
-  modules: "load namd/2.9"
+  modules: ["load namd/2.9"]
   queue: "standard"
   corespernode: 16
   pwd: "#"
@@ -91,7 +92,7 @@ bluewonder1:
   remote: "phase1.wonder.hartree.stfc.ac.uk"
   home_path_template: "/gpfs/home/$project/$groupname/$username"
   runtime_path_template: "/gpfs/home/$project/$groupname/$username"
-  modules: "load namd/2.9"
+  modules: ["load namd/2.9"]
   queue: "standard"
   corespernode: 16
   pwd: "#"
@@ -108,7 +109,7 @@ bluewonder2:
   remote: "phase2.wonder.hartree.stfc.ac.uk"
   home_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
   runtime_path_template: "/gpfs/stfc/local/$project/$groupname/$username"
-  modules: "load namd/2.9"
+  modules: ["load namd/2.9"]
   queue: "standard"
   corespernode: 24
   pwd: "#"

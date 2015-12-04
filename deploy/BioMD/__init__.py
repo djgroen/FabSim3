@@ -6,8 +6,4 @@
 # file, or any part thereof, other than as allowed by any agreement
 # specifically made by you with University College London.
 # 
-cd $job_results
-$run_prefix
-rm -rf results
-cp -r $job_config_path/* .
-$run_command $lammps_exec $lammps_args < in.CG.lammps > log.lammps
+

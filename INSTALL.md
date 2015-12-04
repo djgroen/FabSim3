@@ -25,3 +25,8 @@ You can install them any way you like. Most people prefer `pip`, although you co
 4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabric_dirs`.
 5. Run the LAMMPS test data set using: `fab localhost lammps:lammps_lj_liquid,cores=1,wall_time=1:00:0`.
 6. You can find the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
+
+### Creating the relevant FabSim directories on a local or remote host
+
+1. Ensure that you have modified `machines_user.yml` to contain correct information for your target machine.
+2. Run `fab <machine_name> setup_fabric_dirs`.

@@ -19,9 +19,12 @@ General FabSim commands:
     wait_complete         Wait until all jobs currently qsubbed are complete, then return
 
 FabMD:
-    do_ibi                Copy the obtained output to a work directory, do an IBI iteration and make a new config file from the resulting data.
+    do_ibi                Copy the obtained output to a work directory, do an IBI (Iterative Boltzmann Inversion) iteration and make a new config file from the resulting data.
+    do_pmf                Copy the obtained output to a work directory, do an PMF (Potential Mean Force) iteration and make a new config file from the resulting data.
     full_ibi              Performs both do_ibi and runs lammps with the newly created config file.
     full_ibi_multi        Do multiple IBI iterations in one command.
+    full_pmf              Performs both do_pmf and runs lammps with the newly created config file.
+    full_pmf_multi        Do multiple PMF iterations in one command.
     ibi_analysis_multi    Recreate IBI analysis results based on the output files provided.
     lammps                Submit a LAMMPS job to the remote queue.
 

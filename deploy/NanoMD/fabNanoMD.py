@@ -53,6 +53,7 @@ def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes", ibi_script
     """ Copy the obtained output to a work directory, do an IBI iteration and make a new config file from the resulting data. """
     ibi_in_dir = os.path.join(env.localroot,'results',outdir)
     ibi_out_dir = os.path.join(env.localroot,'output_blackbox',os.path.basename(ibi_script),outdir)
+    ibi_script_dir=os.path.join(env.localroot,'python')
     local("mkdir -p %s" % (ibi_out_dir))
 #    if copy=="yes":
 #      blackbox("copy_lammps_results.sh", "%s %s %d" % (os.path.join(env.localroot,'results',outdir), os.path.join(env.localroot,'python'), int(number)))
@@ -61,6 +62,24 @@ def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes", ibi_script
         blackbox("prepare_lammps_config.sh", "%s %s %s %d %s" % (ibi_out_dir, os.path.join(env.localroot,'config_files'), config_name, int(number)+1, atom_dir))
 
 @task
+ 
+@task
+def do_pmf(number, outdir, atom_type1, atom_type2, config_name="peg", copy="yes", pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python')):
+    """ Copy the obtained output to a work directory, do an IBI iteration and make a new config file from the resulting data. """
+    pmf_in_dir = os.path.join(env.localroot,'results',outdir)
+    pmf_out_dir = os.path.join(env.localroot,'output_blackbox',outdir) 
+    #pmf_out_dir = os.path.join(env.localroot,'output_blackbox',os.path.basename(pmf_script),outdir)
+    ibi_script_dir=os.path.join(env.localroot,'python')
+    local("mkdir -p %s" % (pmf_out_dir))
+#    if copy=="yes":
+#      blackbox("copy_lammps_results.sh", "%s %s %d" % (os.path.join(env.localroot,'results',outdir), os.path.join(env.localroot,'python'), int(number)))
+    blackbox(pmf_script, "%s %s %s %s %s %s %s " % (atom_type1, atom_type2, number, pmf_in_dir, pmf_out_dir, atom_dir, ibi_script_dir))
+    if copy=="yes":
+        blackbox("prepare_lammps_config_pmf.sh", "%s %s %s %d %s " % (pmf_out_dir, os.path.join(env.localroot,'config_files'), config_name, int(number)+1, atom_dir))
+
+@task
+
+
 def ibi_analysis_multi(start_iter, num_iters, outdir_prefix, outdir_suffix, ibi_script="ibi.sh", pressure=1, atom_dir=os.path.join(env.localroot,'python')):
     """ Recreate IBI analysis results based on the output files provided.
     Example use: fab hector ibi_analysis_multi:start_iter=7,num_iters=3,outdir_prefix=peg_,outdir_suffix=_hector_32 """
@@ -85,6 +104,18 @@ def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.
     wait_complete()
     fetch_results(regex="*%s*" % (config_name))
 
+@task
+def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python'), **args): 
+    """ Performs both do_ibi and runs lammps with the newly created config file. 
+    Example use: fab hector full_ibi:config=2peg4,number=3,outdir=2peg3_hector_32,config_name=2peg,cores=32,wall_time=3:0:0 """
+    print "Starting PMF script."
+    do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
+    print "PMF script finished. Launching LAMMPS."
+    env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(env.cores_per_replica), int(env.cores_per_replica))
+    lammps(config, **args)
+    wait_complete()
+    fetch_results(regex="*%s*" % (config_name))
+    
 @task
 def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0.3, script="ibi.sh", atom_dir="default", **args):
     """ Do multiple IBI iterations in one command. 
@@ -113,7 +144,25 @@ def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0
         #        print "(FabMD:) Pressure has converged. OPTIMIZATION COMPLETE"
         #        break  
 
-### Utility Functions
+
+@task
+def full_pmf_multi(start_iter, num_iters, config_name, outdir_suffix, atom_type1, atom_type2, script="pmf.sh", atom_dir="default", **args):
+    """ Do multiple PMF iterations in one command. 
+    Example use: fab hector full_ibi_multi:start_iter=7,num_iters=3,config_name=2peg,outdir_suffix=_hector_32,cores=32,wall_time=3:0:0 """
+
+    if atom_dir == "default":
+        atom_dir =  os.path.join(env.localroot,"results","%s%d%s" % (config_name,1,outdir_suffix))
+
+    si = int(start_iter)
+    ni = int(num_iters)
+    
+    pressure_changed = 0
+    
+    for i in xrange(si,si+ni):       
+        full_pmf("%s%d" % (config_name,i+1), i, "%s%d%s" % (config_name,i,outdir_suffix), config_name, atom_type1, atom_type2, script, atom_dir, **args)
+        
+    
+ 
 
 def lammps_get_pressure(log_dir,number):
     steps = []
