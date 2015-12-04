@@ -220,6 +220,11 @@ def job(*option_dictionaries):
     if env.get('replicas'):
         env.cores_per_replica = int(env.cores) / int(env.replicas)
 
+    if env.get('lambda_list'):
+	env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
+	if env.get('replicas'):
+	    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
+
     # Use this to request more cores than we use, to measure performance without sharing impact
     if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
         env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*int(env.corespernode)
@@ -250,6 +255,8 @@ def job(*option_dictionaries):
         env.run_command=template(env.run_command)
         if env.get('run_ensemble_command'):
             env.run_ensemble_command=template(env.run_ensemble_command)
+	if env.get('run_ensemble_command_ties'):
+	    env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
         env.job_script=script_templates(env.batch_header,env.script)
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
@@ -300,8 +307,22 @@ def manual(cmd):
     manual_command=" && ".join(commands)
     pre_cmd = "ssh -Y -p %(port)s %(user)s@%(host)s " % env
     local(pre_cmd + "'"+manual_command+"'", capture=False)
-    
+
+#def manual_gsissh(cmd):
+#    #From the fabric wiki, bypass fabric internal ssh control
+#    commands=env.command_prefixes[:]
+#    if env.get('cwd'):
+#        commands.append("cd %s"%env.cwd)
+#    commands.append(cmd)
+#    manual_command=" && ".join(commands)
+#
+#    pre_cmd = "gsissh -p %(port)s %(host)s " % env
+#    local(pre_cmd + "'"+manual_command+"'", capture=False)
+#    
 def run(cmd):
+#    if env.manual_gsissh:
+#        return manual_gsissh(cmd)
+#    else if env.manual_ssh:
     if env.manual_ssh:
         return manual(cmd)
     else:
