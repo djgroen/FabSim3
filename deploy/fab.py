@@ -17,6 +17,9 @@ import re
 import numpy as np
 import yaml
 import tempfile
+from pprint import PrettyPrinter
+pp=PrettyPrinter()
+
 
 @task
 def stat():
@@ -64,7 +67,7 @@ def with_job(name):
     env.job_results_contents=env.pather.join(env.job_results,'*')
     env.job_results_contents_local=os.path.join(env.job_results_local,'*')
 
-    env.job_name_template_sh=template("%s.sh" % env.job_name_template)
+    #env.job_name_template_sh=template("%s.sh" % env.job_name_template)
 
 def with_template_config():
     """
@@ -140,7 +143,7 @@ def put_results(name=''):
     rsync_project(local_dir=env.job_results_local+'/',remote_dir=env.job_results)
 
 @task
-def fetch_results(name='',regex=''):
+def fetch_results(name='',regex='',debug=False):
     """
     Fetch results of remote jobs to local result store.
     Specify a job name to transfer just one job.
@@ -148,6 +151,9 @@ def fetch_results(name='',regex=''):
     i.e. /store4/blood/username/results.
     If you can't mount entropy, 'put results' can be useful,  via 'fab legion fetch_results; fab entropy put_results'
     """
+    
+    if debug:
+        pp.pprint(env)
     with_job(name)
     local(template("rsync -pthrvz $username@$remote:$job_results/%s $job_results_local" % regex))
 
