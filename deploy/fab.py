@@ -67,8 +67,6 @@ def with_job(name):
     env.job_results_contents=env.pather.join(env.job_results,'*')
     env.job_results_contents_local=os.path.join(env.job_results_local,'*')
 
-    #env.job_name_template_sh=template("%s.sh" % env.job_name_template)
-
 def with_template_config():
     """
     Determine the name of a used or generated config from environment parameters, and then define additional environment parameters based on it.

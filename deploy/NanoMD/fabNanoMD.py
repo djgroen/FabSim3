@@ -111,6 +111,7 @@ def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_sc
     print "Starting PMF script."
     do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
     print "PMF script finished. Launching LAMMPS."
+    update_environment(args)
     env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(env.cores_per_replica), int(env.cores_per_replica))
     lammps(config, **args)
     wait_complete()
