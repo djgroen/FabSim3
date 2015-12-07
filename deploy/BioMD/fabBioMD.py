@@ -87,7 +87,7 @@ def bac_ties_archerlike(config,**args):
     env.cores=12480
 
   env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
-  if 'replicas' in option_dictionaries[0].keys():
+  if env.get('replicas'):
     env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
 
 
