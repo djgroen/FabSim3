@@ -187,6 +187,9 @@ def bac_nm_remote_hartreelike(**args):
 
 @task
 def find_namd_executable():
+  """
+  Searches module system to locate a NAMD executable.
+  """
   namd_modules = probe('namd')
   print namd_modules
   for line in namd_modules.split("\n"):

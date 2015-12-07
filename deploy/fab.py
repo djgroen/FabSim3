@@ -283,6 +283,9 @@ def input_to_range(arg,default):
 
 @task
 def get_running_location(job=None):
+    """
+    Returns the node name where a given job is running.
+    """
     if job:
         with_job(job)
     env.running_node=run(template("cat $job_results/env_details.asc"))

@@ -79,6 +79,9 @@ env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or
 
 @task
 def diagnostics():
+    """
+    Performs basic machine-level diagnostics.
+    """
     pp.pprint(env)
     pp.pprint(sys.path)
     import HemeLbSetupTool
