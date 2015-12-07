@@ -208,24 +208,14 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
     
-    print type(env)
-
     update_environment(*option_dictionaries)
     with_template_job()
-
-    print env.get('lambda_list')
 
     # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
     # cores per replica by dividing up the total core count.
     if 'replicas' in option_dictionaries[0].keys():
         env.cores_per_replica = int(env.cores) / int(env.replicas)
 
-
-    #if 'lambda_list' in option_dictionaries[0].keys():
-    #    print "FabSim ENV: Option ``lambda_list'' is enabled."
-    #	env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
-    #	if 'replicas' in option_dictionaries[0].keys():
-    #	    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
 
     # Use this to request more cores than we use, to measure performance without sharing impact
     if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
@@ -241,14 +231,10 @@ def job(*option_dictionaries):
         if 'replica_index' in option_dictionaries[0].keys():
             print "replica_index found."
             env.name = env.name + "_" + str(env.replica_index)
-        else:
-            print "replica_index not found."
 
         if 'lambda_index' in option_dictionaries[0].keys():
             print "lambda_index found."
             env.name = env.name + "_" + str(env.lambda_index)
-        else:
-            print "lambda_index not found."
     
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):
