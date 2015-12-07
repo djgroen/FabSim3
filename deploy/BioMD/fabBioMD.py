@@ -82,9 +82,11 @@ def bac_ties_archerlike(config,**args):
     env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
     print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
 
-  for i in env.lambda_list.split(" "):
-    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, x))
-    job(dict(script=env.bac_ties_script,cores=960, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, lambda_index='%.2f' % i, wall_time='10:00:00', memory='2G'),args)
+  job(dict(script=env.bac_ties_script,cores=12480, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, wall_time='12:00:00', memory='2G'),args)
+
+#  for i in env.lambda_list.split(" "):
+#    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, float(i)))
+#    job(dict(script=env.bac_ties_script,cores=960, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, lambda_index='%.2f' % float(i), wall_time='12:00:00', memory='2G'),args)
 
 @task
 def bac_nmode_archerlike(config,**args):
@@ -177,39 +179,6 @@ def bac_nm_remote_hartreelike(**args):
     job(dict(config='',script=env.bac_ensemble_nm_remote_script,
     cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
 
-@task
-def namd_eq(config,**args):
-  """Submit ensemble NAMD equilibration job to the remote queue.
-  The job results will be stored with a name pattern as defined in the environment,
-  e.g. cylinder-abcd1234-legion-256
-  config : config directory to use to define geometry, e.g. config=cylinder
-  Keyword arguments:
-  cores : number of compute cores to request
-  stages : this is always equal to 2 for equilibration jobs
-  wall_time : wall-time job limit
-  memory : memory per node
-  """
-  with_config(config)
-  execute(put_configs,config)
-  job(dict(script='namd-eq-archer',
-  cores=480, stages=2, replicas=5, wall_time='24:00:00',memory='2G'),args)
-
-@task
-def namd_sim(config,**args):
-  """Submit ensemble NAMD simulation job to the remote queue.
-  The job results will be stored with a name pattern as defined in the environment,
-  e.g. cylinder-abcd1234-legion-256
-  config : config directory to use to define geometry, e.g. config=cylinder
-  Keyword arguments:
-  cores : number of compute cores to request
-  stages : this is always equal to 2 for equilibration jobs
-  wall_time : wall-time job limit
-  memory : memory per node
-  """
-  with_config(config)
-  execute(put_configs,config)
-  job(dict(script='namd-sim-archer',
-  cores=480, stages=4, replicas=5, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def find_namd_executable():

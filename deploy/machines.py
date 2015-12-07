@@ -130,6 +130,7 @@ def complete_environment():
     env.work_path=template(env.work_path_template)
     env.remote_path=template(env.remote_path_template)
     env.lammps_exec=template(env.lammps_exec)
+    env.lammps_args=template(env.lammps_args)
     env.results_path=env.pather.join(env.work_path,"results")
     env.config_path=env.pather.join(env.work_path,"config_files")
     env.scripts_path=env.pather.join(env.work_path,"scripts")
