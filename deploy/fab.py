@@ -251,7 +251,11 @@ def job(*option_dictionaries):
         if 'run_ensemble_command' in option_dictionaries[0].keys():
             env.run_ensemble_command=template(env.run_ensemble_command)
 	if 'run_ensemble_command_ties' in option_dictionaries[0].keys():
-	    env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
+
+            pp.pprint(env)
+
+	    env.run_ensemble_command_ties=template(template(env.run_ensemble_command_ties))
+
         env.job_script=script_templates(env.batch_header,env.script)
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
