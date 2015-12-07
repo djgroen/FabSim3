@@ -14,9 +14,9 @@ fab $machine_name $function_name:$config_name,optional_arguments
 
 where $function_name can be either `bac_namd_archerlike` or `bac_namd_hartreelike` and $machine_name can be `archer` for the former while `bluewonder1` or `bluewonder2` for the latter. There are some optional arguments which you may opt to provide additionally to overwrite their default values, which are `replicas` (number of replicas), `cores` (number of cores), `wall_time` (wall clock time), etc. 
 
-In the current example, you can use which remote host you have access to (or like!), $config_name should be `bac_example` and the additional argument `replicas=5` needs to be added.
+In the current example, you can use which remote host you have access to (or like!), $config_name should be `bac_example` and the additional arguments `replicas=5` and `stages_eq=2` need to be added necessarily. You may also want to provide the number of cores and wall clock time using the arguments `cores` and `wall_time` respectively.
 
-It is important to note here that there is a slight difference between submission on Hartree and ARCHER; when inputting the number of cores, Hartree asks for cores per job, or replica, whereas ARCHER asks for total number of cores. The time format is also different between the commands.
+It is important to note here that there is a slight difference between submission on Hartree and ARCHER; when inputting the number of cores, Hartree asks for cores per replica, whereas ARCHER asks for total number of cores for all replicas. The time format is also different between the commands.
 
 3. Free energy calculation submission (when simulation trajectories present on the local machine; this step needs to be ignored in our current example with bac_example)
 (NOTE: You need to put your input file for MMPBSA/NMODE calculation in AMBER format named as `nmode.in` in the directory `replicas` in your input folder)
