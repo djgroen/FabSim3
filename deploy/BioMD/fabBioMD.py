@@ -82,7 +82,12 @@ def bac_ties_archerlike(config,**args):
     env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
     print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
 
-  job(dict(script=env.bac_ties_script,cores=12480, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, wall_time='12:00:00', memory='2G'),args)
+  env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
+  if 'replicas' in option_dictionaries[0].keys():
+    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
+
+
+  job(dict(script=env.bac_ties_script,cores=12480, stages_eq=11, stages_sim=1, replicas=10, wall_time='12:00:00', memory='2G'),args)
 
 #  for i in env.lambda_list.split(" "):
 #    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, float(i)))

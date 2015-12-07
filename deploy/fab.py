@@ -208,26 +208,29 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
     
-    print option_dictionaries
+    print type(env)
 
     update_environment(*option_dictionaries)
     with_template_job()
 
-    print option_dictionaries
+    print env.get('lambda_list')
 
     # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
     # cores per replica by dividing up the total core count.
-    if env.get('replicas'):
+    if 'replicas' in option_dictionaries[0].keys():
         env.cores_per_replica = int(env.cores) / int(env.replicas)
 
-    if env.get('lambda_list'):
-	env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
-	if env.get('replicas'):
-	    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
+
+    #if 'lambda_list' in option_dictionaries[0].keys():
+    #    print "FabSim ENV: Option ``lambda_list'' is enabled."
+    #	env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
+    #	if 'replicas' in option_dictionaries[0].keys():
+    #	    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
 
     # Use this to request more cores than we use, to measure performance without sharing impact
     if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
         env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*int(env.corespernode)
+
     # If cores_reserved is not specified, temporarily set it based on the same as the number of cores
     # Needs to be temporary if there's another job with a different number of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
@@ -253,9 +256,9 @@ def job(*option_dictionaries):
             env.run_command_one_proc=template(env.run_command)
         calc_nodes()
         env.run_command=template(env.run_command)
-        if env.get('run_ensemble_command'):
+        if 'run_ensemble_command' in option_dictionaries[0].keys():
             env.run_ensemble_command=template(env.run_ensemble_command)
-	if env.get('run_ensemble_command_ties'):
+	if 'run_ensemble_command_ties' in option_dictionaries[0].keys():
 	    env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
         env.job_script=script_templates(env.batch_header,env.script)
 
