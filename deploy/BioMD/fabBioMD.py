@@ -85,13 +85,14 @@ def bac_ties_archerlike(config,**args):
   # Workaround to ensure env.cores is set before we calculate cores_per_lambda.
   if not env.get('cores'):
     env.cores=12480
+  if not env.get('replicas'):
+    env.replicas=10
 
   env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
-  if env.get('replicas'):
-    env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
+  env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
 
 
-  job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, replicas=10, wall_time='12:00:00', memory='2G'),args)
+  job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='12:00:00', memory='2G'),args)
 
 #  for i in env.lambda_list.split(" "):
 #    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, float(i)))
