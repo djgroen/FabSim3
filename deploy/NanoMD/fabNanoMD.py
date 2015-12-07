@@ -23,6 +23,7 @@ def lammps(config,**args):
             wall_time : wall-time job limit
             memory : memory per node
     """
+    update_environment(args)
     with_config(config)
     execute(put_configs,config)
     job(dict(script='lammps',
