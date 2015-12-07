@@ -84,6 +84,7 @@ def with_config(name):
     env.job_config_path_local=os.path.join(env.local_configs,name)
     env.job_config_contents=env.pather.join(env.job_config_path,'*')
     env.job_config_contents_local=os.path.join(env.job_config_path_local,'*')
+    env.job_name_template_sh=template("%s.sh" % env.job_name_template) # name of the job sh submission script.
 
 def with_profile(name):
     """Internal: augment the fabric environment with information regarding a particular profile name.
