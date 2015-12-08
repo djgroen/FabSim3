@@ -25,7 +25,7 @@ pp=PrettyPrinter()
 def stat():
     """Check the remote message queue status"""
     #TODO: Respect varying remote machine queue systems.
-    if !env.get('stat_postfix'):
+    if not env.get('stat_postfix'):
       env.stat_postfix = ''
     return run(template("$stat -u $username $stat_postfix"))
 
