@@ -80,6 +80,8 @@ bluejoule:
   queue: "standard"
   corespernode: 16
   pwd: "#"
+  stat: "llq -u"
+  stat_postfix = '| grep -v "There is currently no job status to report"'
 bluewonder1:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
