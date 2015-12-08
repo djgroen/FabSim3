@@ -27,7 +27,7 @@ def stat():
     #TODO: Respect varying remote machine queue systems.
     if not env.get('stat_postfix'):
       env.stat_postfix = ''
-    return run(template("$stat -u $username $stat_postfix"), warn_only=True)
+    return run(template("$stat -u $username $stat_postfix"))
 
 @task
 def monitor():
