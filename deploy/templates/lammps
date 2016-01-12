@@ -9,5 +9,7 @@
 cd $job_results
 $run_prefix
 rm -rf results
+
 cp -r $job_config_path/* .
+/usr/bin/env > env.log
 $run_command $lammps_exec $lammps_args < in.CG.lammps > log.lammps

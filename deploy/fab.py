@@ -17,12 +17,17 @@ import re
 import numpy as np
 import yaml
 import tempfile
+from pprint import PrettyPrinter
+pp=PrettyPrinter()
+
 
 @task
 def stat():
     """Check the remote message queue status"""
     #TODO: Respect varying remote machine queue systems.
-    return run(template("$stat -u $username"))
+    if not env.get('stat_postfix'):
+      env.stat_postfix = ''
+    return run(template("$stat -u $username $stat_postfix"))
 
 @task
 def monitor():
@@ -64,8 +69,6 @@ def with_job(name):
     env.job_results_contents=env.pather.join(env.job_results,'*')
     env.job_results_contents_local=os.path.join(env.job_results_local,'*')
 
-    env.job_name_template_sh=template("%s.sh" % env.job_name_template)
-
 def with_template_config():
     """
     Determine the name of a used or generated config from environment parameters, and then define additional environment parameters based on it.
@@ -83,6 +86,7 @@ def with_config(name):
     env.job_config_path_local=os.path.join(env.local_configs,name)
     env.job_config_contents=env.pather.join(env.job_config_path,'*')
     env.job_config_contents_local=os.path.join(env.job_config_path_local,'*')
+    env.job_name_template_sh=template("%s.sh" % env.job_name_template) # name of the job sh submission script.
 
 def with_profile(name):
     """Internal: augment the fabric environment with information regarding a particular profile name.
@@ -140,7 +144,7 @@ def put_results(name=''):
     rsync_project(local_dir=env.job_results_local+'/',remote_dir=env.job_results)
 
 @task
-def fetch_results(name='',regex=''):
+def fetch_results(name='',regex='',debug=False):
     """
     Fetch results of remote jobs to local result store.
     Specify a job name to transfer just one job.
@@ -148,6 +152,9 @@ def fetch_results(name='',regex=''):
     i.e. /store4/blood/username/results.
     If you can't mount entropy, 'put results' can be useful,  via 'fab legion fetch_results; fab entropy put_results'
     """
+    
+    if debug:
+        pp.pprint(env)
     with_job(name)
     local(template("rsync -pthrvz $username@$remote:$job_results/%s $job_results_local" % regex))
 
@@ -208,21 +215,19 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
     
-    print option_dictionaries
-
     update_environment(*option_dictionaries)
     with_template_job()
 
-    print option_dictionaries
-
     # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
     # cores per replica by dividing up the total core count.
-    if env.get('replicas'):
+    if 'replicas' in option_dictionaries[0].keys():
         env.cores_per_replica = int(env.cores) / int(env.replicas)
+
 
     # Use this to request more cores than we use, to measure performance without sharing impact
     if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
         env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*int(env.corespernode)
+
     # If cores_reserved is not specified, temporarily set it based on the same as the number of cores
     # Needs to be temporary if there's another job with a different number of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
@@ -233,14 +238,10 @@ def job(*option_dictionaries):
         if 'replica_index' in option_dictionaries[0].keys():
             print "replica_index found."
             env.name = env.name + "_" + str(env.replica_index)
-        else:
-            print "replica_index not found."
 
         if 'lambda_index' in option_dictionaries[0].keys():
             print "lambda_index found."
             env.name = env.name + "_" + str(env.lambda_index)
-        else:
-            print "lambda_index not found."
     
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):
@@ -248,8 +249,11 @@ def job(*option_dictionaries):
             env.run_command_one_proc=template(env.run_command)
         calc_nodes()
         env.run_command=template(env.run_command)
-        if env.get('run_ensemble_command'):
+        if env.get('run_ensemble_command') and env.get('cores_per_replica'):
             env.run_ensemble_command=template(env.run_ensemble_command)
+	if env.get('run_ensemble_command_ties') and env.get('cores_per_replica_per_lambda'):
+	    env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
+
         env.job_script=script_templates(env.batch_header,env.script)
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
@@ -287,6 +291,9 @@ def input_to_range(arg,default):
 
 @task
 def get_running_location(job=None):
+    """
+    Returns the node name where a given job is running.
+    """
     if job:
         with_job(job)
     env.running_node=run(template("cat $job_results/env_details.asc"))
@@ -300,8 +307,22 @@ def manual(cmd):
     manual_command=" && ".join(commands)
     pre_cmd = "ssh -Y -p %(port)s %(user)s@%(host)s " % env
     local(pre_cmd + "'"+manual_command+"'", capture=False)
-    
+
+#def manual_gsissh(cmd):
+#    #From the fabric wiki, bypass fabric internal ssh control
+#    commands=env.command_prefixes[:]
+#    if env.get('cwd'):
+#        commands.append("cd %s"%env.cwd)
+#    commands.append(cmd)
+#    manual_command=" && ".join(commands)
+#
+#    pre_cmd = "gsissh -p %(port)s %(host)s " % env
+#    local(pre_cmd + "'"+manual_command+"'", capture=False)
+#    
 def run(cmd):
+#    if env.manual_gsissh:
+#        return manual_gsissh(cmd)
+#    else if env.manual_ssh:
     if env.manual_ssh:
         return manual(cmd)
     else:

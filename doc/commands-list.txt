@@ -30,8 +30,14 @@ FabMD:
 
 FabBioMD
     namd                  Submit a NAMD job to the remote queue.
-    namd_eq               Submit a NAMD equilibration job to the remote queue.
     find_namd_executable
+    dir_structure         Creates appropriate directory structure for standard ensemble simulations from the initial directory structure created by BAC builder.
+    bac_namd_archerlike   Submit an ensemble NAMD equilibration/simulation job to ARCHER.
+    bac_namd_hartreelike  Submit an ensemble NAMD equilibration/simulation job to BlueWonder.
+    bac_nmode_archerlike  Submit an ensemble MMPBSA/NMODE calculation job to ARCHER.
+    bac_nmode_hartreelike Submit an ensemble MMPBSA/NMODE calculation job to BlueWonder.
+    bac_nm_remote_archerlike  Submit an ensemble MMPBSA/NMODE calculation job to ARCHER when simulation trajectories are already located at the remote machine.
+    bac_nm_remote_hartreelike Submit an ensemble MMPBSA/NMODE calculation job to BlueWonder when simulation trajectories are already located at the remote machine.
 
 Machine-specific configuration keywords.
     machine               Load the machine-specific configurations.

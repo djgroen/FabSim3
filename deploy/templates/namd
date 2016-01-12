@@ -7,9 +7,11 @@ $run_prefix
 #rm -rf results
 cp -r $job_config_path/* .
 
+/usr/bin/env > env.log
+
 #   using threading.
 #export OMP_NUM_THREADS=1
 
 #cd $$PBS_O_WORKDIR/
-$run_command $namd_exec ./sim_confs/eq0.conf > ./simulation/eq0.log
+$run_command $namd_exec ./sim_confs/eq.conf > ./simulation/eq.log
 

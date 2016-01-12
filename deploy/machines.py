@@ -79,6 +79,9 @@ env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or
 
 @task
 def diagnostics():
+    """
+    Performs basic machine-level diagnostics.
+    """
     pp.pprint(env)
     pp.pprint(sys.path)
     import HemeLbSetupTool
@@ -146,8 +149,8 @@ def complete_environment():
 
     #env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
-    cmd=os.popen(template("hg id -q -i"))
-    cmd.close()
+    #cmd=os.popen(template("hg id -q -i"))
+    #cmd.close()
     #env.build_number=run("hg id -q -i")
 
 complete_environment()

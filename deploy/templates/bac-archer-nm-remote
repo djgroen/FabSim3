@@ -24,9 +24,9 @@ m=1
 while [ $$m -le $replicas ]; do
      cd $remote_path/replicas/rep$$m/fe-calc/
    #  ~/catdcd -i ../../replicas/index.dat -o sim.dcd sim1.dcd
-     cp ../../../build/lig.top complex_prmtop
-     $run_ensemble_command $mmpbsa_exec -i ../../nmode.in -sp ../../../build/complex.top -y ../simulation/sim1.dcd &
-   #  $run_ensemble_command $mmpbsa_exec -i ../../../nmode.in -rp ../../../build/rec.top -lp ../../../build/lig.top -y ../simulation/sim.dcd &
+     cp ../../../build/com.top complex_prmtop
+   # $run_ensemble_command $mmpbsa_exec -i ../../nmode.in -sp ../../../build/complex.top -y ../simulation/sim1.dcd &
+     $run_ensemble_command $mmpbsa_exec -i ../../nmode.in -sp ../../../build/complex.top -rp ../../../build/rec.top -lp ../../../build/lig.top -y ../simulation/sim1.dcd &
      let m=m+1
 done
 
