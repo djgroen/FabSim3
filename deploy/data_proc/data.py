@@ -1,4 +1,4 @@
-from fab import *
+from ..fab import *
 
 @task
 def analyze(name,title="fab analyze plot", x_column=0, y_column=1, plot_file_name="plot.png"):
