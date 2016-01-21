@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 18 16:04:22 2015
-
-@author: james
-"""
+# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# @author: james
+# PMF.py is a Python-based implementation of the algorithm which calculates the Potentials of Mean Force.
 
 import os, sys, math
 import numpy as np
