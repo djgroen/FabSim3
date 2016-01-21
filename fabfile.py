@@ -1,11 +1,9 @@
 # 
-# Copyright (C) University College London, 2007-2012, all rights reserved.
-# 
-# This file is part of HemeLB and is CONFIDENTIAL. You may not work 
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENCE for detailed information regarding the licensing.
+#
+# fab.py is the main FabSim interface file. Here one can freely include or omit subsections of the FabSim toolkit,
+# to modify the enabled functionalities.
 
 #from deploy.fab import *
 from deploy.NanoMD.fabNanoMD import *
