@@ -1,3 +1,9 @@
+# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# plot_lammps.py provides routines to smooth data and plot it.
+
 import os, sys, math
 import numpy as np
 import scipy 
