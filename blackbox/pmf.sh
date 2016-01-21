@@ -1,4 +1,9 @@
 #!/bin/sh
+# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# Legacy implementation of the Potentials of Mean Force calculation routines.
 
 in=$4 #../python
 out=$5 #../python
