@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 # 
-# Copyright (C) University College London, 2013, all rights reserved.
 # 
-# This file is part of FabMD and is CONFIDENTIAL. You may not work 
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# fab.py contains general-purpose FabSim routines.
 
 from templates import *
 from machines import *
@@ -26,7 +24,7 @@ def stat():
     """Check the remote message queue status"""
     #TODO: Respect varying remote machine queue systems.
     if not env.get('stat_postfix'):
-      env.stat_postfix = ''
+        return run(template("$stat -u $username")) 
     return run(template("$stat -u $username $stat_postfix"))
 
 @task
