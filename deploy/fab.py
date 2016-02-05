@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 # 
-# Copyright (C) University College London, 2013, all rights reserved.
 # 
-# This file is part of FabMD and is CONFIDENTIAL. You may not work 
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# fab.py contains general-purpose FabSim routines.
 
 from templates import *
 from machines import *
@@ -25,7 +23,9 @@ pp=PrettyPrinter()
 def stat():
     """Check the remote message queue status"""
     #TODO: Respect varying remote machine queue systems.
-    return run(template("$stat -u $username"))
+    if not env.get('stat_postfix'):
+        return run(template("$stat -u $username")) 
+    return run(template("$stat -u $username $stat_postfix"))
 
 @task
 def monitor():
@@ -67,8 +67,6 @@ def with_job(name):
     env.job_results_contents=env.pather.join(env.job_results,'*')
     env.job_results_contents_local=os.path.join(env.job_results_local,'*')
 
-    #env.job_name_template_sh=template("%s.sh" % env.job_name_template)
-
 def with_template_config():
     """
     Determine the name of a used or generated config from environment parameters, and then define additional environment parameters based on it.
@@ -86,6 +84,7 @@ def with_config(name):
     env.job_config_path_local=os.path.join(env.local_configs,name)
     env.job_config_contents=env.pather.join(env.job_config_path,'*')
     env.job_config_contents_local=os.path.join(env.job_config_path_local,'*')
+    env.job_name_template_sh=template("%s.sh" % env.job_name_template) # name of the job sh submission script.
 
 def with_profile(name):
     """Internal: augment the fabric environment with information regarding a particular profile name.

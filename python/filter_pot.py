@@ -1,3 +1,9 @@
+# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# filter_pot.py contains routines which can smooth and modify potential files of pair interactions.
+
 import os, sys, math
 import numpy as np
 import scipy 

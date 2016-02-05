@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 # 
-# Copyright (C) University College London, 2013, all rights reserved.
-# 
-# This file is part of FabMD and is CONFIDENTIAL. You may not work 
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# This file contains FabSim definitions specific to FabNanoMD.
 
 from ..fab import *
 
@@ -23,6 +20,7 @@ def lammps(config,**args):
             wall_time : wall-time job limit
             memory : memory per node
     """
+    update_environment(args)
     with_config(config)
     execute(put_configs,config)
     job(dict(script='lammps',
@@ -111,6 +109,7 @@ def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_sc
     print "Starting PMF script."
     do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
     print "PMF script finished. Launching LAMMPS."
+    update_environment(args)
     env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(env.cores_per_replica), int(env.cores_per_replica))
     lammps(config, **args)
     wait_complete()
