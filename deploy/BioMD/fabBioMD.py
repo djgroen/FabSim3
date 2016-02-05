@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 # 
-# Copyright (C) University College London, 2013, all rights reserved.
-# 
-# This file is part of FabMD and is CONFIDENTIAL. You may not work 
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-# 
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+# Please refer to LICENSE for detailed information regarding the licensing.
+#
+# This file contains FabSim definitions specific to FabBioMD.
 
 from ..fab import *
 
@@ -23,10 +20,13 @@ def namd(config,**args):
   wall_time : wall-time job limit
   memory : memory per node
   """
+  update_environment(args)
+  if not env.get('cores'):
+    env.cores=32
   with_config(config)
   execute(put_configs,config)
   job(dict(script='namd',
-  cores=32, wall_time='1:00:00',memory='2G'),args)
+  wall_time='1:00:00',memory='2G'),args)
 
 @task
 def bac_namd_archerlike(config,**args):
@@ -40,10 +40,13 @@ def bac_namd_archerlike(config,**args):
   wall_time : wall-time job limit
   memory : memory per node
   """
+  update_environment(args)
+  if not env.get('cores'):
+    env.cores=2400
   with_config(config)
   execute(put_configs,config)
   job(dict(script=env.bac_ensemble_namd_script,
-  cores=2400, stages_eq=11, stages_sim=1, replicas=25, wall_time='24:00:00',memory='2G'),args)
+  stages_eq=11, stages_sim=1, replicas=25, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def bac_namd_hartreelike(config,**args):
@@ -59,34 +62,36 @@ def bac_namd_hartreelike(config,**args):
   mem : memory of nodes requested for Bluewonder Phase 1. By default is 32000,
   but higher memory nodes can be requested by using other values. For eg. use 64000 for >64 GB memory nodes.
   """
-  with_config(config)
-  execute(put_configs,config)
   update_environment(args)
+  if not env.get('cores'):
+    env.cores=384
   if not env.get('replicas'):
     env.update(dict(replicas=25)) 
     print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
   #  sys.exit()
+  with_config(config)
+  execute(put_configs,config)
 
   for ri in xrange(1,int(env.replicas)+1):
     job(dict(script=env.bac_ensemble_namd_script,
-    cores=384, stages_eq=11, stages_sim=1, wall_time='6:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
+    stages_eq=11, stages_sim=1, wall_time='6:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
 
 @task
 def bac_ties_archerlike(config,**args):
   """Creates appropriate directory structure for TIES calculation given that it is already restructured using dir_structure function of FabSim.
   """
-  with_config(config)
-  execute(put_configs,config)
   update_environment(args)
-  if not env.get('lambda_list'):
-    env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
-    print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
-
   # Workaround to ensure env.cores is set before we calculate cores_per_lambda.
   if not env.get('cores'):
     env.cores=12480
   if not env.get('replicas'):
     env.replicas=10
+  if not env.get('lambda_list'):
+    env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
+    print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
+
+  with_config(config)
+  execute(put_configs,config)
 
   env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
   env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
@@ -109,10 +114,13 @@ def bac_nmode_archerlike(config,**args):
   wall_time : wall-time job limit
   memory : memory per node
   """
+  update_environment(args)
+  if not env.get('cores'):
+    env.cores=240
   with_config(config)
   execute(put_configs,config)
   job(dict(script=env.bac_ensemble_nmode_script,
-  cores=240, replicas=5, wall_time='12:00:00',memory='2G'),args)
+  replicas=5, wall_time='12:00:00',memory='2G'),args)
 
 @task
 def bac_nmode_hartreelike(config,**args):
@@ -128,17 +136,19 @@ def bac_nmode_hartreelike(config,**args):
   mem : memory of nodes requested for Bluewonder Phase 1. By default is 32000,
   but higher memory nodes can be requested by using other values. For eg. use 64000 for >64 GB memory nodes.
   """
-  with_config(config)
-  execute(put_configs,config)
   update_environment(args)
+  if not env.get('cores'):
+    env.cores=24
   if not env.get('replicas'):
     env.update(dict(replicas=25)) 
     print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
   #  sys.exit()
+  with_config(config)
+  execute(put_configs,config)
 
   for ri in xrange(1,int(env.replicas)+1):
     job(dict(script=env.bac_ensemble_nmode_script,
-    cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
+    wall_time='24:00', memory='2G', mem=25000, replica_index=ri),args)
 
 @task
 def bac_nm_remote_archerlike(**args):
@@ -154,11 +164,14 @@ def bac_nm_remote_archerlike(**args):
   remote_path : The path of root directory where all data of ensemble jobs is located; 
                 to be provided by user as an argument
   """
+  update_environment(args)
+  if not env.get('cores'):
+    env.cores=1200
   with_config('')
   #execute(put_configs,config)
   #print "$results_path"
   job(dict(config='',script=env.bac_ensemble_nm_remote_script,
-  cores=1200, replicas=25, wall_time='24:00:00',memory='2G'),args)
+  replicas=25, wall_time='24:00:00',memory='2G'),args)
 
 @task
 def bac_nm_remote_hartreelike(**args):
@@ -177,17 +190,19 @@ def bac_nm_remote_hartreelike(**args):
   remote_path : The path of root directory where all data of ensemble jobs is located;
                 to be provided by user as an argument
   """
-  with_config('')
-  #execute(put_configs,config)
   update_environment(args)
+  if not env.get('cores'):
+    env.cores=24
   if not env.get('replicas'):
     env.update(dict(replicas=25)) 
     print "WARNING: replicas argument not specified. Setting a default value of", env.replicas   
   #  sys.exit()
 
+  with_config('')
+  #execute(put_configs,config)
   for ri in xrange(1,int(env.replicas)+1):
     job(dict(config='',script=env.bac_ensemble_nm_remote_script,
-    cores=24, wall_time='24:00', memory='2G', mem=25000, replicas=env.replicas, replica_index=ri),args)
+    wall_time='24:00', memory='2G', mem=25000, replica_index=ri),args)
 
 
 @task

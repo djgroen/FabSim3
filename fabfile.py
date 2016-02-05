@@ -7,7 +7,7 @@
 # specifically made by you with University College London.
 # 
 
-#from deploy.fab import *
+from deploy.fab import *
 from deploy.NanoMD.fabNanoMD import *
 from deploy.BioMD.fabBioMD import *
 from deploy.data_proc.data import *
