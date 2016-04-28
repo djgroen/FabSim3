@@ -1,0 +1,32 @@
+#!/bin/bash
+## 
+## Copyright (C) University College London, 2007-2012, all rights reserved.
+## 
+## This file is part of HemeLB and is CONFIDENTIAL. You may not work 
+## with, install, use, duplicate, modify, redistribute or share this
+## file, or any part thereof, other than as allowed by any agreement
+## specifically made by you with University College London.
+###
+## optional: energy policy tags
+##
+# DO NOT USE environment = COPY_ALL
+
+#@ job_name = $job_name_template_sh
+#@ job_type = $job_type
+#@ output = job$$(jobid).out
+#@ error = job$$(jobid).err
+#@ class = $job_class
+#@ tasks_per_node = $corespernode
+#@ island_count = $island_count
+#@ node = $nodes
+#@ wall_clock_limit = $wall_time
+#@ network.MPI = sn_all,shared,us
+#@ notification = never
+#@ initialdir = .
+#@ node_usage = shared
+#@ queue
+
+
+# setup modules
+. /etc/profile
+. /etc/profile.d/modules.sh

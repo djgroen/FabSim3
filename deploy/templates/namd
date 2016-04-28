@@ -1,5 +1,3 @@
-module load namd/2.9
-
 # Set the number of threads to 1
 #   This prevents any system libraries from automatically
 cd $job_results

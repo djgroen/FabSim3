@@ -15,6 +15,7 @@ default:
   # Default Modules to load or unload on remote, via module 'foo'
   # e.g. ['load cmake'].
   modules: []
+  module_load_at_connect: true
   # Commands to execute as part of remote run jobs.
   run_prefix_commands: []
   # Templates to use to find space to checkout and build HemeLB on the remote.
@@ -46,6 +47,60 @@ default:
   local_templates_path: "$localroot/deploy/templates"
   stat: qstat
   lammps_args: ""
+supermuc1_thin:
+  max_job_name_chars: 15
+  manual_gsissh: true
+  job_dispatch: "llsubmit"
+  run_command: "poe"
+  batch_header: ll-supermuc
+  bac_ties_script: bac-ties-supermuc
+#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
+  port: 2222
+  remote: "sb.supermuc.lrz.de"
+  home_path_template: "/home/hpc/$project/$username"
+  runtime_path_template: "/gpfs/work/$project/$username"
+  modules: ["load namd/2.10"] #-25Sep11"]
+  module_load_at_connect: false
+  temp_path_template: "$work_path/tmp"
+  queue: "standard"
+  python_build: "lib64/python2.6"
+  corespernode: 16
+supermuc1_fat:
+  max_job_name_chars: 15
+  manual_gsissh: true
+  job_dispatch: "llsubmit"
+  run_command: "poe"
+  batch_header: ll-supermuc
+  bac_ties_script: bac-ties-supermuc
+#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
+  port: 2222
+  remote: "wm.supermuc.lrz.de"
+  home_path_template: "/home/hpc/$project/$username"
+  runtime_path_template: "/gpfs/work/$project/$username"
+  modules: ["load namd/2.10"] #-25Sep11"]
+  module_load_at_connect: false
+  temp_path_template: "$work_path/tmp"
+  queue: "standard"
+  python_build: "lib64/python2.6"
+  corespernode: 40
+supermuc2:
+  max_job_name_chars: 15
+  manual_gsissh: true
+  job_dispatch: "llsubmit"
+  run_command: "poe"
+  batch_header: ll-supermuc
+  bac_ties_script: bac-ties-supermuc
+#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
+  port: 2222
+  remote: "hw.supermuc.lrz.de"
+  home_path_template: "/home/hpc/$project/$username"
+  runtime_path_template: "/gpfs/work/$project/$username"
+  modules: ["load namd/2.10"] #-25Sep11"]
+  module_load_at_connect: false
+  temp_path_template: "$work_path/tmp"
+  queue: "standard"
+  python_build: "lib64/python2.6"
+  corespernode: 28
 archer:
   max_job_name_chars: 15
   job_dispatch: "qsub"

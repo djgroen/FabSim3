@@ -111,7 +111,10 @@ def fetch_configs(config=''):
     via 'fab entropy fetch_configs; fab legion put_configs'
     """
     with_config(config)
-    local(template("rsync -pthrvz $username@$remote:$job_config_path/ $job_config_path_local"))
+    if env.manual_gsissh:
+	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_config_path/ file://$job_config_path_local/"))
+    else:
+        local(template("rsync -pthrvz $username@$remote:$job_config_path/ $job_config_path_local"))
 
 @task
 def put_configs(config=''):
@@ -127,7 +130,10 @@ def put_configs(config=''):
 
     with_config(config)
     run(template("mkdir -p $job_config_path"))
-    rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
+    if env.manual_gsissh:
+	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
+    else:
+        rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
 
 @task
 def put_results(name=''):
@@ -139,7 +145,10 @@ def put_results(name=''):
     """
     with_job(name)
     run(template("mkdir -p $job_results"))
-    rsync_project(local_dir=env.job_results_local+'/',remote_dir=env.job_results)
+    if env.manual_gsissh:
+	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_results_local/ gsiftp://$remote/$job_results/"))
+    else:
+        rsync_project(local_dir=env.job_results_local+'/',remote_dir=env.job_results)
 
 @task
 def fetch_results(name='',regex='',debug=False):
@@ -154,7 +163,10 @@ def fetch_results(name='',regex='',debug=False):
     if debug:
         pp.pprint(env)
     with_job(name)
-    local(template("rsync -pthrvz $username@$remote:$job_results/%s $job_results_local" % regex))
+    if env.manual_gsissh:
+	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_results/%s file://$job_results_local/" % regex))
+    else:
+        local(template("rsync -pthrvz $username@$remote:$job_results/%s $job_results_local" % regex))
 
 @task
 def clear_results(name=''):
@@ -172,7 +184,10 @@ def fetch_profiles(name=''):
     If you can't mount entropy, 'put results' can be useful,  via 'fab legion fetch_results; fab entropy put_results'
     """
     with_profile(name)
-    local(template("rsync -pthrvz $username@$remote:$job_profile_path/ $job_profile_path_local"))
+    if env.manual_gsissh:
+	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_profile_path/ file://$job_profile_path_local/"))
+    else:
+        local(template("rsync -pthrvz $username@$remote:$job_profile_path/ $job_profile_path_local"))
 
 @task
 def put_profiles(name=''):
@@ -184,7 +199,10 @@ def put_profiles(name=''):
     """
     with_profile(name)
     run(template("mkdir -p $job_profile_path"))
-    rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
+    if env.manual_gsissh:
+	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_profile_path_local/ gsiftp://$remote/$job_profile_path/"))
+    else:
+        rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
 
 @task
 def setup_fabric_dirs(name=''):
@@ -246,6 +264,8 @@ def job(*option_dictionaries):
             calc_nodes()
             env.run_command_one_proc=template(env.run_command)
         calc_nodes()
+	if env.get('nodes_new'):
+	    env.nodes = env.nodes_new
         env.run_command=template(env.run_command)
         if env.get('run_ensemble_command') and env.get('cores_per_replica'):
             env.run_ensemble_command=template(env.run_ensemble_command)
@@ -269,7 +289,10 @@ def job(*option_dictionaries):
         # Allow option to submit all preparations, but not actually submit the job
         if not env.get("noexec",False):
                    with cd(env.job_results):
-                       with prefix(env.run_prefix):
+		       if env.module_load_at_connect:
+                       	   with prefix(env.run_prefix):
+                                run(template("$job_dispatch $dest_name"))
+                       else:
                            run(template("$job_dispatch $dest_name"))
 
 def input_to_range(arg,default):
@@ -306,28 +329,36 @@ def manual(cmd):
     pre_cmd = "ssh -Y -p %(port)s %(user)s@%(host)s " % env
     local(pre_cmd + "'"+manual_command+"'", capture=False)
 
-#def manual_gsissh(cmd):
+def manual_gsissh(cmd):
 #    #From the fabric wiki, bypass fabric internal ssh control
-#    commands=env.command_prefixes[:]
-#    if env.get('cwd'):
-#        commands.append("cd %s"%env.cwd)
-#    commands.append(cmd)
-#    manual_command=" && ".join(commands)
-#
-#    pre_cmd = "gsissh -p %(port)s %(host)s " % env
-#    local(pre_cmd + "'"+manual_command+"'", capture=False)
-#    
+    commands=env.command_prefixes[:]
+    if env.get('cwd'):
+        commands.append("cd %s"%env.cwd)
+    commands.append(cmd)
+    manual_command=" && ".join(commands)
+    pre_cmd = "gsissh -t -p %(port)s %(host)s " % env
+    local(pre_cmd + "'"+manual_command+"'", capture=False)
+    
 def run(cmd):
-#    if env.manual_gsissh:
-#        return manual_gsissh(cmd)
-#    else if env.manual_ssh:
-    if env.manual_ssh:
+    if env.manual_gsissh:
+        return manual_gsissh(cmd)
+    elif env.manual_ssh:
+#    if env.manual_ssh:
         return manual(cmd)
     else:
         return fabric.api.run(cmd)
         
 def put(src,dest):
-    if env.manual_ssh:
+    if env.manual_gsissh:
+	if os.path.isdir(src):
+            if src[-1] != '/': 
+	    	env.manual_src=src+'/'
+	    	env.manual_dest=dest+'/'
+	else: 
+	    env.manual_src=src
+	    env.manual_dest=dest
+	local(template("globus-url-copy -sync -r -cd -p 10 file://$manual_src gsiftp://$host/$manual_dest"))
+    elif env.manual_ssh:
         env.manual_src=src
         env.manual_dest=dest
         local(template("scp $manual_src $user@$host:$manual_dest"))

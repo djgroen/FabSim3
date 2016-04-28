@@ -26,7 +26,7 @@ def namd(config,**args):
   with_config(config)
   execute(put_configs,config)
   job(dict(script='namd',
-  wall_time='1:00:00',memory='2G'),args)
+  wall_time='1:00:00',memory='2G',job_type='parallel',job_class='micro'),args)
 
 @task
 def bac_namd_archerlike(config,**args):
@@ -96,12 +96,39 @@ def bac_ties_archerlike(config,**args):
   env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
   env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
 
-
   job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='12:00:00', memory='2G'),args)
 
 #  for i in env.lambda_list.split(" "):
 #    run("rsync -avz --exclude 'LAMBDA_*' %s/ %s/LAMBDA_%.2f/" % (env.job_config_path, env.job_config_path, float(i)))
 #    job(dict(script=env.bac_ties_script,cores=960, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, lambda_index='%.2f' % float(i), wall_time='12:00:00', memory='2G'),args)
+
+@task
+def bac_ties_supermuclike(config,**args):
+  """Creates appropriate directory structure for TIES calculation given that it is already restructured using dir_structure function of FabSim.
+  """
+  update_environment(args)
+  # Workaround to ensure env.cores is set before we calculate cores_per_lambda.
+  if not env.get('cores'):
+    env.cores=1820
+  if not env.get('replicas'):
+    env.replicas=5
+  if not env.get('lambda_list'):
+    env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
+    print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
+ 
+  env.cores_per_lambda = int(env.cores) / len(env.lambda_list.split(" "))
+  env.cores_per_replica_per_lambda = int(env.cores_per_lambda) / int(env.replicas)
+  
+  if not env.get('nodes_per_replica_per_lambda'):
+    env.update(dict(nodes_per_replica_per_lambda = int(env.cores_per_replica_per_lambda) / int(env.corespernode)))
+  calc_nodes()
+  env.nodes_new = "%s" % (int(env.nodes)+1) 
+  
+  with_config(config)
+  execute(put_configs,config)
+ 
+  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
+  job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='12:00:00', memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
 
 @task
 def bac_nmode_archerlike(config,**args):
