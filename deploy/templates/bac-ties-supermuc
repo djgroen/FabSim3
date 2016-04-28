@@ -59,7 +59,7 @@ for i in $lambda_list;
     let k=k+1
 done
 
-second=$$((5*$${#lmb_arr[@]}))
+second=$$(($replicas*$${#lmb_arr[@]}))
 tac $job_results/ties-dependencies.txt | sed "1,$$second{d}" | tac > $job_results/tmp.txt
 mv $job_results/tmp.txt $job_results/ties-dependencies.txt
 
