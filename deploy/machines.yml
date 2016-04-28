@@ -16,6 +16,7 @@ default:
   # e.g. ['load cmake'].
   modules: []
   module_load_at_connect: true
+  cores: 16
   # Commands to execute as part of remote run jobs.
   run_prefix_commands: []
   # Templates to use to find space to checkout and build HemeLB on the remote.

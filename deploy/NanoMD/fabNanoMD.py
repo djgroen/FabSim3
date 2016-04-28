@@ -23,8 +23,7 @@ def lammps(config,**args):
     update_environment(args)
     with_config(config)
     execute(put_configs,config)
-    job(dict(script='lammps',
-            cores=4, wall_time='0:15:0',memory='2G'),args)
+    job(dict(script='lammps', wall_time='0:15:0', memory='2G'),args)
 
 #@task
 #def lammps_swelling_test(config, **args):
