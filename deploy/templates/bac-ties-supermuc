@@ -10,8 +10,8 @@ do
 	cp -r $job_config_path/* .
 done
 
-#nmd=$$(which namd2)
-nmd=/lrz/sys/applications/namd/2.10/superimpi/namd2
+nmd=$$(which namd2)
+#nmd=/lrz/sys/applications/namd/2.10/superimpi/namd2
 rm -f $job_results/ties-loop.txt
 rm -f $job_results/ties-dependencies.txt
 
