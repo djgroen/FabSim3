@@ -103,6 +103,36 @@ def bac_ties_archerlike(config,**args):
 #    job(dict(script=env.bac_ties_script,cores=960, stages_eq=11, stages_sim=1, replicas=10, lambda_list=env.lambda_list, lambda_index='%.2f' % float(i), wall_time='12:00:00', memory='2G'),args)
 
 @task
+def bac_namd_supermuclike(config,**args):
+  """Submit ensemble NAMD equilibration-simulation jobs to the SuperMUC or similar machines.
+  The job results will be stored with a name pattern as defined in the environment,
+  e.g. cylinder-abcd1234-legion-256
+  config : config directory to use to define geometry, e.g. config=cylinder
+  Keyword arguments:
+  cores : number of compute cores to request
+  stages : this is usually 11 for equilibration (WT case) and 4 for simulation
+  wall_time : wall-time job limit
+  memory : memory per node
+  """
+  update_environment(args)
+  if not env.get('cores'):
+    env.cores=9800
+  if not env.get('replicas'):
+    env.replicas=25
+  calc_nodes()
+  env.nodes_new = "%s" % (int(env.nodes)+1) 
+  env.cores_per_replica = int(env.cores) / int(env.replicas)
+  if not env.get('nodes_per_replica'):
+    env.update(dict(nodes_per_replica = int(env.cores_per_replica) / int(env.corespernode)))
+   
+  with_config(config)
+  execute(put_configs,config)
+  
+  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
+  job(dict(script=env.bac_ensemble_namd_script,
+  stages_eq=11, stages_sim=1, wall_time='12:00:00',memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
+
+@task
 def bac_ties_supermuclike(config,**args):
   """Creates appropriate directory structure for TIES calculation given that it is already restructured using dir_structure function of FabSim.
   """

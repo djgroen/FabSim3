@@ -54,6 +54,7 @@ supermuc1_thin:
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
+  bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
 #  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
   port: 2222
@@ -72,6 +73,7 @@ supermuc1_fat:
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
+  bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
 #  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
   port: 2222
@@ -90,6 +92,7 @@ supermuc2:
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
+  bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
 #  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
   port: 2222
