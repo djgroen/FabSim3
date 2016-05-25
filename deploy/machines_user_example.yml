@@ -6,6 +6,8 @@ default:
   local_results: "~/Codes/FabSim/results"
   local_configs: "~/Codes/FabSim/config_files"
   username: "james"
+  # Allows to switch between SSH (default) and GSISSH login.
+  manual_gsissh: false
 archer:
   username: "ucljames"
   project: "e283"
@@ -17,6 +19,16 @@ mavrino:
   budget: ""
 localhost:
   lammps_exec: "/home/james/bin/lmp_serial"
+# SuperMUC phase2 connecting using GSISSH
+supermuc2:
+  username: "di73zih"
+  project: "pr87be"
+  namd_exec: "/lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2"
+  # Password set in the redisexec directory.
+  redispwd: "multiple"
+  # Switches to GSISSH login from SSH.
+  manual_gsissh: true
+  port: 2222
 bluejoule:
   username: "dxg12-dxg01"
   groupname: "dxg01"

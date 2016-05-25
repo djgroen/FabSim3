@@ -15,6 +15,7 @@ default:
   # Default Modules to load or unload on remote, via module 'foo'
   # e.g. ['load cmake'].
   modules: []
+  # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
   cores: 16
   # Commands to execute as part of remote run jobs.
@@ -44,20 +45,16 @@ default:
   job_name_template: '${config}_${machine_name}_${cores}'
   local_templates_path: "$localroot/deploy/templates"
   manual_ssh: false
-  manual_gsissh: false
   local_templates_path: "$localroot/deploy/templates"
   stat: qstat
   lammps_args: ""
 supermuc1_thin:
   max_job_name_chars: 15
-  manual_gsissh: true
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
   bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
-#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
-  port: 2222
   remote: "sb.supermuc.lrz.de"
   home_path_template: "/home/hpc/$project/$username"
   runtime_path_template: "/gpfs/work/$project/$username"
@@ -69,14 +66,11 @@ supermuc1_thin:
   corespernode: 16
 supermuc1_fat:
   max_job_name_chars: 15
-  manual_gsissh: true
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
   bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
-#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
-  port: 2222
   remote: "wm.supermuc.lrz.de"
   home_path_template: "/home/hpc/$project/$username"
   runtime_path_template: "/gpfs/work/$project/$username"
@@ -88,14 +82,11 @@ supermuc1_fat:
   corespernode: 40
 supermuc2:
   max_job_name_chars: 15
-  manual_gsissh: true
   job_dispatch: "llsubmit"
   run_command: "poe"
   batch_header: ll-supermuc
   bac_ensemble_namd_script: bac-supermuc
   bac_ties_script: bac-ties-supermuc
-#  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
-  port: 2222
   remote: "hw.supermuc.lrz.de"
   home_path_template: "/home/hpc/$project/$username"
   runtime_path_template: "/gpfs/work/$project/$username"
