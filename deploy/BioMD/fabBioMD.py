@@ -116,7 +116,7 @@ def bac_namd_supermuclike(config,**args):
   """
   update_environment(args)
   if not env.get('cores'):
-    env.cores=9800
+    env.cores=7000
   if not env.get('replicas'):
     env.replicas=25
   calc_nodes()
@@ -126,11 +126,11 @@ def bac_namd_supermuclike(config,**args):
     env.update(dict(nodes_per_replica = int(env.cores_per_replica) / int(env.corespernode)))
    
   with_config(config)
+  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
   execute(put_configs,config)
   
-  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
   job(dict(script=env.bac_ensemble_namd_script,
-  stages_eq=11, stages_sim=1, wall_time='12:00:00',memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
+  stages_eq=11, stages_sim=1, wall_time='06:00:00',memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
 
 @task
 def bac_ties_supermuclike(config,**args):
@@ -139,7 +139,7 @@ def bac_ties_supermuclike(config,**args):
   update_environment(args)
   # Workaround to ensure env.cores is set before we calculate cores_per_lambda.
   if not env.get('cores'):
-    env.cores=1820
+    env.cores=18200
   if not env.get('replicas'):
     env.replicas=5
   if not env.get('lambda_list'):
@@ -155,10 +155,10 @@ def bac_ties_supermuclike(config,**args):
   env.nodes_new = "%s" % (int(env.nodes)+1) 
   
   with_config(config)
+  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
   execute(put_configs,config)
  
-  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
-  job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='12:00:00', memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
+  job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='06:00:00', memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)
 
 @task
 def bac_nmode_archerlike(config,**args):
