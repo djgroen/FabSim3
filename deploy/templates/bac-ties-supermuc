@@ -10,8 +10,8 @@ do
 	cp -r $job_config_path/* .
 done
 
-nmd=$$(which namd2)
-#nmd=/lrz/sys/applications/namd/2.10/superimpi/namd2
+#nmd=$$(which namd2)
+nmd=$namd_exec
 rm -f $job_results/ties-loop.txt
 rm -f $job_results/ties-dependencies.txt
 
@@ -64,7 +64,7 @@ tac $job_results/ties-dependencies.txt | sed "1,$$second{d}" | tac > $job_result
 mv $job_results/tmp.txt $job_results/ties-dependencies.txt
 
 
-$$HOME/.redis/redisexec/redisexec --taskfile $job_results/ties-loop.txt --redispwd multiple --initfile $job_results/pre.txt --nodespertask $nodes_per_replica_per_lambda --procspernode $corespernode --depsfile $job_results/ties-dependencies.txt --showdeps 2 --analyze 1
+$$HOME/.redis/redisexec/redisexec --taskfile $job_results/ties-loop.txt --redispwd $redispwd --initfile $job_results/pre.txt --nodespertask $nodes_per_replica_per_lambda --procspernode $corespernode --depsfile $job_results/ties-dependencies.txt --showdeps 2 --analyze 1 --forcempi 1
 
 for i in $lambda_list;
 do
