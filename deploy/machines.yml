@@ -45,6 +45,7 @@ default:
   job_name_template: '${config}_${machine_name}_${cores}'
   local_templates_path: "$localroot/deploy/templates"
   manual_ssh: false
+  manual_gsissh: false
   local_templates_path: "$localroot/deploy/templates"
   stat: qstat
   lammps_args: ""

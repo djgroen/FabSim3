@@ -209,9 +209,7 @@ def setup_fabric_dirs(name=''):
     """
     Creates the necessary fab dirs remotely.
     """
-    run(template('mkdir -p $config_path'))
-    run(template('mkdir -p $results_path'))
-    run(template('mkdir -p $scripts_path'))
+    run(template('mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'))
 
 def update_environment(*dicts):
     for adict in dicts:
