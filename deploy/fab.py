@@ -126,10 +126,13 @@ def put_configs(config=''):
     Local path to find config directories is specified in machines_user.json, and should normally point to a mount on entropy,
     i.e. /store4/blood/username/config_files
     If you can't mount entropy, 'fetch_configs' can be useful, via 'fab entropy fetch_configs; fab legion put_configs'
+
+    RECENT ADDITION: Added get_setup_fabric_dirs_string() so that the Fabric Directories are now created automatically whenever 
+    a config file is uploaded.
     """
 
     with_config(config)
-    run(template("mkdir -p $job_config_path"))
+    run(template("%s; mkdir -p $job_config_path" % (get_setup_fabric_dirs_string())))
     if env.manual_gsissh:
 	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
     else:
@@ -204,12 +207,21 @@ def put_profiles(name=''):
     else:
         rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
 
+def get_setup_fabric_dirs_string():
+    """
+    Returns the commands required to set up the fabric directories. This is not in the env, because modifying this 
+    is likely to break FabSim in most cases.
+    This is stored in an individual function, so that the string can be appended in existing commands, reducing 
+    the performance overhead.
+    """
+    return 'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
+
 @task
 def setup_fabric_dirs(name=''):
     """
     Creates the necessary fab dirs remotely.
     """
-    run(template('mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'))
+    run(template(get_setup_fabric_dirs_string()))
 
 def update_environment(*dicts):
     for adict in dicts:
