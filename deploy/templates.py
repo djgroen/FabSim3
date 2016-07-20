@@ -24,6 +24,15 @@ def script_template_content(template_name):
 
 def script_template_save_temporary(content):
   destname=os.path.join(env.localroot,'deploy','.jobscripts',env['name']+'.sh')
+
+  # Support for multi-level directories in the configuration files.
+  if not os.path.exists(os.path.dirname(destname)):
+    try:
+      os.makedirs(os.path.dirname(destname))
+    except OSError as exc: # Guard against race condition
+      if exc.errno != errno.EEXIST:
+        raise
+
   target=open(destname,'w')
   target.write(content)
   return destname
