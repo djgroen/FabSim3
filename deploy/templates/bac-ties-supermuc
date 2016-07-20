@@ -1,7 +1,7 @@
 echo "STARTUP"
 
 $run_prefix
-cp -r $job_config_path/pre.txt $job_results
+cp -r $job_config_path/redis_header.txt $job_results
 
 for i in $lambda_list;
 do
@@ -64,7 +64,7 @@ tac $job_results/ties-dependencies.txt | sed "1,$$second{d}" | tac > $job_result
 mv $job_results/tmp.txt $job_results/ties-dependencies.txt
 
 
-$$HOME/.redis/redisexec/redisexec --taskfile $job_results/ties-loop.txt --redispwd $redispwd --initfile $job_results/pre.txt --nodespertask $nodes_per_replica_per_lambda --procspernode $corespernode --depsfile $job_results/ties-dependencies.txt --showdeps 2 --analyze 1 --forcempi 1
+$$HOME/.redis/redisexec/redisexec --taskfile $job_results/ties-loop.txt --redispwd $redispwd --initfile $job_results/redis_header.txt --nodespertask $nodes_per_replica_per_lambda --procspernode $corespernode --depsfile $job_results/ties-dependencies.txt --showdeps 2 --analyze 1 --forcempi 1
 
 for i in $lambda_list;
 do

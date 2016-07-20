@@ -49,7 +49,7 @@ tac $job_results/esmacs-dependencies.txt | sed "1,$$second{d}" | tac > $job_resu
 mv $job_results/tmp.txt $job_results/esmacs-dependencies.txt
 
 
-$$HOME/.redis/redisexec/redisexec --taskfile $job_results/esmacs-loop.txt --redispwd $redispwd --initfile $job_results/pre.txt --nodespertask $nodes_per_replica --procspernode $corespernode --depsfile $job_results/esmacs-dependencies.txt --showdeps 2 --analyze 1 --forcempi 1
+$$HOME/.redis/redisexec/redisexec --taskfile $job_results/esmacs-loop.txt --redispwd $redispwd --initfile $job_results/redis_header.txt --nodespertask $nodes_per_replica --procspernode $corespernode --depsfile $job_results/esmacs-dependencies.txt --showdeps 2 --analyze 1 --forcempi 1
 
 cd $job_results/mineq_confs
 rm eq*temp*conf
