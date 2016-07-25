@@ -7,6 +7,9 @@
 
 from ..fab import *
 
+# Add local script, blackbox and template path.
+add_local_paths("BioMD")
+
 @task
 def namd(config,**args):
   """Submit a NAMD job to the remote queue.

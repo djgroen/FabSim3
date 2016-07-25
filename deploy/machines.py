@@ -136,7 +136,9 @@ def complete_environment():
     env.scripts_path=env.pather.join(env.work_path,"scripts")
     env.local_results=os.path.expanduser(template(env.local_results))
     env.local_configs=os.path.expanduser(template(env.local_configs))
-    env.local_templates_path=os.path.expanduser(template(env.local_templates_path))
+
+    for i in xrange(0, len(env.local_templates_path)):
+        env.local_templates_path[i]=os.path.expanduser(template(env.local_templates_path[i]))
   
     module_commands=["module %s"%module for module in env.modules]
     env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'

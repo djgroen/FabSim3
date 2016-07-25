@@ -7,6 +7,9 @@
 
 from ..fab import *
 
+# Add local script, blackbox and template path.
+add_local_paths("NanoMD")
+
 @task
 def lammps(config,**args):
     """Submit a LAMMPS job to the remote queue.

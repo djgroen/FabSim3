@@ -19,6 +19,19 @@ from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
 
+def add_local_paths(module_name):
+    # This variable encodes the default location for templates.
+    env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))
+    # This variable encodes the default location for blackbox scripts.
+    env.local_blackbox_path.insert(0, "$localroot/deploy/%s/blackbox" % (module_name))
+    # This variable encodes the default location for Python scripts.
+    env.local_python_path.insert(0, "$localroot/deploy/%s/python" % (module_name))
+
+
+@task
+def print_local_environment():
+  print env
+
 @task
 def stat():
     """Check the remote message queue status"""

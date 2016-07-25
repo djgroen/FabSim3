@@ -43,12 +43,17 @@ default:
   run_command: "mpirun -np $cores"
   temp_path_template: "/tmp"
   job_name_template: '${config}_${machine_name}_${cores}'
-  local_templates_path: "$localroot/deploy/templates"
   manual_ssh: false
   manual_gsissh: false
-  local_templates_path: "$localroot/deploy/templates"
+  # This variable encodes the default location for templates.
+  local_templates_path: ["$localroot/deploy/templates"]
   stat: qstat
   lammps_args: ""
+  # This variable encodes the default location for blackbox scripts.
+  local_blackbox_path: ["$localroot/blackbox"]
+  # This variable encodes the default location for Python scripts.
+  local_python_path: ["$localroot/python"]
+
 supermuc1_thin:
   max_job_name_chars: 15
   job_dispatch: "llsubmit"
