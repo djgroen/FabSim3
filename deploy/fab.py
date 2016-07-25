@@ -391,7 +391,14 @@ def put(src,dest):
 @task
 def blackbox(script='ibi.sh', args=''):
     """ black-box script execution. """
-    local("%s %s" % (os.path.join(env.localroot,'blackbox', script), args))
+    for p in env.local_blackbox_path:
+        script_file_path = os.path.join(p, script)
+        if os.path.exists(os.path.dirname(script_file_path)):
+            local("%s %s" % (script_file_path, args))
+            return
+    print "FabSim Error: could not find blackbox() script file. FabSim looked for it in the following directories: ", env.local_blackbox_path
+
+
 
 @task
 def probe(label="undefined"):
