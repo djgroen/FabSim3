@@ -129,7 +129,7 @@ def bac_namd_supermuclike(config,**args):
     env.update(dict(nodes_per_replica = int(env.cores_per_replica) / int(env.corespernode)))
    
   with_config(config)
-  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
+  local("cp %s/redis_header.txt %s" % (env.local_templates_path[-1], env.job_config_path_local))
   execute(put_configs,config)
   
   job(dict(script=env.bac_ensemble_namd_script,
@@ -158,7 +158,7 @@ def bac_ties_supermuclike(config,**args):
   env.nodes_new = "%s" % (int(env.nodes)+1) 
   
   with_config(config)
-  local("cp %s/pre.txt %s" % (env.local_templates_path, env.job_config_path_local))
+  local("cp %s/redis_header.txt %s" % (env.local_templates_path[-1], env.job_config_path_local))
   execute(put_configs,config)
  
   job(dict(script=env.bac_ties_script, stages_eq=11, stages_sim=1, wall_time='06:00:00', memory='2G', job_type='MPICH', job_class='general', island_count='1', nodes_new=env.nodes_new),args)

@@ -1,0 +1,17 @@
+#@ dependency = (NAMD == 0)
+#@ step_name = NMODE$replica_index
+#@ job_type = parallel
+#@ output = job$(jobid).out
+#@ error = job$(jobid).err
+#@ class = $job_class_nm
+#@ tasks_per_node = $frames_per_node
+#@ island_count = $island_count_nm
+#@ node = $nodes_nm
+#@ wall_clock_limit = $wall_time_nm
+#@ network.MPI =sn_all,shared,us
+#@ notification = never
+#@ initialdir = .
+#@ node_usage = shared
+#@ executable = $job_results/nmode-$replica_index.sh
+#@ queue
+#
