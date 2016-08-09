@@ -307,4 +307,4 @@ def dir_structure(num_rep,path):
     local("mkdir -p %s/replicas/rep1/fe-calc" % path)
     for x in xrange(2, int(num_rep) + 1):
         local("cp -r %s/replicas/rep1 %s/replicas/rep%s" % (path, path, x))
-
+    local("cp %s/fep.tcl %s" % (env.local_templates_path[0], path))
