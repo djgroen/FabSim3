@@ -21,7 +21,7 @@ def script_templates(*names,**options):
 def script_template_content(template_name):
   for p in env.local_templates_path:
     template_file_path = os.path.join(p, template_name)
-    if os.path.exists(os.path.dirname(template_file_path)):
+    if os.path.exists(template_file_path):
       source=open(template_file_path)
   
   if source:
