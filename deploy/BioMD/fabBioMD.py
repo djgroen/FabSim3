@@ -24,7 +24,7 @@ def namd(config,**args):
   memory : memory per node
   """
   if not args.get('cores'):
-    args["cores"] = 72
+    args["cores"] = 32
 
   update_environment(args)
   with_config(config)
