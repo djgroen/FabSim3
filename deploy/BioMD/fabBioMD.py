@@ -23,9 +23,10 @@ def namd(config,**args):
   wall_time : wall-time job limit
   memory : memory per node
   """
+  if not args.get('cores'):
+    args["cores"] = 72
+
   update_environment(args)
-  if not env.get('cores'):
-    env.cores=32
   with_config(config)
   execute(put_configs,config)
   job(dict(script='namd',
