@@ -86,9 +86,9 @@ def bac_ties_archerlike(config,**args):
   update_environment(args)
   # Workaround to ensure env.cores is set before we calculate cores_per_lambda.
   if not env.get('cores'):
-    env.cores=12480
+    env.cores=6240
   if not env.get('replicas'):
-    env.replicas=10
+    env.replicas=5
   if not env.get('lambda_list'):
     env.update(dict(lambda_list= '0.00 0.05 0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95 1.00'))
     print "WARNING: lambda_list argument not specified. Setting a default value of", env.lambda_list
