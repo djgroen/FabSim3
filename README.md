@@ -22,3 +22,20 @@ the source code of that).
 ## Installation and usage 
 
 For instructions on how to install and test FabSim, please refer to `INSTALL.md`.
+
+### Citing FabSim
+
+Please find the BibTex reference below of our FabSim software paper in _Computer Physics Communications_:
+
+@article{GROEN2016375,
+title = "FabSim: Facilitating computational research through automation on large-scale and distributed e-infrastructures",
+journal = "Computer Physics Communications",
+volume = "207",
+number = "Supplement C",
+pages = "375 - 385",
+year = "2016",
+issn = "0010-4655",
+doi = "https://doi.org/10.1016/j.cpc.2016.05.020",
+url = "http://www.sciencedirect.com/science/article/pii/S0010465516301448",
+author = "Derek Groen and Agastya P. Bhati and James Suter and James Hetherington and Stefan J. Zasada and Peter V. Coveney",
+}
