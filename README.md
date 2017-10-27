@@ -15,6 +15,7 @@ the HemeLB lattice-Boltzmann simulation environment (see http://www.github.com/U
 the source code of that).
 * FabMD, which is used to semi-automatically coarse-grain polymer systems (part of this repository).
 * FabBioMD, which is used to facilitate protein-ligand binding affinity calculations (part of this repository).
+* FabFlee, which is under development and used to automate agent-based simulations of forced migration.
 
 
 ## Installation and usage 
