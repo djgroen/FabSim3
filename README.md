@@ -7,7 +7,8 @@ FabSim also contains a system for defining machine-specific configurations, incl
 
 FabSim relies strongly on Fabric (http://www.fabfile.org, shown to work with versions 1.5.3 and 1.10.0) and PyYAML. Previous versions of FabSim (most notably FabHemeLB and FabMD) have been used to run simulation workflows on machines such as ARCHER, SuperMUC, BlueJoule, as well as local clusters and desktops.
 
-FabSim is now publicly available (as early-stage software) at: http://www.github.com/djgroen/FabSim
+FabSim is now publicly available at: http://www.github.com/djgroen/FabSim
+The accompanying software paper can be found here: https://doi.org/10.1016/j.cpc.2016.05.020
 
 Derivative versions of FabSim include:
 * FabHemeLB (previously known as _FabricHemeLB_), which is used to automate workflows involving 
