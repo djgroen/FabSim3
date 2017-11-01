@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# 
-# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+#
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license.
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
-# Use python standard library templates to allow strings to include $foo syntax to interpolate elements from the 
+# Use python standard library templates to allow strings to include $foo syntax to interpolate elements from the
 # Fabric environment dictionary, and to generate job queue submission scripts therefrom.
 #
 # Job-queue submission scripts should be stored in deploy/templates, with filenames like legion-hemelb (for a script used to
@@ -23,11 +23,11 @@ def script_template_content(template_name):
     template_file_path = os.path.join(p, template_name)
     if os.path.exists(template_file_path):
       source=open(template_file_path)
-  
+
   if source:
     return template(source.read())
   else:
-    print "FabSim Error: could not find template file. FabSim looked for it in the following directories: ", env.local_templates_path
+    print("FabSim Error: could not find template file. FabSim looked for it in the following directories: ", env.local_templates_path)
 
 def script_template_save_temporary(content):
   destname=os.path.join(env.localroot,'deploy','.jobscripts',env['name']+'.sh')

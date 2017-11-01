@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# 
-# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+#
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license.
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
 # This file contains functions which help parse and process machine-specific definitions, written in machines*.yml
@@ -21,7 +21,7 @@ if 'VIRTUAL_ENV' in environ:
                        'python%d.%d' % version_info[:2],
                        'site-packages')
     site.addsitedir(virtual_env)
-    print 'Using Virtualenv =>', virtual_env
+    print('Using Virtualenv =>', virtual_env)
 del site, environ, join, version_info
 import fabric.api
 from fabric.api import *
@@ -82,7 +82,7 @@ def diagnostics():
     pp.pprint(env)
     pp.pprint(sys.path)
     import HemeLbSetupTool
-    print HemeLbSetupTool.__path__
+    print(HemeLbSetupTool.__path__)
 
 @task
 def machine(name):
@@ -139,7 +139,7 @@ def complete_environment():
 
     for i in xrange(0, len(env.local_templates_path)):
         env.local_templates_path[i]=os.path.expanduser(template(env.local_templates_path[i]))
-  
+
     module_commands=["module %s"%module for module in env.modules]
     env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'
 
