@@ -24,7 +24,7 @@ default:
   # All user- and generally- defined values in these config dictionaries will be interpolated via $foo
   home_path_template: "/home/$username"
   # Name for the Project Fabric folder
-  fabric_dir: "FabSim"
+  fabric_dir: "FabSim3"
   # Path to runtime accessible filesystem (default is same as build time)
   runtime_path_template: "$home_path"
   corespernode: 1

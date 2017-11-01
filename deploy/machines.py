@@ -30,7 +30,7 @@ import sys
 import subprocess
 import posixpath
 import yaml
-from templates import *
+from .templates import *
 from functools import *
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
