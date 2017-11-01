@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
-# 
-# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+#
+#
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license.
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
 # fab.py contains general-purpose FabSim routines.
@@ -30,14 +30,14 @@ def add_local_paths(module_name):
 
 @task
 def print_local_environment():
-  print env
+  print(env)
 
 @task
 def stat():
     """Check the remote message queue status"""
     #TODO: Respect varying remote machine queue systems.
     if not env.get('stat_postfix'):
-        return run(template("$stat -u $username")) 
+        return run(template("$stat -u $username"))
     return run(template("$stat -u $username $stat_postfix"))
 
 @task
@@ -46,12 +46,12 @@ def monitor():
     while True:
         execute(stat)
         time.sleep(120)
-        
-        
+
+
 def check_complete():
   """Return true if the user has no queued jobs"""
   return stat()==""
-     
+
 @task
 def wait_complete():
   """Wait until all jobs currently qsubbed are complete, then return"""
@@ -125,7 +125,7 @@ def fetch_configs(config=''):
     """
     with_config(config)
     if env.manual_gsissh:
-	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_config_path/ file://$job_config_path_local/"))
+        local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_config_path/ file://$job_config_path_local/"))
     else:
         local(template("rsync -pthrvz $username@$remote:$job_config_path/ $job_config_path_local"))
 
@@ -140,14 +140,14 @@ def put_configs(config=''):
     i.e. /store4/blood/username/config_files
     If you can't mount entropy, 'fetch_configs' can be useful, via 'fab entropy fetch_configs; fab legion put_configs'
 
-    RECENT ADDITION: Added get_setup_fabric_dirs_string() so that the Fabric Directories are now created automatically whenever 
+    RECENT ADDITION: Added get_setup_fabric_dirs_string() so that the Fabric Directories are now created automatically whenever
     a config file is uploaded.
     """
 
     with_config(config)
     run(template("%s; mkdir -p $job_config_path" % (get_setup_fabric_dirs_string())))
     if env.manual_gsissh:
-	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
+        local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
     else:
         rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
 
@@ -162,7 +162,7 @@ def put_results(name=''):
     with_job(name)
     run(template("mkdir -p $job_results"))
     if env.manual_gsissh:
-	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_results_local/ gsiftp://$remote/$job_results/"))
+        local(template("globus-url-copy -p 10 -cd -r -sync file://$job_results_local/ gsiftp://$remote/$job_results/"))
     else:
         rsync_project(local_dir=env.job_results_local+'/',remote_dir=env.job_results)
 
@@ -175,12 +175,12 @@ def fetch_results(name='',regex='',debug=False):
     i.e. /store4/blood/username/results.
     If you can't mount entropy, 'put results' can be useful,  via 'fab legion fetch_results; fab entropy put_results'
     """
-    
+
     if debug:
         pp.pprint(env)
     with_job(name)
     if env.manual_gsissh:
-	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_results/%s file://$job_results_local/" % regex))
+        local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_results/%s file://$job_results_local/" % regex))
     else:
         local(template("rsync -pthrvz $username@$remote:$job_results/%s $job_results_local" % regex))
 
@@ -201,7 +201,7 @@ def fetch_profiles(name=''):
     """
     with_profile(name)
     if env.manual_gsissh:
-	local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_profile_path/ file://$job_profile_path_local/"))
+        local(template("globus-url-copy -cd -r -sync gsiftp://$remote/$job_profile_path/ file://$job_profile_path_local/"))
     else:
         local(template("rsync -pthrvz $username@$remote:$job_profile_path/ $job_profile_path_local"))
 
@@ -216,15 +216,15 @@ def put_profiles(name=''):
     with_profile(name)
     run(template("mkdir -p $job_profile_path"))
     if env.manual_gsissh:
-	local(template("globus-url-copy -p 10 -cd -r -sync file://$job_profile_path_local/ gsiftp://$remote/$job_profile_path/"))
+        local(template("globus-url-copy -p 10 -cd -r -sync file://$job_profile_path_local/ gsiftp://$remote/$job_profile_path/"))
     else:
         rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
 
 def get_setup_fabric_dirs_string():
     """
-    Returns the commands required to set up the fabric directories. This is not in the env, because modifying this 
+    Returns the commands required to set up the fabric directories. This is not in the env, because modifying this
     is likely to break FabSim in most cases.
-    This is stored in an individual function, so that the string can be appended in existing commands, reducing 
+    This is stored in an individual function, so that the string can be appended in existing commands, reducing
     the performance overhead.
     """
     return 'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
@@ -243,21 +243,21 @@ def update_environment(*dicts):
 def calc_nodes():
   # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
 
-  env.coresusedpernode=env.corespernode
-  if int(env.coresusedpernode)>int(env.cores):
-    env.coresusedpernode=env.cores
-  env.nodes=int(env.cores)/int(env.coresusedpernode)
+    env.coresusedpernode=env.corespernode
+    if int(env.coresusedpernode)>int(env.cores):
+        env.coresusedpernode=env.cores
+    env.nodes=int(env.cores)/int(env.coresusedpernode)
 
 
 def job(*option_dictionaries):
     """Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
-    
+
     update_environment(*option_dictionaries)
     with_template_job()
 
-    # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the 
+    # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the
     # cores per replica by dividing up the total core count.
     if 'replicas' in option_dictionaries[0].keys():
         env.cores_per_replica = int(env.cores) / int(env.replicas)
@@ -273,37 +273,37 @@ def job(*option_dictionaries):
         calc_nodes()
         if env.node_type:
             env.node_type_restriction=template(env.node_type_restriction_template)
-        
+
         if 'replica_index' in option_dictionaries[0].keys():
-            print "replica_index found."
+            print("replica_index found.")
             env.name = env.name + "_" + str(env.replica_index)
 
         if 'lambda_index' in option_dictionaries[0].keys():
-            print "lambda_index found."
+            print("lambda_index found.")
             env.name = env.name + "_" + str(env.lambda_index)
-    
+
         env['job_name']=env.name[0:env.max_job_name_chars]
         with settings(cores=1):
             calc_nodes()
             env.run_command_one_proc=template(env.run_command)
         calc_nodes()
-	if env.get('nodes_new'):
-	    env.nodes = env.nodes_new
+    if env.get('nodes_new'):
+        env.nodes = env.nodes_new
         env.run_command=template(env.run_command)
         if env.get('run_ensemble_command') and env.get('cores_per_replica'):
             env.run_ensemble_command=template(env.run_ensemble_command)
-	if env.get('run_ensemble_command_ties') and env.get('cores_per_replica_per_lambda'):
-	    env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
+    if env.get('run_ensemble_command_ties') and env.get('cores_per_replica_per_lambda'):
+        env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
 
         env.job_script=script_templates(env.batch_header,env.script)
 
         env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
         put(env.job_script,env.dest_name)
-        
+
         if 'remote_path' in option_dictionaries[1].keys():
-            print "remote_path found."
+            print("remote_path found.")
             env.job_results = env.remote_path
-        
+
         run(template("mkdir -p $job_results && cp $dest_name $job_results && chmod u+x $dest_name")) #bundled 3 ssh sessions into one to improve performance.
         with tempfile.NamedTemporaryFile() as tempf:
             tempf.write(yaml.dump(dict(env)))
@@ -311,12 +311,12 @@ def job(*option_dictionaries):
             put(tempf.name,env.pather.join(env.job_results,'env.yml'))
         # Allow option to submit all preparations, but not actually submit the job
         if not env.get("noexec",False):
-                   with cd(env.job_results):
-		       if env.module_load_at_connect:
-                       	   with prefix(env.run_prefix):
-                                run(template("$job_dispatch $dest_name"))
-                       else:
-                           run(template("$job_dispatch $dest_name"))
+            with cd(env.job_results):
+                if env.module_load_at_connect:
+                    with prefix(env.run_prefix):
+                        run(template("$job_dispatch $dest_name"))
+                else:
+                    run(template("$job_dispatch $dest_name"))
 
 def input_to_range(arg,default):
     ttype=type(default)
@@ -361,7 +361,7 @@ def manual_gsissh(cmd):
     manual_command=" && ".join(commands)
     pre_cmd = "gsissh -t -p %(port)s %(host)s " % env
     local(pre_cmd + "'"+manual_command+"'", capture=False)
-    
+
 def run(cmd):
     if env.manual_gsissh:
         return manual_gsissh(cmd)
@@ -370,17 +370,17 @@ def run(cmd):
         return manual(cmd)
     else:
         return fabric.api.run(cmd)
-        
+
 def put(src,dest):
     if env.manual_gsissh:
-	if os.path.isdir(src):
-            if src[-1] != '/': 
-	    	env.manual_src=src+'/'
-	    	env.manual_dest=dest+'/'
-	else: 
-	    env.manual_src=src
-	    env.manual_dest=dest
-	local(template("globus-url-copy -sync -r -cd -p 10 file://$manual_src gsiftp://$host/$manual_dest"))
+        if os.path.isdir(src):
+            if src[-1] != '/':
+                env.manual_src=src+'/'
+                env.manual_dest=dest+'/'
+        else:
+            env.manual_src=src
+            env.manual_dest=dest
+        local(template("globus-url-copy -sync -r -cd -p 10 file://$manual_src gsiftp://$host/$manual_dest"))
     elif env.manual_ssh:
         env.manual_src=src
         env.manual_dest=dest
@@ -396,7 +396,7 @@ def blackbox(script='ibi.sh', args=''):
         if os.path.exists(os.path.dirname(script_file_path)):
             local("%s %s" % (script_file_path, args))
             return
-    print "FabSim Error: could not find blackbox() script file. FabSim looked for it in the following directories: ", env.local_blackbox_path
+    print("FabSim Error: could not find blackbox() script file. FabSim looked for it in the following directories: ", env.local_blackbox_path)
 
 
 
@@ -404,23 +404,22 @@ def blackbox(script='ibi.sh', args=''):
 def probe(label="undefined"):
     """ Scans a remote site for the presence of certain software. """
     return run("module avail 2>&1 | grep %s" % label)
-    
+
 @task
 def archive(prefix, archive_location):
     """ Cleans results directories of core dumps and moves results to archive locations. """
 
     if len(prefix)<1:
-      print "error: no prefix defined."
+      print("error: no prefix defined.")
       sys.exit()
 
-    print "LOCAL %s %s %s*" % (env.local_results, prefix, archive_location)
+    print("LOCAL %s %s %s*" % (env.local_results, prefix, archive_location))
     local("rm -f %s/*/core" % (env.local_results))
     local("mv -i %s/%s* %s/" % (env.local_results, prefix, archive_location))
-    
-    
+
     parent_path = os.sep.join(env.results_path.split(os.sep)[:-1])
-    
-    print "REMOTE MOVE: mv %s/%s %s/Backup" % (env.results_path, prefix, parent_path)
+
+    print("REMOTE MOVE: mv %s/%s %s/Backup" % (env.results_path, prefix, parent_path))
     run("mkdir -p %s/Backup" % (parent_path))
     run("mv -i %s/%s* %s/Backup/" % (env.results_path, prefix, parent_path))
 
@@ -428,4 +427,4 @@ def archive(prefix, archive_location):
 def print_config(args=''):
     """ Prints local environment """
     for x in env:
-        print x,':',env[x]
+        print(x,':',env[x])
