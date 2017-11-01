@@ -72,7 +72,7 @@ env.blackboxroot=os.path.join(env.localroot,'blackbox')
 
 module_commands=["module %s"%module for module in env.modules]
 
-env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'
+env.run_prefix=" && ".join(module_commands+list(map(template,run_prefix_commands))) or 'echo Running...'
 
 @task
 def diagnostics():
@@ -137,11 +137,11 @@ def complete_environment():
     env.local_results=os.path.expanduser(template(env.local_results))
     env.local_configs=os.path.expanduser(template(env.local_configs))
 
-    for i in xrange(0, len(env.local_templates_path)):
+    for i in range(0, len(env.local_templates_path)):
         env.local_templates_path[i]=os.path.expanduser(template(env.local_templates_path[i]))
 
     module_commands=["module %s"%module for module in env.modules]
-    env.run_prefix=" && ".join(module_commands+map(template,run_prefix_commands)) or 'echo Running...'
+    env.run_prefix=" && ".join(module_commands+list(map(template,run_prefix_commands))) or 'echo Running...'
 
     if env.temp_path_template:
         env.temp_path=template(env.temp_path_template)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# 
-# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license. 
+#
+# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license.
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
 # This file contains FabSim definitions specific to FabNanoMD.
@@ -33,15 +33,15 @@ def lammps(config,**args):
     """Submits a set of LAMMPS jobs to the remote queue, as part of a clay swelling test."""
 
     #let's first try to run the exfoliated one.
-    
-    #lammps_in_file = 
+
+    #lammps_in_file =
 
 
     #with_config(config)
     #execute(put_configs,config)
-    
+
     #loop over swelling values
-    
+
     #update_environment(dict(job_results, job_config_path))
     #job(dict(script='lammps',
     #cores=4, wall_time='0:15:0',memory='2G'),args)
@@ -62,12 +62,12 @@ def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes", ibi_script
         blackbox("prepare_lammps_config.sh", "%s %s %s %d %s" % (ibi_out_dir, os.path.join(env.localroot,'config_files'), config_name, int(number)+1, atom_dir))
 
 @task
- 
+
 @task
 def do_pmf(number, outdir, atom_type1, atom_type2, config_name="peg", copy="yes", pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python')):
     """ Copy the obtained output to a work directory, do an IBI iteration and make a new config file from the resulting data. """
     pmf_in_dir = os.path.join(env.localroot,'results',outdir)
-    pmf_out_dir = os.path.join(env.localroot,'output_blackbox',outdir) 
+    pmf_out_dir = os.path.join(env.localroot,'output_blackbox',outdir)
     #pmf_out_dir = os.path.join(env.localroot,'output_blackbox',os.path.basename(pmf_script),outdir)
     ibi_script_dir=os.path.join(env.localroot,'python')
     local("mkdir -p %s" % (pmf_out_dir))
@@ -96,8 +96,8 @@ def ibi_analysis_multi(start_iter, num_iters, outdir_prefix, outdir_suffix, ibi_
 #        blackbox(ibi_script, "%s %s %s %s" % (i, pressure, ibi_in_dir, ibi_out_dir))
 
 @task
-def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.sh", atom_dir=os.path.join(env.localroot,'python'), **args): 
-    """ Performs both do_ibi and runs lammps with the newly created config file. 
+def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.sh", atom_dir=os.path.join(env.localroot,'python'), **args):
+    """ Performs both do_ibi and runs lammps with the newly created config file.
     Example use: fab hector full_ibi:config=2peg4,number=3,outdir=2peg3_hector_32,config_name=2peg,cores=32,wall_time=3:0:0 """
     do_ibi(number, outdir, pressure, config_name, "yes", ibi_script, atom_dir)
     lammps(config, **args)
@@ -105,21 +105,21 @@ def full_ibi(config, number, outdir, config_name, pressure=0.3, ibi_script="ibi.
     fetch_results(regex="*%s*" % (config_name))
 
 @task
-def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python'), **args): 
-    """ Performs both do_ibi and runs lammps with the newly created config file. 
+def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_script="pmf.sh", atom_dir=os.path.join(env.localroot,'python'), **args):
+    """ Performs both do_ibi and runs lammps with the newly created config file.
     Example use: fab hector full_ibi:config=2peg4,number=3,outdir=2peg3_hector_32,config_name=2peg,cores=32,wall_time=3:0:0 """
-    print "Starting PMF script."
+    print("Starting PMF script.")
     do_pmf(number, outdir, atom_type1, atom_type2, config_name, "yes", pmf_script, atom_dir)
-    print "PMF script finished. Launching LAMMPS."
+    print("PMF script finished. Launching LAMMPS.")
     update_environment(args)
     env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(env.cores_per_replica), int(env.cores_per_replica))
     lammps(config, **args)
     wait_complete()
     fetch_results(regex="*%s*" % (config_name))
-    
+
 @task
 def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0.3, script="ibi.sh", atom_dir="default", **args):
-    """ Do multiple IBI iterations in one command. 
+    """ Do multiple IBI iterations in one command.
     Example use: fab hector full_ibi_multi:start_iter=7,num_iters=3,config_name=2peg,outdir_suffix=_hector_32,cores=32,wall_time=3:0:0 """
 
     if atom_dir == "default":
@@ -127,28 +127,28 @@ def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0
 
     si = int(start_iter)
     ni = int(num_iters)
-    
+
     pressure_changed = 0
-    
-    for i in xrange(si,si+ni):       
+
+    for i in xrange(si,si+ni):
         full_ibi("%s%d" % (config_name,i+1), i, "%s%d%s" % (config_name,i,outdir_suffix), config_name, pressure, script, atom_dir, **args)
-        
+
         p_ave, p_std = lammps_get_pressure(os.path.join(env.localroot,"results","%s%d%s" % (config_name,i,outdir_suffix)), i)
-        print "Average pressure is now", p_ave, "after iteration", i, "completed."
+        print("Average pressure is now", p_ave, "after iteration", i, "completed.")
         #if(i >= 10 and p_ave < p_std):
         #    if pressure_changed == 0:
         #        pressure = float(pressure)/3.0
         #        pressure_changed = 1
-        #        print "(FabMD:) Pressure factor now set to", pressure, "after iteration", i
+        #        print("(FabMD:) Pressure factor now set to", pressure, "after iteration", i)
 
         #    if abs(p_ave) - (p_std*0.5) < 0: # We have converged, let's not waste further CPU cycles!
-        #        print "(FabMD:) Pressure has converged. OPTIMIZATION COMPLETE"
-        #        break  
+        #        print("(FabMD:) Pressure has converged. OPTIMIZATION COMPLETE")
+        #        break
 
 
 @task
 def full_pmf_multi(start_iter, num_iters, config_name, outdir_suffix, atom_type1, atom_type2, script="pmf.sh", atom_dir="default", **args):
-    """ Do multiple PMF iterations in one command. 
+    """ Do multiple PMF iterations in one command.
     Example use: fab hector full_ibi_multi:start_iter=7,num_iters=3,config_name=2peg,outdir_suffix=_hector_32,cores=32,wall_time=3:0:0 """
 
     if atom_dir == "default":
@@ -156,14 +156,14 @@ def full_pmf_multi(start_iter, num_iters, config_name, outdir_suffix, atom_type1
 
     si = int(start_iter)
     ni = int(num_iters)
-    
+
     pressure_changed = 0
-    
-    for i in xrange(si,si+ni):       
+
+    for i in xrange(si,si+ni):
         full_pmf("%s%d" % (config_name,i+1), i, "%s%d%s" % (config_name,i,outdir_suffix), config_name, atom_type1, atom_type2, script, atom_dir, **args)
-        
-    
- 
+
+
+
 
 def lammps_get_pressure(log_dir,number):
     steps = []
@@ -175,6 +175,6 @@ def lammps_get_pressure(log_dir,number):
             if NewRow[0] == "Press":
                 pressures.append(float(NewRow[2]))
     d1 = np.array(pressures[5:])
-    print "READ: new_CG.prod%d.log" % (number)
+    print("READ: new_CG.prod%d.log" % (number))
     return np.average(d1), np.std(d1) #average and stdev
 
