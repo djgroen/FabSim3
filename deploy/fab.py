@@ -15,6 +15,7 @@ import re
 import numpy as np
 import yaml
 import tempfile
+import os.path
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
@@ -220,7 +221,7 @@ def put_profiles(name=''):
     else:
         rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
 
-def get_setup_fabric_dirs_string():
+def get_setup_fabsim_dirs_string():
     """
     Returns the commands required to set up the fabric directories. This is not in the env, because modifying this
     is likely to break FabSim in most cases.
@@ -230,11 +231,21 @@ def get_setup_fabric_dirs_string():
     return 'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
 
 @task
-def setup_fabric_dirs(name=''):
+def setup_fabsim_dirs(name=''):
     """
     Creates the necessary fab dirs remotely.
     """
-    run(template(get_setup_fabric_dirs_string()))
+    run(template(get_setup_fabsim_dirs_string()))
+
+@task
+def setup_ssh_keys(password=""):
+    print(env)
+    import os.path
+    if os.path.isfile("%s/.ssh/id_rsa.pub" % (os.path.expanduser("~"))):
+      print("local id_rsa key already exists.")
+    else:
+      local("ssh-keygen -q -f %s/.ssh/id_rsa -t rsa -b 4096 -N \"%s\"" % (os.path.expanduser("~"), password))
+    local(template("ssh-copy-id -i ~/.ssh/id_rsa.pub %s" % env.host_string))
 
 def update_environment(*dicts):
     for adict in dicts:
