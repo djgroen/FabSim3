@@ -271,73 +271,47 @@ def calc_nodes():
 
 
 def job(*option_dictionaries):
-    """Internal low level job launcher.
+    """
+    Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
-    Execute a generic job on the remote machine. Use lammps, regress, or test instead."""
+    Execute a generic job on the remote machine. Use hemelb, regress, or test instead.
+    """
 
+    env.submit_time = time.strftime('%Y%m%d%H%M%S')
+    time.sleep(1.)
     update_environment(*option_dictionaries)
     with_template_job()
-
-    # If the replicas parameter is defined, then we are dealing with an ensemble job. We will calculate the
-    # cores per replica by dividing up the total core count.
-    if 'replicas' in option_dictionaries[0].keys():
-        env.cores_per_replica = int(env.cores) / int(env.replicas)
-
-
     # Use this to request more cores than we use, to measure performance without sharing impact
-    if env.get('cores_reserved')=='WholeNode' and env.get('corespernode'):
-        env.cores_reserved=(1+(int(env.cores)-1)/int(env.corespernode))*int(env.corespernode)
-
+    if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
+        env.cores_reserved = (1 + (int(env.cores) - 1) / int(env.corespernode)) * env.corespernode
     # If cores_reserved is not specified, temporarily set it based on the same as the number of cores
     # Needs to be temporary if there's another job with a different number of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
         calc_nodes()
         if env.node_type:
-            env.node_type_restriction=template(env.node_type_restriction_template)
-
-        if 'replica_index' in option_dictionaries[0].keys():
-            print("replica_index found.")
-            env.name = env.name + "_" + str(env.replica_index)
-
-        if 'lambda_index' in option_dictionaries[0].keys():
-            print("lambda_index found.")
-            env.name = env.name + "_" + str(env.lambda_index)
-
-        env['job_name']=env.name[0:env.max_job_name_chars]
+            env.node_type_restriction = template(env.node_type_restriction_template)
+        env['job_name'] = env.name[0:env.max_job_name_chars]
         with settings(cores=1):
-            calc_nodes()
-            env.run_command_one_proc=template(env.run_command)
+          calc_nodes()
+          env.run_command_one_proc = template(env.run_command)
         calc_nodes()
-    if env.get('nodes_new'):
-        env.nodes = env.nodes_new
-        env.run_command=template(env.run_command)
-        if env.get('run_ensemble_command') and env.get('cores_per_replica'):
-            env.run_ensemble_command=template(env.run_ensemble_command)
-    if env.get('run_ensemble_command_ties') and env.get('cores_per_replica_per_lambda'):
-        env.run_ensemble_command_ties=template(env.run_ensemble_command_ties)
+        env.run_command = template(env.run_command)
+        env.job_script = script_templates(env.batch_header, env.script)
 
-        env.job_script=script_templates(env.batch_header,env.script)
-
-        env.dest_name=env.pather.join(env.scripts_path,env.pather.basename(env.job_script))
-        put(env.job_script,env.dest_name)
-
-        if 'remote_path' in option_dictionaries[1].keys():
-            print("remote_path found.")
-            env.job_results = env.remote_path
-
-        run(template("mkdir -p $job_results && cp $dest_name $job_results && chmod u+x $dest_name")) #bundled 3 ssh sessions into one to improve performance.
+        env.dest_name = env.pather.join(env.scripts_path, env.pather.basename(env.job_script))
+        put(env.job_script, env.dest_name)
+        run(template("mkdir -p $job_results"))
+        run(template("cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile() as tempf:
             tempf.write(yaml.dump(dict(env)))
             tempf.flush() #Flush the file before we copy it.
-            put(tempf.name,env.pather.join(env.job_results,'env.yml'))
+            put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
+        run(template("chmod u+x $dest_name"))
         # Allow option to submit all preparations, but not actually submit the job
-        if not env.get("noexec",False):
-            with cd(env.job_results):
-                if env.module_load_at_connect:
-                    with prefix(env.run_prefix):
-                        run(template("$job_dispatch $dest_name"))
-                else:
-                    run(template("$job_dispatch $dest_name"))
+        if not env.get("noexec", False):
+                   with cd(env.job_results):
+                       with prefix(env.run_prefix):
+                           run(template("$job_dispatch $dest_name"))
 
 def input_to_range(arg,default):
     ttype=type(default)
