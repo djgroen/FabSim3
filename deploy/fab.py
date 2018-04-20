@@ -233,19 +233,29 @@ def get_setup_fabsim_dirs_string():
 @task
 def setup_fabsim_dirs(name=''):
     """
+    Sets up directories required for the use of FabSim.
+    """
+    """
     Creates the necessary fab dirs remotely.
     """
     run(template(get_setup_fabsim_dirs_string()))
 
 @task
 def setup_ssh_keys(password=""):
-    print(env)
+    """
+    Sets up SSH key pairs for FabSim access.
+    """
     import os.path
     if os.path.isfile("%s/.ssh/id_rsa.pub" % (os.path.expanduser("~"))):
       print("local id_rsa key already exists.")
     else:
       local("ssh-keygen -q -f %s/.ssh/id_rsa -t rsa -b 4096 -N \"%s\"" % (os.path.expanduser("~"), password))
     local(template("ssh-copy-id -i ~/.ssh/id_rsa.pub %s" % env.host_string))
+
+@task
+def setup_fabsim(password=""):
+    setup_ssh_keys(password)
+    setup_fabsim_dirs()
 
 def update_environment(*dicts):
     for adict in dicts:
