@@ -141,12 +141,12 @@ def put_configs(config=''):
     i.e. /store4/blood/username/config_files
     If you can't mount entropy, 'fetch_configs' can be useful, via 'fab entropy fetch_configs; fab legion put_configs'
 
-    RECENT ADDITION: Added get_setup_fabric_dirs_string() so that the Fabric Directories are now created automatically whenever
+    RECENT ADDITION: Added get_setup_fabsim_dirs_string() so that the Fabric Directories are now created automatically whenever
     a config file is uploaded.
     """
 
     with_config(config)
-    run(template("%s; mkdir -p $job_config_path" % (get_setup_fabric_dirs_string())))
+    run(template("%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())))
     if env.manual_gsissh:
         local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
     else:
