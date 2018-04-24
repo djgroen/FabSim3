@@ -302,7 +302,7 @@ def job(*option_dictionaries):
         put(env.job_script, env.dest_name)
         run(template("mkdir -p $job_results"))
         run(template("cp $dest_name $job_results"))
-        with tempfile.NamedTemporaryFile() as tempf:
+        with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(yaml.dump(dict(env)))
             tempf.flush() #Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
