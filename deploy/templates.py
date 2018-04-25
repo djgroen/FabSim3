@@ -12,6 +12,7 @@
 from fabric.api import *
 from string import Template
 import os
+import sys
 
 def script_templates(*names,**options):
   commands=options.get('commands',[])
@@ -55,4 +56,14 @@ def script_template(template_name):
   return script_template_save_temporary(result)
 
 def template(pattern):
-  return Template(pattern).substitute(env)
+  try:
+    template = Template(pattern).substitute(env)
+    return template
+  except KeyError as err:
+    print("ORIGINAL PATTERN:\n\n%s" % (pattern))
+    print("SAFELY SUBSTITUTED PATTERN:\n\n%s" % (Template(pattern).safe_substitute(env)))
+    print("ERROR: FABSIM_TEMPLATE_KEYERROR")
+    print("Template variables were not found in FabSim env dictionary: These variables need to be added, with a default value set.")
+    print("FabSim performed a 'safe_substite' and print the original template and the partially substituted one (both are given above this message). Variables that are missing in the env dictionary will be displayed unsubstituted in the output text. FabSim will now terminate as these errors would result in unpredictable behavior otherwise.")
+    sys.exit()
+
