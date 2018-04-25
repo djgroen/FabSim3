@@ -16,6 +16,7 @@ import numpy as np
 import yaml
 import tempfile
 import os.path
+import subprocess
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
@@ -262,13 +263,17 @@ def update_environment(*dicts):
         env.update(adict)
 
 def calc_nodes():
-  # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
+    # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
 
     env.coresusedpernode=env.corespernode
     if int(env.coresusedpernode)>int(env.cores):
         env.coresusedpernode=env.cores
     env.nodes=int(env.cores)/int(env.coresusedpernode)
 
+@task
+def get_fabsim_git_hash():
+    git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+    return git_hash.strip()
 
 def job(*option_dictionaries):
     """
@@ -276,6 +281,8 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use hemelb, regress, or test instead.
     """
+
+    env.fabsim_git_hash = get_fabsim_git_hash()
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
     time.sleep(1.)
