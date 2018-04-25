@@ -13,6 +13,10 @@ number_of_cores: 16
 ```
 env.number_of_cores = 16
 ```
+or
+```
+update_environment({"number_of_cores":16})
+```
 
 * within templates as a $ denominated variable, which is to be substituted. For example:
 ```
