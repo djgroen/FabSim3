@@ -275,6 +275,17 @@ def get_fabsim_git_hash():
     git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
     return git_hash.strip()
 
+@task
+def get_fabsim_command_history():
+    """
+    Parses the bash history, and returns all the instances that contain the phrase "fab ".
+    """
+    ps = subprocess.Popen(('cat', '/home/derek/.bash_history'), stdout=subprocess.PIPE)
+    hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
+    ps.wait()
+    print(hist)
+    return hist.strip()
+
 def job(*option_dictionaries):
     """
     Internal low level job launcher.
@@ -308,6 +319,10 @@ def job(*option_dictionaries):
         env.dest_name = env.pather.join(env.scripts_path, env.pather.basename(env.job_script))
         put(env.job_script, env.dest_name)
         run(template("mkdir -p $job_results"))
+
+        # Store previous fab commands in bash history.
+        env.fabsim_command_history = get_fabsim_command_history()
+
         run(template("cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(yaml.dump(dict(env)))
