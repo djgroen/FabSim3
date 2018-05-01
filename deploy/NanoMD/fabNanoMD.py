@@ -28,6 +28,37 @@ def lammps(config,**args):
     execute(put_configs,config)
     job(dict(script='lammps', wall_time='0:15:0', memory='2G'),args)
 
+@task
+def lammps_epoxy(config,**args):
+    """Submit a LAMMPS job to the remote queue.
+    The job results will be stored with a name pattern as defined in the environment,
+    e.g. cylinder-abcd1234-legion-256
+    config : config directory to use to define geometry, e.g. config=cylinder
+    Keyword arguments:
+            cores : number of compute cores to request
+            images : number of images to take
+            steering : steering session i.d.
+            wall_time : wall-time job limit
+            memory : memory per node
+    """
+
+    for repl in range(1,3):
+        mat="g0"
+        temp=300.0
+        nts=1
+        dld="x"
+        gof="flake"
+
+        ddir="./init.%s_%d.bin"%(mat,repl)
+        odir="./"
+
+        env.lammps_args = " -var loco %s -var locd %s -var epoxy %s -var tempt %f -var nsstrain %d" \
+                          " -var nrep %d -var dld %s -var gflake %s -screen none" \
+                             % (odir, ddir, mat, temp, nts, repl, dld, gof)
+
+        lammps(config, **args)
+
+
 #@task
 #def lammps_swelling_test(config, **args):
     """Submits a set of LAMMPS jobs to the remote queue, as part of a clay swelling test."""
@@ -177,4 +208,3 @@ def lammps_get_pressure(log_dir,number):
     d1 = np.array(pressures[5:])
     print("READ: new_CG.prod%d.log" % (number))
     return np.average(d1), np.std(d1) #average and stdev
-
