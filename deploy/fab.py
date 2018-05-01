@@ -16,6 +16,7 @@ import numpy as np
 import yaml
 import tempfile
 import os.path
+import subprocess
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
@@ -262,13 +263,28 @@ def update_environment(*dicts):
         env.update(adict)
 
 def calc_nodes():
-  # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
+    # If we're not reserving whole nodes, then if we request less than one node's worth of cores, need to keep N<=n
 
     env.coresusedpernode=env.corespernode
     if int(env.coresusedpernode)>int(env.cores):
         env.coresusedpernode=env.cores
     env.nodes=int(env.cores)/int(env.coresusedpernode)
 
+@task
+def get_fabsim_git_hash():
+    git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+    return git_hash.strip()
+
+@task
+def get_fabsim_command_history():
+    """
+    Parses the bash history, and returns all the instances that contain the phrase "fab ".
+    """
+    ps = subprocess.Popen(('cat', '/home/derek/.bash_history'), stdout=subprocess.PIPE)
+    hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
+    ps.wait()
+    print(hist)
+    return hist.strip()
 
 def job(*option_dictionaries):
     """
@@ -276,6 +292,8 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use hemelb, regress, or test instead.
     """
+
+    env.fabsim_git_hash = get_fabsim_git_hash()
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
     time.sleep(1.)
@@ -301,6 +319,10 @@ def job(*option_dictionaries):
         env.dest_name = env.pather.join(env.scripts_path, env.pather.basename(env.job_script))
         put(env.job_script, env.dest_name)
         run(template("mkdir -p $job_results"))
+
+        # Store previous fab commands in bash history.
+        env.fabsim_command_history = get_fabsim_command_history()
+
         run(template("cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(yaml.dump(dict(env)))
