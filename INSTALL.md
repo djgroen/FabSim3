@@ -9,6 +9,8 @@ FabSim requires the following Python modules:
 
 You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
 
+For Mac users, you might also need ssh-copy-id. This can be installed using `brew install ssh-copy-id`.
+
 ## Installation
 
 1. Clone the code from the GitHub repository.
