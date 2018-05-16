@@ -4,10 +4,10 @@ Installing and Testing FabSim
 ## Dependencies
 
 FabSim requires the following Python modules:
-* PyYaml 
-* Fabric3 (1.1.13.post1 has worked for us)
+* PyYAML (any version) 
+* fabric3 (1.1.13.post1 has worked for us)
 
-You can install using `pip3`.
+You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
 
 ## Installation
 
