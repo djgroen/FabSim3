@@ -26,7 +26,7 @@ For Mac users, you might also need ssh-copy-id. This can be installed using `bre
 1. Install LAMMPS (see http://lammps.sandia.gov for detailed download and installation instructions).
 2. Modify `machines_user.yml` to make the `lammps_exec` variable point to the location of the LAMMPS executable. e.g., `lammps_exec: "/home/james/bin/lmp_serial"`.
 3. FabSim contains a trial LAMMPS configuration, so there's no need to download that.
-4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabric_dirs`.
+4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabsim_dirs`.
 5. Run the LAMMPS test data set using: `fab localhost lammps:lammps_lj_liquid,cores=1,wall_time=1:00:0`.
 6. Run `fab localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
