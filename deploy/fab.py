@@ -270,10 +270,19 @@ def calc_nodes():
         env.coresusedpernode=env.cores
     env.nodes=int(env.cores)/int(env.coresusedpernode)
 
+def run_cmd(command, verbose=False):
+    """
+    Run a command using subprocess.
+    """
+    out = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = out.communicate()
+    if verbose:
+        print(output[0].strip())
+    return output[0].strip()
+
 @task
 def get_fabsim_git_hash():
-    git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
-    return git_hash.strip()
+    return run_cmd("git rev-parse HEAD", verbose=True)
 
 @task
 def get_fabsim_command_history():
