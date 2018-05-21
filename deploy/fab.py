@@ -280,7 +280,7 @@ def get_fabsim_command_history():
     """
     Parses the bash history, and returns all the instances that contain the phrase "fab ".
     """
-    ps = subprocess.Popen(('cat', '/home/derek/.bash_history'), stdout=subprocess.PIPE)
+    ps = subprocess.Popen(('cat', "%s/.bash_history" % (env.home_path)), stdout=subprocess.PIPE)
     hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
     ps.wait()
     print(hist)
