@@ -20,6 +20,16 @@ import subprocess
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
+def local_with_stdout(cmd, verbose=False):
+    """
+    Runs Fabric's local() function, while capturing and returning stdout automatically.
+    """
+    output = local(cmd, capture=True)
+    if verbose:
+        print("stdout: %s" % output.stdout)
+        print("stderr: %s" % output.stderr)
+    return output.stdout
+
 
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
@@ -270,30 +280,21 @@ def calc_nodes():
         env.coresusedpernode=env.cores
     env.nodes=int(env.cores)/int(env.coresusedpernode)
 
-def run_cmd(command, verbose=False):
-    """
-    Run a command using subprocess.
-    """
-    out = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    output = out.communicate()
-    if verbose:
-        print(output[0].strip())
-    return output[0].strip()
-
 @task
-def get_fabsim_git_hash():
-    return run_cmd("git rev-parse HEAD", verbose=True)
+def get_fabsim_git_hash(verbose=True):
+    return local_with_stdout("git rev-parse HEAD", verbose=True)
 
 @task
 def get_fabsim_command_history():
     """
     Parses the bash history, and returns all the instances that contain the phrase "fab ".
     """
-    ps = subprocess.Popen(('cat', "%s/.bash_history" % (env.home_path)), stdout=subprocess.PIPE)
-    hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
-    ps.wait()
-    print(hist)
-    return hist.strip()
+    return local_with_stdout("cat %s/.bash_history | grep fab" % (env.home_path), verbose=True)
+    #ps = subprocess.Popen(('cat', "%s/.bash_history" % (env.home_path)), stdout=subprocess.PIPE)
+    #hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
+    #ps.wait()
+    #print(hist)
+    #return hist.strip()
 
 def job(*option_dictionaries):
     """
