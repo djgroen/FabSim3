@@ -17,6 +17,7 @@ import yaml
 import tempfile
 import os.path
 import subprocess
+import math
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
@@ -220,7 +221,7 @@ def calc_nodes():
     env.coresusedpernode=env.corespernode
     if int(env.coresusedpernode)>int(env.cores):
         env.coresusedpernode=env.cores
-    env.nodes=int(env.cores)/int(env.coresusedpernode)
+    env.nodes=int(math.ceil(float(env.cores)/float(env.coresusedpernode)))
 
 @task
 def get_fabsim_git_hash(verbose=True):
