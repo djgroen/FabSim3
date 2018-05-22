@@ -5,6 +5,6 @@
 # fabfile.py is the main FabSim interface file. Here one can freely include or omit subsections of the FabSim toolkit,
 # to modify the enabled functionalities.
 
-from deploy.fab import *
+from base.fab import *
 from deploy.NanoMD.fabNanoMD import *
 #from deploy.repast.fabRepast import *

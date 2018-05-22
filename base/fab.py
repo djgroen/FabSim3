@@ -6,8 +6,8 @@
 #
 # fab.py contains general-purpose FabSim routines.
 
-from .templates import *
-from .machines import *
+from deploy.templates import *
+from deploy.machines import *
 from fabric.contrib.project import *
 from xml.etree import ElementTree
 import time

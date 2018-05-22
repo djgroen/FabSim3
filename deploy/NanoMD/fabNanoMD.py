@@ -5,7 +5,7 @@
 #
 # This file contains FabSim definitions specific to FabNanoMD.
 
-from ..fab import *
+from base.fab import *
 
 # Add local script, blackbox and template path.
 add_local_paths("NanoMD")
