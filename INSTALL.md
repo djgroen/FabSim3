@@ -17,18 +17,26 @@ For Mac users, you might also need ssh-copy-id. This can be installed using `bre
 
 2. The 'fab' command, which comes with Fabric, needs to be usable directly from the command line. You can make it usable by ensuring that the command resides in your `$PATH` environment.
 
-3. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
+3. Ensure that the main FabSim3 directory is in your $PYTHONPATH environment variable. An easy way to accomplish this is by adding the following to the end of your $HOME/.bashrc file:
+```
+export PYTHONPATH=(path of your FabSim3 directory):$PYTHONPATH
+```
+Note that you may have to restart the shell for this change to apply.
+
+4. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
 
 Note: For Mac Users, be sure to override the default home directory, by adding the following line in the section default:
 ```
 home_path_template: "/home/$username
 ```
 
-4. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
+5. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
 
-5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
+6. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
 
 ## Testing FabSim
+
+The easiest way to test FabSim is to simply go to the base directory of your FabSim installation and try the examples below.
 
 ### LAMMPS testing on the local host
 
