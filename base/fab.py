@@ -20,6 +20,9 @@ import subprocess
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
+from manage_remote_job import *
+from setup_fabsim import *
+
 def local_with_stdout(cmd, verbose=False):
     """
     Runs Fabric's local() function, while capturing and returning stdout automatically.
@@ -30,7 +33,6 @@ def local_with_stdout(cmd, verbose=False):
         print("stderr: %s" % output.stderr)
     return output.stdout
 
-
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
     env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))
@@ -38,38 +40,6 @@ def add_local_paths(module_name):
     env.local_blackbox_path.insert(0, "$localroot/deploy/%s/blackbox" % (module_name))
     # This variable encodes the default location for Python scripts.
     env.local_python_path.insert(0, "$localroot/deploy/%s/python" % (module_name))
-
-
-@task
-def print_local_environment():
-  print(env)
-
-@task
-def stat():
-    """Check the remote message queue status"""
-    #TODO: Respect varying remote machine queue systems.
-    if not env.get('stat_postfix'):
-        return run(template("$stat -u $username"))
-    return run(template("$stat -u $username $stat_postfix"))
-
-@task
-def monitor():
-    """Report on the queue status, ctrl-C to interrupt"""
-    while True:
-        execute(stat)
-        time.sleep(120)
-
-
-def check_complete():
-  """Return true if the user has no queued jobs"""
-  return stat()==""
-
-@task
-def wait_complete():
-  """Wait until all jobs currently qsubbed are complete, then return"""
-  time.sleep(120)
-  while not check_complete():
-        time.sleep(120)
 
 def with_template_job():
     """
@@ -232,7 +202,6 @@ def put_profiles(name=''):
     else:
         rsync_project(local_dir=env.job_profile_path_local+'/',remote_dir=env.job_profile_path)
 
-def get_setup_fabsim_dirs_string():
     """
     Returns the commands required to set up the fabric directories. This is not in the env, because modifying this
     is likely to break FabSim in most cases.
@@ -241,8 +210,6 @@ def get_setup_fabsim_dirs_string():
     """
     return 'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
 
-@task
-def setup_fabsim_dirs(name=''):
     """
     Sets up directories required for the use of FabSim.
     """
@@ -250,23 +217,6 @@ def setup_fabsim_dirs(name=''):
     Creates the necessary fab dirs remotely.
     """
     run(template(get_setup_fabsim_dirs_string()))
-
-@task
-def setup_ssh_keys(password=""):
-    """
-    Sets up SSH key pairs for FabSim access.
-    """
-    import os.path
-    if os.path.isfile("%s/.ssh/id_rsa.pub" % (os.path.expanduser("~"))):
-      print("local id_rsa key already exists.")
-    else:
-      local("ssh-keygen -q -f %s/.ssh/id_rsa -t rsa -b 4096 -N \"%s\"" % (os.path.expanduser("~"), password))
-    local(template("ssh-copy-id -i ~/.ssh/id_rsa.pub %s" % env.host_string))
-
-@task
-def setup_fabsim(password=""):
-    setup_ssh_keys(password)
-    setup_fabsim_dirs()
 
 def update_environment(*dicts):
     for adict in dicts:
