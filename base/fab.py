@@ -33,14 +33,6 @@ def local_with_stdout(cmd, verbose=False):
         print("stderr: %s" % output.stderr)
     return output.stdout
 
-def add_local_paths(module_name):
-    # This variable encodes the default location for templates.
-    env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))
-    # This variable encodes the default location for blackbox scripts.
-    env.local_blackbox_path.insert(0, "$localroot/deploy/%s/blackbox" % (module_name))
-    # This variable encodes the default location for Python scripts.
-    env.local_python_path.insert(0, "$localroot/deploy/%s/python" % (module_name))
-
 def with_template_job():
     """
     Determine a generated job name from environment parameters, and then define additional environment parameters based on it.

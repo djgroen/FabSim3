@@ -2,6 +2,14 @@ from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
 
+def add_local_paths(module_name):
+    # This variable encodes the default location for templates.
+    env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))
+    # This variable encodes the default location for blackbox scripts.
+    env.local_blackbox_path.insert(0, "$localroot/deploy/%s/blackbox" % (module_name))
+    # This variable encodes the default location for Python scripts.
+    env.local_python_path.insert(0, "$localroot/deploy/%s/python" % (module_name))
+
 def get_setup_fabsim_dirs_string():
     """
     Returns the commands required to set up the fabric directories. This is not in the env, because modifying this
