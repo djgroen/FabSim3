@@ -43,6 +43,9 @@ def setup_ssh_keys(password=""):
 
 @task
 def setup_fabsim(password=""):
+    """
+    Combined command which sets up both the SSH keys and creates the FabSim directories.
+    """
     setup_ssh_keys(password)
     setup_fabsim_dirs()
 
