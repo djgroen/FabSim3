@@ -24,6 +24,8 @@ def script_template_content(template_name):
     template_file_path = os.path.join(p, template_name)
     if os.path.exists(template_file_path):
       source=open(template_file_path)
+    else:
+      print("Warn:", template_file_path, "does not exist.")
 
   if source:
     return template(source.read())

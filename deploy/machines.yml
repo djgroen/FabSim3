@@ -54,6 +54,21 @@ default:
   # This variable encodes the default location for Python scripts.
   local_python_path: ["$localroot/python"]
 
+prometheus:
+  max_job_name_chars: 15
+  job_dispatch: "sbatch"
+  stat: "squeue"
+  run_command: "mpiexec -n $cores"
+  batch_header: slurm-prometheus
+  remote: "prometheus.cyfronet.pl"
+  home_path_template: "/net/people/$username"
+  runtime_path_template: "/net/scratch/people/$username"
+  modules: ["load apps/lammps"]
+  temp_path_template: "$work_path/tmp"
+  queue: "plgrid"
+  python_build: "python2.7"
+  corespernode: 24
+
 supermuc1_thin:
   max_job_name_chars: 15
   job_dispatch: "llsubmit"
@@ -181,6 +196,7 @@ oppenheimer:
 localhost:
   remote: "localhost"
   python_build: "lib/python2.7"
+  home_path_template: "/home/$username"
   # The setting below can be useful for debugging if you run into problems.
   # manual_ssh: true
 mavrino:
