@@ -1,6 +1,7 @@
 from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
+import time
 
 @task
 def stat():
