@@ -3,6 +3,7 @@ from deploy.machines import *
 from fabric.contrib.project import *
 
 #TODO: Make general purpose plugin install command.
+@task
 def install_FabMD():
     with cd("%s/deploy" % env.localroot):
         local("rm -rf FabMD")
