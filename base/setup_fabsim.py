@@ -19,12 +19,13 @@ def activate_plugin(name):
     # if the commented pattern is not found, then we need to append a new import at the end of fabfile.py.
     if found == False:
         with open(fabfile_loc, "a") as myfile:
-            myfile.write("from deploy.%s.%s import *\n" % (name, name))
+            myfile.write("from plugins.%s.%s import *\n" % (name, name))
 
 #TODO: Make general purpose plugin install command.
 @task
 def install_FabMD():
-    with cd("%s/deploy" % env.localroot):
+    local("mkdir -p %s/plugins" % (env.localroot))
+    with cd("%s/plugins" % env.localroot):
         local("rm -rf FabMD")
         local("git clone git@github.com:UCL-CCS/FabMD.git")
         activate_plugin("FabMD")
