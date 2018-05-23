@@ -24,11 +24,15 @@ def activate_plugin(name):
 #TODO: Make general purpose plugin install command.
 @task
 def install_FabMD():
-    local("mkdir -p %s/plugins" % (env.localroot))
-    with cd("%s/plugins" % env.localroot):
-        local("rm -rf FabMD")
-        local("git clone git@github.com:UCL-CCS/FabMD.git")
-        activate_plugin("FabMD")
+    name = "FabMD"
+    plugin_dir = "%s/plugins" % (env.localroot)
+    local("mkdir -p %s" % (plugin_dir))
+
+    local("rm -rf %s/%s" % (plugin_dir, name))
+
+    local("git clone git@github.com:UCL-CCS/FabMD.git %s/%s" % (plugin_dir, name))
+
+    activate_plugin("%s" % (name))
 
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
