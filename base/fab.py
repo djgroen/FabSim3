@@ -21,8 +21,8 @@ import math
 from pprint import PrettyPrinter
 pp=PrettyPrinter()
 
-from manage_remote_job import *
-from setup_fabsim import *
+from base.manage_remote_job import *
+from base.setup_fabsim import *
 
 def local_with_stdout(cmd, verbose=False):
     """
@@ -232,12 +232,7 @@ def get_fabsim_command_history():
     """
     Parses the bash history, and returns all the instances that contain the phrase "fab ".
     """
-    return local_with_stdout("cat ~/.bash_history | grep fab", verbose=True)
-    #ps = subprocess.Popen(('cat', "%s/.bash_history" % (env.home_path)), stdout=subprocess.PIPE)
-    #hist = subprocess.check_output(('grep', 'fab'), stdin=ps.stdout)
-    #ps.wait()
-    #print(hist)
-    #return hist.strip()
+    return local_with_stdout("cat %s/.bash_history | grep fab" % (env.localhome), verbose=True)
 
 def job(*option_dictionaries):
     """

@@ -37,8 +37,9 @@ pp=PrettyPrinter()
 
 
 
-#Root of local HemeLB checkout.
-env.localroot=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#Root of local FabSim installation
+env.localroot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env.localhome = os.path.path(expanduser("~"))
 env.no_ssh=False
 env.no_hg=False
 #Load and invoke the default non-machine specific config JSON dictionaries.
