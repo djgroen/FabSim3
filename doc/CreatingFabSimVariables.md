@@ -46,10 +46,13 @@ def test_sim(config,**args):
     # This will override any defaults set in other parts of FabSim (e.g. machines_user.yml)
 
     update_environment(args) 
-    # If a value for test_var is given as a command-line argument, then the default set above will be overridden.
+    # If a value for test_var is given as a command-line argument, 
+    # then the default set above will be overridden.
 
     env.sim_args = "-test-var=%s" % (env.test_var) 
-    # Optional example how to use your created variable to create some parameter syntax for your job.
+    # Optional example how to use your created variable 
+    # to create some parameter syntax for your job.
 
-    test_sim(config, **args) # start a fictitious job, with the variable present in your FabSim environment.
+    test_sim(config, **args) 
+    # start a fictitious job, with the variable present in your FabSim environment.
 ```
