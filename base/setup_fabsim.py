@@ -2,6 +2,12 @@ from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
 
+#TODO: Make general purpose plugin install command.
+def install_FabMD():
+    with cd("%s/deploy" % env.localroot):
+        local("rm -rf FabMD")
+        local("git clone git@github.com:UCL-CCS/FabMD.git")
+
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
     env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))

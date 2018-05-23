@@ -6,5 +6,5 @@
 # to modify the enabled functionalities.
 
 from base.fab import *
-from deploy.NanoMD.fabNanoMD import *
+from deploy.fabMD.fabNanoMD import *
 #from deploy.repast.fabRepast import *
