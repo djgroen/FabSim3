@@ -55,7 +55,7 @@ The easiest way to test FabSim is to simply go to the base directory of your Fab
 5. Run the LAMMPS test data set using: `fab localhost lammps:lammps_lj_liquid,cores=1,wall_time=1:00:0`.
 6. Run `fab localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
-### FabBioMD testing is currently unavailable in the core FabSim3, as we are refactoring this module.
+### FabBioMD testing is currently unavailable in the core FabSim3, as we are refactoring this plugin.
 
 (1. Install NAMD (required just for local host).
 2. Modify `machines_user.yml` to make the `namd_exec` variable point to the location of the NAMD executable. e.g., `namd_exec: "/home/james/bin/namd/2.9"` (This needs to be done individually for all local or remote hosts).
