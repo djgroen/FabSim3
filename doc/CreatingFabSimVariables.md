@@ -32,3 +32,24 @@ Variable are obtained from the following sources:
 ### How variables are applied:
 1. Directly, by reading values from env.<variable_name> in the Python code base.
 2. Through template substitution, where instances of $<variable_name> are replaced with <variable_value> in the substitution output.
+
+#### Example of applying a variable 
+
+```
+@task
+def test_sim(config,**args):
+    """
+    Submit a my_sim job to the remote queue.
+    """
+    
+    env.test_var = 300.0 # test variable is set to a default value in the FabSim environment. 
+    # This will override any defaults set in other parts of FabSim (e.g. machines_user.yml)
+
+    update_environment(args) 
+    # If a value for test_var is given as a command-line argument, then the default set above will be overridden.
+
+    env.sim_args = "-test-var=%s" % (env.test_var) 
+    # Optional example how to use your created variable to create some parameter syntax for your job.
+
+    test_sim(config, **args) # start a fictitious job, with the variable present in your FabSim environment.
+```
