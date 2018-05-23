@@ -6,6 +6,9 @@ import fileinput
 import sys
 
 def activate_plugin(name):
+    """
+    Updates fabfile.py to enable plugin.
+    """
     found = False
     fabfile_loc = "%s/fabfile.py" % (env.localroot)
 
@@ -21,16 +24,19 @@ def activate_plugin(name):
         with open(fabfile_loc, "a") as myfile:
             myfile.write("from plugins.%s.%s import *\n" % (name, name))
 
-#TODO: Make general purpose plugin install command.
 @task
-def install_FabMD():
-    name = "FabMD"
+def install_plugin(name):
+    """
+    Install a specific FabSim3 plugin.
+    """
+    config=yaml.load(open(os.path.join(env.localroot,'deploy','plugins.yml')))
+    info = config[name]
     plugin_dir = "%s/plugins" % (env.localroot)
     local("mkdir -p %s" % (plugin_dir))
 
     local("rm -rf %s/%s" % (plugin_dir, name))
 
-    local("git clone git@github.com:UCL-CCS/FabMD.git %s/%s" % (plugin_dir, name))
+    local("git clone %s %s/%s" % (info["repository"], plugin_dir, name))
 
     activate_plugin("%s" % (name))
 
@@ -80,5 +86,6 @@ def setup_fabsim(password=""):
     """
     setup_ssh_keys(password)
     setup_fabsim_dirs()
+    install_plugin("FabMD") #FabSim3 ships with FabMD by default, to make it easier for new users to test things.
 
 
