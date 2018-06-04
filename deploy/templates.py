@@ -57,9 +57,15 @@ def script_template(template_name):
   result=script_template_content(template_name)
   return script_template_save_temporary(result)
 
-def template(pattern):
+def template(pattern, number_of_iterations=1):
+  """
+  Low-level templating function, insert env variables into any string pattern.
+  - number_of_iterations can be adjusted to allow recursive templating using a single function call.
+  """
   try:
-    template = Template(pattern).substitute(env)
+    for i in range(0, number_of_iterations):
+      template = Template(pattern).substitute(env)
+      pattern = template
     return template
   except KeyError as err:
     print("ORIGINAL PATTERN:\n\n%s" % (pattern))
