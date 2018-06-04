@@ -60,7 +60,7 @@ def script_template(template_name):
 def template(pattern, number_of_iterations=1):
   """
   Low-level templating function, insert env variables into any string pattern.
-  - number_of_iterations can be adjusted to allow recursive templating using a single function call.
+  - number_of_iterations can be adjusted to allow recurring templating using a single function call.
   """
   try:
     for i in range(0, number_of_iterations):
