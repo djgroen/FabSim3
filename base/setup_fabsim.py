@@ -42,11 +42,11 @@ def install_plugin(name):
 
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
-    env.local_templates_path.insert(0, "$localroot/deploy/%s/templates" % (module_name))
+    env.local_templates_path.insert(0, "$localroot/plugins/%s/templates" % (module_name))
     # This variable encodes the default location for blackbox scripts.
-    env.local_blackbox_path.insert(0, "$localroot/deploy/%s/blackbox" % (module_name))
+    env.local_blackbox_path.insert(0, "$localroot/plugins/%s/blackbox" % (module_name))
     # This variable encodes the default location for Python scripts.
-    env.local_python_path.insert(0, "$localroot/deploy/%s/python" % (module_name))
+    env.local_python_path.insert(0, "$localroot/plugins/%s/python" % (module_name))
 
 def get_setup_fabsim_dirs_string():
     """
