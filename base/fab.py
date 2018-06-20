@@ -25,6 +25,12 @@ pp=PrettyPrinter()
 from base.manage_remote_job import *
 from base.setup_fabsim import *
 
+def get_plugin_path(name):
+    """
+    Get the local base path of plugin <name>.
+    """
+    return os.path.join(env.localroot, 'plugins', name)
+
 def local_with_stdout(cmd, verbose=False):
     """
     Runs Fabric's local() function, while capturing and returning stdout automatically.
