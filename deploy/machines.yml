@@ -1,13 +1,13 @@
-# 
+#
 # Copyright (C) University College London, 2007-2012, all rights reserved.
-# 
-# This file is part of HemeLB and is CONFIDENTIAL. You may not work 
+#
+# This file is part of HemeLB and is CONFIDENTIAL. You may not work
 # with, install, use, duplicate, modify, redistribute or share this
 # file, or any part thereof, other than as allowed by any agreement
 # specifically made by you with University College London.
-# 
+#
 
-default: 
+default:
   # General default values for all machines live in the default dictionary.
   # Machine-specific overrides replace these.
   # Mercurial server to find HemeLB
@@ -68,6 +68,20 @@ prometheus:
   queue: "plgrid"
   python_build: "python2.7"
   corespernode: 24
+
+eagle:
+  max_job_name_chars: 15
+  job_dispatch: "sbatch"
+  stat: "squeue"
+  run_command: "mpirun -n $cores"
+  batch_header: slurm-eagle
+  remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/plgrid/$username"
+  runtime_path_template: "/tmp/lustre_shared/$username"
+  temp_path_template: "$work_path/tmp"
+  modules: ["load plgrid/tools/openmpi/1.10.2-1_gcc482"]
+  queue: "plgrid"
+  corespernode: 28
 
 supermuc1_thin:
   max_job_name_chars: 15
@@ -209,6 +223,6 @@ mavrino:
   home_path_template: "/home/$username"
   runtime_path_template: "/home/$username"
   temp_path_template: "$work_path/tmp"
-  corespernode: 8 
+  corespernode: 8
   batch_header: sge
   queue: "parallel2" #"mapper"
