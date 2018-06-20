@@ -47,6 +47,8 @@ def add_local_paths(module_name):
     env.local_blackbox_path.insert(0, "$localroot/plugins/%s/blackbox" % (module_name))
     # This variable encodes the default location for Python scripts.
     env.local_python_path.insert(0, "$localroot/plugins/%s/python" % (module_name))
+    # This variable encodes the default location for config files.
+    env.local_config_file_path.insert(0, "$localroot/plugins/%s/config_files" % (module_name))
 
 def get_setup_fabsim_dirs_string():
     """

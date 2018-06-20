@@ -53,6 +53,8 @@ default:
   local_blackbox_path: ["$localroot/blackbox"]
   # This variable encodes the default location for Python scripts.
   local_python_path: ["$localroot/python"]
+  # This variable encodes the default location for config_files.
+  local_config_file_path: ["$localroot/config_files"]
 
 prometheus:
   max_job_name_chars: 15

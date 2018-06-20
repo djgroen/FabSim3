@@ -69,7 +69,18 @@ def with_config(name):
     """
     env.config=name
     env.job_config_path=env.pather.join(env.config_path,name)
-    env.job_config_path_local=os.path.join(env.local_configs,name)
+
+    path_used = "None"
+
+    for p in env.local_config_file_path:
+        config_file_path = os.path.join(p, name)
+        if os.path.exists(config_file_path):
+            path_used = config_file_path
+
+    if path_used == "None":
+        print("Error: config file directory not found in: ", env.local_config_file_path)
+
+    env.job_config_path_local=os.path.join(path_used)
     env.job_config_contents=env.pather.join(env.job_config_path,'*')
     env.job_config_contents_local=os.path.join(env.job_config_path_local,'*')
     env.job_name_template_sh=template("%s.sh" % env.job_name_template) # name of the job sh submission script.
