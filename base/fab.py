@@ -9,6 +9,7 @@
 from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
+from fabric.api import settings
 from xml.etree import ElementTree
 import time
 import re
@@ -28,11 +29,12 @@ def local_with_stdout(cmd, verbose=False):
     """
     Runs Fabric's local() function, while capturing and returning stdout automatically.
     """
-    output = local(cmd, capture=True)
-    if verbose:
-        print("stdout: %s" % output.stdout)
-        print("stderr: %s" % output.stderr)
-    return output.stdout
+    with settings(warn_only=True):
+        output = local(cmd, capture=True)
+        if verbose:
+            print("stdout: %s" % output.stdout)
+            print("stderr: %s" % output.stderr)
+        return output.stdout
 
 def with_template_job():
     """
@@ -236,7 +238,8 @@ def calc_nodes():
 
 @task
 def get_fabsim_git_hash(verbose=True):
-    return local_with_stdout("git rev-parse HEAD", verbose=True)
+    with settings(warn_only=True):
+        return local_with_stdout("git rev-parse HEAD", verbose=True)
 
 @task
 def get_fabsim_command_history():
