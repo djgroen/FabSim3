@@ -1,3 +1,5 @@
 FabMD:
- repository: git@github.com:UCL-CCS/FabMD.git
+  repository: git@github.com:UCL-CCS/FabMD.git
 
+FabFlee:
+  repository: git@github.com:djgroen/FabFlee.git
