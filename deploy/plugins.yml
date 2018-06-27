@@ -3,3 +3,6 @@ FabMD:
 
 FabFlee:
   repository: git@github.com:djgroen/FabFlee.git
+
+FabDummy:
+  repository: git@github.com:djgroen/FabDummy.git

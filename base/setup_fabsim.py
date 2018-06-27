@@ -89,5 +89,6 @@ def setup_fabsim(password=""):
     setup_ssh_keys(password)
     setup_fabsim_dirs()
     install_plugin("FabMD") #FabSim3 ships with FabMD by default, to make it easier for new users to test things.
+    install_plugin("FabDummy") #FabSim3 ships with FabDummy by default, to provide a placeholder example for a plugin.
 
 
