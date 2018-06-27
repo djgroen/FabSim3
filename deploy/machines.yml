@@ -83,6 +83,7 @@ eagle:
   temp_path_template: "$work_path/tmp"
   modules: ["load plgrid/tools/openmpi/1.10.2-1_gcc482"]
   queue: "plgrid"
+  budget: "compatpsnc2"
   corespernode: 28
 
 supermuc1_thin:
