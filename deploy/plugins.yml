@@ -1,8 +1,11 @@
+#Collaborator status required
 FabMD:
   repository: git@github.com:UCL-CCS/FabMD.git
 
+#Collaborator status required
 FabFlee:
   repository: git@github.com:djgroen/FabFlee.git
 
+#Anonymous cloning, publicly available
 FabDummy:
-  repository: git@github.com:djgroen/FabDummy.git
+  repository: https://github.com/djgroen/FabDummy.git
