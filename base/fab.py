@@ -413,3 +413,5 @@ def print_config(args=''):
     """ Prints local environment """
     for x in env:
         print(x,':',env[x])
+
+from base.test_fabsim import *
