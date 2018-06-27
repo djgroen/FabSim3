@@ -46,13 +46,16 @@ To create your own plugin, please refer to doc/CreatingPlugins.md
 
 The easiest way to test FabSim is to simply go to the base directory of your FabSim installation and try the examples below.
 
+### List available commands.
+1. Simply type `fab localhost help`.
+
 ### LAMMPS testing on the local host
 
 1. Install LAMMPS (see http://lammps.sandia.gov for detailed download and installation instructions).
 2. Modify `machines_user.yml` to make the `lammps_exec` variable point to the location of the LAMMPS executable. e.g., `lammps_exec: "/home/james/bin/lmp_serial"`.
-3. FabSim contains a trial LAMMPS configuration, so there's no need to download that.
-4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabsim_dirs`.
-5. Run the LAMMPS test data set using: `fab localhost lammps:lammps_lj_liquid,cores=1,wall_time=1:00:0`.
+3. FabSim contains sample LAMMPS input files, so there's no need to download that.
+4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabsim`.
+5. Run the LAMMPS test data set using: `fab localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
 6. Run `fab localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
 ### FabBioMD testing is currently unavailable in the core FabSim3, as we are refactoring this plugin.

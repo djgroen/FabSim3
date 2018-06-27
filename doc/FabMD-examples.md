@@ -1,4 +1,6 @@
-## FabNanoMD examples
+## FabMD examples
+These examples require the installation of the FabMD plugin. You can install the plugin using:
+``fab localhost install_plugin:FabMD''
 
 ### Perform an example IBI calculation
 This example assumes that you have been able to run the basic FabSim examples described in INSTALL.md, and that you have installed and configured LAMMPS on the target machine.
