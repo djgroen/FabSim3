@@ -303,6 +303,39 @@ def job(*option_dictionaries):
                        with prefix(env.run_prefix):
                            run(template("$job_dispatch $dest_name"))
 
+def run_ensemble(config, sweep_dir, **args):
+    """Map and execute ensemble jobs.
+    The job results will be stored with a name pattern as defined in the environment,
+    e.g. water-abcd1234-legion-256
+
+    config : base config directory to use to define input files, e.g. config=water
+    sweep_dir : directory containing inputs that will vary per ensemble simulation instance.
+
+    These can either be stored as a range of files or as a range of subdirectories.
+    Keyword arguments:
+            input_name_in_config : name of included file once embedded in the simulation config.
+            cores : number of compute cores to request
+            wall_time : wall-time job limit
+            memory : memory per node
+    """
+    update_environment(args)
+
+    if "script" not in env:
+        print("ERROR: run_ensemble function has been called, but the parameter 'script' was not specified.")
+
+    with_config(config)
+
+    for root, dirs, files in os.walk(sweep_dir):
+        for file_ in files:
+            #copy file_ to config directory
+            if "input_name_in_config" in env:
+                local(template("cp %s %s/config_files/%s/%s") % (os.path.join(root, file_), env.localroot, config, input_name_in_config))
+            else:
+                local(template("cp %s %s/config_files/%s/") % (os.path.join(root, file_), env.localroot, config))
+
+            execute(put_configs,config)
+            job(dict(wall_time='0:15:0', memory='2G', label=file_),args)
+
 def input_to_range(arg,default):
     ttype=type(default)
     gen_regexp="\[([\d\.]+):([\d\.]+):([\d\.]+)\]" #regexp for a array generator like [1.2:3:0.2]
