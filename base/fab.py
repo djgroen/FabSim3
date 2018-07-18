@@ -329,9 +329,9 @@ def run_ensemble(config, sweep_dir, **args):
         for file_ in files:
             #copy file_ to config directory
             if "input_name_in_config" in env:
-                local(template("cp %s %s/config_files/%s/%s") % (os.path.join(root, file_), env.localroot, config, input_name_in_config))
+                local(template("cp %s %s/%s") % (os.path.join(root, file_), env.job_config_path_local, input_name_in_config))
             else:
-                local(template("cp %s %s/config_files/%s/") % (os.path.join(root, file_), env.localroot, config))
+                local(template("cp %s %s/") % (os.path.join(root, file_), env.job_config_path_local))
 
             execute(put_configs,config)
             job(dict(wall_time='0:15:0', memory='2G', label=file_),args)
