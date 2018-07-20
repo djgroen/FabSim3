@@ -5,5 +5,21 @@
 # fabfile.py is the main FabSim interface file. Here one can freely include or omit subsections of the FabSim toolkit,
 # to modify the enabled functionalities.
 
+import yaml
+import importlib
+
 from base.fab import *
-#from deploy.repast.fabRepast import *
+
+config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')))
+for key in config.keys():
+    try:
+        plugin = importlib.import_module('plugins.{}.{}'.format(key, key))
+        plugin_dict = plugin.__dict__
+        try:
+            to_import = plugin.__all__
+        except AttributeError:
+            to_import = [name for name in plugin_dict if not name.startswith('_')]
+        globals().update({name: plugin_dict[name] for name in to_import})
+    except ModuleNotFoundError:
+        pass
+
