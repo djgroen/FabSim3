@@ -5,25 +5,6 @@ from fabric.contrib.project import *
 import fileinput
 import sys
 
-def activate_plugin(name):
-    """
-    Updates fabfile.py to enable plugin.
-    """
-    found = False
-    fabfile_loc = "%s/fabfile.py" % (env.localroot)
-
-    for line in fileinput.input(fabfile_loc, inplace=1):
-        if name in line:
-            found = True
-            if line[0] == "#":
-                line = line[1:]
-        sys.stdout.write(line)
-
-    # if the commented pattern is not found, then we need to append a new import at the end of fabfile.py.
-    if found == False:
-        with open(fabfile_loc, "a") as myfile:
-            myfile.write("from plugins.%s.%s import *\n" % (name, name))
-
 @task
 def install_plugin(name):
     """
@@ -38,7 +19,6 @@ def install_plugin(name):
 
     local("git clone %s %s/%s" % (info["repository"], plugin_dir, name))
 
-    activate_plugin("%s" % (name))
 
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
