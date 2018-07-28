@@ -40,6 +40,7 @@ pp=PrettyPrinter()
 #Root of local FabSim installation
 env.localroot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env.localhome = os.path.expanduser("~")
+env.localplugins = {} #dict containing local paths to all plugins.
 env.no_ssh=False
 env.no_hg=False
 #Load and invoke the default non-machine specific config JSON dictionaries.
@@ -67,7 +68,6 @@ if env.temp_path_template:
 #  run_prefix_commands.append(template("export TMP=$temp_path"))
 #  run_prefix_commands.append(template("export TMPDIR=$temp_path"))
 
-## Extra parameters specific for MD:
 env.pythonroot=os.path.join(env.localroot,'python')
 env.blackboxroot=os.path.join(env.localroot,'blackbox')
 
