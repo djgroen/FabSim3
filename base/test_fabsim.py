@@ -14,8 +14,11 @@ def test():
 
   assert("plugins" in get_plugin_path("FabDummy"))
   assert("FabDummy" in get_plugin_path("FabDummy"))
+  assert("plugins" in env.localplugins["FabDummy"])
+  assert("FabDummy" in env.localplugins["FabDummy"])
 
   assert(len(get_fabsim_git_hash()) > 0)
+
 
   print("----------------------------------------")
   print("ALL FabSim3 BASE UNIT TESTS HAVE PASSED.")
