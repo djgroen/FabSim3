@@ -18,8 +18,6 @@ def install_plugin(name):
     local("rm -rf %s/%s" % (plugin_dir, name))
 
     local("git clone %s %s/%s" % (info["repository"], plugin_dir, name))
-    env.localplugins[name] = plugin_dir
-
 
 @task
 def remove_plugin(name):
