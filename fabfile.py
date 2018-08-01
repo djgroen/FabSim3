@@ -20,8 +20,7 @@ for key in config.keys():
         except AttributeError:
             to_import = [name for name in plugin_dict if not name.startswith('_')]
         globals().update({name: plugin_dict[name] for name in to_import})
-        
         env.localplugins[key] = os.path.join(env.localroot, 'plugins', key)
-    except ModuleNotFoundError:
+    except ImportError:
         pass
 
