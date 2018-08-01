@@ -341,7 +341,7 @@ def run_ensemble(config, sweep_dir, **args):
 
     if sweep_length == 0:
         print("ERROR: no files where found in the sweep_dir of this run_ensemble command.")
-		print("Sweep dir location: %s" % (sweep_dir))
+        print("Sweep dir location: %s" % (sweep_dir))
 
 def input_to_range(arg,default):
     ttype=type(default)
