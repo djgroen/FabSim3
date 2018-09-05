@@ -126,7 +126,7 @@ def fetch_configs(config=''):
         local(template("rsync -pthrvz $username@$remote:$job_config_path/ $job_config_path_local"))
 
 @task
-def put_configs(config=''):
+def put_configs(config='', skip_sweep_dir=False):
     """
     Transfer config files to the remote.
     For use in launching jobs, via rsync.
@@ -143,9 +143,14 @@ def put_configs(config=''):
     with_config(config)
     run(template("%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())))
     if env.manual_gsissh:
+        if skip_sweep_dir:
+            print("Warning: skip_sweep_dir is not supported when using FabSim3 with Globus. This is because the Globus developers did not bother to support the option to exclude specific directories with globus-url-copy (unlike the rsync developers).")
         local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
     else:
-        rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
+        if skip_sweep_dir:
+            rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path,exclude='SWEEP')
+        else:
+            rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
 
 @task
 def put_results(name=''):
@@ -338,7 +343,7 @@ def run_ensemble(config, sweep_dir, **args):
             else:
                 local(template("cp %s %s/") % (os.path.join(root, file_), env.job_config_path_local))
 
-            execute(put_configs,config)
+            execute(put_configs,config,skip_sweep_dir=True)
             job(dict(wall_time='0:15:0', memory='2G', label=file_),args)
 
     if sweep_length == 0:
