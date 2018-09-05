@@ -69,6 +69,16 @@ def with_template_config():
     """
     with_config(template(env.config_name_template))
 
+def find_config_file_path(name):
+    for p in env.local_config_file_path:
+        config_file_path = os.path.join(p, name)
+        if os.path.exists(config_file_path):
+            path_used = config_file_path
+
+    if path_used == "None":
+        raise Exception("Error: config file directory not found in: ", env.local_config_file_path)
+    return path_used
+
 def with_config(name):
     """Internal: augment the fabric environment with information regarding a particular configuration name.
     Definitions created:
@@ -78,15 +88,7 @@ def with_config(name):
     env.config=name
     env.job_config_path=env.pather.join(env.config_path,name)
 
-    path_used = "None"
-
-    for p in env.local_config_file_path:
-        config_file_path = os.path.join(p, name)
-        if os.path.exists(config_file_path):
-            path_used = config_file_path
-
-    if path_used == "None":
-        print("Error: config file directory not found in: ", env.local_config_file_path)
+    path_used = find_config_file_path(name)
 
     env.job_config_path_local=os.path.join(path_used)
     env.job_config_contents=env.pather.join(env.job_config_path,'*')
