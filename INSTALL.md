@@ -3,13 +3,24 @@ Installing and Testing FabSim
 
 ## Dependencies
 
+### The "pip" way
 FabSim requires the following Python modules:
 * PyYAML (any version) 
 * fabric3 (1.1.13.post1 has worked for us)
 
 You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
 
+### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
+(when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
+* `sudo apt install python3-yaml`
+* `sudo apt install python3-pip`
+* go to the `fabric3_base` subdirectory.
+* run `pip3 install Fabric3-1.14.post1-py3-none-any.whl`
+
+### Note for MAC users
 For Mac users, you might also need ssh-copy-id. This can be installed using `brew install ssh-copy-id`.
+
+
 
 ## Installation
 
