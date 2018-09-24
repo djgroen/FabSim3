@@ -148,7 +148,7 @@ def put_configs(config='', skip_sweep_dir=False):
         local(template("globus-url-copy -p 10 -cd -r -sync file://$job_config_path_local/ gsiftp://$remote/$job_config_path/"))
     else:
         if skip_sweep_dir:
-            rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path,exclude='SWEEP')
+            rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path,exclude=["SWEEP"])
         else:
             rsync_project(local_dir=env.job_config_path_local+'/',remote_dir=env.job_config_path)
 
