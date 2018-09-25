@@ -329,6 +329,7 @@ def run_ensemble(config, sweep_dir, **args):
 
     if "script" not in env:
         print("ERROR: run_ensemble function has been called, but the parameter 'script' was not specified.")
+        sys.exit()
 
     with_config(config)
 
