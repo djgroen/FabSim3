@@ -8,12 +8,9 @@ This command takes the files in the config_files/dummy_ensemble directory and co
 ### Lammps Ensemble Job
 This example requires the installation of the FabMD plugin. You can install the plugin using:
 `fab localhost install_plugin:FabMD`
-
 Also assumes that you have been able to run the basic FabSim examples described in INSTALL.md, and that you have installed and configured LAMMPS on the target machine.
 
 This is an applied version of the FabDummy example:
 `fab localhost lammps_ensemble:lammps_ensemble_example,input_name_in_config=in.lammps`
-
 FabMD looks for a directory called `lammps_ensemble_example` in `config_files`. It then looks for a sweep directory (by default called `SWEEP`) that contains a number of input files to iterate through. All the files in `lammps_ensemble_example` directory and one of the sweep directory files will be copied to the host in separate directories (one for each sweep file) and executed in the normal way. 
-
 `lammps_ensemble` requires `input_name_in_config` to be set on the command line, this is the name that each of the sweep files will be changed to when copied to the host. 
