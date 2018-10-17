@@ -20,7 +20,14 @@ def test_fabsim():
     assert("FabDummy" in get_plugin_path("FabDummy"))
     assert(len(get_fabsim_git_hash()) > 0)
 
+def test_fabdummy_install():
+    assert( subprocess.call(["fab", "localhost", "install_plugin:FabDummy"]) == 0)
+
+
 def test_fabdummy():
     assert( subprocess.call(["fab", "localhost", "dummy:dummy_test"]) == 0)
-    assert( 'This dummy textfile has been printed with great success.' in subprocess.check_output(["fab", "localhost", "dummy:dummy_test"]).decode("utf-8"))
+    output = subprocess.check_output(["fab", "localhost", "dummy:dummy_test"]).decode("utf-8")
+    print(output)
+    assert(output.find('success') >= 0)
+    #assert(output.find('This dummy textfile has been printed with great success.') >= 0)
     
