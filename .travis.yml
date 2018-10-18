@@ -5,5 +5,8 @@ install:
   - pip install -r requirements.txt
   - cp deploy/machines_user_example.yml deploy/machines_user.yml
   - fab localhost install_plugin:FabDummy
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  - chmod og-wx ~/.ssh/authorized_keys
+  - ssh localhost
 script:
   - python -m pytest tests/ 
