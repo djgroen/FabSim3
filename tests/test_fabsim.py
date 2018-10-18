@@ -27,7 +27,9 @@ def test_fabdummy_install():
 def test_fabdummy():
     assert( subprocess.call(["fab", "localhost", "dummy:dummy_test"]) == 0)
     output = subprocess.check_output(["fab", "localhost", "dummy:dummy_test"]).decode("utf-8")
-    print(output)
     assert(output.find('success') >= 0)
-    #assert(output.find('This dummy textfile has been printed with great success.') >= 0)
-    
+   
+def test_dummy_ensemble():
+    assert( subprocess.call(["fab", "localhost", "dummy_ensemble:dummy_test"]) == 0)
+    output = subprocess.check_output(["fab", "localhost", "dummy_ensemble:dummy_test"]).decode("utf-8")
+    assert(output.find('success') >= 0)
