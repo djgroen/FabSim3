@@ -3,7 +3,12 @@ python:
   - "3.6"
 install:
   - pip install -r requirements.txt
-  - cp deploy/machines_user_example.yml deploy/machines_user.yml
+  - sed "s/james/`whoami`/g" <<< cat deploy/machines_user_example.yml > deploy/machines_user.yml
+  - rm ~/.ssh/id_rsa
+  - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  - chmod og-wx ~/.ssh/authorized_keys
+  - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+  - fab localhost install_plugin:FabDummy
 script:
-  - python -m pytest tests/
-  
+  - python -m pytest tests/ 
