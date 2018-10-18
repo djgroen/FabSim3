@@ -9,6 +9,7 @@ install:
   - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
   - chmod og-wx ~/.ssh/authorized_keys
   - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+  - fab localhost setup_fabsim
   - fab localhost install_plugin:FabDummy
   - fab localhost dummy:dummy_test
 script:
