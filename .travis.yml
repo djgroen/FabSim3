@@ -4,5 +4,6 @@ python:
 install:
   - pip install -r requirements.txt
   - cp deploy/machines_user_example.yml deploy/machines_user.yml
+  - fab localhost install_plugin:FabDummy
 script:
   - python -m pytest tests/ 
