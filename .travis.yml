@@ -10,6 +10,5 @@ install:
   - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
   - chmod og-wx ~/.ssh/authorized_keys
   - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-  - ssh localhost
 script:
   - python -m pytest tests/ 
