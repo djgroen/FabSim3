@@ -10,6 +10,5 @@ install:
   - chmod og-wx ~/.ssh/authorized_keys
   - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
   - fab localhost install_plugin:FabDummy
-  - fab localhost dummy:dummy_test
 script:
   - python -m pytest tests/ 
