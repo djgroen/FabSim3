@@ -309,6 +309,8 @@ def job(*option_dictionaries):
                    with cd(env.job_results):
                        with prefix(env.run_prefix):
                            run(template("$job_dispatch $dest_name"))
+        print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " % (env.remote, env.job_results))
+        print("Use `fab %s fetch_results` to copy the results back to %s on localhost." % (env.remote, env.job_results_local))
 
 def run_ensemble(config, sweep_dir, **args):
     """Map and execute ensemble jobs.
