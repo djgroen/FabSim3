@@ -5,26 +5,22 @@
 default:
   local_results: "~/Codes/FabSim/results"
   local_configs: "~/Codes/FabSim/config_files"
-  username: "james"
+  username: "your-username"
   # home_path_template: "/home/$username"
   # home_path_template: "/Users/$username"  # for OSX users
   # Allows to switch between SSH (default) and GSISSH login.
   manual_gsissh: false
 archer:
-  username: "ucljames"
-  project: "e283"
-  budget: "e283-suter"
-  lammps_exec: "/home/e283/e283/ucljames/lmp_xc30"
-mavrino:
-  username: "james"
-  lammps_exec: "/store/clay/james/lammps-14Aug11/src/lmp_openmpi"
-  budget: ""
+  username: "user"
+  project: "e123"
+  budget: "e123-user"
+  lammps_exec: "/home/e123/e123/user/lmp_xc30"
 localhost:
-  lammps_exec: "/home/james/bin/lmp_serial"
+  lammps_exec: "/home/your-username/bin/lmp_serial"
 # SuperMUC phase2 connecting using GSISSH
 supermuc2:
-  username: "di73zih"
-  project: "pr87be"
+  username: "ab12cde"
+  project: "fg34hi"
   namd_exec: "/lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2"
   # Password set in the redisexec directory.
   redispwd: "multiple"
@@ -32,8 +28,8 @@ supermuc2:
   manual_gsissh: true
   port: 2222
 bluejoule:
-  username: "dxg12-dxg01"
-  groupname: "dxg01"
-  project: "HCBG049" #"HCP056"
+  username: "abc12-def01"
+  groupname: "abc01"
+  project: "ABC012" #"HCP056"
   namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
   ensemble_dir: "rep0/replicas"   
