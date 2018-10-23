@@ -12,6 +12,12 @@ def stat():
     return run(template("$stat -u $username $stat_postfix"))
 
 @task
+def cancel(jobid=""):
+    """Cancel a remote job."""
+    env.jobid=jobid
+    return run(template("$cancel_job_command $jobid"))
+
+@task
 def monitor():
     """Report on the queue status, ctrl-C to interrupt"""
     while True:
