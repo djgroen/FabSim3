@@ -5,7 +5,7 @@ import time
 
 @task
 def stat():
-    """Check the remote message queue status"""
+    """Check the remote message queue status. Syntax: fab <machine> stat."""
     #TODO: Respect varying remote machine queue systems.
     if not env.get('stat_postfix'):
         return run(template("$stat -u $username"))
@@ -13,13 +13,13 @@ def stat():
 
 @task
 def cancel(jobid=""):
-    """Cancel a remote job."""
+    """Cancel a remote job. Syntax: fab <machine> cancel:jobid=<machine_specific_identifier_of_job>."""
     env.jobid=jobid
     return run(template("$cancel_job_command $jobid"))
 
 @task
 def monitor():
-    """Report on the queue status, ctrl-C to interrupt"""
+    """Report on the queue status, ctrl-C to interrupt. Syntax: fab <machine> monitor."""
     while True:
         execute(stat)
         time.sleep(120)
@@ -31,8 +31,8 @@ def check_complete():
 
 @task
 def wait_complete():
-  """Wait until all jobs currently qsubbed are complete, then return"""
-  time.sleep(120)
-  while not check_complete():
+    """Wait until all jobs currently qsubbed are complete, then return. Syntax: fab <machine> wait_complete."""
+    time.sleep(120)
+    while not check_complete():
         time.sleep(120)
 
