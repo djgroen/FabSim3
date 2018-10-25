@@ -26,7 +26,6 @@ def check_complete():
 @task
 def wait_complete():
   """Wait until all jobs currently qsubbed are complete, then return"""
-  time.sleep(120)
+  # time.sleep(120)
   while not check_complete():
         time.sleep(120)
-
