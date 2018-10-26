@@ -126,7 +126,7 @@ def complete_environment():
     build_number: Tip revision number of mercurial repository.
     """
     env.hosts=['%s@%s'%(env.username,env.remote)]
-    env.host_string = env.remote
+    env.host_string = '%s@%s'%(env.username,env.remote)
     env.home_path=template(env.home_path_template)
     env.runtime_path=template(env.runtime_path_template)
     env.work_path=template(env.work_path_template)
