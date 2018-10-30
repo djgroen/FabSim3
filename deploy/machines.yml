@@ -74,7 +74,7 @@ prometheus:
 eagle:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  stat: "squeue"
+  stat: "squeue --noheader"
   run_command: "mpirun -n $cores"
   batch_header: slurm-eagle
   remote: "eagle.man.poznan.pl"
