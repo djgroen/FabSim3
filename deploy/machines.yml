@@ -48,6 +48,7 @@ default:
   # This variable encodes the default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
   stat: qstat
+  cancel_job_command: "qdel"
   lammps_args: ""
   # This variable encodes the default location for blackbox scripts.
   local_blackbox_path: ["$localroot/blackbox"]
