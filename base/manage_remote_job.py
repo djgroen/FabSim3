@@ -25,14 +25,13 @@ def monitor():
         time.sleep(120)
 
 
-def check_complete():
-  """Return true if the user has no queued jobs"""
-  return stat()==""
+def check_complete(jobname_synthax=""):
+  """Return true if the user has no job running containing jobname_synthax in their name"""
+  return jobname_synthax not in stat()
 
 @task
-def wait_complete():
-    """Wait until all jobs currently qsubbed are complete, then return. Syntax: fab <machine> wait_complete."""
-    time.sleep(120)
-    while not check_complete():
+def wait_complete(jobname_synthax):
+  """Wait until jobs currently running containing jobname_synthax in their name are complete, then return"""
+  # time.sleep(120)
+  while not check_complete(jobname_synthax):
         time.sleep(120)
-
