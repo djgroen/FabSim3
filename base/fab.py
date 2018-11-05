@@ -262,6 +262,14 @@ def get_fabsim_command_history():
     """
     return local_with_stdout("cat %s/.bash_history | grep fab" % (env.localhome), verbose=True)
 
+def removekey(d, key):
+    r = dict(d)
+    try:
+        del r[key]
+    except KeyError as ex:
+        pass
+    return r
+
 def job(*option_dictionaries):
     """
     Internal low level job launcher.
@@ -301,7 +309,7 @@ def job(*option_dictionaries):
 
         run(template("cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
-            tempf.write(yaml.dump(dict(env)))
+            tempf.write(yaml.dump(removekey(dict(env),'passwords')))
             tempf.flush() #Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
         run(template("chmod u+x $dest_name"))
