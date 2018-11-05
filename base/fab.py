@@ -309,7 +309,7 @@ def job(*option_dictionaries):
 
         run(template("cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
-            tempf.write(yaml.dump(removekey(dict(env),'passwords')))
+            tempf.write(yaml.dump(removekey(removekey(dict(env),'passwords'), 'password')))
             tempf.flush() #Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
         run(template("chmod u+x $dest_name"))
