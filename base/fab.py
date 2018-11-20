@@ -302,12 +302,12 @@ def job(*option_dictionaries):
 
         env.dest_name = env.pather.join(env.scripts_path, env.pather.basename(env.job_script))
         put(env.job_script, env.dest_name)
-        run(template("mkdir -p $job_results"))
 
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
 
-        run(template("cp $dest_name $job_results"))
+        # Make directory, copy input files and job script to results directory
+        run(template("mkdir -p $job_results && rsync -av --progress $job_config_path/* $job_results/ --exclude SWEEP && cp $dest_name $job_results"))
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(yaml.dump(removekey(removekey(dict(env),'passwords'), 'password')))
             tempf.flush() #Flush the file before we copy it.

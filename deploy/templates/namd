@@ -1,7 +1,5 @@
 cd $job_results
 $run_prefix
-rm -rf results
-cp -r $job_config_path/* .
 
 /usr/bin/env > env.log
 
