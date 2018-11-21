@@ -305,6 +305,9 @@ def job(*option_dictionaries):
 
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
+        
+        # Make sure that prefix and module load definitions are properly updated.
+        complete_environment()
 
         # Make directory, copy input files and job script to results directory
         run(template("mkdir -p $job_results && rsync -av --progress $job_config_path/* $job_results/ --exclude SWEEP && cp $dest_name $job_results"))

@@ -14,7 +14,9 @@ default:
   hg: "ssh://hg@entropy.chem.ucl.ac.uk"
   # Default Modules to load or unload on remote, via module 'foo'
   # e.g. ['load cmake'].
-  modules: []
+  modules: 
+    all: []
+    dummy: []
   # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
   cores: 16
@@ -151,7 +153,12 @@ archer:
   # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
   home_path_template: "/home/$project/$project/$username"
   runtime_path_template: "/work/$project/$project/$username"
-  modules: ["load lammps/lammps-28Jun14","load namd"] #-25Sep11"]
+  modules: 
+    all: []
+    lammps: ["load lammps/lammps-28Jun14"]
+    dummy_lammps: ["load lammps/lammps-28Jun14"]
+    namd: ["load namd"]
+    gromacs: ["load gromacs"]
   temp_path_template: "$work_path/tmp"
   queue: "standard"
   python_build: "lib64/python2.6"
