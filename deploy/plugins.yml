@@ -3,10 +3,6 @@ FabMD:
   repository: git@github.com:UCL-CCS/FabMD.git
 
 #Collaborator status required
-FabGromacs:
-  repository: git@github.com:UCL-CCS/FabGromacs.git
-
-#Collaborator status required
 FabFlee:
   repository: git@github.com:djgroen/FabFlee.git
 
