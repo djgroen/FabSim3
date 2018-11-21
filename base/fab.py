@@ -536,7 +536,7 @@ def run_ensemble(config, sweep_dir, **args):
             else:
                 local(
                     template("cp %s %s/") % (
-                        os.path.join(sweep_dir, item), 
+                        os.path.join(sweep_dir, item),
                         env.job_config_path_local)
                     )
             execute(put_configs, config, skip_sweep_dir=True)
