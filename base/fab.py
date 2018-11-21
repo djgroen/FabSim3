@@ -434,6 +434,9 @@ def job(*option_dictionaries):
     # Needs to be temporary if there's another job with a different number
     # of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
+        # Make sure that prefix and module load definitions are properly updated.
+        complete_environment()
+
         calc_nodes()
         if env.node_type:
             env.node_type_restriction = template(
@@ -454,6 +457,7 @@ def job(*option_dictionaries):
 
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
+        
         # Make directory, copy input files and job script to results directory
         run(
             template(

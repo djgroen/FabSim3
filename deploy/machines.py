@@ -71,9 +71,21 @@ if env.temp_path_template:
 env.pythonroot=os.path.join(env.localroot,'python')
 env.blackboxroot=os.path.join(env.localroot,'blackbox')
 
-module_commands=["module %s"%module for module in env.modules]
 
+
+def generate_module_commands(script=None):
+    module_commands = ["module %s"%module for module in env.modules["all"]] # Not using get as I want this to crash if the all key does not exist (it should always be present).
+    module_commands += ["module %s"%module for module in env.modules.get("nonexistent","")]
+
+    if script != None:
+        module_commands += ["module %s"%module for module in env.modules.get(script,"")] # Not using get as I want this to crash if the all key does not exist (it should always be present).
+        print("SCRIPT: ", script)
+    print("MODULE COMMANDS: ", module_commands)
+    return module_commands
+
+module_commands = generate_module_commands()
 env.run_prefix=" && ".join(module_commands+list(map(template,run_prefix_commands))) or 'echo Running...'
+
 
 @task
 def diagnostics():
@@ -144,7 +156,7 @@ def complete_environment():
     for i in range(0, len(env.local_config_file_path)):
         env.local_config_file_path[i]=os.path.expanduser(template(env.local_config_file_path[i]))
 
-    module_commands=["module %s"%module for module in env.modules]
+    module_commands = generate_module_commands(script = env.get("script",None))
     env.run_prefix=" && ".join(module_commands+list(map(template,run_prefix_commands))) or 'echo Running...'
 
     if env.temp_path_template:
@@ -156,4 +168,4 @@ def complete_environment():
     #cmd.close()
     #env.build_number=run("hg id -q -i")
 
-complete_environment()
+#complete_environment()
