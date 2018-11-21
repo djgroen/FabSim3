@@ -434,7 +434,8 @@ def job(*option_dictionaries):
     # Needs to be temporary if there's another job with a different number
     # of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
-        # Make sure that prefix and module load definitions are properly updated.
+        # Make sure that prefix and module load definitions are properly
+        # updated.
         complete_environment()
 
         calc_nodes()
