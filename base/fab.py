@@ -458,7 +458,6 @@ def job(*option_dictionaries):
 
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
-        
         # Make directory, copy input files and job script to results directory
         run(
             template(
