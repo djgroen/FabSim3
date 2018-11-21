@@ -523,24 +523,33 @@ def run_ensemble(config, sweep_dir, **args):
 
     sweep_length = 0  # number of runs performed in this sweep
 
-    for root, dirs, files in os.walk(sweep_dir):
-        for file_ in files:
+    for item in os.listdir(sweep_dir):
+        if os.path.isfile(os.path.join(sweep_dir, item)):
             sweep_length += 1
             # copy file_ to config directory
             if "input_name_in_config" in env:
                 local(
                     template("cp %s %s/%s") % (
-                        os.path.join(root, file_),
+                        os.path.join(sweep_dir, item),
                         env.job_config_path_local, env.input_name_in_config)
                     )
             else:
                 local(
                     template("cp %s %s/") % (
-                        os.path.join(root, file_), env.job_config_path_local)
+                        os.path.join(sweep_dir, item),
+                        env.job_config_path_local)
                     )
             execute(put_configs, config, skip_sweep_dir=True)
-            job(dict(wall_time='0:15:0', memory='2G', label=file_), args)
-
+            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
+        if os.path.isdir(os.path.join(sweep_dir, item)):
+            sweep_length += 1
+            # copy file_ to config directory
+            local(
+                template("cp -r %s/* %s/") % (
+                    os.path.join(sweep_dir, item), env.job_config_path_local)
+                )
+            execute(put_configs, config, skip_sweep_dir=True)
+            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
     if sweep_length == 0:
         print(
             "ERROR: no files where found in the sweep_dir of this\
