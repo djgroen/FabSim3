@@ -289,6 +289,9 @@ def job(*option_dictionaries):
     # If cores_reserved is not specified, temporarily set it based on the same as the number of cores
     # Needs to be temporary if there's another job with a different number of cores which should also be defaulted to.
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
+        # Make sure that prefix and module load definitions are properly updated.
+        complete_environment()
+
         calc_nodes()
         if env.node_type:
             env.node_type_restriction = template(env.node_type_restriction_template)
@@ -306,8 +309,6 @@ def job(*option_dictionaries):
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
         
-        # Make sure that prefix and module load definitions are properly updated.
-        complete_environment()
 
         # Make directory, copy input files and job script to results directory
         run(template("mkdir -p $job_results && rsync -av --progress $job_config_path/* $job_results/ --exclude SWEEP && cp $dest_name $job_results"))
