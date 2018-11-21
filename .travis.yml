@@ -12,4 +12,4 @@ install:
   - fab localhost install_plugin:FabDummy
 script:
   - python -m pytest tests/
-  - py.test --pep-8 base/
+  - py.test --pep8 base/
