@@ -11,4 +11,5 @@ install:
   - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
   - fab localhost install_plugin:FabDummy
 script:
-  - python -m pytest tests/ 
+  - python -m pytest tests/
+  - py.test --pep8 base/
