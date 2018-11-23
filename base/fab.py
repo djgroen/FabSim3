@@ -488,7 +488,7 @@ def job(*option_dictionaries):
         print(
             "Use `fab %s fetch_results` to copy the results back to %s on\
             localhost." %
-            (env.remote, env.job_results_local)
+            (env.machine_name, env.job_results_local)
             )
 
 
