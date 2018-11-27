@@ -88,16 +88,6 @@ env.run_prefix=" && ".join(module_commands+list(map(template,run_prefix_commands
 
 
 @task
-def diagnostics():
-    """
-    Performs basic machine-level diagnostics.
-    """
-    pp.pprint(env)
-    pp.pprint(sys.path)
-    import HemeLbSetupTool
-    print(HemeLbSetupTool.__path__)
-
-@task
 def machine(name):
     """
     Load the machine-specific configurations.
@@ -113,6 +103,19 @@ def machine(name):
     if name in user_config:
         env.update(user_config[name])
     env.machine_name=name
+
+    #Construct modules environment: update, not replace when overrides are done.
+    env.modules = config["default"]["modules"]
+    if "import" in config[name]:
+        env.modules.update(config[config[name]["import"]].modules)
+    env.modules.update(config[name].get("modules",{}))
+    
+    if "import" in config[name]:
+        if config[name]["import"] in user_config:
+            env.modules.update(user_config[config[name]["import"]].modules)
+        
+    env.modules.update(user_config[name].get("modules",{}))
+
     complete_environment()
 
 #Metaprogram the machine wrappers
