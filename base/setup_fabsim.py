@@ -52,6 +52,10 @@ def add_local_paths(module_name):
         0, "$localroot/plugins/%s/config_files" % (module_name)
         )
 
+def load_plugin_modules(plugin_name):
+    # This line loads in default module settings from a specific plugin.
+    env.modules.update(yaml.load($localroot/plugins/%s/modules.yml) % (plugin_name))
+
 
 def get_setup_fabsim_dirs_string():
     """
