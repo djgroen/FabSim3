@@ -466,11 +466,10 @@ def job(*option_dictionaries):
                 cp $dest_name $job_results"
                 )
             )
+        env = removekey(removekey(dict(env), 'passwords'), 'password')
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(
-                yaml.dump(
-                    removekey(removekey(dict(env), 'passwords'), 'password')
-                    )
+                yaml.dump(dict(env))
                 )
             tempf.flush()  # Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
