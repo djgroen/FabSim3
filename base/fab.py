@@ -466,7 +466,16 @@ def job(*option_dictionaries):
                 cp $dest_name $job_results"
                 )
             )
-        env = removekey(removekey(dict(env), 'passwords'), 'password')
+        
+        try:
+            del env["passwords"]
+        except KeyError:
+            pass
+        try:
+            del env["password"]
+        except KeyError:
+            pass
+
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(
                 yaml.dump(dict(env))

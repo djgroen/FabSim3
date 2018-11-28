@@ -29,7 +29,7 @@ def test_fabsim_password_bugfix():
     """
     output = subprocess.check_output(["fab", "localhost", "dummy:dummy_test,password=ERROR,dumpenv=True"]).decode("utf-8")
     print(output)
-    assert(output.find('\'password\': \'ERROR\'') == 0)
+    assert(output.find('\'password\': \'ERROR\'') < 0)
 
 
 def test_fabdummy():
