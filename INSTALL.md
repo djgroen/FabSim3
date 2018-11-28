@@ -10,11 +10,14 @@ FabSim requires the following Python modules:
 
 You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
 
+To perform the Py.test tests (not required for using FabSim, but essential for running the tests), you will need python3-pytest and python3-pytest-pep8.
+
 ### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 (when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
 * `sudo apt install python3-yaml`
 * `sudo apt install python3-numpy`
 * `sudo apt install python3-pip`
+* `sudo apt install python3-pytest-pep8` (this will also install py.test for Python3)
 * go to the `fabric3_base` subdirectory.
 * run `pip3 install Fabric3-1.14.post1-py3-none-any.whl`
 
