@@ -33,7 +33,6 @@ def remove_plugin(name):
     plugin_dir = '{}/plugins'.format(env.localroot)
     local('rm -rf {}/{}'.format(plugin_dir, name))
 
-
 def add_local_paths(module_name):
     # This variable encodes the default location for templates.
     env.local_templates_path.insert(
@@ -51,11 +50,6 @@ def add_local_paths(module_name):
     env.local_config_file_path.insert(
         0, "$localroot/plugins/%s/config_files" % (module_name)
         )
-
-def load_plugin_modules(plugin_name):
-    # This line loads in default module settings from a specific plugin.
-    env.modules.update(yaml.load($localroot/plugins/%s/modules.yml) % (plugin_name))
-
 
 def get_setup_fabsim_dirs_string():
     """

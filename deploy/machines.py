@@ -116,6 +116,8 @@ def machine(name):
         
     env.modules.update(user_config[name].get("modules",{}))
 
+    print(env.modules)
+
     complete_environment()
 
 #Metaprogram the machine wrappers
