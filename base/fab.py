@@ -490,6 +490,9 @@ def job(*option_dictionaries):
             localhost." %
             (env.machine_name, env.job_results_local)
             )
+    if env.get("dumpenv",False) == "True":
+        print("DUMPENV mode enabled. Dumping environment:")
+        print(env)
 
 
 def run_ensemble(config, sweep_dir, **args):
