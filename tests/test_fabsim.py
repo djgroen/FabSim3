@@ -23,6 +23,14 @@ def test_fabsim():
 def test_fabdummy_install():
     assert( subprocess.call(["fab", "localhost", "install_plugin:FabDummy"]) == 0)
 
+def test_fabsim_password_bugfix():
+    """
+    GitHub Issue #56
+    """
+    output = subprocess.check_output(["fab", "localhost", "dummy:dummy_test,password=ERROR,dumpenv=True"]).decode("utf-8")
+    print(output)
+    assert(output.find('\'password\': \'ERROR\'') == 0)
+
 
 def test_fabdummy():
     assert( subprocess.call(["fab", "localhost", "dummy:dummy_test"]) == 0)
