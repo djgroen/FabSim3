@@ -466,7 +466,7 @@ def job(*option_dictionaries):
                 cp $dest_name $job_results"
                 )
             )
-        
+
         try:
             del env["passwords"]
         except KeyError:
@@ -498,7 +498,7 @@ def job(*option_dictionaries):
             localhost." %
             (env.machine_name, env.job_results_local)
             )
-    if env.get("dumpenv",False) == "True":
+    if env.get("dumpenv", False) == "True":
         print("DUMPENV mode enabled. Dumping environment:")
         print(env)
 
