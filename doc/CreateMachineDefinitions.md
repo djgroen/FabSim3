@@ -47,3 +47,9 @@ archer:
   budget: "e283-suter"
   lammps_exec: "/home/e283/e283/ucljames/lmp_xc30" # custom variable overwrite
 ```
+
+## Changing connectivity settings for specific machines
+
+Please note that some connectivity settings are not explicitly exposed as FabSim3 environment variables, but are present in the env through the original fabric environment variables. An example of such a variable is `port`, which indicates the port that any SSH connection would rely on.
+
+A full list of fabric env variables can be found on www.fabfile.org, e.g. here: http://docs.fabfile.org/en/1.14/usage/env.html
