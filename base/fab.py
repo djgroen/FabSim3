@@ -466,11 +466,19 @@ def job(*option_dictionaries):
                 cp $dest_name $job_results"
                 )
             )
+
+        try:
+            del env["passwords"]
+        except KeyError:
+            pass
+        try:
+            del env["password"]
+        except KeyError:
+            pass
+
         with tempfile.NamedTemporaryFile(mode='r+') as tempf:
             tempf.write(
-                yaml.dump(
-                    removekey(removekey(dict(env), 'passwords'), 'password')
-                    )
+                yaml.dump(dict(env))
                 )
             tempf.flush()  # Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
@@ -490,6 +498,9 @@ def job(*option_dictionaries):
             localhost." %
             (env.machine_name, env.job_results_local)
             )
+    if env.get("dumpenv", False) == "True":
+        print("DUMPENV mode enabled. Dumping environment:")
+        print(env)
 
 
 def run_ensemble(config, sweep_dir, **args):
