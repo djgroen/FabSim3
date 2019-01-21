@@ -1,15 +1,42 @@
-language: python
-python:
-  - "3.6"
-install:
-  - pip install -r requirements.txt
-  - sed "s/your-username/`whoami`/g" <<< cat deploy/machines_user_example.yml > deploy/machines_user.yml
-  - rm -f ~/.ssh/id_rsa
-  - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-  - chmod og-wx ~/.ssh/authorized_keys
-  - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-  - fab localhost install_plugin:FabDummy
-script:
-  - python -m pytest tests/
-  - py.test --pep8 base/
+matrix:
+  include:
+    - stage: testing
+      language: python
+      python:
+        - "3.6"
+      install:
+        - pip install -r requirements.txt
+        - sed "s/your-username/`whoami`/g" <<< cat deploy/machines_user_example.yml > deploy/machines_user.yml
+        - rm -f ~/.ssh/id_rsa
+        - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+        - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+        - chmod og-wx ~/.ssh/authorized_keys
+        - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+        - fab localhost install_plugin:FabDummy
+      script:
+        - python -m pytest tests/
+        - py.test --pep8 base/
+
+    - stage: building docker image
+      sudo: required
+      services:
+      - docker
+      env:
+        - secure: "D0spY4msi+SgCRIKAfgYoxX/0nQiA9jnwg0c3qLXF9kMtX7K1bkX5H6NdAMZxfK5zlB48jk6hSLYFmLQ++358hh5y1BRTfeFnvUUP9PI/3c/XU/0eL7/exWrl9t2klEb+4YKDFt3VEkIgzSauyNt6pnnaY6e6yBPRQbNAhr/FlBAqCVcCymdUmn/xR9gNOmi/xEl2ZigbAQy9vcWw9cr0nWVFH6whBe3eiYXm8VM6w89GCNZJHMT3ERDPlKPCnyVYtmCS335eqYIOcwGQylGU8pKj6fYZeznIW1wHwW7pS91JAjs45XkesiGD+Oczo9Xab7WUQfLN7t6we39ykZKg7+xjkU8XasmXuSY/zQgNVW0PDHPlP6gCd0nnIvPMKWAVPxSWPlAmzKfjuYUNwL2RtpVQtM81ia8QjyxT6N8b4N/CmX5IsQ8jLA5luZT75rTLc+G/iUxXVIQjbeLlGUUiQpzZ4MErVkak+ezKYJ8MnONQV7bdks8i+pwKsMQCVoAxxgHuH6yaG/2k9rgtw0S3DGebvjzHBDJFs2igLuqZG4L/wjf4l/MPZYaP0xCvSi7y5mKlAbwdcB70q2tou6cg9srh15mXM6C2PbdI+aIgpQjTsZJ+0MD3U2SAjRJAGx1AR//vjpdhHXQnoG26HXdIzVyQ+r1OhrNO7VSS4kcFbM="
+        - secure: "KAWfo8g0hVDUmALzNPWgmgo8PUN52hzfYNsIQ/uLrkRJgZDHADptqYUKVGegsMErHD56Lv+SZp6tPA+AAJV4MuW0X4M8BWNc4BKvJnNPGbM4SA1nwX7ZU4GD2z7Y4evgWR3Ih8JKQh7X5YvQHn9XXY/HpMnH3gQ0dj86lgvD3OewlwQ1tVU5ixKyfp9r3NK8TPbfWtBreFGCNdw4dUPjQHyAXB9IvgEkjbwj8taUCm9IsyZe8kk/gDQidxvnrPytXc61vyyiCB4x4LcB0u2p0uKtuHJTDLedw+ka26nLgt1qBEecHGAO1OROJcnEVwmXO5pdpHCGH08O4Ty/UQyyeXX3BDvfnfd3NrqOGwxeyIHsTgLv30aYxRWIPk66qsiIpT8LvPB6tPRbZ1d8WIi0c6ikq7N8VqUe3N3RHjGx+cOYBs6CGbOvspRzRvOo83zBwt00aScRZadT8h2E+zIEVnnhDbZZfxgAkIye6dCwJ3rI48bo7dR/95bINTHWUH5XcflJ5nUHPdGT2pptI32jEunh9T43+06WpEdST9xYZwAu3UW5GeOOiMuQbjQipBCYET8Zzzcr9CZ0DUuFxmyz/NZ4wiVlz1CzyOvpf42I7zXafgLJ9aMjSn+KLIJ+2+2PkoQtjv2Phq3NSCT7c6X04uEcuW6rVGJ2gsZowvoPZts="
+
+      before_script:
+      - docker pull vecmafabsim3/fabsimdocker || true
+      script:
+      - docker build --pull --cache-from vecmafabsim3/fabsimdocker --tag vecmafabsim3/fabsimdocker .
+      #- docker build --pull --tag vecmafabsim3/fabsimdocker .
+      - docker run vecmafabsim3/fabsimdocker
+      after_script:
+      - docker images
+      before_deploy:
+      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+      deploy:
+        provider: script
+        script: docker push vecmafabsim3/fabsimdocker
+        on:
+          branch: master
