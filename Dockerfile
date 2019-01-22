@@ -12,7 +12,7 @@ WORKDIR $PWD/FabSim3
 
 RUN pip install -r requirements.txt
 RUN pip install numpy
-RUN sed "s/your-username/`whoami`/g;s#~/Codes/FabSim#$PWD/FabSim3#g"  << cat deploy/machines_user_example.yml > deploy/machines_user.yml
+RUN sed "s/your-username/`whoami`/g;s#~/Codes/FabSim#$PWD#g"  << cat deploy/machines_user_example.yml > deploy/machines_user.yml
 RUN rm -f ~/.ssh/id_rsa
 RUN ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
 RUN cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
