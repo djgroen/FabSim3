@@ -486,11 +486,7 @@ def job(*option_dictionaries):
         # Allow option to submit all preparations, but not actually submit
         # the job
 
-        if ( 
-                hasattr(env, 'dispatch_jobs_on_localhost') and 
-                type(env.dispatch_jobs_on_localhost) is bool and 
-                env.dispatch_jobs_on_localhost == True
-            ):
+        if (hasattr(env, 'dispatch_jobs_on_localhost') and type(env.dispatch_jobs_on_localhost) is bool and env.dispatch_jobs_on_localhost == True):
             local(template("$job_dispatch " +  env.job_script))
             print("job dispatch is done locally\n")  
 
