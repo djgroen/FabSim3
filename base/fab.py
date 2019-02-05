@@ -487,7 +487,8 @@ def job(*option_dictionaries):
         # the job
 
         if (hasattr(env, 'dispatch_jobs_on_localhost') and isinstance(
-                env.dispatch_jobs_on_localhost, bool) and env.dispatch_jobs_on_localhost):
+                env.dispatch_jobs_on_localhost, bool) and 
+                env.dispatch_jobs_on_localhost):
             local(template("$job_dispatch " + env.job_script))
             print("job dispatch is done locally\n")
         elif not env.get("noexec", False):
