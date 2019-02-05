@@ -25,9 +25,9 @@ def script_template_content(template_name):
     if os.path.exists(template_file_path):
       source=open(template_file_path)
 
-  if source:
+  try:
     return template(source.read())
-  else:
+  except UnboundLocalError:
     print("FabSim Error: could not find template file. FabSim looked for it in the following directories: ", env.local_templates_path)
 
 def script_template_save_temporary(content):
