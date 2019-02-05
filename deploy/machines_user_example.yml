@@ -33,3 +33,7 @@ bluejoule:
   project: "ABC012" #"HCP056"
   namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
   ensemble_dir: "rep0/replicas"   
+
+qcg:
+  username: "plg<your-username>"
+  flee_location : "/home/plgrid/plgarabnejad/flee" # location of installed flee on the plgrid machine

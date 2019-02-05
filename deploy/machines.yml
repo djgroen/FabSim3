@@ -237,3 +237,19 @@ mavrino:
   corespernode: 8
   batch_header: sge
   queue: "parallel2" #"mapper"
+
+qcg:
+  remote: "eagle.man.poznan.pl" 
+  # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
+  # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
+  home_path_template: "/home/plgrid/$username/"
+  manual_ssh: true
+  dispatch_jobs_on_localhost: true #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
+  job_dispatch: "qcg-sub"
+  run_command: "mpirun -n $cores"
+  batch_header: qcg-eagle #TODO: make deploy/templates/qcg-eagle (should contain header specific for QCG broker)
+  stat: "qcg-list -Q -s all" 
+  cancel_job_command: "qcg-cancel"
+  queue: "plgrid"
+  budget: "vecma2019"
+  corespernode: 28

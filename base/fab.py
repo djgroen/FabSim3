@@ -485,7 +485,16 @@ def job(*option_dictionaries):
         run(template("chmod u+x $dest_name"))
         # Allow option to submit all preparations, but not actually submit
         # the job
-        if not env.get("noexec", False):
+
+        if ( 
+                hasattr(env, 'dispatch_jobs_on_localhost') and 
+                type(env.dispatch_jobs_on_localhost) is bool and 
+                env.dispatch_jobs_on_localhost == True
+            ):
+            local(template("$job_dispatch " +  env.job_script))
+            print("job dispatch is done locally\n")  
+
+        elif not env.get("noexec", False):
             with cd(env.job_results):
                 with prefix(env.run_prefix):
                     run(template("$job_dispatch $dest_name"))
