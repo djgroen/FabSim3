@@ -562,23 +562,6 @@ def run_ensemble(config, sweep_dir, **args):
     sweep_length = 0  # number of runs performed in this sweep
 
     for item in os.listdir(sweep_dir):
-        if os.path.isfile(os.path.join(sweep_dir, item)):
-            sweep_length += 1
-            # copy file_ to config directory
-            if "input_name_in_config" in env:
-                local(
-                    template("cp %s %s/%s") % (
-                        os.path.join(sweep_dir, item),
-                        env.job_config_path_local, env.input_name_in_config)
-                    )
-            else:
-                local(
-                    template("cp %s %s/") % (
-                        os.path.join(sweep_dir, item),
-                        env.job_config_path_local)
-                    )
-            execute(put_configs, config, skip_sweep_dir=True)
-            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
             # copy file_ to config directory
