@@ -9,3 +9,7 @@ FabFlee:
 #Anonymous cloning, publicly available
 FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
+
+#Collaborator status required
+FabADE:
+  repository: https://github.com/wedeling/fabade.git
