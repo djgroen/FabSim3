@@ -184,7 +184,7 @@ def fetch_configs(config=''):
 
 
 @task
-def put_configs(config='', skip_sweep_dir=False):
+def put_configs(config='', ensemble_mode=False, run_name=None):
     """
     Transfer config files to the remote. For use in launching jobs, via
     rsync. Specify a config directory, such as 'cylinder' to copy just
@@ -201,15 +201,21 @@ def put_configs(config='', skip_sweep_dir=False):
     """
 
     with_config(config)
-    run(
-        template(
-            "%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())
-            )
-        )
+    if not ensemble_mode:
+        run(
+            template(
+                "%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())
+                )
+           )
+    else:
+        run(
+            template(
+                "%s; mkdir -p $job_config_path/RUNS/%s" % (get_setup_fabsim_dirs_string(), run_name)
+                )
     if env.manual_gsissh:
-        if skip_sweep_dir:
+        if ensemble_mode:
             print(
-                "Warning: skip_sweep_dir is not supported when using \
+                "Warning: ensemble mode is not supported when using \
                 FabSim3 with Globus. This is because the Globus developers \
                 did not bother to support the option to exclude specific \
                 directories with globus-url-copy (unlike the rsync \
@@ -223,11 +229,17 @@ def put_configs(config='', skip_sweep_dir=False):
                 )
             )
     else:
-        if skip_sweep_dir:
+        if ensemble_mode:
+            # Upload base input files in config_files/<config_name>
             rsync_project(
                 local_dir=env.job_config_path_local + '/',
-                remote_dir=env.job_config_path,
+                remote_dir="%s/RUNS/%s" % (env.job_config_path, run_name),
                 exclude=["SWEEP"]
+                )
+            # Upload files that are specific to the particular run instance, using SCP/overwrite mode.
+            upload_project(
+                local_dir="%s/SWEEP/%s" % (env.job_config_path_local, run_name),
+                remote_dir="%s/RUNS/" % (env.job_config_path)
                 )
         else:
             rsync_project(
@@ -565,11 +577,11 @@ def run_ensemble(config, sweep_dir, **args):
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
             # copy file_ to config directory
-            local(
-                template("cp -r %s/* %s/") % (
-                    os.path.join(sweep_dir, item), env.job_config_path_local)
-                )
-            execute(put_configs, config, skip_sweep_dir=True)
+            #local(
+            #    template("cp -r %s/* %s/") % (
+            #        os.path.join(sweep_dir, item), env.job_config_path_local)
+            #    )
+            execute(put_configs, config, ensemble_mode=True, run_name=item)
             job(dict(wall_time='0:15:0', memory='2G', label=item), args)
     if sweep_length == 0:
         print(
