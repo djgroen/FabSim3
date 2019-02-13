@@ -208,9 +208,9 @@ def put_configs(config=''):
     with_config(config)
     run(
         template(
-           "%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())
-           )
-       )
+            "%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())
+            )
+        )
     if env.manual_gsissh:
         local(
             template(
