@@ -99,7 +99,6 @@ def find_config_file_path(name, ExceptWhenNotFound=True):
             return False
     return path_used
 
-
 def with_config(name):
     """Internal: augment the fabric environment with information
       regarding a particular configuration name.
@@ -507,12 +506,13 @@ def job(*option_dictionaries):
 def campaign2ensemble(config, campaign_dir, **args):
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
-    config: FabSim3 configuration name (will create in top level if non-existent, and overwrite existing content).
+    config: FabSim3 configuration name (will create in top level if 
+    non-existent, and overwrite existing content).
     campagin_dir: EasyVVUQ root campaign directory.
     """
     update_environment(args)
     config_path = find_config_file_path(config, ExceptWhenNotFound=False)
-    if config_path == False:
+    if config_path is False:
         local("mkdir -p %s/SWEEP" % (env.local_config_path[-1]))
         config_path = env.local_config_path[-1]
     sweep_dir = config_path + "/SWEEP/"
