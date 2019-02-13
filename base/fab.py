@@ -72,10 +72,10 @@ def with_job(name, ensemble_mode=False):
         env.job_results = env.pather.join(env.results_path, name)
         env.job_results_local = os.path.join(env.local_results, name)
     else:
-        env.job_results = "%s/RUNS/%s" % (env.pather.join(env.results_path,
-            name), env.label)
-        env.job_results_local = "%s/RUNS/%s" % (os.path.join(env.local_results,
-            name), env.label)
+        env.job_results = "%s/RUNS/%s" % (env.pather.join(
+            env.results_path, name), env.label)
+        env.job_results_local = "%s/RUNS/%s" % (os.path.join(
+            env.local_results, name), env.label)
 
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
@@ -527,7 +527,7 @@ def campaign2ensemble(config, campaign_dir, **args):
     config_path = find_config_file_path(config, ExceptWhenNotFound=False)
     if config_path is False:
         local("mkdir -p %s/%s/SWEEP" % (env.local_config_file_path[-1],
-            config))
+              config))
         config_path = "%s/%s" % (env.local_config_file_path[-1], config)
     sweep_dir = config_path + "/SWEEP/"
 
