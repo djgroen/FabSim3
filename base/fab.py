@@ -82,6 +82,7 @@ def with_template_config():
     """
     with_config(template(env.config_name_template))
 
+
 def find_config_file_path(name, ExceptWhenNotFound=True):
     path_used = None
     for p in env.local_config_file_path:
@@ -98,6 +99,7 @@ def find_config_file_path(name, ExceptWhenNotFound=True):
         else:
             return False
     return path_used
+
 
 def with_config(name):
     """Internal: augment the fabric environment with information
@@ -503,10 +505,12 @@ def job(*option_dictionaries):
         print("DUMPENV mode enabled. Dumping environment:")
         print(env)
 
+
+@task
 def campaign2ensemble(config, campaign_dir, **args):
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
-    config: FabSim3 configuration name (will create in top level if 
+    config: FabSim3 configuration name (will create in top level if
     non-existent, and overwrite existing content).
     campagin_dir: EasyVVUQ root campaign directory.
     """
@@ -518,6 +522,7 @@ def campaign2ensemble(config, campaign_dir, **args):
     sweep_dir = config_path + "/SWEEP/"
 
     local("cp -r %s/runs/* %s" % (campaign_dir, sweep_dir))
+
 
 def run_ensemble(config, sweep_dir, **args):
     """Map and execute ensemble jobs.
