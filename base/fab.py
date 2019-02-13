@@ -72,8 +72,10 @@ def with_job(name, ensemble_mode=False):
         env.job_results = env.pather.join(env.results_path, name)
         env.job_results_local = os.path.join(env.local_results, name)
     else:
-        env.job_results = "%s/RUNS/%s" % (env.pather.join(env.results_path, name), env.label)
-        env.job_results_local = "%s/RUNS/%s" % (os.path.join(env.local_results, name), env.label)
+        env.job_results = "%s/RUNS/%s" % (env.pather.join(env.results_path,
+            name), env.label)
+        env.job_results_local = "%s/RUNS/%s" % (os.path.join(env.local_results,
+            name), env.label)
 
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
@@ -413,7 +415,7 @@ def job(*option_dictionaries):
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
     time.sleep(0.5)
-    env.ensemble_mode=False # setting a default before reading in args.
+    env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
     with_template_job(env.ensemble_mode)
     # Use this to request more cores than we use, to measure performance
@@ -524,7 +526,8 @@ def campaign2ensemble(config, campaign_dir, **args):
     update_environment(args)
     config_path = find_config_file_path(config, ExceptWhenNotFound=False)
     if config_path is False:
-        local("mkdir -p %s/%s/SWEEP" % (env.local_config_file_path[-1], config))
+        local("mkdir -p %s/%s/SWEEP" % (env.local_config_file_path[-1],
+            config))
         config_path = "%s/%s" % (env.local_config_file_path[-1], config)
     sweep_dir = config_path + "/SWEEP/"
 
@@ -566,7 +569,8 @@ def run_ensemble(config, sweep_dir, **args):
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
             execute(put_configs, config)
-            job(dict(wall_time='0:15:0', memory='2G', ensemble_mode=True, label=item), args)
+            job(dict(wall_time='0:15:0', memory='2G', ensemble_mode=True,
+                label=item), args)
     if sweep_length == 0:
         print(
             "ERROR: no files where found in the sweep_dir of this\
