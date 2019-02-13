@@ -47,18 +47,18 @@ def local_with_stdout(cmd, verbose=False):
         return output.stdout
 
 
-def with_template_job():
+def with_template_job(ensemble_mode=False):
     """
     Determine a generated job name from environment parameters,
     and then define additional environment parameters based on it.
     """
     name = template(env.job_name_template)
-    if env.get('label'):
+    if env.get('label') and not ensemble_mode:
         name = '_'.join((env['label'], name))
-    with_job(name)
+    with_job(name, ensemble_mode)
 
 
-def with_job(name):
+def with_job(name, ensemble_mode=False):
     """Augment the fabric environment with information regarding a
     particular job name.
 
@@ -68,8 +68,13 @@ def with_job(name):
       stored
     """
     env.name = name
-    env.job_results = env.pather.join(env.results_path, name)
-    env.job_results_local = os.path.join(env.local_results, name)
+    if not ensemble_mode:
+        env.job_results = env.pather.join(env.results_path, name)
+        env.job_results_local = os.path.join(env.local_results, name)
+    else:
+        env.job_results = "%s/RUNS/%s" % (env.pather.join(env.results_path, name), label)
+        env.job_results_local = "%s/RUNS/%s" % (os.path.join(env.local_results, name), label)
+
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
 
@@ -436,7 +441,7 @@ def job(*option_dictionaries):
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
     time.sleep(1.)
     update_environment(*option_dictionaries)
-    with_template_job()
+    with_template_job(env.ensemble_mode)
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
     if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
@@ -582,7 +587,7 @@ def run_ensemble(config, sweep_dir, **args):
             #        os.path.join(sweep_dir, item), env.job_config_path_local)
             #    )
             execute(put_configs, config, ensemble_mode=True, run_name=item)
-            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
+            job(dict(wall_time='0:15:0', memory='2G', ensemble_mode=True, label=item), args)
     if sweep_length == 0:
         print(
             "ERROR: no files where found in the sweep_dir of this\
