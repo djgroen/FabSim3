@@ -47,18 +47,18 @@ def local_with_stdout(cmd, verbose=False):
         return output.stdout
 
 
-def with_template_job():
+def with_template_job(ensemble_mode=False):
     """
     Determine a generated job name from environment parameters,
     and then define additional environment parameters based on it.
     """
     name = template(env.job_name_template)
-    if env.get('label'):
+    if env.get('label') and not ensemble_mode:
         name = '_'.join((env['label'], name))
-    with_job(name)
+    with_job(name, ensemble_mode)
 
 
-def with_job(name):
+def with_job(name, ensemble_mode=False):
     """Augment the fabric environment with information regarding a
     particular job name.
 
@@ -68,8 +68,15 @@ def with_job(name):
       stored
     """
     env.name = name
-    env.job_results = env.pather.join(env.results_path, name)
-    env.job_results_local = os.path.join(env.local_results, name)
+    if not ensemble_mode:
+        env.job_results = env.pather.join(env.results_path, name)
+        env.job_results_local = os.path.join(env.local_results, name)
+    else:
+        env.job_results = "%s/RUNS/%s" % (env.pather.join(
+            env.results_path, name), env.label)
+        env.job_results_local = "%s/RUNS/%s" % (os.path.join(
+            env.local_results, name), env.label)
+
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
 
@@ -184,7 +191,7 @@ def fetch_configs(config=''):
 
 
 @task
-def put_configs(config='', skip_sweep_dir=False):
+def put_configs(config=''):
     """
     Transfer config files to the remote. For use in launching jobs, via
     rsync. Specify a config directory, such as 'cylinder' to copy just
@@ -207,14 +214,6 @@ def put_configs(config='', skip_sweep_dir=False):
             )
         )
     if env.manual_gsissh:
-        if skip_sweep_dir:
-            print(
-                "Warning: skip_sweep_dir is not supported when using \
-                FabSim3 with Globus. This is because the Globus developers \
-                did not bother to support the option to exclude specific \
-                directories with globus-url-copy (unlike the rsync \
-                developers)."
-                )
         local(
             template(
                 "globus-url-copy -p 10 -cd -r -sync \
@@ -223,17 +222,10 @@ def put_configs(config='', skip_sweep_dir=False):
                 )
             )
     else:
-        if skip_sweep_dir:
-            rsync_project(
-                local_dir=env.job_config_path_local + '/',
-                remote_dir=env.job_config_path,
-                exclude=["SWEEP"]
-                )
-        else:
-            rsync_project(
-                local_dir=env.job_config_path_local + '/',
-                remote_dir=env.job_config_path
-                )
+        rsync_project(
+            local_dir=env.job_config_path_local + '/',
+            remote_dir=env.job_config_path
+            )
 
 
 @task
@@ -422,9 +414,10 @@ def job(*option_dictionaries):
     env.fabsim_git_hash = get_fabsim_git_hash()
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
-    time.sleep(1.)
+    time.sleep(0.5)
+    env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
-    with_template_job()
+    with_template_job(env.ensemble_mode)
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
     if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
@@ -461,6 +454,7 @@ def job(*option_dictionaries):
 
         # Store previous fab commands in bash history.
         env.fabsim_command_history = get_fabsim_command_history()
+
         # Make directory, copy input files and job script to results directory
         run(
             template(
@@ -469,6 +463,15 @@ def job(*option_dictionaries):
                 cp $dest_name $job_results"
                 )
             )
+
+        # In ensemble mode, also add run-specific file to the results dir.
+        if env.ensemble_mode:
+            run(
+                template(
+                    "cp -r \
+                    $job_config_path/SWEEP/$label/* $job_results/"
+                    )
+                )
 
         try:
             del env["passwords"]
@@ -563,32 +566,11 @@ def run_ensemble(config, sweep_dir, **args):
     sweep_length = 0  # number of runs performed in this sweep
 
     for item in os.listdir(sweep_dir):
-        if os.path.isfile(os.path.join(sweep_dir, item)):
-            sweep_length += 1
-            # copy file_ to config directory
-            if "input_name_in_config" in env:
-                local(
-                    template("cp %s %s/%s") % (
-                        os.path.join(sweep_dir, item),
-                        env.job_config_path_local, env.input_name_in_config)
-                    )
-            else:
-                local(
-                    template("cp %s %s/") % (
-                        os.path.join(sweep_dir, item),
-                        env.job_config_path_local)
-                    )
-            execute(put_configs, config, skip_sweep_dir=True)
-            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
-            # copy file_ to config directory
-            local(
-                template("cp -r %s/* %s/") % (
-                    os.path.join(sweep_dir, item), env.job_config_path_local)
-                )
-            execute(put_configs, config, skip_sweep_dir=True)
-            job(dict(wall_time='0:15:0', memory='2G', label=item), args)
+            execute(put_configs, config)
+            job(dict(wall_time='0:15:0', memory='2G', ensemble_mode=True,
+                label=item), args)
     if sweep_length == 0:
         print(
             "ERROR: no files where found in the sweep_dir of this\
