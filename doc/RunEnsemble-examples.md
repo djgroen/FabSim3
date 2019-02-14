@@ -5,6 +5,9 @@
 `fab localhost dummy_ensemble` runs this basic ensemble job.
 This command takes the files in the config_files/dummy_ensemble directory and copies them into the localhost result directory as usual, but does this for each file in the SWEEP directory
 
+If you want to specify a specific machine, configuration, directory, wall_time and core count per job, you can do that as follows:
+`fab <machine_name> dummy_ensemble:<config, e.g. dummy_test>,wall_time=1:00:00,cores=4`
+
 ### Lammps Ensemble Job
 This example requires the installation of the FabMD plugin. You can install the plugin using:
 `fab localhost install_plugin:FabMD`
