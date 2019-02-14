@@ -523,9 +523,10 @@ def campaign2ensemble(config, campaign_dir, **args):
     update_environment(args)
     config_path = find_config_file_path(config, ExceptWhenNotFound=False)
     if config_path is False:
-        local("mkdir -p %s/%s/SWEEP" % (env.local_config_file_path[-1], config))
+        local("mkdir -p %s/%s" % (env.local_config_file_path[-1], config))
         config_path = "%s/%s" % (env.local_config_file_path[-1], config)
-    sweep_dir = config_path + "/SWEEP/"
+    sweep_dir = config_path + "/SWEEP"
+    local("mkdir -p %s" % (sweep_dir))
 
     local("cp -r %s/runs/* %s" % (campaign_dir, sweep_dir))
 
