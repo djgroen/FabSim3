@@ -59,6 +59,24 @@ default:
   # This variable encodes the default location for config_files.
   local_config_file_path: ["$localroot/config_files"]
 
+
+cartesius:
+  max_job_name_chars: 15
+  job_dispatch: "sbatch"
+  stat: "squeue"
+  run_command: "mpiexec -n $cores"
+  batch_header: slurm-cartesius
+  remote: "cartesius.surfsara.nl"
+  home_path_template: "/home/$username"
+  runtime_path_template: "/scratch-local/$username"
+  modules:
+    all: []
+    gromacs: ["load gromacs"]
+  temp_path_template: "$work_path/tmp"
+  queue: "normal"
+  python_build: "python2.7"
+  corespernode: 24
+
 prometheus:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
@@ -88,6 +106,9 @@ eagle:
   queue: "plgrid"
   budget: "compatpsnc2"
   corespernode: 28
+
+
+
 
 supermuc1_thin:
   max_job_name_chars: 15
