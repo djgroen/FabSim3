@@ -40,9 +40,9 @@ Note that you may have to restart the shell for this change to apply.
 
 4. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
 
-Note: For Mac Users, be sure to override the default home directory, by adding the following line in the section default:
+Note: For Mac Users, be sure to override the default home directory, by switching the `home_path_template` variable by uncommenting the following line: 
 ```
-home_path_template: "/home/$username
+home_path_template: "/Users/$username
 ```
 
 5. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
@@ -66,6 +66,8 @@ To update plugins you will have to `git pull` from within each plugin directory 
 ## Testing FabSim
 
 The easiest way to test FabSim is to simply go to the base directory of your FabSim installation and try the examples below.
+
+Note: Mac users may get a `ssh: connect to host localhost port 22: Connection refused` error. This means you must enable remote login. This is done in `System Preferences > Sharing > Remote Login`.
 
 ### List available commands.
 1. Simply type `fab localhost help`.
