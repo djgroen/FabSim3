@@ -49,13 +49,19 @@ home_path_template: "/home/$username
 
 6. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
 
-## Installing plugins
+### Installing plugins
 
 By default, FabSim3 comes with the FabMD plugin installed. Other plugins can be installed, and are listed in deploy/plugins.yml.
 
 To install a specific plugin, simply type: `fab localhost install_plugin:<plug_name>`
 
 To create your own plugin, please refer to doc/CreatingPlugins.md
+
+### Updating 
+
+If you have already installed FabSim, in your local FabSim directory type `git pull`. Your personal settings like the `machines_user.yml` will be unchanged by this.
+
+To update plugins you will have to `git pull` from within each plugin directory as and when required.
 
 ## Testing FabSim
 
