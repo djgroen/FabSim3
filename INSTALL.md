@@ -59,7 +59,7 @@ To create your own plugin, please refer to doc/CreatingPlugins.md
 
 ### Updating 
 
-If you have already installed FabSim, in your local FabSim directory type `git pull`. Your personal settings like the `machines_user.yml` will be unchanged by this.
+If you have already installed FabSim and want to update to the latest version, in your local FabSim directory simply type `git pull`. Your personal settings like the `machines_user.yml` will be unchanged by this.
 
 To update plugins you will have to `git pull` from within each plugin directory as and when required.
 
