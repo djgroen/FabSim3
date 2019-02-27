@@ -1,6 +1,6 @@
 #Collaborator status required
 FabMD:
-  repository: git@github.com:UCL-CCS/FabMD.git
+  repository: https://github.com/UCL-CCS/FabMD.git
 
 #Collaborator status required
 FabFlee:
