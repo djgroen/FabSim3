@@ -502,8 +502,8 @@ def job(*option_dictionaries):
             # just-submitted task
             time.sleep(2)
             save_submitted_job_info()
-            print("jobID is stored into : %s\n" % (os.path.join
-                (env.local_jobsDB_path, env.local_jobsDB_filename)))
+            print("jobID is stored into : %s\n" % (os.path.join(
+                env.local_jobsDB_path, env.local_jobsDB_filename)))
 
         elif not env.get("noexec", False):
             with cd(env.job_results):
