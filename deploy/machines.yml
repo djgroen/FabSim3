@@ -266,11 +266,30 @@ qcg:
   home_path_template: "/home/plgrid/$username/"
   manual_ssh: true
   dispatch_jobs_on_localhost: true #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
-  job_dispatch: "qcg-sub"
   run_command: "mpirun -n $cores"
+
   batch_header: qcg-eagle
-  stat: "qcg-list -Q -s all" 
-  cancel_job_command: "qcg-cancel"
+  qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+  eagle_modules: "vecma/apps/flee"
   queue: "plgrid"
+
   budget: "vecma2019"
   corespernode: 28
+
+  # stat : return report for all submitted jobs
+  # it should be set in the way that only return jobID, job status, and host in the output (without column header)
+  # for example: the template output should be similar to :
+  #           ...   ...       ...
+  #           job1  FINISHED  eagle
+  #           job2  FAILED    eagle
+  #           job2  CANCELED  eagle  
+  #           ...   ...       ...  
+  stat: 'qcg-list -Q -s all -F "%-22I %-16S %-8H" | awk "{if(NR>2)print}"'
+
+  # job_dispatch : the command to submit the task to be processed by remote machine
+  job_dispatch: "qcg-sub"
+
+  # cancel_job_command : cancel submitted task based on input $jobID 
+  # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
+  cancel_job_command: 'qcg-cancel $jobID'
+      
