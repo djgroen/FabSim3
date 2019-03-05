@@ -71,7 +71,9 @@ if env.temp_path_template:
 env.pythonroot=os.path.join(env.localroot,'python')
 env.blackboxroot=os.path.join(env.localroot,'blackbox')
 
-
+# job database configuration for remote machines
+env.local_jobsDB_path = os.path.join(env.localroot, 'deploy', '.jobsDB')
+env.local_jobsDB_filename = 'jobsDB.txt'
 
 def generate_module_commands(script=None):
     module_commands = ["module %s"%module for module in env.modules["all"]] # Not using get as I want this to crash if the all key does not exist (it should always be present).
