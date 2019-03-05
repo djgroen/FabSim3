@@ -77,7 +77,6 @@ def job_stat_update():
             print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, '-'))
 
 
-
 @task
 def job_info(jobID=None):
     """
