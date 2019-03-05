@@ -14,7 +14,7 @@ def job_stat(period="localDB", jobID=None):
         default :
                 reports the status of jobs saved in the local DataBase
                 by fetching the results of each job,
-                the location of local database is set by $local_jobsDB_path at 
+                the location of local database is set by $local_jobsDB_path at
                 /deploy/machines.yaml file
         options:
                 period=all : return task information for all submitted jobs,
@@ -213,7 +213,7 @@ def save_submitted_job_info():
 
 def read_submitted_jobsID(output_format='dict'):
     """
-        this function reads submitted jobIDs for local database, 
+        this function reads submitted jobIDs for local database,
         returns (only jobIDs) as a dictionary/an array object
     """
     check_local_database_file_exist()
