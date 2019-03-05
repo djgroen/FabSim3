@@ -1,7 +1,7 @@
 FabSim
 ======
 
-[![Build Status](https://travis-ci.com/djgroen/FabSim3.svg?branch=fabsim_qcg_dev)](https://travis-ci.com/djgroen/FabSim3)
+[![Build Status](https://travis-ci.com/djgroen/FabSim3.svg?branch=master)](https://travis-ci.com/djgroen/FabSim3)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vecmafabsim3/fabsimdocker.svg)](https://hub.docker.com/r/vecmafabsim3/fabsimdocker/)
 [![Docker Pulls](https://img.shields.io/docker/automated/vecmafabsim3/fabsimdocker.svg)](https://hub.docker.com/r/vecmafabsim3/fabsimdocker/)
 
