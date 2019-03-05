@@ -111,6 +111,7 @@ mkdir -p $HOME/.globus
 cat > $HOME/.globus/cog.properties << EOF
 usercert=$HOME/.globus/usercert.pem
 userkey=$HOME/.globus/userkey.pem
+proxy=$HOME/.globus/proxy
 EOF
 
 printf "Next steps : \n"
