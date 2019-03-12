@@ -11,5 +11,5 @@ FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
 
 #Collaborator status required: Plugin for stochastic collocation examples
-FabSC:
-  repository: https://github.com/wedeling/FabSC.git
+FabUQCampaign:
+  repository: https://github.com/wedeling/FabUQCampaign.git
