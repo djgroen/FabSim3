@@ -1,10 +1,11 @@
-FROM ubuntu
-FROM python:3
+FROM ubuntu:latest
 
+RUN apt-get update && \
+	apt-get install -y git python3-pip python3-dev openssh-server rsync
 
-RUN apt-get update
-RUN apt-get install -y openssh-server
-RUN apt-get install -y rsync
+RUN cd /usr/local/bin \
+	&& ln -s /usr/bin/python3 python \
+	&& pip3 install --upgrade pip
 
 RUN git clone https://github.com/djgroen/FabSim3.git
 
