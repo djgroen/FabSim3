@@ -7,7 +7,16 @@ Note that, in this tutorial, all parameters are set based on our tested target m
 ## machine configuration
 To execute jobs through remote resource schedulers, some **essential** machine-specific configurations are required to be set and stored. These parameters will be applied to all applications run on that remote machine. 
 
-Here is a simple example for remote machine configuration in ```/deploy/machines.yml``` file.
+First, you need to add your `username` for remote machine in ```/deploy/machines_user.yml``` file as : 
+> `File : /deploy/machines_user.yml`
+> ``` yaml
+> ---
+> qcg: # machine name
+>     username: "plg..." 
+> ---
+> ```
+
+Then, set up configuration for remote machine in ```/deploy/machines.yml``` file.<br/> Here is a simple example.<br/>
 
 
 > ```File : /deploy/machines.yml```
@@ -29,17 +38,7 @@ Here is a simple example for remote machine configuration in ```/deploy/machines
 
 
 * `qcg` : the name of target remote machine machine, it will use by FabSim as ```fab qcg <command>```. internally, FabSim uses ```<$user_name>@<$remote>``` to connect to the remote machine.
-* `remote` : the remote machine address. FabSim uses ```<$user_name>@<$remote>``` template internally all connection. 
-	* `user_name` parameter should be set in ```/deploy/machines_user.yml``` file as :
-
-		> `File : /deploy/machines_user.yml`
-		> ``` yaml
-		> ---
-		> qcg: # machine name
-		>     username: "plg..." 
-		> ---
-		> ```
-
+* `remote` : the remote machine address. FabSim uses ```<$user_name>@<$remote>``` template internally all connection. The `user_name` parameter is taken from ```/deploy/machines.yml``` file.
 
 * `home_path_template` : used to the storage space to checkout and build on the remote machine
 
@@ -86,7 +85,7 @@ Here is a simple example for remote machine configuration in ```/deploy/machines
 
 * `job_stat_update` :  updates the job status in the local database file
   ``` sh
-  $ fab <machine> job_stat
+  $ fab <machine> job_stat_update
   ...
       JobID                    current Status       New Status
       ----------------------   ----------------     ----------------
