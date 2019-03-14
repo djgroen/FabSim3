@@ -10,7 +10,7 @@ In this document, we will explain how to download, setup, and run [FabSim3](http
 
 ### Pull the container from library:
 ```sh
-$ singularity pull --name fabsim.img shub://arabnejad/singularity_test
+$ singularity pull --name fabsim.img shub://arabnejad/FabSim3
 ```
 - note that the download image should be kept as `fabsim.img`, this filename will be used later for setting environment variable and alias names in your `bashrc` file
 
