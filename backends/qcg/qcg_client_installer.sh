@@ -4,7 +4,7 @@
 # set variables
 SOURCE='source'
 TARGET='client'
-SVN_URL='https://apps.man.poznan.pl/svn/qcg-broker/branches/compat'
+SVN_URL='https://apps.man.poznan.pl/svn/qcg-broker/branches/vecma/'
 SVN_USER='piontek'
 SVN_PASSWD='piontek'
 
