@@ -278,7 +278,8 @@ def fetch_results(name='', regex='', debug=False):
     else:
         local(
             template(
-                "rsync -pthrvz $username@$remote:$job_results/%s \
+                "rsync -pthrvz -e 'ssh -p $port' \
+                $username@$remote:$job_results/%s \
                 $job_results_local" % regex
                 )
             )
