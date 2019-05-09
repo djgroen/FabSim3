@@ -41,11 +41,12 @@ In this document, we will explain how to download, setup, and run [FabSim3](http
 5. After, loading the environment variable from `fabsim_env.conf` into your into the current shell script, `fab` command will be available as a alias name to run for singularity image and accept all FabSim3 command.
 
 6. For [QCG](http://www.qoscosgrid.org/trac/qcg) users, 
+	- please make sure, you udpate/replace `username: "plg<your-username>"` with your username account in `{fabsim_INSTALL_DIR}/deploy/machines_user.yml`
+	- Sets up SSH key pairs for FabSim access : `fab qcg setup_ssh_keys` 
 	- please create a `globus` in your `$HOME` directory, If Not Exist : `mkdir -p ~/.globus`
 	- copy `usercert.pem` and `userkey.pem` from your account to `~/.globus`
 		> `scp plg<user>@eagle.man.poznan.pl:~/.globus/usercert.pem ~/.globus`<br/>
 		> `scp plg<user>@eagle.man.poznan.pl:~/.globus/userkey.pem ~/.globus`
-	- please make sure, you udpate/replace `username: "plg<your-username>"` with your username account in `{fabsim_INSTALL_DIR}/deploy/machines_user.yml`
 		
 ## FabSim3 Usage
 - To enable use of FabSim3 on your local host, type `fab localhost setup_fabsim`
