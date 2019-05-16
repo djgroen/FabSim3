@@ -32,11 +32,11 @@ def get_plugin_path(name):
     Get the local base path of plugin <name>.
     """
     plugin_path = os.path.join(env.localroot, 'plugins', name)
-
     if not os.path.isdir(plugin_path):
         return ''
     else:
         return plugin_path
+    
 
 def local_with_stdout(cmd, verbose=False):
     """
