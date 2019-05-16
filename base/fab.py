@@ -36,7 +36,7 @@ def get_plugin_path(name):
         return ''
     else:
         return plugin_path
-    
+
 
 def local_with_stdout(cmd, verbose=False):
     """
