@@ -261,6 +261,14 @@ mavrino:
 
 qcg:
   remote: "eagle.man.poznan.pl" 
+
+  # PilotJob attributes
+  PJ_header: qcg-PJ-header
+  PJ_PYheader: qcg-PJ.py
+  #PJ_header: no_batch
+  PJ_size : "1"
+  PJ_wall_time : "PT10M"
+
   # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
   # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
   home_path_template: "/home/plgrid/$username/"
