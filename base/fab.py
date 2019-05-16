@@ -528,6 +528,17 @@ def job(*option_dictionaries):
         print("DUMPENV mode enabled. Dumping environment:")
         print(env)
 
+@task
+def ensemble2campaign(results_dir, campaign_dir, **args):
+    """
+    Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
+    results_dir: FabSim3 results root directory 
+    campagin_dir: EasyVVUQ root campaign directory.
+    """
+    update_environment(args)
+    
+    local("cp -r %s/RUNS/* %s/runs" % (results_dir, campaign_dir))
+
 
 @task
 def campaign2ensemble(config, campaign_dir, **args):
