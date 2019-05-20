@@ -1,0 +1,7 @@
+
+qcg-pm-client $PJ_FileName
+#QCG stage-in-file=$PJ_PATH
+#QCG stage-out-dir=.->$job_results/eagle.wd.$${JOB_ID}
+#QCG application=qcg-pm-client
+#QCG argument=$PJ_FileName
+

@@ -110,8 +110,6 @@ eagle:
   corespernode: 28
 
 
-
-
 supermuc1_thin:
   max_job_name_chars: 15
   job_dispatch: "llsubmit"
