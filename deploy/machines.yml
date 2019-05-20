@@ -86,7 +86,8 @@ prometheus:
   remote: "prometheus.cyfronet.pl"
   home_path_template: "/net/people/$username"
   runtime_path_template: "/net/scratch/people/$username"
-  modules: ["load apps/lammps"]
+  modules: 
+    all: ["load apps/lammps"]
   temp_path_template: "$work_path/tmp"
   queue: "plgrid"
   python_build: "python2.7"
@@ -102,9 +103,10 @@ eagle:
   home_path_template: "/home/plgrid/$username"
   runtime_path_template: "/tmp/lustre_shared/$username"
   temp_path_template: "$work_path/tmp"
-  modules: ["load plgrid/tools/openmpi/1.10.2-1_gcc482"]
+  modules:
+    all: ["load plgrid/tools/openmpi/1.10.2-1_gcc482"]
   queue: "plgrid"
-  budget: "compatpsnc2"
+  budget: ""
   corespernode: 28
 
 
