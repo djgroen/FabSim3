@@ -6,7 +6,7 @@ import time
 
 @task
 def stat():
-    """Check the remote message queue status for individual machines. 
+    """Check the remote message queue status for individual machines.
     Syntax: fab <machine> stat."""
     # TODO: Respect varying remote machine queue systems.
     if not env.get('stat_postfix'):
@@ -17,7 +17,7 @@ def stat():
 @task
 def job_stat(period="localDB", jobID=None):
     """
-        return a report for all submitted jobs or for a specific one 
+        return a report for all submitted jobs or for a specific one
         when using QCG.
         Syntax:
                 fab <machine> job_stat
