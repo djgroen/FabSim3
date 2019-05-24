@@ -3,6 +3,7 @@ from deploy.machines import *
 from fabric.contrib.project import *
 import time
 
+
 @task
 def stat():
     """Check the remote message queue status for individual machines. Syntax: fab <machine> stat."""
@@ -10,6 +11,7 @@ def stat():
     if not env.get('stat_postfix'):
         return run(template("$stat -u $username"))
     return run(template("$stat -u $username $stat_postfix"))
+
 
 @task
 def job_stat(period="localDB", jobID=None):
