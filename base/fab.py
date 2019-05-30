@@ -529,9 +529,10 @@ def job(*option_dictionaries):
         # wait a little bit before fetching the jobID for the
         # just-submitted task
         time.sleep(2)
-        save_submitted_job_info()
-        print("jobID is stored into : %s\n" % (os.path.join(
-            env.local_jobsDB_path, env.local_jobsDB_filename)))
+        if check_dispatch_jobs_status_flag():
+            save_submitted_job_info()
+            print("jobID is stored into : %s\n" % (os.path.join(
+                env.local_jobsDB_path, env.local_jobsDB_filename)))
 
         print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
               (env.remote, env.job_results)
