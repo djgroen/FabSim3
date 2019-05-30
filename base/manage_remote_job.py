@@ -330,6 +330,8 @@ def check_local_database_file_exist():
 
 
 def check_dispatch_jobs_status_flag():
+    return True
+
     if (
             hasattr(env, 'dispatch_jobs_on_localhost') and
             isinstance(env.dispatch_jobs_on_localhost, bool) and
