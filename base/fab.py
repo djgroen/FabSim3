@@ -512,17 +512,26 @@ def job(*option_dictionaries):
             local(template("$job_dispatch " + env.job_script))
             print("job dispatch is done locally\n")
 
+            '''
             # wait a little bit before fetching the jobID for the
             # just-submitted task
             time.sleep(2)
             save_submitted_job_info()
             print("jobID is stored into : %s\n" % (os.path.join(
                 env.local_jobsDB_path, env.local_jobsDB_filename)))
+            '''
 
         elif not env.get("noexec", False):
             with cd(env.job_results):
                 with prefix(env.run_prefix):
                     run(template("$job_dispatch $dest_name"))
+
+        # wait a little bit before fetching the jobID for the
+        # just-submitted task
+        time.sleep(2)
+        save_submitted_job_info()
+        print("jobID is stored into : %s\n" % (os.path.join(
+            env.local_jobsDB_path, env.local_jobsDB_filename)))
 
         print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
               (env.remote, env.job_results)
