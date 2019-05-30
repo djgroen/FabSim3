@@ -4,7 +4,8 @@ FabMD:
 
 #Collaborator status required
 FabFlee:
-  repository: git@github.com:djgroen/FabFlee.git
+  #repository: git@github.com:djgroen/FabFlee.git
+  repository: https://github.com/djgroen/FabFlee.git
 
 #Anonymous cloning, publicly available
 FabDummy:
