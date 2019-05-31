@@ -526,10 +526,10 @@ def job(*option_dictionaries):
                 with prefix(env.run_prefix):
                     run(template("$job_dispatch $dest_name"))
 
-        # wait a little bit before fetching the jobID for the
-        # just-submitted task
-        time.sleep(2)
-        if check_dispatch_jobs_status_flag():
+        if env.remote != 'localhost':
+            # wait a little bit before fetching the jobID for the
+            # just-submitted task
+            time.sleep(2)
             save_submitted_job_info()
             print("jobID is stored into : %s\n" % (os.path.join(
                 env.local_jobsDB_path, env.local_jobsDB_filename)))

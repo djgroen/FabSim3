@@ -37,6 +37,8 @@ def job_stat(period="localDB", jobID=None):
     # TODO: Respect varying remote machine queue systems.
     # it return the information for all submitted jobs
 
+    check_jobs_dispatched_on_remote_machine()
+
     jobsInfo = jobs_list(quiet=True, jobsID=jobID)
 
     if len(jobsInfo) == 0:
@@ -65,7 +67,7 @@ def job_stat_update():
                 fab <machine> job_stat_update
     """
 
-    check_dispatch_jobs_status_flag()
+    check_jobs_dispatched_on_remote_machine()
 
     check_local_database_file_exist()
 
@@ -95,14 +97,23 @@ def job_info(jobID=None):
         Syntax: fab <machine> job_info:jobID
     """
 
+    check_jobs_dispatched_on_remote_machine()
+
     if jobID is None:
         print("ERROR: No jobID is passed, usage Syntax : \
             fab <machine> job_info:jobID= <input_jobID>")
         sys.exit()
 
     env.jobID = jobID
-    if check_dispatch_jobs_status_flag:
+
+    if (
+            hasattr(env, 'dispatch_jobs_on_localhost') and
+            isinstance(env.dispatch_jobs_on_localhost, bool) and
+            env.dispatch_jobs_on_localhost
+    ):
         local(template(env.job_info_command))
+    else:
+        run(template(env.job_info_command))
 
 
 @task
@@ -114,6 +125,9 @@ def cancel_job(jobID=None):
         note : if the jobID is empty, this function cancel all submitted
                job which are not in FINISHED status
     """
+
+    check_jobs_dispatched_on_remote_machine()
+
     if jobID is None:
         print("ERROR: No jobID is passed,\n\tusage Syntax :"
               "\n\t\tfab <machine> cancel_job:jobID= <input_jobID>")
@@ -121,8 +135,14 @@ def cancel_job(jobID=None):
 
     env.jobID = jobID
 
-    if check_dispatch_jobs_status_flag:
+    if (
+            hasattr(env, 'dispatch_jobs_on_localhost') and
+            isinstance(env.dispatch_jobs_on_localhost, bool) and
+            env.dispatch_jobs_on_localhost
+    ):
         return local(template("$cancel_job_command $jobID"))
+    else:
+        return run(template("$cancel_job_command $jobID"))
 
 
 @task
@@ -135,13 +155,14 @@ def delete_job(jobID=None, status=None):
 
         TODO : should I call it from fetch_results ???
     """
+
+    check_jobs_dispatched_on_remote_machine()
+
     if jobID is None and status is None:
         print("ERROR: For delete command : one of these parameters "
               "(jobID OR status) should be set\n\tSyntax:"
               "\n\t\tfab <machine> delete_job:jobID='...',status='...'")
         sys.exit()
-
-    check_dispatch_jobs_status_flag()
 
     check_local_database_file_exist()
 
@@ -169,8 +190,6 @@ def jobs_list(quiet=False, jobsID=None):
         options:
                 quiet = True : hide the command output
     """
-
-    check_dispatch_jobs_status_flag()
 
     output = local(template("$stat "), capture=quiet)
 
@@ -329,21 +348,10 @@ def check_local_database_file_exist():
         sys.exit()
 
 
-def check_dispatch_jobs_status_flag():
+def check_jobs_dispatched_on_remote_machine():
     if env.remote == 'localhost':
-        return False
-    else:
-        return True
-
-    if (
-            hasattr(env, 'dispatch_jobs_on_localhost') and
-            isinstance(env.dispatch_jobs_on_localhost, bool) and
-            env.dispatch_jobs_on_localhost
-    ):
-        return True
-    else:
         print("ERROR: This functionality can be used only when\
-               jobs are submitted on the remote machine")
+            jobs are submitted on the remote machine")
         sys.exit()
 
 
@@ -384,12 +392,3 @@ def print_job_info(jobs_dict):
         print("%-30s \t %-15s \t %-15s" % (JobID, status, host))
 
     print('\n')
-    # import yaml
-    # print(yaml.dump(jobs_dict, default_flow_style=False))
-
-    # import pprint
-    # pp = pprint.PrettyPrinter(indent=4)
-    # pprint.pprint(jobs_dict)
-
-    # import json
-    # print(json.dumps(jobs_dict,indent=4))
