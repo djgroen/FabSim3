@@ -450,7 +450,7 @@ def job(*option_dictionaries):
         env.run_command = template(env.run_command)
 
         if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
-            env.job_script = script_templates(env.batch_header, env.script)
+            env.job_script = script_templates(env.batch_header)
         else:
             env.job_script = script_templates(env.batch_header, env.script)
 
@@ -495,6 +495,7 @@ def job(*option_dictionaries):
             )
             tempf.flush()  # Flush the file before we copy it.
             put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
+
         run(template("chmod u+x $dest_name"))
 
         # check for PilotJob option is true, DO NOT submit the job directly
@@ -529,7 +530,7 @@ def job(*option_dictionaries):
         if env.remote != 'localhost':
             # wait a little bit before fetching the jobID for the
             # just-submitted task
-            time.sleep(2)
+            time.sleep(5)
             save_submitted_job_info()
             print("jobID is stored into : %s\n" % (os.path.join(
                 env.local_jobsDB_path, env.local_jobsDB_filename)))
@@ -645,8 +646,9 @@ def run_ensemble(config, sweep_dir, **args):
     elif (hasattr(env, 'PilotJob') and
           env.PilotJob.lower() == 'true'
           ):
-        env.submitted_jobs_list = "\n".join(
-            [str(i) for i in env.submitted_jobs_list])
+
+        env.submitted_jobs_list = ".".join(
+            ["\n\t" + str(i) for i in env.submitted_jobs_list])
 
         env.batch_header = env.PJ_PYheader
         job(dict(wall_time='0:15:0', memory='2G',
