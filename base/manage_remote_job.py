@@ -79,15 +79,17 @@ def job_stat_update():
     print('-' * 30 + " \t " + '-' * 20 + " \t " + '-' * 20)
 
     for key, value in submitted_jobsID.items():
-        JobID = key
-        curr_status = value['status']
-        new_status = jobsInfo[JobID]['status']
+        if key in jobsInfo:
+            JobID = key
+            curr_status = value['status']
+            new_status = jobsInfo[JobID]['status']
 
-        if (new_status != curr_status):
-            update_submitted_job_info(jobID=JobID, status=new_status)
-            print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, new_status))
-        else:
-            print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, '-'))
+            if (new_status != curr_status):
+                update_submitted_job_info(jobID=JobID, status=new_status)
+                print("%-30s \t %-20s \t %-20s" %
+                      (JobID, curr_status, new_status))
+            else:
+                print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, '-'))
 
 
 @task
@@ -190,8 +192,15 @@ def jobs_list(quiet=False, jobsID=None):
         options:
                 quiet = True : hide the command output
     """
-
-    output = local(template("$stat "), capture=quiet)
+    #output = local(template("$stat "), capture=quiet)
+    if (
+            hasattr(env, 'dispatch_jobs_on_localhost') and
+            isinstance(env.dispatch_jobs_on_localhost, bool) and
+            env.dispatch_jobs_on_localhost
+    ):
+        output = local(template("$stat "), capture=quiet)
+    else:
+        output = run(template("$stat"))
 
     jobsInfo = {}
     for line in output.split('\n'):
