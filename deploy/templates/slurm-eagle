@@ -1,10 +1,24 @@
-#!/bin/bash --login
-# 
-#SBATCH --job-name=$job_name
+#!/bin/bash
+#
+## number of nodes
 #SBATCH --nodes $nodes
-#SBATCH --ntasks-per-node=$corespernode
+
+## task per node
+#SBATCH --tasks-per-node=$corespernode
+
+## wall time in format MINUTES:SECONDS
 #SBATCH --time=$wall_time
-#SBATCH -A $budget
-#SBATCH -p $queue
-#SBATCH --output="job.out"
-#SBATCH --error="job.err"
+
+## grant
+#SBATCH --account=$budget
+
+## stdout file
+#SBATCH --output=$job_results/JobID-%j.output
+
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
+
+
+export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
+
+module load $eagle_modules

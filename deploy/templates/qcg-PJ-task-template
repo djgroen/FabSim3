@@ -1,1 +1,1 @@
-ids$idsID = m.submit(Jobs().add( name = 'TaskID$idsID', exec = 'bash', args = ['$idsPath'], stdout = '$${jname}__$${uniq}.stdout', stderr = 'TaskID$idsID$${jname}__$${uniq}.stderr'))
+add( name = 'TaskID$idsID', exec = 'bash', args = ['$idsPath'], stdout = '$${jname}__$${uniq}.stdout', stderr = 'TaskID$idsID$${jname}__$${uniq}.stderr')
