@@ -192,7 +192,7 @@ def jobs_list(quiet=False, jobsID=None):
         options:
                 quiet = True : hide the command output
     """
-    #output = local(template("$stat "), capture=quiet)
+    # output = local(template("$stat "), capture=quiet)
     if (
             hasattr(env, 'dispatch_jobs_on_localhost') and
             isinstance(env.dispatch_jobs_on_localhost, bool) and
