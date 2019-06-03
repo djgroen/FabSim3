@@ -93,22 +93,6 @@ prometheus:
   python_build: "python2.7"
   corespernode: 24
 
-eagle:
-  max_job_name_chars: 15
-  job_dispatch: "sbatch"
-  stat: "squeue --noheader"
-  run_command: "mpirun -n $cores"
-  batch_header: slurm-eagle
-  remote: "eagle.man.poznan.pl"
-  home_path_template: "/home/plgrid/$username"
-  runtime_path_template: "/tmp/lustre_shared/$username"
-  temp_path_template: "$work_path/tmp"
-  modules:
-    all: ["load plgrid/tools/openmpi/1.10.2-1_gcc482"]
-  queue: "plgrid"
-  budget: ""
-  corespernode: 28
-
 
 supermuc1_thin:
   max_job_name_chars: 15
@@ -301,3 +285,27 @@ qcg:
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
       
+eagle:
+  run_command: "mpirun -n $cores"
+  batch_header: slurm-eagle
+  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+  eagle_modules: "vecma/apps/flee"
+  remote: "eagle.man.poznan.pl" 
+  home_path_template: "/home/plgrid/$username"
+  queue: "plgrid"
+  budget: "vecma2019"
+  corespernode: 2
+  manual_ssh: false
+  #stat: "sacct -o jobid,state,cluster -X -n"
+  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
+  job_dispatch: "sbatch"
+  cancel_job_command: 'scancel $jobID'
+  #job_info_command : 'sacct -X -j $jobID'  
+  job_info_command : 'sacct --allocations --job $jobID'
+  
+
+  #max_job_name_chars: 15
+  #modules:
+  #  all: []  
+  #runtime_path_template: "/tmp/lustre_shared/$username"
+  #temp_path_template: "$work_path/tmp"  
