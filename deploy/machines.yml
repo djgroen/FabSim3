@@ -250,14 +250,14 @@ qcg:
   PJ_header: qcg-PJ-header
   PJ_PYheader: qcg-PJ.py
   #PJ_header: no_batch
-  PJ_size : "1"
+  PJ_size : "3"
   PJ_wall_time : "PT10M"
 
   # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
   # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
   home_path_template: "/home/plgrid/$username/"
-  manual_ssh: true
-  dispatch_jobs_on_localhost: true #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
+  manual_ssh: false
+  dispatch_jobs_on_localhost: false #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
   run_command: "mpirun -n $cores"
 
   batch_header: qcg-eagle
@@ -266,7 +266,7 @@ qcg:
   queue: "plgrid"
 
   budget: "vecma2019"
-  corespernode: 28
+  corespernode: 2
 
   # stat : return report for all submitted jobs
   # it should be set in the way that only return jobID, job status, and host in the output (without column header)
