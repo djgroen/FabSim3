@@ -81,14 +81,6 @@ Note: Mac users may get a `ssh: connect to host localhost port 22: Connection re
 5. Run the LAMMPS test data set using: `fab localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
 6. Run `fab localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
-### FabBioMD testing is currently unavailable in the core FabSim3, as we are refactoring this plugin.
-
-(1. Install NAMD (required just for local host).
-2. Modify `machines_user.yml` to make the `namd_exec` variable point to the location of the NAMD executable. e.g., `namd_exec: "/home/james/bin/namd/2.9"` (This needs to be done individually for all local or remote hosts).
-3. FabSim contains a trial NAMD configuration, so there's no need to download that.
-4. Run the NAMD test data set using: `fab machine_name namd:namd_toy_model,cores=x,wall_time=y`, where you can choose the values of x and y depending on your machine.
-5. You can find the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.)
-
 ### Creating the relevant FabSim directories on a local or remote host
 
 1. Ensure that you have modified `machines_user.yml` to contain correct information for your target machine.
