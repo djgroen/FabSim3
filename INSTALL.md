@@ -72,6 +72,14 @@ Note: Mac users may get a `ssh: connect to host localhost port 22: Connection re
 ### List available commands.
 1. Simply type `fab localhost help`.
 
+### FabDummy testing on the local host
+####  Installation
+Simply type `fab localhost install_plugin:FabDummy` anywhere inside your FabSim3 install directory. `FabDummy` plugin will be downloaded under `<fabsim home folder>/plugins/FabDummy` 
+####  Testing
+1. To run a dummy job, type `fab localhost dummy:dummy_test`
+2. To run an ensemble of dummy jobs, type `fab localhost dummy_ensemble`
+3. for both cases, i.e., a single dummy job or an ensemble of dummy jobs, you can fetch the results by using `fab localhost fetch_results`
+
 ### LAMMPS testing on the local host
 
 1. Install LAMMPS (see http://lammps.sandia.gov for detailed download and installation instructions).
