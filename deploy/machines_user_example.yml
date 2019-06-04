@@ -36,4 +36,7 @@ bluejoule:
 
 qcg:
   username: "plg<your-username>"
-  flee_location : "/home/plgrid/plgarabnejad/flee" # location of installed flee on the plgrid machine
+  # flee_location : "/home/plgrid/plgarabnejad/flee" # location of installed flee on the plgrid machine
+
+eagle:
+  username: "plg<your-username>"
