@@ -49,7 +49,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 **Intermediate:**
 
-* Do UQ with molecular dynamics using the FabMD plugin: https://github.com/UCL-CCS/FabMD/blob/master/doc/EasyVVUQ_FabMD_example.md
+* You can find detailed tutorials for FabMD (molecular dynamics) here: https://github.com/UCL-CCS/FabMD/blob/master/doc
 * Do UQ with a coupled agent-based migration model using the FabFlee plugin: https://github.com/djgroen/FabFlee/blob/master/doc/Tutorial.md
 
 **Advanced:**
