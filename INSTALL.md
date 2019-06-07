@@ -3,6 +3,8 @@ Installing and Testing FabSim
 
 ## Dependencies
 
+To use FabSim3, you will need to have git installed.
+
 ### The "pip" way
 FabSim requires the following Python modules:
 * PyYAML (any version) 
@@ -14,6 +16,7 @@ To perform the Py.test tests (not required for using FabSim, but essential for r
 
 ### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 (when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
+* `sudo apt install git`
 * `sudo apt install python3-yaml`
 * `sudo apt install python3-numpy`
 * `sudo apt install python3-pip`
