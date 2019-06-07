@@ -82,7 +82,7 @@ def generate_module_commands(script=None):
     if script != None:
         module_commands += ["module %s"%module for module in env.modules.get(script,"")] # Not using get as I want this to crash if the all key does not exist (it should always be present).
         print("SCRIPT: ", script)
-    print("MODULE COMMANDS: ", module_commands)
+    #print("MODULE COMMANDS: ", module_commands)
     return module_commands
 
 module_commands = generate_module_commands()
@@ -152,6 +152,7 @@ def complete_environment():
     env.remote_path=template(env.remote_path_template)
     env.lammps_exec=template(env.lammps_exec)
     env.lammps_args=template(env.lammps_args)
+    env.stat=template(env.stat)
     env.results_path=env.pather.join(env.work_path,"results")
     env.config_path=env.pather.join(env.work_path,"config_files")
     env.scripts_path=env.pather.join(env.work_path,"scripts")

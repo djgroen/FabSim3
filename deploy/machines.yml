@@ -66,11 +66,11 @@ default:
   
   # Default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
+
+  # Default command syntax for getting the job status.
+  stat: "qstat -u $username"
   
-  # Default command to query the job status on the remote machine.
-  stat: qstat
-  
-  # Default command to cancel a job running remotely.
+  # Default command for cancelling jobs.
   cancel_job_command: "qdel"
   
   # Default arguments to LAMMPS - OBSOLETE?
@@ -88,7 +88,7 @@ default:
 cartesius:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  stat: "squeue"
+  stat: "squeue -u $username"
   run_command: "mpiexec -n $cores"
   batch_header: slurm-cartesius
   remote: "cartesius.surfsara.nl"
@@ -105,7 +105,7 @@ cartesius:
 prometheus:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  stat: "squeue"
+  stat: "squeue -u $username"
   run_command: "mpiexec -n $cores"
   batch_header: slurm-prometheus
   remote: "prometheus.cyfronet.pl"
@@ -183,6 +183,7 @@ archer:
   # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
   home_path_template: "/home/$project/$project/$username"
   runtime_path_template: "/work/$project/$project/$username"
+  stat: "qstat -u $username"
   modules: 
     all: []
     lammps: ["load lammps/lammps-28Jun14"]
@@ -206,8 +207,7 @@ bluejoule:
   queue: "standard"
   corespernode: 16
   pwd: "#"
-  stat: "llq -u"
-  stat_postfix: = '| grep -q -v "There is currently no job status to report"'
+  stat: "llq -u $username"
 bluewonder1:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
@@ -224,7 +224,7 @@ bluewonder1:
   queue: "standard"
   corespernode: 16
   pwd: "#"
-  stat: "bjobs -W"
+  stat: "bjobs -W $username"
 bluewonder2:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
