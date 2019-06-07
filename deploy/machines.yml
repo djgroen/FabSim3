@@ -49,7 +49,7 @@ default:
   manual_gsissh: false
   # This variable encodes the default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
-  stat: qstat
+  stat: "qstat -u $username"
   cancel_job_command: "qdel"
   lammps_args: ""
   # This variable encodes the default location for blackbox scripts.
@@ -63,7 +63,7 @@ default:
 cartesius:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  stat: "squeue"
+  stat: "squeue -u $username"
   run_command: "mpiexec -n $cores"
   batch_header: slurm-cartesius
   remote: "cartesius.surfsara.nl"
@@ -80,7 +80,7 @@ cartesius:
 prometheus:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  stat: "squeue"
+  stat: "squeue -u $username"
   run_command: "mpiexec -n $cores"
   batch_header: slurm-prometheus
   remote: "prometheus.cyfronet.pl"
@@ -182,8 +182,7 @@ bluejoule:
   queue: "standard"
   corespernode: 16
   pwd: "#"
-  stat: "llq -u"
-  stat_postfix: = '| grep -q -v "There is currently no job status to report"'
+  stat: "llq -u $username"
 bluewonder1:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
@@ -200,7 +199,7 @@ bluewonder1:
   queue: "standard"
   corespernode: 16
   pwd: "#"
-  stat: "bjobs -W"
+  stat: "bjobs -W $username"
 bluewonder2:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
