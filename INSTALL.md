@@ -3,6 +3,8 @@ Installing and Testing FabSim
 
 ## Dependencies
 
+To use FabSim3, you will need to have git installed.
+
 ### The "pip" way
 FabSim requires the following Python modules:
 * PyYAML (any version) 
@@ -14,6 +16,7 @@ To perform the Py.test tests (not required for using FabSim, but essential for r
 
 ### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 (when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
+* `sudo apt install git`
 * `sudo apt install python3-yaml`
 * `sudo apt install python3-numpy`
 * `sudo apt install python3-pip`
@@ -46,6 +49,7 @@ home_path_template: "/Users/$username
 ```
 
 5. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
+   - As part of this command, you will be logging in to your own machine through SSH once, which can trigger a password prompt. In this case, simply type the password for the machine in which you are running these commands.
 
 6. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
 

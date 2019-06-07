@@ -10,7 +10,8 @@ An automation toolkit for complex simulation tasks
 
 FabSim3 is a Python-based automation toolkit for scientific simulation and data
 processing workflows, licensed under the BSD 3-clause license. It is developed 
-as part of VECMA (http://www.vecma.eu).
+as part of VECMA (http://www.vecma.eu), and is part of the VECMA Toolkit 
+(http://www.vecma-toolkit.eu).
 
 FabSim3 helps users to perform comples remote tasks from a local command-line,
 and to run applications while curating data and environment variables. It
@@ -25,7 +26,7 @@ versions 1.5.3 and 1.10.0) and PyYAML. It has been used to run simulation
 workflows on supercomputers such as ARCHER, SuperMUC, Carthesius, Eagle, as well
 as local clusters and desktops.
 
-FabSim3 is publicly available at: http://www.github.com/djgroen/FabSim The
+FabSim3 is publicly available at: http://www.github.com/djgroen/FabSim3 The
 accompanying software paper can be found here:
 https://doi.org/10.1016/j.cpc.2016.05.020
 
@@ -33,7 +34,7 @@ The public plugins for FabSim3 include:
 
 * FabMD, focused on molecular dynamics.
 * FabFlee, focused on agent-based modelling.
-* FabUQCampaign, focused on ocean modelling.
+* FabUQCampaign, focused on UQ ensemble sampling.
 * FabDummy, a dummy plugin used for testing the toolkit.
 
 
@@ -61,7 +62,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 Citing FabSim3
 ==============
 
-Please find the BibTex reference below of our FabSim software paper in *Computer Physics Communications*::
+Please find the BibTex reference below of our FabSim3 software paper in *Computer Physics Communications*::
 
 
   @article{GROEN2016375,
