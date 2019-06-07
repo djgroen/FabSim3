@@ -8,11 +8,11 @@ import time
 def stat(jobID=None):
     """Check the remote message queue status for individual machines.
     Syntax: fab <machine> stat."""
-    
+
     job_stat(jobID)
-    
+
     # TODO: Respect varying remote machine queue systems.
-    #return run(template("$stat -u $username $stat_postfix"))
+    # return run(template("$stat -u $username $stat_postfix"))
 
 
 @task
