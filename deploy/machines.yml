@@ -158,6 +158,7 @@ archer:
   # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
   home_path_template: "/home/$project/$project/$username"
   runtime_path_template: "/work/$project/$project/$username"
+  stat: "qstat -u $username"
   modules: 
     all: []
     lammps: ["load lammps/lammps-28Jun14"]
