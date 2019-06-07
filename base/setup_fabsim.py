@@ -82,9 +82,9 @@ def setup_ssh_keys(password=""):
     """
     Sets up SSH key pairs for FabSim access.
     """
-    print("To set up your SSH keys, you will be logged in to your
+    print("""To set up your SSH keys, you will be logged in to your
           local machine once using SSH. You may be asked to provide
-          your password once to facilitate this login.")
+          your password once to facilitate this login.""")
 
     import os.path
     if os.path.isfile("%s/.ssh/id_rsa.pub" % (os.path.expanduser("~"))):
