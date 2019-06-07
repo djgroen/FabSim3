@@ -1,62 +1,87 @@
-#
-# Copyright (C) University College London, 2007-2012, all rights reserved.
-#
-# This file is part of HemeLB and is CONFIDENTIAL. You may not work
-# with, install, use, duplicate, modify, redistribute or share this
-# file, or any part thereof, other than as allowed by any agreement
-# specifically made by you with University College London.
-#
-
 default:
   # General default values for all machines live in the default dictionary.
-  # Machine-specific overrides replace these.
-  # Mercurial server to find HemeLB
-  hg: "ssh://hg@entropy.chem.ucl.ac.uk"
-  # Default Modules to load or unload on remote, via module 'foo'
+  # Machine-specific values override (replace) these.
+  # User-specific values in machines_user.yml override machine-specific values.
+
+  # Default Modules to load or unload on remote, grouped by scriptname (or 'all' if to be used by all scripts).
   # e.g. ['load cmake'].
   modules: 
     all: []
     dummy: []
+    
   # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
+  
+  # Default number of cores per job.
   cores: 16
-  # Commands to execute as part of remote run jobs.
+  
+  # Commands to execute remotely as part of remote run jobs, prior to execution of the main code.
   run_prefix_commands: []
-  # Templates to use to find space to checkout and build HemeLB on the remote.
+  
+  # Templates to use to find space to build codes and execute workflows remotely.
   # All user- and generally- defined values in these config dictionaries will be interpolated via $foo
   home_path_template: "/home/$username"
-  # Name for the Project Fabric folder
+  
+  # Name for the Project FabSim3 folder
   fabric_dir: "FabSim3"
-  # Path to runtime accessible filesystem (default is same as build time)
+  
+  # Path to runtime accessible filesystem (default is same as build time) - OBSOLETE?
   runtime_path_template: "$home_path"
+  
+  # Default number of cores per (supercomputer) node.
   corespernode: 1
+  
+  # Default number of cores per replica in an ensemble. - OBSOLETE?
   cores_per_replica: "${cores}"
-  # Default options used in the CMake configure step.
-  # Command to use to launch remote jobs
-  # e.g. qsub, empty string to launch interactively.
+  
+  # Default command to use to launch remote jobs
+  # e.g. qsub, empty string to launch interactively (e.g. on localhost, a VM or a machine without scheduler).
   job_dispatch: ''
+  
   # Path to build filesystem folder
   # All user-defined values in these config dictionaries will be interpolated via $foo
   remote_path_template: "$home_path/$fabric_dir"
+  
   # Path to run filesystem folder
   work_path_template: "$runtime_path/$fabric_dir"
-  # Normally, the regression test can be run directly out of diffTest, but sometimes needs to be copied to a runtime file area.
+  
+  # Default batch job header template.
+  # These templates are located in the templates/ subdirectory.
   batch_header: no_batch
+  
+  # Default command used to launch jobs on the nodes of a specific machine.
   run_command: "mpirun -np $cores"
+  
+  # Default location of the temporary file path - OBSOLETE?
   temp_path_template: "/tmp"
+  
+  # Default naming scheme used to label FabSim3 jobs.
   job_name_template: '${config}_${machine_name}_${cores}'
+  
+  # Flag to bypass paramiko and do direct remote SSH commands.
   manual_ssh: false
+  
+  # Flag to use GSISSH instead of SSH.
   manual_gsissh: false
-  # This variable encodes the default location for templates.
+  
+  # Default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
+  
+  # Default command to query the job status on the remote machine.
   stat: qstat
+  
+  # Default command to cancel a job running remotely.
   cancel_job_command: "qdel"
+  
+  # Default arguments to LAMMPS - OBSOLETE?
   lammps_args: ""
-  # This variable encodes the default location for blackbox scripts.
+  
+  # Default location for blackbox scripts. - OBSOLETE?
   local_blackbox_path: ["$localroot/blackbox"]
-  # This variable encodes the default location for Python scripts.
+  # Default location for Python scripts. - OBSOLETE?
   local_python_path: ["$localroot/python"]
-  # This variable encodes the default location for config_files.
+  
+  # Default location for config_files.
   local_config_file_path: ["$localroot/config_files"]
 
 
