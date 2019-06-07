@@ -82,7 +82,7 @@ def generate_module_commands(script=None):
     if script != None:
         module_commands += ["module %s"%module for module in env.modules.get(script,"")] # Not using get as I want this to crash if the all key does not exist (it should always be present).
         print("SCRIPT: ", script)
-    print("MODULE COMMANDS: ", module_commands)
+    #print("MODULE COMMANDS: ", module_commands)
     return module_commands
 
 module_commands = generate_module_commands()
