@@ -12,8 +12,6 @@ def stat(jobID=None):
     job_stat(jobID)
     
     # TODO: Respect varying remote machine queue systems.
-    #if not env.get('stat_postfix'):
-    #    return run(template("$stat -u $username"))
     #return run(template("$stat -u $username $stat_postfix"))
 
 
