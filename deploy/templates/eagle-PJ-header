@@ -1,0 +1,33 @@
+#!/bin/bash
+
+## stdout file
+#SBATCH --output=$job_results/SLURM_JobID-%j.output
+
+## stderr file
+#SBATCH --error=$job_results/SLURM_JobID-%j.error
+
+## job name
+#SBATCH --job-name=FabSim_PJ_SLURM
+
+## wall time in format MINUTES:SECONDS
+#SBATCH --time=$PJ_wall_time
+
+## number of nodes
+#SBATCH --nodes=$PJ_size
+
+## grant
+#SBATCH --account=$budget
+
+export PATH=$$HOME/.local/bin:$$PATH
+export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
+
+
+module load $eagle_modules
+
+## load QCG-PilotJob  
+source $virtual_env_path/bin/activate
+
+pip install --upgrade  pip
+python3 -m pip install  numpy
+
+python3 $PJ_PATH
