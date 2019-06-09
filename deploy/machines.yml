@@ -280,7 +280,7 @@ qcg:
 
   # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
   # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
-  home_path_template: "/home/plgrid/$username/"
+  home_path_template: "/home/plgrid/$username"
   manual_ssh: false
   dispatch_jobs_on_localhost: false #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
   run_command: "mpirun -n $cores"
@@ -309,18 +309,36 @@ qcg:
   # cancel_job_command : cancel submitted task based on input $jobID 
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
-      
+
+  # pilot job manager installation
+  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
+  app_repository: "/home/plgrid/$username/VECMA/App_repo"
+  job_name: "VECMA"
+
 eagle:
   run_command: "mpirun -n $cores"
   batch_header: slurm-eagle
   eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/flee"
+  eagle_modules: "vecma/apps/fleev2"
   remote: "eagle.man.poznan.pl" 
   home_path_template: "/home/plgrid/$username"
   queue: "plgrid"
   budget: "vecma2019"
   corespernode: 2
   manual_ssh: false
+
+  # PilotJob attributes
+  PJ_header: eagle-PJ-header
+  PJ_PYheader: eagle-PJ.py
+  #PJ_header: no_batch
+  PJ_size : "3"
+  # wall time in format MINUTES:SECONDS
+  PJ_wall_time : "10:00"
+
+  budget: "vecma2019"
+  corespernode: 2
+
+
   #stat: "sacct -o jobid,state,cluster -X -n"
   stat: "sacct --format=jobid,state,cluster --allocations --noheader"
   job_dispatch: "sbatch"
@@ -328,7 +346,11 @@ eagle:
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
   
-
+  # pilot job manager installation
+  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
+  app_repository: "/home/plgrid/$username/VECMA/App_repo"
+  job_name: "VECMA"
+  
   #max_job_name_chars: 15
   #modules:
   #  all: []  
