@@ -1,1 +1,13 @@
 deploy/machines_user.yml
+
+base/__pycache__/
+
+deploy/\.jobscripts/
+
+deploy/\.jobsDB/
+
+deploy/__pycache__/
+
+__pycache__/
+
+plugins/
