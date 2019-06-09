@@ -22,3 +22,11 @@
 export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
 
 module load $eagle_modules
+
+## load QCG-PilotJob  
+source $virtual_env_path/bin/activate
+
+pip install --upgrade  pip
+python3 -m pip install  numpy
+
+
