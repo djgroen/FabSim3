@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#QCG host=eagle
+#QCG queue=$queue
+
+#QCG walltime=$job_wall_time  
+#QCG output=$job_results/$${JOB_ID}.output
+#QCG error=$job_results/$${JOB_ID}.error
+#QCG grant=$budget
+
+module load python
+
+
