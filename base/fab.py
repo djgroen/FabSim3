@@ -33,10 +33,19 @@ def get_plugin_path(name):
     Get the local base path of plugin <name>.
     """
     plugin_path = os.path.join(env.localroot, 'plugins', name)
+
+    assert os.path.isdir(plugin_path) is False, \
+        "The requested plugin %s does not exist !!!\n \
+        you can install it by :\n\t \
+        fab localhost install_plugin:%s" % (name, name)
+    return plugin_path
+    '''
     if not os.path.isdir(plugin_path):
+        exit()
         return ''
     else:
         return plugin_path
+    '''
 
 
 def local_with_stdout(cmd, verbose=False):
