@@ -1,0 +1,13 @@
+QCG-PilotJob:
+    repository: https://github.com/vecma-project/QCG-PilotJob.git
+    name: QCGPilotManager
+    version: 0.1
+    additional_dependencies:
+        - pandas
+        - numpy
+        - pytest
+
+
+packages:
+    - numpy
+    - scipy
