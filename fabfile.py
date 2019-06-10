@@ -12,6 +12,7 @@ from base.fab import *
 
 config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')))
 for key in config.keys():
+    plugin = {}
     try:
         plugin = importlib.import_module('plugins.{}.{}'.format(key, key))
         plugin_dict = plugin.__dict__
