@@ -13,10 +13,12 @@ processing workflows, licensed under the BSD 3-clause license. It is developed
 as part of VECMA (http://www.vecma.eu), and is part of the VECMA Toolkit 
 (http://www.vecma-toolkit.eu).
 
-FabSim3 helps users to perform comples remote tasks from a local command-line,
-and to run applications while curating data and environment variables. It
-supports the execution of jobs, job arrays and dynamic workflows through
-schedulers such as SLURM, PBSPro, LoadLeveller and QCG. It stores
+FabSim3 is an automation toolkit for complex simulation tasks. FabSim3 helps
+users to perform complex remote tasks from a local command-line, and to
+automatically organise their data and environment variables when they
+perform these tasks. FabSim3 supports the execution of single jobs, ensembles
+of multiple jobs, and dynamic workflows through schedulers such as SLURM,
+PBSPro, LoadLeveller and QCG. It stores
 machine-specific configurations in the repository, and applies it to all
 applications run on that machine. These configurations are updated by any
 contributor who feels that a fix or improvement is required.
