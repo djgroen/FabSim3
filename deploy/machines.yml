@@ -270,7 +270,7 @@ mavrino:
 
 qcg:
   remote: "eagle.man.poznan.pl" 
-
+  job_wall_time : "PT10M"
   # PilotJob attributes
   PJ_header: qcg-PJ-header
   PJ_PYheader: qcg-PJ.py
@@ -311,6 +311,7 @@ qcg:
   cancel_job_command: 'qcg-cancel $jobID'
 
   # pilot job manager installation
+  batch_header_install_app : qcg-eagle-app
   virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
   app_repository: "/home/plgrid/$username/VECMA/App_repo"
   job_name: "VECMA"
@@ -326,14 +327,14 @@ eagle:
   budget: "vecma2019"
   corespernode: 2
   manual_ssh: false
-
+  job_wall_time : "20:00"
   # PilotJob attributes
   PJ_header: eagle-PJ-header
   PJ_PYheader: eagle-PJ.py
   #PJ_header: no_batch
   PJ_size : "3"
   # wall time in format MINUTES:SECONDS
-  PJ_wall_time : "10:00"
+  PJ_wall_time : "20:00"
 
   budget: "vecma2019"
   corespernode: 2
@@ -347,6 +348,7 @@ eagle:
   job_info_command : 'sacct --allocations --job $jobID'
   
   # pilot job manager installation
+  batch_header_install_app : slurm-eagle-app
   virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
   app_repository: "/home/plgrid/$username/VECMA/App_repo"
   job_name: "VECMA"
