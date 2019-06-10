@@ -28,7 +28,6 @@ from pathlib import Path
 pp = PrettyPrinter()
 
 
-
 def get_plugin_path(name):
     """
     Get the local base path of plugin <name>.
