@@ -372,15 +372,17 @@ def _is_task(name, value):
 
 
 def _sift_tasks(mapping):
-    tasks, collections = [], []
-    for name, value in six.iteritems(mapping):
+    tasks, collections, modules = [], [], []
+    for name, value in six.iteritems(mapping): #value is a WrappedCallableTask
         if _is_task(name, value):
+            #print(name, value.__module__)
             tasks.append(name)
+            modules.append(value.__module__)
         elif isinstance(value, Mapping):
             collections.append(name)
     tasks = sorted(tasks)
     collections = sorted(collections)
-    return tasks, collections
+    return tasks, collections, modules
 
 
 def _task_names(mapping):
@@ -390,14 +392,14 @@ def _task_names(mapping):
     Tasks are always listed before submodules at the same level, but within
     those two groups, sorting is alphabetical.
     """
-    tasks, collections = _sift_tasks(mapping)
-    for collection in collections:
-        module = mapping[collection]
-        if hasattr(module, 'default'):
-            tasks.append(collection)
-        join = lambda x: ".".join((collection, x))
-        tasks.extend(map(join, _task_names(module)))
-    return tasks
+    tasks, collections, modules = _sift_tasks(mapping)
+    #for collection in collections:
+    #    module = mapping[collection]
+    #    if hasattr(module, 'default'):
+    #        tasks.append(collection)
+    #    join = lambda x: ".".join((collection, x))
+    #    tasks.extend(map(join, _task_names(module)))
+    return tasks, modules
 
 
 def _print_docstring(docstrings, name):
@@ -410,33 +412,34 @@ def _print_docstring(docstrings, name):
 
 def _normal_list(docstrings=True):
     result = []
-    task_names = _task_names(state.commands)
+    task_names, modules = _task_names(state.commands)
     # Want separator between name, description to be straight col
     max_len = reduce(lambda a, b: max(a, len(b)), task_names, 0)
+    max_len2 = reduce(lambda a, b: max(a, len(b)), modules, 0)
     sep = '  '
     trail = '...'
     max_width = _pty_size()[1] - 1 - len(trail)
-    for name in task_names:
+    for i in range(0, len(task_names)-1):
         output = None
-        docstring = _print_docstring(docstrings, name)
+        docstring = _print_docstring(docstrings, task_names[i])
         if docstring:
             lines = filter(None, docstring.splitlines())
             first_line = list(lines)[0].strip()
             # Truncate it if it's longer than N chars
-            size = max_width - (max_len + len(sep) + len(trail))
+            size = max_width - (max_len + max_len2 + len(sep) + len(trail))
             if len(first_line) > size:
                 first_line = first_line[:size] + trail
-            output = name.ljust(max_len) + sep + first_line
+            output = task_names[i].ljust(max_len) + sep + modules[i].ljust(max_len2) + sep + first_line
         # Or nothing (so just the name)
         else:
-            output = name
+            output = task_names[i]
         result.append(indent(output))
     return result
 
 
 def _nested_list(mapping, level=1):
     result = []
-    tasks, collections = _sift_tasks(mapping)
+    tasks, collections, modules = _sift_tasks(mapping)
     # Tasks come first
     result.extend(map(lambda x: indent(x, spaces=level * 4), tasks))
     for collection in collections:
@@ -462,7 +465,8 @@ def list_commands(docstring, format_):
     """
     # Short-circuit with simple short output
     if format_ == "short":
-        return _task_names(state.commands)
+        n,m = _task_names(state.commands)
+        return n
     # Otherwise, handle more verbose modes
     result = []
     # Docstring at top, if applicable
