@@ -3,7 +3,7 @@
 #QCG host=eagle
 #QCG queue=$queue
 
-#QCG walltime=PT5M  
+#QCG walltime=$job_wall_time  
 #QCG output=$job_results/$${JOB_ID}.output
 #QCG error=$job_results/$${JOB_ID}.error
 #QCG grant=$budget
@@ -11,5 +11,11 @@
 export MODULEPATH=$$MODULEPATH:$qcg_MODULEPATH
 
 module load $eagle_modules
+
+## load QCG-PilotJob  
+source $virtual_env_path/bin/activate
+
+pip install --upgrade  pip
+python3 -m pip install  numpy
 
 
