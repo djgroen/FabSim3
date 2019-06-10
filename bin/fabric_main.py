@@ -725,7 +725,7 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
 
         # Abort if any unknown commands were specified
         if unknown_commands and not state.env.get('skip_unknown_tasks', False):
-            warn("Command(s) not found:\n%s\n use `fab -l` to show all commands." \
+            warn("Command(s) not found:\n%s\n use `fabsim -l` to show all commands." \
                 % indent(unknown_commands))
             #show_commands(None, options.list_format, 1)
 
