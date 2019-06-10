@@ -24,8 +24,9 @@ import os.path
 import subprocess
 import math
 from pprint import PrettyPrinter
-pp = PrettyPrinter()
 from pathlib import Path
+pp = PrettyPrinter()
+
 
 
 def get_plugin_path(name):
