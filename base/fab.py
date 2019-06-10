@@ -35,9 +35,9 @@ def get_plugin_path(name):
     plugin_path = os.path.join(env.localroot, 'plugins', name)
 
     assert os.path.isdir(plugin_path) is False, \
-        "The requested plugin %s does not exist !!!\n \
+        "The requested plugin %s does not exist (%s) !!!\n \
         you can install it by :\n\t \
-        fab localhost install_plugin:%s" % (name, name)
+        fab localhost install_plugin:%s" % (name, plugin_path, name)
     return plugin_path
     '''
     if not os.path.isdir(plugin_path):
