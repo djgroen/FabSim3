@@ -25,6 +25,7 @@ import subprocess
 import math
 from pprint import PrettyPrinter
 pp = PrettyPrinter()
+from pathlib import Path
 
 
 def get_plugin_path(name):
@@ -621,8 +622,7 @@ def run_ensemble(config, sweep_dir, **args):
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
             execute(put_configs, config)
-            job(dict(wall_time='0:15:0',
-                     memory='2G',
+            job(dict(memory='2G',
                      ensemble_mode=True,
                      label=item),
                 args)
@@ -651,16 +651,14 @@ def run_ensemble(config, sweep_dir, **args):
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
 
         env.batch_header = env.PJ_PYheader
-        job(dict(wall_time='0:15:0', memory='2G',
-                 label='PJ_PYheader', NoEnvScript=True), args)
+        job(dict(memory='2G', label='PJ_PYheader', NoEnvScript=True), args)
         env.PJ_PATH = env.pather.join(
             env.job_results, env.pather.basename(env.job_script))
         env.PJ_FileName = env.pather.basename(env.job_script)
 
         env.batch_header = env.PJ_header
         env.submit_job = True
-        job(dict(wall_time='0:15:0', memory='2G',
-                 label='PJ_header', NoEnvScript=True), args)
+        job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
 
 
 def input_to_range(arg, default):
@@ -783,3 +781,222 @@ def print_config(args=''):
     """ Prints local environment """
     for x in env:
         print(x, ':', env[x])
+
+
+@task
+def install_packages(virtual_env='False'):
+    """
+    Install list of packages defined in deploy/applications.yml
+    """
+
+    config = yaml.load(
+        open(os.path.join(env.localroot, 'deploy', 'applications.yml'))
+    )
+    packages = config['packages']
+
+    tmp_app_dir = "%s/tmp_app" % (env.localroot)
+    local('mkdir -p %s' % (tmp_app_dir))
+
+    for dep in config['packages']:
+        local('pip3 download --no-binary=:all: -d %s %s' % (tmp_app_dir, dep))
+    add_dep_list_compressed = sorted(Path(tmp_app_dir).iterdir(),
+                                     key=lambda f: f.stat().st_mtime)
+    for it in range(len(add_dep_list_compressed)):
+        add_dep_list_compressed[it] = os.path.basename(
+            add_dep_list_compressed[it])
+
+    # Create  directory in the remote machine to store dependency packages
+    run(
+        template(
+            "mkdir -p %s" % env.app_repository
+        )
+    )
+
+    # Set required env variable
+    env.config = "Install_VECMA_App"
+    env.nodes = 1
+    script = os.path.join(tmp_app_dir, "script")
+    # Write the Install command in a file
+    with open(script, "w") as sc:
+        install_dir = "--user"
+        if virtual_env == 'True':
+            sc.write("if [ ! -d %s ]; then \n\tvirtualenv -p python3 \
+                    %s || echo 'WARNING : virtualenv is not installed \
+                    or has a problem' \nfi\n\nsource %s/bin/activate\n" %
+                     (env.virtual_env_path, env.virtual_env_path,
+                      env.virtual_env_path))
+            install_dir = ""
+
+        # First install the additional_dependencies
+        for dep in reversed(add_dep_list_compressed):
+            print(dep)
+            if dep.endswith('.zip'):
+                sc.write("\nunzip %s/%s -d %s && cd %s/%s \
+                        && python3 setup.py install %s"
+                         % (env.app_repository, dep, env.app_repository,
+                            env.app_repository, dep.replace(".zip", ""),
+                            install_dir))
+            elif dep.endswith('.tar.gz'):
+                sc.write("\ntar xf %s/%s -C %s && cd %s/%s \
+                        && python3 setup.py install %s\n"
+                         % (env.app_repository, dep, env.app_repository,
+                            env.app_repository, dep.replace(".tar.gz", ""),
+                            install_dir))
+
+    # Add the tmp_app_dir directory in the local templates path because the
+    # script is saved in it
+    env.local_templates_path.insert(0, tmp_app_dir)
+
+    install_dict = dict(script="script")
+    # env.script = "script"
+    update_environment(install_dict)
+
+    # Determine a generated job name from environment parameters
+    # and then define additional environment parameters based on it.
+    with_template_job()
+
+    # Create job script based on "sbatch header" and script created above in
+    # deploy/.jobscript/
+    env.job_script = script_templates(env.batch_header, env.script)
+
+    # Create script's destination path to remote machine based on
+    env.dest_name = env.pather.join(
+        env.scripts_path, env.pather.basename(env.job_script)
+    )
+    # Send Install script to remote machine
+    put(env.job_script, env.dest_name)
+    #
+    run(template("mkdir -p $job_results"))
+    with cd(env.pather.dirname(env.job_results)):
+        run(template("%s %s") % (env.job_dispatch, env.dest_name))
+
+    local('rm -rf %s' % tmp_app_dir)
+
+
+@task
+def install_app(name="", external_connexion='no', virtual_env='False'):
+    """
+    Install a specific Application through FasbSim3
+
+    """
+
+    config = yaml.load(
+        open(os.path.join(env.localroot, 'deploy', 'applications.yml'))
+    )
+    info = config[name]
+
+    # Offline cluster installation - --user install
+    # Temporary folder
+    tmp_app_dir = "%s/tmp_app" % (env.localroot)
+    local('mkdir -p %s' % (tmp_app_dir))
+
+    # First download all the additional dependencies
+    for dep in info['additional_dependencies']:
+        local('pip3 download --no-binary=:all: -d %s %s' % (tmp_app_dir, dep))
+    add_dep_list_compressed = sorted(Path(tmp_app_dir).iterdir(),
+                                     key=lambda f: f.stat().st_mtime)
+    for it in range(len(add_dep_list_compressed)):
+        add_dep_list_compressed[it] = os.path.basename(
+            add_dep_list_compressed[it])
+
+    # Download all the dependencies of the application
+    # This first method should download all the dependencies needed
+    # but for the local plateform !
+    # --> Possible Issue during the installation in the remote
+    # (it's not a cross-plateform install yet)
+    local('pip3 download --no-binary=:all: -d %s git+%s' %
+          (tmp_app_dir, info['repository']))
+
+    # Create  directory in the remote machine to store dependency packages
+    run(
+        template(
+            "mkdir -p %s" % env.app_repository
+        )
+    )
+    # Send the dependencies (and the dependencies of dependencies) to the
+    # remote machine
+    for whl in os.listdir(tmp_app_dir):
+        local(
+            template(
+                "rsync -pthrvz -e 'ssh -p $port'  %s/%s \
+                $username@$remote:$app_repository" % (tmp_app_dir, whl)
+            )
+            # "rsync -pthrvz %s/%s eagle:$app_repository"%(tmp_app_dir, whl)
+        )
+
+    # Set required env variable
+    env.config = "Install_VECMA_App"
+    env.nodes = 1
+    script = os.path.join(tmp_app_dir, "script")
+    # Write the Install command in a file
+    with open(script, "w") as sc:
+        install_dir = "--user"
+        if virtual_env == 'True':
+            # It seems some version of python/virtualenv doesn't support
+            # the option --no-download. So there is sometime a problem :
+            # from pip import main
+            # ImportError: cannot import name 'main'
+            #
+            # TODO Check python version and raised a Warning if not the
+            # right version ?
+            # TODO
+            sc.write("if [ ! -d %s ]; then \n\tvirtualenv -p python3 \
+                    %s || echo 'WARNING : virtualenv is not installed \
+                    or has a problem' \nfi\n\nsource %s/bin/activate\n" %
+                     (env.virtual_env_path, env.virtual_env_path,
+                      env.virtual_env_path))
+            install_dir = ""
+
+        # First install the additional_dependencies
+        for dep in reversed(add_dep_list_compressed):
+            print(dep)
+            if dep.endswith('.zip'):
+                sc.write("\nunzip %s/%s -d %s && cd %s/%s \
+                        && python3 setup.py install %s"
+                         % (env.app_repository, dep, env.app_repository,
+                            env.app_repository, dep.replace(".zip", ""),
+                            install_dir))
+            elif dep.endswith('.tar.gz'):
+                sc.write("\ntar xf %s/%s -C %s && cd %s/%s \
+                        && python3 setup.py install %s\n"
+                         % (env.app_repository, dep, env.app_repository,
+                            env.app_repository, dep.replace(".tar.gz", ""),
+                            install_dir))
+
+        sc.write("pip3 install --no-index --find-links=file:%s %s/%s-%s.zip %s \
+                || pip3 install --no-index --find-links=file:%s %s/%s-%s.zip"
+                 % (env.app_repository, env.app_repository,
+                    info['name'], info['version'],
+                    install_dir, env.app_repository,
+                    env.app_repository, info['name'], info['version']))
+
+    # Add the tmp_app_dir directory in the local templates path because the
+    # script is saved in it
+    env.local_templates_path.insert(0, tmp_app_dir)
+
+    install_dict = dict(script="script")
+    # env.script = "script"
+    update_environment(install_dict)
+
+    # Determine a generated job name from environment parameters
+    # and then define additional environment parameters based on it.
+    with_template_job()
+
+    # Create job script based on "sbatch header" and script created above in
+    # deploy/.jobscript/
+    env.job_script = script_templates(env.batch_header_install_app, env.script)
+
+    # Create script's destination path to remote machine based on
+    run(template("mkdir -p $scripts_path"))
+    env.dest_name = env.pather.join(
+        env.scripts_path, env.pather.basename(env.job_script)
+    )
+
+    # Send Install script to remote machine
+    put(env.job_script, env.dest_name)
+    #
+    run(template("mkdir -p $job_results"))
+    with cd(env.pather.dirname(env.job_results)):
+        run(template("%s %s") % (env.job_dispatch, env.dest_name))
+
+    local('rm -rf %s' % tmp_app_dir)
