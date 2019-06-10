@@ -7,7 +7,7 @@
 #SBATCH --tasks-per-node=$corespernode
 
 ## wall time in format MINUTES:SECONDS
-#SBATCH --time=$wall_time
+#SBATCH --time=$job_wall_time
 
 ## grant
 #SBATCH --account=$budget
