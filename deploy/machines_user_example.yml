@@ -10,6 +10,7 @@ default:
   # home_path_template: "/Users/$username"  # for OSX users
   # Allows to switch between SSH (default) and GSISSH login.
   manual_gsissh: false
+  port: 22
 archer:
   username: "user"
   project: "e123"
