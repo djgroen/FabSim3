@@ -54,7 +54,7 @@ home_path_template: "/Users/$username
 
 5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
 
-* NOTE: FabSim commands can now be launched using the `fabsim` command. Note that some older tutorials might use `fab` commands instead of `fabsim`. The two commands can be used interchangably, although the `fabsim` command gives clearer outputs and can be launched from anywhere. 
+* NOTE: FabSim commands can now be launched using the `fabsim` command. Note that some older tutorials might use `fab` commands instead of `fabsim`. The two commands can be used interchangably, although the `fabsim` command gives clearer outputs and can be launched from anywhere (`fab` can only be used within the FabSim installation directories). 
 
 ### Installing plugins
 
