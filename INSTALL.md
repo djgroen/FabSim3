@@ -1,9 +1,11 @@
 Installing and Testing FabSim
 ======
 
+This document describes how to install FabSim3 and perform basic tests. The full documentation is available at http://fabsim3.readthedocs.io or in docs/index.rst (locally).
+
 ## Dependencies
 
-To use FabSim3, you will need to have git installed.
+To use FabSim3, you will need to have git installed, as FabSim3 requires git to install plugins.
 
 ### The "pip" way
 FabSim requires the following Python modules:
@@ -12,7 +14,7 @@ FabSim requires the following Python modules:
 
 You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
 
-To perform the Py.test tests (not required for using FabSim, but essential for running the tests), you will need python3-pytest and python3-pytest-pep8.
+To perform the Py.test tests (not required for using FabSim, but essential for running the tests), you will need `python3-pytest` and `python3-pytest-pep8`.
 
 ### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 (when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
@@ -29,35 +31,36 @@ For Mac users, you might also need ssh-copy-id. This can be installed using `bre
 
 
 
-## Installation
+## Installing FabSim3
 
 1. Clone the code from the GitHub repository.
 
-2. The 'fab' command, which comes with Fabric, needs to be usable directly from the command line. You can make it usable by ensuring that the command resides in your `$PATH` environment.
-
-3. Ensure that the main FabSim3 directory is in your $PYTHONPATH environment variable. An easy way to accomplish this is by adding the following to the end of your $HOME/.bashrc file:
+2. Ensure that the main FabSim3 directory is in your $PYTHONPATH environment variable and that the `fabsim` command can be launched from the command line. An easy way to accomplish this is by adding the following to the end of your $HOME/.bashrc file:
 ```
+export PATH=(path of your FabSim3 directory)/bin:$PATH
 export PYTHONPATH=(path of your FabSim3 directory):$PYTHONPATH
 ```
-Note that you may have to restart the shell for this change to apply.
+Note that you may have to restart the shell for these changes to apply.
 
-4. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
+3. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
 
 Note: For Mac Users, be sure to override the default home directory, by switching the `home_path_template` variable by uncommenting the following line: 
 ```
 home_path_template: "/Users/$username
 ```
 
-5. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
+4. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
    - As part of this command, you will be logging in to your own machine through SSH once, which can trigger a password prompt. In this case, simply type the password for the machine in which you are running these commands.
 
-6. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
+5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
+
+* NOTE: FabSim commands can now be launched using the `fabsim` command. Note that some older tutorials might use `fab` commands instead of `fabsim`. The two commands can be used interchangably, although the `fabsim` command gives clearer outputs and can be launched from anywhere. 
 
 ### Installing plugins
 
 By default, FabSim3 comes with the FabMD plugin installed. Other plugins can be installed, and are listed in deploy/plugins.yml.
 
-To install a specific plugin, simply type: `fab localhost install_plugin:<plug_name>`
+To install a specific plugin, simply type: `fabsim localhost install_plugin:<plug_name>`
 
 To create your own plugin, please refer to doc/CreatingPlugins.md
 
@@ -74,24 +77,24 @@ The easiest way to test FabSim is to simply go to the base directory of your Fab
 Note: Mac users may get a `ssh: connect to host localhost port 22: Connection refused` error. This means you must enable remote login. This is done in `System Preferences > Sharing > Remote Login`.
 
 ### List available commands.
-1. Simply type `fab localhost help`.
+1. Simply type `fabsim -l`.
 
 ### FabDummy testing on the local host
 ####  Installation
-Simply type `fab localhost install_plugin:FabDummy` anywhere inside your FabSim3 install directory. `FabDummy` plugin will be downloaded under `<fabsim home folder>/plugins/FabDummy` 
+Simply type `fabsim localhost install_plugin:FabDummy` anywhere inside your FabSim3 install directory. `FabDummy` plugin will be downloaded under `<fabsim home folder>/plugins/FabDummy` 
 ####  Testing
-1. To run a dummy job, type `fab localhost dummy:dummy_test`
-2. To run an ensemble of dummy jobs, type `fab localhost dummy_ensemble`
-3. for both cases, i.e., a single dummy job or an ensemble of dummy jobs, you can fetch the results by using `fab localhost fetch_results`
+1. To run a dummy job, type `fabsim localhost dummy:dummy_test`
+2. To run an ensemble of dummy jobs, type `fabsim localhost dummy_ensemble`
+3. for both cases, i.e., a single dummy job or an ensemble of dummy jobs, you can fetch the results by using `fabsim localhost fetch_results`
 
 ### LAMMPS testing on the local host
 
 1. Install LAMMPS (see http://lammps.sandia.gov for detailed download and installation instructions).
 2. Modify `machines_user.yml` to make the `lammps_exec` variable point to the location of the LAMMPS executable. e.g., `lammps_exec: "/home/james/bin/lmp_serial"`.
 3. FabSim contains sample LAMMPS input files, so there's no need to download that.
-4. (first time use only) Create the required FabSim directory using the following command: `fab localhost setup_fabsim`.
-5. Run the LAMMPS test data set using: `fab localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
-6. Run `fab localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
+4. (first time use only) Create the required FabSim directory using the following command: `fabsim localhost setup_fabsim`.
+5. Run the LAMMPS test data set using: `fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
+6. Run `fabsim localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
 ### Creating the relevant FabSim directories on a local or remote host
 
