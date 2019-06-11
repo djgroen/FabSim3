@@ -28,24 +28,18 @@ from pathlib import Path
 pp = PrettyPrinter()
 
 
-def get_plugin_path(name):
+def get_plugin_path(name, quiet=False):
     """
     Get the local base path of plugin <name>.
     """
     plugin_path = os.path.join(env.localroot, 'plugins', name)
 
-    assert os.path.isdir(plugin_path), \
-        "The requested plugin %s does not exist (%s) !!!\n \
-        you can install it by :\n\t \
-        fab localhost install_plugin:%s" % (name, plugin_path, name)
+    if not quiet:
+        assert os.path.isdir(plugin_path), \
+            "The requested plugin %s does not exist (%s).\n \
+            you can install it by typing:\n\t \
+            fabsim localhost install_plugin:%s" % (name, plugin_path, name)
     return plugin_path
-    '''
-    if not os.path.isdir(plugin_path):
-        exit()
-        return ''
-    else:
-        return plugin_path
-    '''
 
 
 def local_with_stdout(cmd, verbose=False):
