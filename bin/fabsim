@@ -3,9 +3,16 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
+import os
 
 import fabric_main
 
 if __name__ == '__main__':
+    fabfile_path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), os.path.pardir) + "/fabfile.py"
+    
+    #print(fabfile_path) 
+    #To be captured in a test. 
+    #Should point to the fabfile within the FabSim installation.
+
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
-    sys.exit(fabric_main.main())
+    sys.exit(fabric_main.main([fabfile_path]))
