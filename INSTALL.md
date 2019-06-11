@@ -93,8 +93,10 @@ Simply type `fabsim localhost install_plugin:FabDummy` anywhere inside your FabS
 2. Modify `machines_user.yml` to make the `lammps_exec` variable point to the location of the LAMMPS executable. e.g., `lammps_exec: "/home/james/bin/lmp_serial"`.
 3. FabSim contains sample LAMMPS input files, so there's no need to download that.
 4. (first time use only) Create the required FabSim directory using the following command: `fabsim localhost setup_fabsim`.
-5. Run the LAMMPS test data set using: `fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
-6. Run `fabsim localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
+5. Before run LAMMPS test data set, you should install FabMD which provides functionality to extend FabSim3's workflow and remote submission capabilities to LAMMPS specific tasks. Please install it by typing
+`fabsim localhost install_plugin:FabMD`
+6. Run the LAMMPS test data set using: `fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0`.
+7. Run `fabsim localhost fetch_results` to copy the output of your job in the results directory. By default this will be a subdirectory in `~/FabSim/results`.
 
 ### Creating the relevant FabSim directories on a local or remote host
 
