@@ -26,7 +26,7 @@ To perform the Py.test tests (not required for using FabSim, but essential for r
 * go to the `fabric3_base` subdirectory.
 * run `pip3 install Fabric3-1.14.post1-py3-none-any.whl`
 
-> Note for **Mac users**
+**Note for Mac users**
 > For Mac users, you might also need ssh-copy-id. This can be installed using `brew install ssh-copy-id`.
 
 
@@ -44,7 +44,8 @@ Note that you may have to restart the shell for these changes to apply.
 
 3. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
 
-> For **Mac Users**, be sure to override the default home directory, 
+**Note for Mac Users**
+> For Mac Users, be sure to override the default home directory, 
 > by switching the `home_path_template` variable by uncommenting the following line: 
 > `home_path_template: "/Users/$username`
 
