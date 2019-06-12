@@ -20,6 +20,13 @@ def install_plugin(name):
     local("rm -rf %s/%s" % (plugin_dir, name))
     local("git clone %s %s/%s" % (info["repository"], plugin_dir, name))
 
+@task
+def update_plugin(name):
+    """
+    Update a specific FabSim3 plugin.
+    """
+    plugin_dir = "%s/plugins" % (env.localroot)
+    local("cd %s/%s && git pull" % (plugin_dir, name))
 
 @task
 def remove_plugin(name):
