@@ -128,9 +128,17 @@ def machine(name):
 
     env.modules.update(user_config[name].get("modules", {}))
 
-    print(env.modules)
+    #print(env.modules)
 
     complete_environment()
+
+@task
+def print_machine_config_info(name=""):
+    if name == "":
+        print("Usage: fabsim localhost print_machine_config_info:<machine_name>")
+        sys.exit()
+    print("Defaults: ", config[name])
+    print("User overrides: ", user_config[name])
 
 # Metaprogram the machine wrappers
 for machine_name in set(config.keys()) - set(['default']):
