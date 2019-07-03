@@ -318,13 +318,6 @@ qcg:
 
 eagle:
   run_command: "mpirun -n $cores"
-  batch_header: slurm-eagle
-  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/fleev2"
-  remote: "eagle.man.poznan.pl" 
-  home_path_template: "/home/plgrid/$username"
-  queue: "plgrid"
-  budget: "vecma2019"
   corespernode: 2
   manual_ssh: false
   job_wall_time : "20:00"
@@ -336,10 +329,6 @@ eagle:
   # wall time in format MINUTES:SECONDS
   PJ_wall_time : "20:00"
 
-  budget: "vecma2019"
-  corespernode: 2
-
-
   #stat: "sacct -o jobid,state,cluster -X -n"
   stat: "sacct --format=jobid,state,cluster --allocations --noheader"
   job_dispatch: "sbatch"
@@ -347,14 +336,29 @@ eagle:
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
   
-  # pilot job manager installation
-  batch_header_install_app : slurm-eagle-app
-  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
-  app_repository: "/home/plgrid/$username/VECMA/App_repo"
-  job_name: "VECMA"
   
   #max_job_name_chars: 15
   #modules:
   #  all: []  
   #runtime_path_template: "/tmp/lustre_shared/$username"
   #temp_path_template: "$work_path/tmp"  
+
+eagle_HiDALGO:
+  run_command: "mpirun -n $cores"
+  corespernode: 2
+  manual_ssh: false
+  job_wall_time : "20:00"
+  # PilotJob attributes
+  PJ_header: eagle-PJ-header
+  PJ_PYheader: eagle-PJ.py
+  #PJ_header: no_batch
+  PJ_size : "3"
+  # wall time in format MINUTES:SECONDS
+  PJ_wall_time : "20:00"
+
+  #stat: "sacct -o jobid,state,cluster -X -n"
+  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
+  job_dispatch: "sbatch"
+  cancel_job_command: 'scancel $jobID'
+  #job_info_command : 'sacct -X -j $jobID'  
+  job_info_command : 'sacct --allocations --job $jobID'
