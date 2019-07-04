@@ -12,7 +12,7 @@ def install_plugin(name):
     Install a specific FabSim3 plugin.
     """
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'plugins.yml'))
+        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')), Loader=yaml.SafeLoader
         )
     info = config[name]
     plugin_dir = "%s/plugins" % (env.localroot)
@@ -36,7 +36,7 @@ def remove_plugin(name):
     Remove the specified plug-in.
     """
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'plugins.yml'))
+        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')), Loader=yaml.SafeLoader
         )
     info = config[name]
     plugin_dir = '{}/plugins'.format(env.localroot)
