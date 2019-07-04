@@ -338,8 +338,9 @@ eagle:
   
   
   #max_job_name_chars: 15
-  #modules:
-  #  all: []  
+  modules:
+    flee: ["vecma/apps/fleev2"]  
+    foodflee: ["vecma/apps/fleev2"]  
   #runtime_path_template: "/tmp/lustre_shared/$username"
   #temp_path_template: "$work_path/tmp"  
 
