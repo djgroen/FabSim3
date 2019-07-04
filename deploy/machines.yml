@@ -318,6 +318,7 @@ qcg:
 
 eagle:
   run_command: "mpirun -n $cores"
+  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
   corespernode: 2
   manual_ssh: false
   job_wall_time : "20:00"
