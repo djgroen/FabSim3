@@ -1,8 +1,0 @@
-. /etc/profile  > /dev/null 2>&1
-echo $HOSTNAME
-. /etc/profile.d/modules.sh  > /dev/null 2>&1
-module unload mpi.ibm  > /dev/null 2>&1
-module load mpi.intel > /dev/null 2>&1
-module load fftw  > /dev/null 2>&1
-module load tcltk  > /dev/null 2>&1
-export I_MPI_DAPL_UD=disable
