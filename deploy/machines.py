@@ -44,10 +44,10 @@ env.localplugins = {}  # dict containing local paths to all plugins.
 env.no_ssh = False
 env.no_hg = False
 # Load and invoke the default non-machine specific config JSON dictionaries.
-config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'machines.yml')))
+config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'machines.yml')), Loader=yaml.SafeLoader)
 env.update(config['default'])
 user_config = yaml.load(
-    open(os.path.join(env.localroot, 'deploy', 'machines_user.yml')))
+    open(os.path.join(env.localroot, 'deploy', 'machines_user.yml')), Loader=yaml.SafeLoader)
 env.update(user_config['default'])
 env.verbose = False
 env.needs_tarballs = False
