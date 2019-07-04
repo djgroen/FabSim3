@@ -63,11 +63,8 @@ env.node_type_restriction_template = ""
 env.max_job_name_chars = None
 env.lammps_exec = "undefined"
 run_prefix_commands = env.run_prefix_commands[:]
-#run_prefix_commands.append("export PYTHONPATH=$$PYTHONPATH:$tools_build_path")
 if env.temp_path_template:
     env.temp_path = template(env.temp_path_template)
-#  run_prefix_commands.append(template("export TMP=$temp_path"))
-#  run_prefix_commands.append(template("export TMPDIR=$temp_path"))
 
 env.pythonroot = os.path.join(env.localroot, 'python')
 env.blackboxroot = os.path.join(env.localroot, 'blackbox')
