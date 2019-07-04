@@ -646,9 +646,7 @@ def run_ensemble(config, sweep_dir, **args):
         )
         print("Sweep dir location: %s" % (sweep_dir))
 
-    elif (hasattr(env, 'PilotJob') and
-          env.PilotJob.lower() == 'true'
-          ):
+    elif (get(env['PilotJob'], "False").lower() == 'true'):
 
         env.submitted_jobs_list = ".".join(
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
