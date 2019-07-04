@@ -614,7 +614,7 @@ def run_ensemble(config, sweep_dir, **args):
     with_config(config)
 
     # check for PilotJob option
-    if (env.get(['PilotJob'], "False").lower() == 'true'):
+    if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
         # env.batch_header = "no_batch"
         env.submitted_jobs_list = []
         env.submit_job = False
@@ -646,7 +646,7 @@ def run_ensemble(config, sweep_dir, **args):
         )
         print("Sweep dir location: %s" % (sweep_dir))
 
-    elif (env.get(['PilotJob'], "False").lower() == 'true'):
+    elif (hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
 
         env.submitted_jobs_list = ".".join(
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
