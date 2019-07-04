@@ -10,7 +10,7 @@ import importlib
 
 from base.fab import *
 
-config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')))
+config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')), Loader=yaml.SafeLoader)
 for key in config.keys():
     plugin = {}
     try:

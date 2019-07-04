@@ -793,7 +793,8 @@ def install_packages(virtual_env='False'):
     """
 
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'applications.yml'))
+        open(os.path.join(env.localroot, 'deploy', 'applications.yml')),
+        Loader=yaml.SafeLoader
     )
     packages = config['packages']
 
@@ -884,7 +885,8 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     """
 
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'applications.yml'))
+        open(os.path.join(env.localroot, 'deploy', 'applications.yml')),
+        Loader=yaml.SafeLoader
     )
     info = config[name]
 
