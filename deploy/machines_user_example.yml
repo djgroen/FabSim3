@@ -41,11 +41,11 @@ bluejoule:
 
 
 qcg:
-  username: "plgarabnejad"
+  username: "<your-username>"
   flee_location: "$home_path/flee-release"
 
 slurm_vecma:
-  username: "plgarabnejad"
+  username: "<your-username>"
   flee_location: "$home_path/flee-release"
 
 slurm_hidalgo:
