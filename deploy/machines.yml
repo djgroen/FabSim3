@@ -268,30 +268,70 @@ mavrino:
   batch_header: sge
   queue: "parallel2" #"mapper"
 
-qcg:
-  remote: "eagle.man.poznan.pl" 
-  job_wall_time : "PT10M"
-  # PilotJob attributes
-  PJ_header: qcg-PJ-header
-  PJ_PYheader: qcg-PJ.py
+
+QCG_PJ: &QCG_PilotJob
+  # pilot job manager installation  
+  virtual_env_path: "$home_path/VirtualEnv"
+  app_repository: "$home_path/App_repo"
+  job_name: "QCG_PilotJob_installation" 
+
+
+slurm : &SLURM_Defult_Config
+  #stat: "sacct -o jobid,state,cluster -X -n"
+  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
+  job_dispatch: "sbatch"
+  cancel_job_command: 'scancel $jobID'
+  #job_info_command : 'sacct -X -j $jobID'  
+  job_info_command : 'sacct --allocations --job $jobID'
+  # wall time in format MINUTES:SECONDS
+  job_wall_time : "20:00"
+  manual_ssh: false
+  corespernode: 2
+
+  # template header for VirtualEnv
+  batch_header_install_app : slurm-eagle-app
+
+  # PilotJob attributes  
+  PJ_PYheader: eagle-PJ.py
+  PJ_header: eagle-PJ-header
   #PJ_header: no_batch
   PJ_size : "3"
-  PJ_wall_time : "PT10M"
+  PJ_wall_time : "20:00"
 
-  # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
-  # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
+
+qcg:
+  <<: *QCG_PilotJob
+  remote: "eagle.man.poznan.pl" 
+  job_wall_time : "PT20M"
+  budget: "vecma2019"
+  corespernode: 2
+  queue: "plgrid"
+  # template header for VirtualEnv
+  batch_header_install_app : qcg-eagle-app
+  # PilotJob header template
+  
+  # PilotJob attributes  
+  PJ_PYheader: qcg-PJ.py
+  PJ_header: qcg-PJ-header
+  #PJ_header: no_batch
+  PJ_size : "3"
+  PJ_wall_time : "PT20M"
+
   home_path_template: "/home/plgrid/$username"
   manual_ssh: false
   dispatch_jobs_on_localhost: false #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
   run_command: "mpirun -n $cores"
 
   batch_header: qcg-eagle
-  qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+  #qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
   eagle_modules: "vecma/apps/fleev2"
-  queue: "plgrid"
 
-  budget: "vecma2019"
-  corespernode: 2
+
+  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
+  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+
+
+
 
   # stat : return report for all submitted jobs
   # it should be set in the way that only return jobID, job status, and host in the output (without column header)
@@ -310,63 +350,32 @@ qcg:
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
 
-  # pilot job manager installation
-  batch_header_install_app : qcg-eagle-app
-  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
-  app_repository: "/home/plgrid/$username/VECMA/App_repo"
-  job_name: "VECMA"
-
-eagle:
+slurm_vecma:
+  <<: *SLURM_Defult_Config
+  <<: *QCG_PilotJob
+  run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/plgrid/$username"
   batch_header: slurm-eagle
-
-  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-
-  run_command: "mpirun -n $cores"
+  budget: "vecma2019"
+  queue: "plgrid"
+  job_wall_time : "20:00"
+  
   run_prefix_commands: ["source $virtual_env_path/bin/activate"]
-  corespernode: 2
-  manual_ssh: false
-  job_wall_time : "20:00"
-  # PilotJob attributes
-  PJ_header: eagle-PJ-header
-  PJ_PYheader: eagle-PJ.py
-  #PJ_header: no_batch
-  PJ_size : "3"
-  # wall time in format MINUTES:SECONDS
-  PJ_wall_time : "20:00"
+ 
 
-  #stat: "sacct -o jobid,state,cluster -X -n"
-  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
-  job_dispatch: "sbatch"
-  cancel_job_command: 'scancel $jobID'
-  #job_info_command : 'sacct -X -j $jobID'  
-  job_info_command : 'sacct --allocations --job $jobID'
-  
-  
-  #max_job_name_chars: 15
-  modules:
-    flee: ["load vecma/apps/fleev2"]  
-    pflee: ["load vecma/apps/fleev2"]  
-    foodflee: ["load vecma/apps/fleev2"]  
-  #runtime_path_template: "/tmp/lustre_shared/$username"
-  #temp_path_template: "$work_path/tmp"  
 
-eagle_HiDALGO:
+slurm_hidalgo:
+  <<: *SLURM_Defult_Config
+  <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
-  corespernode: 2
-  manual_ssh: false
+  remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/users/$username"
+  batch_header: slurm-eagle
+  #batch_header: slurm-eagle-HiDALGO
+  budget: "394"
   job_wall_time : "20:00"
-  # PilotJob attributes
-  PJ_header: eagle-PJ-header
-  PJ_PYheader: eagle-PJ.py
-  #PJ_header: no_batch
-  PJ_size : "3"
-  # wall time in format MINUTES:SECONDS
-  PJ_wall_time : "20:00"
+  
+  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
+ 
 
-  #stat: "sacct -o jobid,state,cluster -X -n"
-  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
-  job_dispatch: "sbatch"
-  cancel_job_command: 'scancel $jobID'
-  #job_info_command : 'sacct -X -j $jobID'  
-  job_info_command : 'sacct --allocations --job $jobID'

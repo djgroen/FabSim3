@@ -8,14 +8,7 @@
 #QCG error=$job_results/$${JOB_ID}.error
 #QCG grant=$budget
 
-export MODULEPATH=$$MODULEPATH:$qcg_MODULEPATH
+export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
 
-module load $eagle_modules
-
-## load QCG-PilotJob  
-source $virtual_env_path/bin/activate
-
-pip install --upgrade  pip
-python3 -m pip install  numpy
 
 

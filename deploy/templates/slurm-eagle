@@ -18,5 +18,5 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
-export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
+
 
