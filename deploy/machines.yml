@@ -324,7 +324,6 @@ qcg:
 
   batch_header: qcg-eagle
   #qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/fleev2"
 
 
   run_prefix_commands: ["source $virtual_env_path/bin/activate"]
