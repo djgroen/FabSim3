@@ -35,36 +35,20 @@ bluejoule:
   namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
   ensemble_dir: "rep0/replicas"   
 
+
+
+
+
+
 qcg:
-  username: "plg<your-username>"
+  username: "plgarabnejad"
+  flee_location: "$home_path/flee-release"
 
+slurm_vecma:
+  username: "plgarabnejad"
+  flee_location: "$home_path/flee-release"
 
-eagle:
-  username: "plg<your-username>"
-  remote: "eagle.man.poznan.pl" 
-  batch_header: slurm-eagle
-  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/fleev2"  
-  home_path_template: "/home/plgrid/$username"
-  queue: "plgrid"
-  budget: "vecma2019"
-
-  # pilot job manager installation
-  batch_header_install_app : slurm-eagle-app
-  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
-  app_repository: "/home/plgrid/$username/VECMA/App_repo"
-  job_name: "PJ_install_job" 
-
-eagle_HiDALGO:
+slurm_hidalgo:
   username: "<your-username>"
-  remote: "eagle.man.poznan.pl" 
-  batch_header: slurm-eagle-HiDALGO
-  home_path_template: "/home/users/$username"
-  eagle_modules: "python"  
-  budget: "394"
-
-  # pilot job manager installation
-  batch_header_install_app : slurm-eagle-app
-  virtual_env_path: "/home/users/$username/MyVirtualEnv"
-  app_repository: "/home/users/$username/VECMA/App_repo"
-  job_name: "PJ_install_job"  
+  flee_location: "$home_path/flee-release"
+  
