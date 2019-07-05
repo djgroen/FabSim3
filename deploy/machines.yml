@@ -317,6 +317,11 @@ qcg:
   job_name: "VECMA"
 
 eagle:
+  remote: "eagle.man.poznan.pl"
+  batch_header: slurm-eagle
+
+  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+
   run_command: "mpirun -n $cores"
   run_prefix_commands: ["source $virtual_env_path/bin/activate"]
   corespernode: 2
@@ -340,8 +345,9 @@ eagle:
   
   #max_job_name_chars: 15
   modules:
-    flee: ["vecma/apps/fleev2"]  
-    foodflee: ["vecma/apps/fleev2"]  
+    flee: ["load vecma/apps/fleev2"]  
+    pflee: ["load vecma/apps/fleev2"]  
+    foodflee: ["load vecma/apps/fleev2"]  
   #runtime_path_template: "/tmp/lustre_shared/$username"
   #temp_path_template: "$work_path/tmp"  
 
