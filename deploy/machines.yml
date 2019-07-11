@@ -328,10 +328,6 @@ qcg:
   run_command: "mpirun -n $cores"
 
   batch_header: qcg-eagle
-<<<<<<< HEAD
-=======
-  #qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
->>>>>>> template-cleanup
 
   
   #run_prefix_commands: ["source $virtual_env_path/bin/activate"]
