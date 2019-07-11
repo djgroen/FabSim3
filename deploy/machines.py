@@ -82,6 +82,11 @@ def generate_module_commands(script=None):
     module_commands += ["module %s" %
                         module for module in env.modules.get("nonexistent", "")]
 
+    module_commands += ["module unload %s" %
+                        module for module in env.modules.get("unloaded", "")]
+    module_commands += ["module load %s" %
+                        module for module in env.modules.get("loaded", "")]
+
     if script != None:
         # Not using get as I want this to crash if the all key does not exist
         # (it should always be present).
@@ -94,6 +99,10 @@ def generate_module_commands(script=None):
 module_commands = generate_module_commands()
 env.run_prefix = " && ".join(
     module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
+
+if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
+    env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
+        " && " + env.run_prefix
 
 
 @task
@@ -189,8 +198,9 @@ def complete_environment():
         env.local_config_file_path[i] = os.path.expanduser(
             template(env.local_config_file_path[i]))
 
-    run_prefix_commands = env.run_prefix_commands[:]
+    #module_commands = generate_module_commands()
     module_commands = generate_module_commands(script=env.get("script", None))
+    run_prefix_commands = env.run_prefix_commands[:]
     env.run_prefix = " && ".join(
         module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
 
@@ -202,6 +212,10 @@ def complete_environment():
 
     if (hasattr(env, 'app_repository') and env.app_repository):
         env.app_repository = template(env.app_repository)
+
+    if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
+        env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
+            " && " + env.run_prefix
 
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.

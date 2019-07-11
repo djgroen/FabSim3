@@ -19,6 +19,8 @@
 #SBATCH --error=$job_results/JobID-%j.error
 
 
-module load python
+module load python 
+module load openmpi/1.8.1-1_gcc482
+
 
 

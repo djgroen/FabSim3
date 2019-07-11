@@ -509,6 +509,9 @@ def job(*option_dictionaries):
                 env.submit_job is False):
             return
 
+        if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
+            return
+
         # Allow option to submit all preparations, but not actually submit
         # the job
         if hasattr(env, 'dispatch_jobs_on_localhost') and \
@@ -788,6 +791,11 @@ def print_config(args=''):
 def install_packages(virtual_env='False'):
     """
     Install list of packages defined in deploy/applications.yml
+    note : if you got an error on your local machine during the build wheel 
+    for scipy, like this one
+        ERROR: lapack_opt_info:
+    Try to install BLAS and LAPACK first. by
+    sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
     """
 
     config = yaml.load(
@@ -814,9 +822,21 @@ def install_packages(virtual_env='False'):
         )
     )
 
+    # Send the dependencies (and the dependencies of dependencies) to the
+    # remote machine
+    for whl in os.listdir(tmp_app_dir):
+        local(
+            template(
+                "rsync -pthrvz -e 'ssh -p $port'  %s/%s \
+                $username@$remote:$app_repository" % (tmp_app_dir, whl)
+            )
+            # "rsync -pthrvz %s/%s eagle:$app_repository"%(tmp_app_dir, whl)
+        )
+
     # Set required env variable
     env.config = "Install_VECMA_App"
-    env.nodes = 1
+    #env.nodes = 1
+    env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
     with open(script, "w") as sc:
@@ -859,12 +879,13 @@ def install_packages(virtual_env='False'):
 
     # Create job script based on "sbatch header" and script created above in
     # deploy/.jobscript/
-    env.job_script = script_templates(env.batch_header, env.script)
+    env.job_script = script_templates(env.batch_header_install_app, env.script)
 
     # Create script's destination path to remote machine based on
     env.dest_name = env.pather.join(
         env.scripts_path, env.pather.basename(env.job_script)
     )
+
     # Send Install script to remote machine
     put(env.job_script, env.dest_name)
     #
@@ -929,7 +950,8 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
 
     # Set required env variable
     env.config = "Install_VECMA_App"
-    env.nodes = 1
+    #env.nodes = 1
+    env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
     with open(script, "w") as sc:
@@ -999,6 +1021,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     put(env.job_script, env.dest_name)
     #
     run(template("mkdir -p $job_results"))
+
     with cd(env.pather.dirname(env.job_results)):
         run(template("%s %s") % (env.job_dispatch, env.dest_name))
 

@@ -8,7 +8,9 @@ default:
   modules: 
     all: []
     dummy: []
-    
+
+  # loading virtual environment on the remote machine 
+  virtualenv : False
   # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
   
@@ -273,23 +275,25 @@ QCG_PJ: &QCG_PilotJob
   # pilot job manager installation  
   virtual_env_path: "$home_path/VirtualEnv"
   app_repository: "$home_path/App_repo"
+
+  #virtual_env_path: "$home_path/VirtualEnv3.7"
+  #app_repository: "$home_path/App_repo3.7"
+
   job_name: "QCG_PilotJob_installation" 
 
 
-slurm : &SLURM_Defult_Config
+Eagle : &Eagle_Defult_Config
   #stat: "sacct -o jobid,state,cluster -X -n"
   stat: "sacct --format=jobid,state,cluster --allocations --noheader"
   job_dispatch: "sbatch"
   cancel_job_command: 'scancel $jobID'
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
-  # wall time in format MINUTES:SECONDS
-  job_wall_time : "20:00"
   manual_ssh: false
   corespernode: 2
 
   # template header for VirtualEnv
-  batch_header_install_app : slurm-eagle-app
+  batch_header_install_app : eagle-app
 
   # PilotJob attributes  
   PJ_PYheader: eagle-PJ.py
@@ -302,9 +306,10 @@ slurm : &SLURM_Defult_Config
 qcg:
   <<: *QCG_PilotJob
   remote: "eagle.man.poznan.pl" 
-  job_wall_time : "PT20M"
+  job_wall_time : "PT10M"
   budget: "vecma2019"
   corespernode: 2
+  cores: 1
   queue: "plgrid"
   # template header for VirtualEnv
   batch_header_install_app : qcg-eagle-app
@@ -314,8 +319,8 @@ qcg:
   PJ_PYheader: qcg-PJ.py
   PJ_header: qcg-PJ-header
   #PJ_header: no_batch
-  PJ_size : "3"
-  PJ_wall_time : "PT20M"
+  PJ_size : "20"
+  PJ_wall_time : "P2D"
 
   home_path_template: "/home/plgrid/$username"
   manual_ssh: false
@@ -323,12 +328,17 @@ qcg:
   run_command: "mpirun -n $cores"
 
   batch_header: qcg-eagle
-  #qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/fleev2"
 
+  
+  #run_prefix_commands: ["source $virtual_env_path/bin/activate"]
 
-  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
   eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []
 
 
 
@@ -339,7 +349,7 @@ qcg:
   #           ...   ...       ...
   #           job1  FINISHED  eagle
   #           job2  FAILED    eagle
-  #           job2  CANCELED  eagle  
+  #           job2  CANCELED  eagle
   #           ...   ...       ...  
   stat: 'qcg-list -Q -s all -F "%-22I %-16S %-8H" | awk "{if(NR>2)print}"'
 
@@ -350,8 +360,8 @@ qcg:
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
 
-slurm_vecma:
-  <<: *SLURM_Defult_Config
+eagle_vecma:
+  <<: *Eagle_Defult_Config
   <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
@@ -359,23 +369,35 @@ slurm_vecma:
   batch_header: slurm-eagle
   budget: "vecma2019"
   queue: "plgrid"
-  job_wall_time : "20:00"
+  corespernode: 2
+  cores: 1
+
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []
   
-  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
- 
-
-
-slurm_hidalgo:
-  <<: *SLURM_Defult_Config
+eagle_hidalgo:
+  <<: *Eagle_Defult_Config
   <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
   home_path_template: "/home/users/$username"
   batch_header: slurm-eagle
-  #batch_header: slurm-eagle-HiDALGO
   budget: "394"
-  job_wall_time : "20:00"
-  
-  run_prefix_commands: ["source $virtual_env_path/bin/activate"]
- 
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:40:00"
 
+  corespernode: 2
+  cores: 8
+  
+ 
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []

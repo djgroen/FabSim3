@@ -8,6 +8,8 @@
 #QCG error=$job_results/$${JOB_ID}.error
 #QCG grant=$budget
 
-module load python
+module load python 
+module load openmpi/1.8.1-1_gcc482
+
 
 

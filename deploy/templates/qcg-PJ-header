@@ -2,7 +2,7 @@
 
 #QCG host=eagle
 #QCG queue=$queue
-#QCG nodes=1:$PJ_size
+#QCG nodes=$PJ_size:1
 #QCG walltime=$PJ_wall_time
 #QCG grant=$budget
 
