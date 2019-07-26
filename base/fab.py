@@ -791,7 +791,7 @@ def print_config(args=''):
 def install_packages(virtual_env='False'):
     """
     Install list of packages defined in deploy/applications.yml
-    note : if you got an error on your local machine during the build wheel 
+    note : if you got an error on your local machine during the build wheel
     for scipy, like this one
         ERROR: lapack_opt_info:
     Try to install BLAS and LAPACK first. by
@@ -835,7 +835,7 @@ def install_packages(virtual_env='False'):
 
     # Set required env variable
     env.config = "Install_VECMA_App"
-    #env.nodes = 1
+    # env.nodes = 1
     env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
@@ -950,7 +950,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
 
     # Set required env variable
     env.config = "Install_VECMA_App"
-    #env.nodes = 1
+    # env.nodes = 1
     env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
