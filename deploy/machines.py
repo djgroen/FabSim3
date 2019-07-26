@@ -187,7 +187,8 @@ def complete_environment():
     env.scripts_path = env.pather.join(env.work_path, "scripts")
     env.local_results = os.path.expanduser(template(env.local_results))
 
-    if env.flee_location:
+    # if env.flee_location:
+    if (hasattr(env, 'flee_location'):
         env.flee_location = template(env.flee_location)
 
     for i in range(0, len(env.local_templates_path)):
