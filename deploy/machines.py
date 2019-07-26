@@ -44,7 +44,8 @@ env.localplugins = {}  # dict containing local paths to all plugins.
 env.no_ssh = False
 env.no_hg = False
 # Load and invoke the default non-machine specific config JSON dictionaries.
-config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'machines.yml')), Loader=yaml.SafeLoader)
+config = yaml.load(open(os.path.join(env.localroot, 'deploy',
+                                     'machines.yml')), Loader=yaml.SafeLoader)
 env.update(config['default'])
 user_config = yaml.load(
     open(os.path.join(env.localroot, 'deploy', 'machines_user.yml')), Loader=yaml.SafeLoader)
@@ -63,11 +64,8 @@ env.node_type_restriction_template = ""
 env.max_job_name_chars = None
 env.lammps_exec = "undefined"
 run_prefix_commands = env.run_prefix_commands[:]
-#run_prefix_commands.append("export PYTHONPATH=$$PYTHONPATH:$tools_build_path")
 if env.temp_path_template:
     env.temp_path = template(env.temp_path_template)
-#  run_prefix_commands.append(template("export TMP=$temp_path"))
-#  run_prefix_commands.append(template("export TMPDIR=$temp_path"))
 
 env.pythonroot = os.path.join(env.localroot, 'python')
 env.blackboxroot = os.path.join(env.localroot, 'blackbox')
@@ -84,6 +82,11 @@ def generate_module_commands(script=None):
     module_commands += ["module %s" %
                         module for module in env.modules.get("nonexistent", "")]
 
+    module_commands += ["module unload %s" %
+                        module for module in env.modules.get("unloaded", "")]
+    module_commands += ["module load %s" %
+                        module for module in env.modules.get("loaded", "")]
+
     if script != None:
         # Not using get as I want this to crash if the all key does not exist
         # (it should always be present).
@@ -96,6 +99,10 @@ def generate_module_commands(script=None):
 module_commands = generate_module_commands()
 env.run_prefix = " && ".join(
     module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
+
+if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
+    env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
+        " && " + env.run_prefix
 
 
 @task
@@ -128,9 +135,10 @@ def machine(name):
 
     env.modules.update(user_config[name].get("modules", {}))
 
-    #print(env.modules)
+    # print(env.modules)
 
     complete_environment()
+
 
 @task
 def print_machine_config_info(name=""):
@@ -139,6 +147,7 @@ def print_machine_config_info(name=""):
         sys.exit()
     print("Defaults: ", config[name])
     print("User overrides: ", user_config[name])
+
 
 # Metaprogram the machine wrappers
 for machine_name in set(config.keys()) - set(['default']):
@@ -178,6 +187,9 @@ def complete_environment():
     env.scripts_path = env.pather.join(env.work_path, "scripts")
     env.local_results = os.path.expanduser(template(env.local_results))
 
+    if env.flee_location:
+        env.flee_location = template(env.flee_location)
+
     for i in range(0, len(env.local_templates_path)):
         env.local_templates_path[i] = os.path.expanduser(
             template(env.local_templates_path[i]))
@@ -186,7 +198,9 @@ def complete_environment():
         env.local_config_file_path[i] = os.path.expanduser(
             template(env.local_config_file_path[i]))
 
+    #module_commands = generate_module_commands()
     module_commands = generate_module_commands(script=env.get("script", None))
+    run_prefix_commands = env.run_prefix_commands[:]
     env.run_prefix = " && ".join(
         module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
 
@@ -198,6 +212,10 @@ def complete_environment():
 
     if (hasattr(env, 'app_repository') and env.app_repository):
         env.app_repository = template(env.app_repository)
+
+    if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
+        env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
+            " && " + env.run_prefix
 
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.

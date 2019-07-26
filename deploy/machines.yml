@@ -8,7 +8,9 @@ default:
   modules: 
     all: []
     dummy: []
-    
+
+  # loading virtual environment on the remote machine 
+  virtualenv : False
   # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
   
@@ -268,30 +270,78 @@ mavrino:
   batch_header: sge
   queue: "parallel2" #"mapper"
 
-qcg:
-  remote: "eagle.man.poznan.pl" 
-  job_wall_time : "PT10M"
-  # PilotJob attributes
-  PJ_header: qcg-PJ-header
-  PJ_PYheader: qcg-PJ.py
+
+QCG_PJ: &QCG_PilotJob
+  # pilot job manager installation  
+  virtual_env_path: "$home_path/VirtualEnv"
+  app_repository: "$home_path/App_repo"
+
+  #virtual_env_path: "$home_path/VirtualEnv3.7"
+  #app_repository: "$home_path/App_repo3.7"
+
+  job_name: "QCG_PilotJob_installation" 
+
+
+Eagle : &Eagle_Defult_Config
+  #stat: "sacct -o jobid,state,cluster -X -n"
+  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
+  job_dispatch: "sbatch"
+  cancel_job_command: 'scancel $jobID'
+  #job_info_command : 'sacct -X -j $jobID'  
+  job_info_command : 'sacct --allocations --job $jobID'
+  manual_ssh: false
+  corespernode: 2
+
+  # template header for VirtualEnv
+  batch_header_install_app : eagle-app
+
+  # PilotJob attributes  
+  PJ_PYheader: eagle-PJ.py
+  PJ_header: eagle-PJ-header
   #PJ_header: no_batch
   PJ_size : "3"
-  PJ_wall_time : "PT10M"
+  PJ_wall_time : "20:00"
 
-  # For QCG, env.remote is the machine where we will store and retrieve the input/output files.
-  # This is NOT the machine where we run batch scripts; this is done using the QCG-Client instead.  
+
+qcg:
+  <<: *QCG_PilotJob
+  remote: "eagle.man.poznan.pl" 
+  job_wall_time : "PT10M"
+  budget: "vecma2019"
+  corespernode: 2
+  cores: 1
+  queue: "plgrid"
+  # template header for VirtualEnv
+  batch_header_install_app : qcg-eagle-app
+  # PilotJob header template
+  
+  # PilotJob attributes  
+  PJ_PYheader: qcg-PJ.py
+  PJ_header: qcg-PJ-header
+  #PJ_header: no_batch
+  PJ_size : "20"
+  PJ_wall_time : "P2D"
+
   home_path_template: "/home/plgrid/$username"
   manual_ssh: false
   dispatch_jobs_on_localhost: false #TODO: implement this in fab/base in the def job() function, so that job dispatch is done locally.
   run_command: "mpirun -n $cores"
 
   batch_header: qcg-eagle
-  qcg_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
-  eagle_modules: "vecma/apps/fleev2"
-  queue: "plgrid"
 
-  budget: "vecma2019"
-  corespernode: 2
+  
+  #run_prefix_commands: ["source $virtual_env_path/bin/activate"]
+
+  eagle_MODULEPATH : "/home/plgrid-groups/plggvecma/.qcg-modules"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []
+
+
+
 
   # stat : return report for all submitted jobs
   # it should be set in the way that only return jobID, job status, and host in the output (without column header)
@@ -299,7 +349,7 @@ qcg:
   #           ...   ...       ...
   #           job1  FINISHED  eagle
   #           job2  FAILED    eagle
-  #           job2  CANCELED  eagle  
+  #           job2  CANCELED  eagle
   #           ...   ...       ...  
   stat: 'qcg-list -Q -s all -F "%-22I %-16S %-8H" | awk "{if(NR>2)print}"'
 
@@ -310,55 +360,44 @@ qcg:
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
 
-  # pilot job manager installation
-  batch_header_install_app : qcg-eagle-app
-  virtual_env_path: "/home/plgrid/$username/MyVirtualEnv"
-  app_repository: "/home/plgrid/$username/VECMA/App_repo"
-  job_name: "VECMA"
-
-eagle:
+eagle_vecma:
+  <<: *Eagle_Defult_Config
+  <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
+  remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/plgrid/$username"
+  batch_header: slurm-eagle
+  budget: "vecma2019"
+  queue: "plgrid"
   corespernode: 2
-  manual_ssh: false
-  job_wall_time : "20:00"
-  # PilotJob attributes
-  PJ_header: eagle-PJ-header
-  PJ_PYheader: eagle-PJ.py
-  #PJ_header: no_batch
-  PJ_size : "3"
-  # wall time in format MINUTES:SECONDS
-  PJ_wall_time : "20:00"
+  cores: 1
 
-  #stat: "sacct -o jobid,state,cluster -X -n"
-  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
-  job_dispatch: "sbatch"
-  cancel_job_command: 'scancel $jobID'
-  #job_info_command : 'sacct -X -j $jobID'  
-  job_info_command : 'sacct --allocations --job $jobID'
-  
-  
-  #max_job_name_chars: 15
-  #modules:
-  #  all: []  
-  #runtime_path_template: "/tmp/lustre_shared/$username"
-  #temp_path_template: "$work_path/tmp"  
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
 
-eagle_HiDALGO:
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []
+  
+eagle_hidalgo:
+  <<: *Eagle_Defult_Config
+  <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
-  corespernode: 2
-  manual_ssh: false
-  job_wall_time : "20:00"
-  # PilotJob attributes
-  PJ_header: eagle-PJ-header
-  PJ_PYheader: eagle-PJ.py
-  #PJ_header: no_batch
-  PJ_size : "3"
-  # wall time in format MINUTES:SECONDS
-  PJ_wall_time : "20:00"
+  remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/users/$username"
+  batch_header: slurm-eagle
+  budget: "394"
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:40:00"
 
-  #stat: "sacct -o jobid,state,cluster -X -n"
-  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
-  job_dispatch: "sbatch"
-  cancel_job_command: 'scancel $jobID'
-  #job_info_command : 'sacct -X -j $jobID'  
-  job_info_command : 'sacct --allocations --job $jobID'
+  corespernode: 2
+  cores: 8
+  
+ 
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    # list of modules to be unloaded on remote machine
+    unloaded: []
