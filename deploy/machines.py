@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# This source file is part of the FabSim software toolkit, which is distributed under the BSD 3-Clause license.
+# This source file is part of the FabSim software toolkit, which is distributed
+# under the BSD 3-Clause license.
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
 # This file contains functions which help parse and process
@@ -16,14 +17,6 @@ from os import environ
 from os.path import join
 from sys import version_info
 import sys
-if 'VIRTUAL_ENV' in environ:
-    virtual_env = join(environ.get('VIRTUAL_ENV'),
-                       'lib',
-                       'python%d.%d' % version_info[:2],
-                       'site-packages')
-    site.addsitedir(virtual_env)
-    print('Using Virtualenv =>', virtual_env)
-del site, environ, join, version_info
 import fabric.api
 from fabric.api import *
 import os
@@ -36,6 +29,14 @@ from functools import *
 from pprint import PrettyPrinter
 pp = PrettyPrinter()
 
+if 'VIRTUAL_ENV' in environ:
+    virtual_env = join(environ.get('VIRTUAL_ENV'),
+                       'lib',
+                       'python%d.%d' % version_info[:2],
+                       'site-packages')
+    site.addsitedir(virtual_env)
+    print('Using Virtualenv =>', virtual_env)
+del site, environ, join, version_info
 
 # Root of local FabSim installation
 env.localroot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,8 +48,8 @@ env.no_hg = False
 config = yaml.load(open(os.path.join(env.localroot, 'deploy',
                                      'machines.yml')), Loader=yaml.SafeLoader)
 env.update(config['default'])
-user_config = yaml.load(
-    open(os.path.join(env.localroot, 'deploy', 'machines_user.yml')), Loader=yaml.SafeLoader)
+user_config = yaml.load(open(os.path.join(
+    env.localroot, 'deploy', 'machines_user.yml')), Loader=yaml.SafeLoader)
 env.update(user_config['default'])
 env.verbose = False
 env.needs_tarballs = False
@@ -59,7 +60,8 @@ env.dollar = "$"
 env.machine_name = None
 env.node_type_restriction = ""
 env.node_type_restriction_template = ""
-# Maximum number of characters permitted in the name of a job in the queue system
+# Maximum number of characters permitted in the name of a job
+# in the queue system
 # -1 for unlimited
 env.max_job_name_chars = None
 env.lammps_exec = "undefined"
@@ -78,27 +80,29 @@ env.local_jobsDB_filename = 'jobsDB.txt'
 def generate_module_commands(script=None):
     # Not using get as I want this to crash if the all key does not exist (it
     # should always be present).
-    module_commands = ["module %s" % module for module in env.modules["all"]]
-    module_commands += ["module %s" %
-                        module for module in env.modules.get("nonexistent", "")]
+    module_commands = ["module %s" % module
+                       for module in env.modules["all"]]
 
-    module_commands += ["module unload %s" %
-                        module for module in env.modules.get("unloaded", "")]
-    module_commands += ["module load %s" %
-                        module for module in env.modules.get("loaded", "")]
+    module_commands += ["module %s" % module
+                        for module in env.modules.get("nonexistent", "")]
 
-    if script != None:
+    module_commands += ["module unload %s" % module
+                        for module in env.modules.get("unloaded", "")]
+    module_commands += ["module load %s" % module
+                        for module in env.modules.get("loaded", "")]
+    if script is not None:
         # Not using get as I want this to crash if the all key does not exist
         # (it should always be present).
-        module_commands += ["module %s" %
-                            module for module in env.modules.get(script, "")]
+        module_commands += ["module %s" % module
+                            for module in env.modules.get(script, "")]
         print("SCRIPT: ", script)
-    #print("MODULE COMMANDS: ", module_commands)
+    # print("MODULE COMMANDS: ", module_commands)
     return module_commands
 
 module_commands = generate_module_commands()
-env.run_prefix = " && ".join(
-    module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
+env.run_prefix = " && ".join(module_commands +
+                             list(map(template, run_prefix_commands))) \
+    or 'echo Running...'
 
 if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
     env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
@@ -143,7 +147,8 @@ def machine(name):
 @task
 def print_machine_config_info(name=""):
     if name == "":
-        print("Usage: fabsim localhost print_machine_config_info:<machine_name>")
+        print("Usage: \
+            fabsim localhost print_machine_config_info:<machine_name>")
         sys.exit()
     print("Defaults: ", config[name])
     print("User overrides: ", user_config[name])
@@ -157,7 +162,8 @@ for machine_name in set(config.keys()) - set(['default']):
 
 def complete_environment():
     """Add paths to the environment based on information in the JSON configs.
-    Templates are filled in from the dictionary to allow $foo interpolation in the JSON file.
+    Templates are filled in from the dictionary to allow $foo interpolation
+    in the JSON file.
     Environment vars created can be used in job-script templates:
     results_path: Path to store results
     remote_path: Root of area for checkout and build on remote
@@ -167,7 +173,8 @@ def complete_environment():
     tools_build_path: Path of disttools python 'build' folder for python tools
     regression_test_path: Path on remote to diffTest
     build_path: Path on remote to HemeLB cmake build area.
-    scripts_path: Path where job-queue-submission scripts generated by Fabric are sent.
+    scripts_path: Path where job-queue-submission scripts generated
+    by Fabric are sent.
     cmake_flags: Flags to pass to cmake
     run_prefix: Command string to invoke before any job is run.
     build_prefix: Command string to invoke before builds/installs are attempted
@@ -187,8 +194,7 @@ def complete_environment():
     env.scripts_path = env.pather.join(env.work_path, "scripts")
     env.local_results = os.path.expanduser(template(env.local_results))
 
-    # if env.flee_location:
-    if (hasattr(env, 'flee_location'):
+    if env.flee_location:
         env.flee_location = template(env.flee_location)
 
     for i in range(0, len(env.local_templates_path)):
@@ -199,11 +205,12 @@ def complete_environment():
         env.local_config_file_path[i] = os.path.expanduser(
             template(env.local_config_file_path[i]))
 
-    #module_commands = generate_module_commands()
+    # module_commands = generate_module_commands()
     module_commands = generate_module_commands(script=env.get("script", None))
     run_prefix_commands = env.run_prefix_commands[:]
-    env.run_prefix = " && ".join(
-        module_commands + list(map(template, run_prefix_commands))) or 'echo Running...'
+    env.run_prefix = " && ".join(module_commands +
+                                 list(map(template, run_prefix_commands))) \
+        or 'echo Running...'
 
     if env.temp_path_template:
         env.temp_path = template(env.temp_path_template)
@@ -220,8 +227,8 @@ def complete_environment():
 
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
-    #cmd=os.popen(template("hg id -q -i"))
+    # cmd=os.popen(template("hg id -q -i"))
     # cmd.close()
-    #env.build_number=run("hg id -q -i")
+    # env.build_number=run("hg id -q -i")
 
 # complete_environment()
