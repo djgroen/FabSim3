@@ -383,7 +383,7 @@ def check_complete(jobname_syntax=""):
     jobs_dict = stat()
     for key, value in jobs_dict.items():
         if jobname_syntax in key:
-            if value['status'] not in ["COMPLETED", "FAILED","CANCELLED"]:
+            if value['status'] not in ["COMPLETED", "FAILED", "CANCELLED"]:
                 print("Still running: ", key, value)
                 return False
     return True
