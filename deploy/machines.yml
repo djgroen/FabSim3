@@ -282,7 +282,7 @@ QCG_PJ: &QCG_PilotJob
   job_name: "QCG_PilotJob_installation" 
 
 
-Eagle : &Eagle_Defult_Config
+Eagle : &Eagle_Default_Config
   #stat: "sacct -o jobid,state,cluster -X -n"
   stat: "sacct --format=jobid,state,cluster --allocations --noheader"
   job_dispatch: "sbatch"
@@ -290,7 +290,8 @@ Eagle : &Eagle_Defult_Config
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
   manual_ssh: false
-  corespernode: 14
+  corespernode: 28
+  cores: 8
 
   # template header for VirtualEnv
   batch_header_install_app : eagle-app
@@ -308,7 +309,7 @@ qcg:
   remote: "eagle.man.poznan.pl" 
   job_wall_time : "PT10M"
   budget: "vecma2019"
-  corespernode: 2
+  corespernode: 28
   cores: 1
   queue: "plgrid"
   # template header for VirtualEnv
@@ -361,7 +362,7 @@ qcg:
   cancel_job_command: 'qcg-cancel $jobID'
 
 eagle_vecma:
-  <<: *Eagle_Defult_Config
+  <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
@@ -369,8 +370,6 @@ eagle_vecma:
   batch_header: slurm-eagle
   budget: "vecma2019"
   queue: "plgrid"
-  corespernode: 2
-  cores: 1
 
   # wall time in format days-hours:minutes:seconds
   job_wall_time : "0-0:10:00"
@@ -382,7 +381,7 @@ eagle_vecma:
     unloaded: []
   
 eagle_hidalgo:
-  <<: *Eagle_Defult_Config
+  <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
   run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
@@ -392,10 +391,6 @@ eagle_hidalgo:
   # wall time in format days-hours:minutes:seconds
   job_wall_time : "0-0:40:00"
 
-  corespernode: 2
-  cores: 8
-  
- 
   modules:
     # list of modules to be loaded on remote machine
     loaded: ["python", "openmpi/1.8.1-1_gcc482"]
