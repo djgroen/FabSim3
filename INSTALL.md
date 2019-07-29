@@ -11,8 +11,9 @@ To use FabSim3, you will need to have git installed, as FabSim3 requires git to 
 FabSim requires the following Python modules:
 * PyYAML (any version) 
 * fabric3 (1.1.13.post1 has worked for us)
+* numpy
 
-You can install using `pip3 install PyYAML` and `pip3 install fabric3`.
+You can install using `pip3 install PyYAML`, `pip3 install numpy` and `pip3 install fabric3`.
 
 To perform the Py.test tests (not required for using FabSim, but essential for running the tests), you will need `pytest` and `pytest-pep8`.
 
