@@ -9,7 +9,7 @@ def stat(jobID=None):
     """Check the remote message queue status for individual machines.
     Syntax: fab <machine> stat."""
 
-    job_stat(jobID)
+    return job_stat(jobID)
 
     # TODO: Respect varying remote machine queue systems.
     # return run(template("$stat -u $username $stat_postfix"))
@@ -57,6 +57,7 @@ def job_stat(period="localDB", jobID=None):
                             for key, value in jobsInfo.items()
                             if key in jobsID.keys()))
 
+    return jobsInfo
 
 @task
 def job_stat_update():
@@ -92,6 +93,7 @@ def job_stat_update():
             else:
                 print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, '-'))
 
+    return jobsInfo
 
 @task
 def job_info(jobID=None):
@@ -377,7 +379,14 @@ def monitor():
 def check_complete(jobname_syntax=""):
     """Return true if the user has no job running containing
     jobname_syntax in their name"""
-    return jobname_syntax not in stat()
+
+    jobs_dict = stat()
+    for key, value in jobs_dict.items():
+        if jobname_syntax in key:
+            if value['status'] not in ["COMPLETED", "FAILED"]:
+                print ("Still running: ", key, value)
+                return False
+    return True
 
 
 @task
