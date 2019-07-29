@@ -290,7 +290,7 @@ Eagle : &Eagle_Defult_Config
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
   manual_ssh: false
-  corespernode: 2
+  corespernode: 14
 
   # template header for VirtualEnv
   batch_header_install_app : eagle-app
