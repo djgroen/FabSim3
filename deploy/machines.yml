@@ -284,7 +284,7 @@ QCG_PJ: &QCG_PilotJob
 
 Eagle : &Eagle_Defult_Config
   #stat: "sacct -o jobid,state,cluster -X -n"
-  stat: "sacct --format=jobid,state,cluster --allocations --noheader"
+  stat: "sacct --format=jobid,state,cluster --allocations --noheader  | grep eagle | grep -v COMP"
   job_dispatch: "sbatch"
   cancel_job_command: 'scancel $jobID'
   #job_info_command : 'sacct -X -j $jobID'  

@@ -374,18 +374,18 @@ def monitor():
         time.sleep(120)
 
 
-def check_complete(jobname_synthax=""):
+def check_complete(jobname_syntax=""):
     """Return true if the user has no job running containing
-    jobname_synthax in their name"""
-    return jobname_synthax not in stat()
+    jobname_syntax in their name"""
+    return jobname_syntax not in stat()
 
 
 @task
-def wait_complete(jobname_synthax):
-    """Wait until jobs currently running containing jobname_synthax in
+def wait_complete(jobname_syntax):
+    """Wait until jobs currently running containing jobname_syntax in
     their name are complete, then return"""
     # time.sleep(120)
-    while not check_complete(jobname_synthax):
+    while not check_complete(jobname_syntax):
         time.sleep(120)
 
 
