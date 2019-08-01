@@ -420,10 +420,11 @@ def job(*option_dictionaries):
     # env.fabsim_git_hash = get_fabsim_git_hash()
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
+    env.replicas = 1
     time.sleep(0.5)
     env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
-    with_template_job(env.ensemble_mode)
+
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
     if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
@@ -438,113 +439,126 @@ def job(*option_dictionaries):
     with settings(cores_reserved=env.get('cores_reserved') or env.cores):
         # Make sure that prefix and module load definitions are properly
         # updated.
-        complete_environment()
+        for i in range(1, int(env.replicas) + 1):
 
-        calc_nodes()
+            if int(env.replicas) > 1:
+                replica_num = '_replica_' + str(i)
+            else:
+                replica_num = ''
 
-        if env.node_type:
-            env.node_type_restriction = template(
-                env.node_type_restriction_template)
-
-        env['job_name'] = env.name[0:env.max_job_name_chars]
-        with settings(cores=1):
+            update_environment({'replica_num': replica_num})
+            with_template_job(env.ensemble_mode)
+            complete_environment()
             calc_nodes()
-            env.run_command_one_proc = template(env.run_command)
-        calc_nodes()
-        env.run_command = template(env.run_command)
 
-        if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
-            env.job_script = script_templates(env.batch_header)
-        else:
-            env.job_script = script_templates(env.batch_header, env.script)
+            if env.node_type:
+                env.node_type_restriction = template(
+                    env.node_type_restriction_template)
 
-        env.dest_name = env.pather.join(env.scripts_path,
-                                        env.pather.basename(env.job_script))
+            env['job_name'] = env.name[0:env.max_job_name_chars]
 
-        put(env.job_script, env.dest_name)
+            with settings(cores=1):
+                calc_nodes()
+                env.run_command_one_proc = template(env.run_command)
+            calc_nodes()
+            env.run_command = template(env.run_command)
 
-        # Store previous fab commands in bash history.
-        # env.fabsim_command_history = get_fabsim_command_history()
+            if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
+                env.job_script = script_templates(env.batch_header)
+                print("run with env.NoEnvScript")
+            else:
+                env.job_script = script_templates(env.batch_header, env.script)
+                print("run without env.NoEnvScript")
 
-        # Make directory, copy input files and job script to results directory
-        run(
-            template(
-                "mkdir -p $job_results && rsync -av --progress \
-                $job_config_path/* $job_results/ --exclude SWEEP && \
-                cp $dest_name $job_results"
-            )
-        )
+            env.dest_name = env.pather.join(
+                env.scripts_path,
+                env.pather.basename(env.job_script))
 
-        # In ensemble mode, also add run-specific file to the results dir.
-        if env.ensemble_mode:
+            put(env.job_script, env.dest_name)
+
+            # Store previous fab commands in bash history.
+            # env.fabsim_command_history = get_fabsim_command_history()
+
+            # Make directory, copy input files and job script to results
+            # directory
             run(
                 template(
-                    "cp -r \
-                    $job_config_path/SWEEP/$label/* $job_results/"
+                    "mkdir -p $job_results && rsync -av --progress \
+                    $job_config_path/* $job_results/ --exclude SWEEP && \
+                    cp $dest_name $job_results"
                 )
             )
 
-        try:
-            del env["passwords"]
-        except KeyError:
-            pass
-        try:
-            del env["password"]
-        except KeyError:
-            pass
+            # In ensemble mode, also add run-specific file to the results dir.
+            if env.ensemble_mode:
+                run(
+                    template(
+                        "cp -r \
+                        $job_config_path/SWEEP/$label/* $job_results/"
+                    )
+                )
 
-        with tempfile.NamedTemporaryFile(mode='r+') as tempf:
-            tempf.write(
-                yaml.dump(dict(env))
-            )
-            tempf.flush()  # Flush the file before we copy it.
-            put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
+            try:
+                del env["passwords"]
+            except KeyError:
+                pass
+            try:
+                del env["password"]
+            except KeyError:
+                pass
 
-        run(template("chmod u+x $dest_name"))
+            with tempfile.NamedTemporaryFile(mode='r+') as tempf:
+                tempf.write(
+                    yaml.dump(dict(env))
+                )
+                tempf.flush()  # Flush the file before we copy it.
+                put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
 
-        # check for PilotJob option is true, DO NOT submit the job directly
-        # , only submit PJ script
-        if (hasattr(env, 'submit_job') and
-                isinstance(env.submit_job, bool) and
-                env.submit_job is False):
-            return
+            run(template("chmod u+x $dest_name"))
 
-        if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
-            return
+            # check for PilotJob option is true, DO NOT submit the job directly
+            # , only submit PJ script
+            if (hasattr(env, 'submit_job') and
+                    isinstance(env.submit_job, bool) and
+                    env.submit_job is False):
+                return
 
-        # Allow option to submit all preparations, but not actually submit
-        # the job
-        if hasattr(env, 'dispatch_jobs_on_localhost') and \
-                isinstance(env.dispatch_jobs_on_localhost, bool) and \
-                env.dispatch_jobs_on_localhost:
-            local(template("$job_dispatch " + env.job_script))
-            print("job dispatch is done locally\n")
+            if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
+                return
 
-            '''
-            # wait a little bit before fetching the jobID for the
-            # just-submitted task
-            time.sleep(2)
-            save_submitted_job_info()
-            print("jobID is stored into : %s\n" % (os.path.join(
-                env.local_jobsDB_path, env.local_jobsDB_filename)))
-            '''
+            # Allow option to submit all preparations, but not actually submit
+            # the job
+            if hasattr(env, 'dispatch_jobs_on_localhost') and \
+                    isinstance(env.dispatch_jobs_on_localhost, bool) and \
+                    env.dispatch_jobs_on_localhost:
+                local(template("$job_dispatch " + env.job_script))
+                print("job dispatch is done locally\n")
 
-        elif not env.get("noexec", False):
-            with cd(env.job_results):
-                with prefix(env.run_prefix):
-                    run(template("$job_dispatch $dest_name"))
+                '''
+                # wait a little bit before fetching the jobID for the
+                # just-submitted task
+                time.sleep(2)
+                save_submitted_job_info()
+                print("jobID is stored into : %s\n" % (os.path.join(
+                    env.local_jobsDB_path, env.local_jobsDB_filename)))
+                '''
 
-        if env.remote != 'localhost':
-            # wait a little bit before fetching the jobID for the
-            # just-submitted task
-            time.sleep(5)
-            save_submitted_job_info()
-            print("jobID is stored into : %s\n" % (os.path.join(
-                env.local_jobsDB_path, env.local_jobsDB_filename)))
+            elif not env.get("noexec", False):
+                with cd(env.job_results):
+                    with prefix(env.run_prefix):
+                        run(template("$job_dispatch $dest_name"))
 
-        print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
-              (env.remote, env.job_results)
-              )
+            if env.remote != 'localhost':
+                # wait a little bit before fetching the jobID for the
+                # just-submitted task
+                time.sleep(5)
+                save_submitted_job_info()
+                print("jobID is stored into : %s\n" % (os.path.join(
+                    env.local_jobsDB_path, env.local_jobsDB_filename)))
+
+            print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
+                  (env.remote, env.job_results)
+                  )
 
         print("Use `fab %s fetch_results` to copy the results back to %s on\
             localhost." % (env.machine_name, env.job_results_local)
