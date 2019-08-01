@@ -59,6 +59,7 @@ def job_stat(period="localDB", jobID=None):
 
     return jobsInfo
 
+
 @task
 def job_stat_update():
     """
@@ -94,6 +95,7 @@ def job_stat_update():
                 print("%-30s \t %-20s \t %-20s" % (JobID, curr_status, '-'))
 
     return jobsInfo
+
 
 @task
 def job_info(jobID=None):
