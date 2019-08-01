@@ -39,11 +39,11 @@ def validate_ensemble_output(results_dir, validation_function, aggregation_funct
     """
 
     validation_scores = []
-    for item in os.listdir("{}/RUNS".format(results_dir)):
+    for item in os.listdir("{}".format(results_dir)):
         print(item)
-        if os.path.isdir(os.path.join(results_dir, "RUNS", item)):
-            print(os.path.join(results_dir, "RUNS", item))
-            validation_scores.append(validation_function(os.path.join(results_dir, "RUNS", item)))
+        if os.path.isdir(os.path.join(results_dir, item)):
+            print(os.path.join(results_dir, item))
+            validation_scores.append(validation_function(os.path.join(results_dir, item)))
 
     print("scores:", validation_scores)
     print("AVERAGED VALIDATION SCORE: {}".format(aggregation_function(validation_scores)))
