@@ -7,13 +7,14 @@
 # This file can be included in any code base. 
 # It has no dependencies, but does require a working FabSim3 installation.
 
+import os
 
-def fabsim(machine = 'localhost', command, arguments):
+def fabsim(command, arguments, machine = 'localhost'):
     """
     Generic function for running any FabSim3 command.
     """
-    os.system("fabsim {} {}:{}".format(machine, command, arguments)
-
+    print('Executing', "fabsim {} {}:{}".format(machine, command, arguments))
+    os.system("fabsim {} {}:{}".format(machine, command, arguments))
 
 def run_uq_ensemble(campaign_dir, script_name, machine='localhost'):
     """
@@ -21,4 +22,12 @@ def run_uq_ensemble(campaign_dir, script_name, machine='localhost'):
     """
     sim_ID = campaign_dir.split('/')[-1]
     arguments = "{},campaign_dir={},script_name={}".format(sim_ID, campaign_dir, script_name)
-    fabsim(machine, "run_uq_ensemble", arguments)
+    fabsim("run_uq_ensemble", arguments, machine=machine)
+    
+def get_uq_samples(campaign_dir, machine = 'localhost'):
+    """
+    Retrieves results from UQ ensemble
+    """
+    sim_ID = campaign_dir.split('/')[-1]
+    arguments = "{},campaign_dir={}".format(sim_ID, campaign_dir)
+    fabsim("get_uq_samples", arguments, machine=machine)
