@@ -58,7 +58,7 @@ default:
   temp_path_template: "/tmp"
   
   # Default naming scheme used to label FabSim3 jobs.
-  job_name_template: '${config}_${machine_name}_${cores}'
+  job_name_template: '${config}_${machine_name}_${cores}'  
   
   # Flag to bypass paramiko and do direct remote SSH commands.
   manual_ssh: false
