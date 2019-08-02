@@ -75,7 +75,7 @@ env.blackboxroot = os.path.join(env.localroot, 'blackbox')
 # job database configuration for remote machines
 env.local_jobsDB_path = os.path.join(env.localroot, 'deploy', '.jobsDB')
 env.local_jobsDB_filename = 'jobsDB.txt'
-
+env.replicas = 1
 
 def generate_module_commands(script=None):
     # Not using get as I want this to crash if the all key does not exist (it
