@@ -84,7 +84,6 @@ def with_job(name, ensemble_mode=False):
             env.results_path, name), env.label)
         env.job_results_local = "%s/RUNS/%s" % (os.path.join(
             env.local_results, name), env.label)
-
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
 
@@ -420,7 +419,6 @@ def job(*option_dictionaries):
     # env.fabsim_git_hash = get_fabsim_git_hash()
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S')
-    env.replicas = 1
     time.sleep(0.5)
     env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
@@ -441,13 +439,24 @@ def job(*option_dictionaries):
         # updated.
         for i in range(1, int(env.replicas) + 1):
 
-            if int(env.replicas) > 1:
-                replica_num = '_replica_' + str(i)
-            else:
-                replica_num = ''
-
-            update_environment({'replica_num': replica_num})
             with_template_job(env.ensemble_mode)
+
+            if int(env.replicas) > 1:
+                if env.ensemble_mode is False:
+                    update_environment({
+                        'job_results':
+                        env.job_results + '_replica_' + str(i)})
+                    update_environment({
+                        'job_results_contents_local':
+                        env.job_results_contents_local + '_replica_' + str(i)})
+                else:
+                    update_environment({
+                        'job_results':
+                        env.job_results + '_' + str(i)})
+                    update_environment({
+                        'job_results_contents_local':
+                        env.job_results_contents_local + '_' + str(i)})
+
             complete_environment()
             calc_nodes()
 
@@ -465,10 +474,8 @@ def job(*option_dictionaries):
 
             if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                 env.job_script = script_templates(env.batch_header)
-                print("run with env.NoEnvScript")
             else:
                 env.job_script = script_templates(env.batch_header, env.script)
-                print("run without env.NoEnvScript")
 
             env.dest_name = env.pather.join(
                 env.scripts_path,
