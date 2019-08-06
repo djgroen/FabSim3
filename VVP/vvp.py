@@ -29,23 +29,47 @@ SPECS of the aggregation_function:
   element.
 - Returns a data type that represents the compound validation outcome
   (.e.g, one or more error scores).
-
 """
 
-def validate_ensemble_output(results_dir, validation_function, aggregation_function):
+"""
+***********
+SUGGESTIONS
+***********
+1) 'validate_ensemble_output' may not be a good name, this function will be 
+   used for verification as well, changed it to 'ensemble_vvp'
+2) 'validation_function': same comment, changed it to 'sample_testing_function',
+   being the opposite of 'aggregation_function', something that acts on a single sample only
+3) print("AVERAGED VALIDATION SCORE ...) line is removed
+4) added **kwargs in case the sample_testing/aggragation function takes more than the result_dir as argument
+5) added the possibility of multiple results_dirs
+6) added the possibility of hand-selecting selecting (a subset of) the sample directories via 'items' in kwargs 
+   !! This is also required if the order in which the scores are appended is important
+   since os.listdirs returns an illogical order
+"""
+
+def ensemble_vvp(results_dirs, sample_testing_function, aggregation_function, **kwargs):
     """
-    Goes through all the output directories and calculates the validation
-    scores.
+    Goes through all the output directories and calculates the scores.
     """
 
-    validation_scores = []
-    for item in os.listdir("{}".format(results_dir)):
-        print(item)
-        if os.path.isdir(os.path.join(results_dir, item)):
-            print(os.path.join(results_dir, item))
-            validation_scores.append(validation_function(os.path.join(results_dir, item)))
+    #if a single result_dir is specified, still add it to a list
+    if type(results_dirs) == str:
+        tmp = []; tmp.append(results_dirs); results_dirs = tmp
+        
+    for results_dir in results_dirs:    
 
-    print("scores:", validation_scores)
-    print("AVERAGED VALIDATION SCORE: {}".format(aggregation_function(validation_scores)))
-
-
+        scores = []
+        
+        #use user-specified sample directories if specified, 
+        #otherwise look for uq results in all directories in results_dir
+        if 'items' in kwargs:
+            items = kwargs['items']
+        else:
+            items = os.listdir("{}".format(results_dir))
+        
+        for item in items:
+            if os.path.isdir(os.path.join(results_dir, item)):
+                print(os.path.join(results_dir, item))
+                scores.append(sample_testing_function(os.path.join(results_dir, item), **kwargs))
+    
+        aggregation_function(scores, **kwargs)
