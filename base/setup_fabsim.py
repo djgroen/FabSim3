@@ -14,7 +14,7 @@ def install_plugin(name):
     config = yaml.load(
         open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
-        )
+    )
     info = config[name]
     plugin_dir = "%s/plugins" % (env.localroot)
     local("mkdir -p %s" % (plugin_dir))
@@ -39,7 +39,7 @@ def remove_plugin(name):
     config = yaml.load(
         open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
-        )
+    )
     info = config[name]
     plugin_dir = '{}/plugins'.format(env.localroot)
     local('rm -rf {}/{}'.format(plugin_dir, name))
@@ -49,19 +49,19 @@ def add_local_paths(module_name):
     # This variable encodes the default location for templates.
     env.local_templates_path.insert(
         0, "$localroot/plugins/%s/templates" % (module_name)
-        )
+    )
     # This variable encodes the default location for blackbox scripts.
     env.local_blackbox_path.insert(
         0, "$localroot/plugins/%s/blackbox" % (module_name)
-        )
+    )
     # This variable encodes the default location for Python scripts.
     env.local_python_path.insert(
         0, "$localroot/plugins/%s/python" % (module_name)
-        )
+    )
     # This variable encodes the default location for config files.
     env.local_config_file_path.insert(
         0, "$localroot/plugins/%s/config_files" % (module_name)
-        )
+    )
 
 
 def get_setup_fabsim_dirs_string():
@@ -74,7 +74,7 @@ def get_setup_fabsim_dirs_string():
     """
     return(
         'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
-        )
+    )
 
 
 @task
@@ -104,9 +104,9 @@ def setup_ssh_keys(password=""):
         local(
             "ssh-keygen -q -f %s/.ssh/id_rsa -t rsa -b 4096 -N \"%s\"" %
             (os.path.expanduser("~"), password)
-            )
+        )
     local(template("ssh-copy-id -i ~/.ssh/id_rsa.pub %s 2>ssh_copy_id.log"
-          % env.host_string))
+                   % env.host_string))
 
 
 @task
@@ -120,3 +120,30 @@ def setup_fabsim(password=""):
     # FabSim3 ships with FabDummy by default,
     # to provide a placeholder example for a plugin.
     install_plugin("FabDummy")
+
+
+@task
+def bash_alias(name=None):
+    if name is None:
+        print("the bash alias name is not set !!!")
+        print("the correct format is :")
+        print("\t\t\t fab %s bash_alias:<prefered_ash_alias_name>\n" %
+              (env.machine_name))
+        exit()
+
+    destname = os.path.join(env.localroot, 'bin', name)
+    content = script_template_content('bash_alias')
+
+    # save the file
+    target = open(destname, 'w')
+    target.write(content)
+    target.close()
+    # change file permission to be executable
+    local("chmod u+x %s" % (destname))
+
+    print("the alias name is set. so, you can use :\n")
+    print("\t\t\t %s ..." % (name))
+    print("\tinstead of :")
+    print("\t\t\t fab %s ..." % (env.machine_name))
+    print("\n\nNote: you need to reload your bashrc file or restart " +
+          "the shell to use the new alias name")
