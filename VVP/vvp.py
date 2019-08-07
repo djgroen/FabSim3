@@ -9,15 +9,14 @@ import os
 validate_ensemble_output Validation Pattern.
 
 Purpose: 
-1. given an ensemble of validation output directories, it will:
-2. operate a validation_function on each direction, and
+1. given an ensemble of validation/verification output directories, it will:
+2. operate a sample  testing function on each directory, and
 3. print the outputs to screen, and
-4. use an aggregation function to combine all outputs into a compound metric, 
-   and
-5. print the compound metric.
+4. use an aggregation function to combine all outputs into a compound metric.
+(printing needs to be done within the testing and aggregation functions themselves).
 
 
-SPECS of the required validation_function:
+SPECS of the required sample_testing_function:
 - Should operate with a single argument (the simulation output directory).
 - ASSUMPTION: There is no explicit argument to indicate where the validation 
   data resides (currently assumed to be packaged with the simulation output 
@@ -31,25 +30,17 @@ SPECS of the aggregation_function:
   (.e.g, one or more error scores).
 """
 
-"""
-***********
-SUGGESTIONS
-***********
-1) 'validate_ensemble_output' may not be a good name, this function will be 
-   used for verification as well, changed it to 'ensemble_vvp'
-2) 'validation_function': same comment, changed it to 'sample_testing_function',
-   being the opposite of 'aggregation_function', something that acts on a single sample only
-3) print("AVERAGED VALIDATION SCORE ...) line is removed
-4) added **kwargs in case the sample_testing/aggragation function takes more than the result_dir as argument
-5) added the possibility of multiple results_dirs
-6) added the possibility of hand-selecting selecting (a subset of) the sample directories via 'items' in kwargs 
-   !! This is also required if the order in which the scores are appended is important
-   since os.listdirs returns an illogical order
-"""
-
 def ensemble_vvp(results_dirs, sample_testing_function, aggregation_function, **kwargs):
     """
     Goes through all the output directories and calculates the scores.
+    Arguments:
+    - results_dirs: list of result dirs to analyse.
+    - sample_testing_function: analysis/validation/verification function to be
+    performed on each subdirectory of the results_dirs.
+    - aggregation_function: function to combine all results
+    - **kwargs: custom parameters. The 'items' parameter can be used to give
+    explicit ordering of the various subdirectories.
+    Authors: Derek Groen and Wouter Edeling
     """
 
     #if a single result_dir is specified, still add it to a list
