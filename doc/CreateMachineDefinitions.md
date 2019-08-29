@@ -53,3 +53,13 @@ archer:
 Please note that some connectivity settings are not explicitly exposed as FabSim3 environment variables, but are present in the env through the original fabric environment variables. An example of such a variable is `port`, which indicates the port that any SSH connection would rely on.
 
 A full list of fabric env variables can be found on www.fabfile.org, e.g. here: http://docs.fabfile.org/en/1.14/usage/env.html
+
+## Adding shortened commands for specific machines.
+
+Note: this has to be done for every user, as different people have different existing shell commands, and we want to avoid accidental conflicts.
+
+In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a `feh` command to use in place of `fab eagle_hidalgo`. Such aliases can help speed up the typing of interactive commands.
+
+To define an alias, simply type `fabsim <machine_name> bash_machine_alias:name=<name_of_alias>`. So, given the previous example, one could type `fabsim eagle_hidalgo bash_machine_alias:name=feh`.
+
+Aliases are stored in `$FabSim3/bin` and cannot be named `fabsim`, as that would break the main fabsim command.
