@@ -123,12 +123,17 @@ def setup_fabsim(password=""):
 
 
 @task
-def bash_alias(name=None):
+def bash_machine_alias(name=None):
     if name is None:
-        print("the bash alias name is not set !!!")
+        print("Error: the bash alias name (argument 'name') is not set.")
         print("the correct format is :")
         print("\t\t\t fab %s bash_alias:<prefered_ash_alias_name>\n" %
               (env.machine_name))
+        exit()
+
+    if name=='fabsim':
+        print("Error: cannot set a machine alias to 'fabsim', as this will")
+        print("overwrite the main fabsim command.")
         exit()
 
     destname = os.path.join(env.localroot, 'bin', name)
