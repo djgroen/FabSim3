@@ -62,3 +62,10 @@ def lammps(config,**args):
 * ```with_config()``` loads in input files into FabSim3.
 * ```execute(put_configs,config)``` copies the configuration information to the right directory at the remote resource.
 * On the last line, LAMMPS is run remotely (shown by ```script='lammps'), and the values of ```args``` are passed on to that function as well, overriding the default wall_time and memory specification on that line if the user has specified those variables explicitly already.
+
+## Accessing FabSim commands from Python scripts.
+
+To launch FabSim3 commands from Python scripts, we have established a basic Python API. This file can be found here:
+https://github.com/djgroen/FabSim3/blob/master/lib/fabsim3_cmd_api.py
+
+We recommend using this API rather than `os.system()` or `subprocess()` directly, as it will allow us to fix any emerging bugs in future versions for you.
