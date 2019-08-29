@@ -1,16 +1,16 @@
-#Collaborator status required
+#Anonymous cloning, publicly available
 FabMD:
   repository: https://github.com/UCL-CCS/FabMD.git
 
-#Collaborator status required
 FabFlee:
-  #repository: git@github.com:djgroen/FabFlee.git
   repository: https://github.com/djgroen/FabFlee.git
 
-#Anonymous cloning, publicly available
 FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
 
-#Collaborator status required: Plugin for stochastic collocation examples
 FabUQCampaign:
   repository: https://github.com/wedeling/FabUQCampaign.git
+
+#Collaborator status required (as a precaution, as this is in development)
+FabMUSCLE:
+  repository: git@github.com:djgroen/FabMUSCLE.git
