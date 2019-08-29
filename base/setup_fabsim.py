@@ -131,7 +131,7 @@ def bash_machine_alias(name=None):
               (env.machine_name))
         exit()
 
-    if name=='fabsim':
+    if name == 'fabsim':
         print("Error: cannot set a machine alias to 'fabsim', as this will")
         print("overwrite the main fabsim command.")
         exit()
