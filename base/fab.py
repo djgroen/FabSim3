@@ -645,7 +645,13 @@ def run_ensemble(config, sweep_dir, **args):
 
     sweep_length = 0  # number of runs performed in this sweep
 
-    for item in os.listdir(sweep_dir):
+    sweepdir_items = os.listdir(sweep_dir)
+
+    # reorder an exec_first item for priority execution.
+    if(hasattr(env, 'exec_first')):
+        sweepdir_items.insert(0, sweepdir_items.pop(sweepdir_items.index(env.exec_first)))
+
+    for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
             execute(put_configs, config)
