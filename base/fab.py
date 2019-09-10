@@ -649,7 +649,10 @@ def run_ensemble(config, sweep_dir, **args):
 
     # reorder an exec_first item for priority execution.
     if(hasattr(env, 'exec_first')):
-        sweepdir_items.insert(0, sweepdir_items.pop(sweepdir_items.index(env.exec_first)))
+        sweepdir_items.insert(
+            0, sweepdir_items.pop(
+                sweepdir_items.index(
+                    env.exec_first)))
 
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
