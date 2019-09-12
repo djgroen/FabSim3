@@ -108,3 +108,11 @@ For more advanced testing features, please refer to the FabDummy tutorial at htt
 ### Creating the relevant FabSim directories on a local or remote host
 
 1. Ensure that you have modified `machines_user.yml` to contain correct information for your target machine.
+
+### Auto bash-completion for fabsim
+
+To enable this option, please run `srouce fabric-completion.bash` on your FabSim3 directory, or you can add
+```
+source (path of your FabSim3 directory)/fabric-completion.bash
+```
+into your `$HOME/.bashrc` file to have enable it everytime that the shell is activated
