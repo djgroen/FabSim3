@@ -111,8 +111,8 @@ For more advanced testing features, please refer to the FabDummy tutorial at htt
 
 ### Auto bash-completion for fabsim
 
-To enable this option, please run `srouce fabsim-completion.bash` on your FabSim3 directory, or you can add
+To enable this option, please run `source fabsim-completion.bash` on your FabSim3 directory, or you can add
 ```
 source (path of your FabSim3 directory)/fabsim-completion.bash
 ```
-into your `$HOME/.bashrc` file to have enable it everytime that the shell is activated
+into your `$HOME/.bashrc` file to have enable it everytime that the shell is activated.
