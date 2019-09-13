@@ -36,6 +36,11 @@ the source code of that).
 
 For instructions on how to install and test FabSim, please refer to `INSTALL.md`.
 
+## Known issues
+
+* `fabsim3 -l` sorts commands but not the module list correctly.
+* The FabMUSCLE plugin does not yet work correctly with the Eagle Supercomputer.
+
 ### Citing FabSim
 
 Please find the BibTex reference below of our FabSim software paper in _Computer Physics Communications_:
