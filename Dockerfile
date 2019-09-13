@@ -42,7 +42,7 @@ RUN cd /usr/local/bin \
     && ln -s /usr/bin/python3 python \
     && pip3 install --upgrade pip \
     && pip install -U pip setuptools \
-    && pip install pyyaml numpy fabric3 cryptography==2.4.2
+    && pip install pyyaml numpy fabric3 cryptography==2.4.2 \
     && pip install easyvvuq muscle3
 
 
