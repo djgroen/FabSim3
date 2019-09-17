@@ -44,11 +44,11 @@ qcg:
   username: "<your-username>"
   flee_location: "$home_path/flee-release"
 
-slurm_vecma:
+eagle_vecma:
   username: "<your-username>"
   flee_location: "$home_path/flee-release"
 
-slurm_hidalgo:
+eagle_hidalgo:
   username: "<your-username>"
   flee_location: "$home_path/flee-release"
   

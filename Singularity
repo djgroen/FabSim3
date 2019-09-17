@@ -37,6 +37,7 @@ From: ubuntu:latest
     pip3 install --upgrade pip
     pip install -U pip setuptools
     pip install pyyaml numpy fabric3 cryptography==2.4.2
+    pip install easyvvuq muscle3
 
 
     # clean up    

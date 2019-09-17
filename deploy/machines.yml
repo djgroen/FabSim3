@@ -86,7 +86,7 @@ default:
   # Default location for config_files.
   local_config_file_path: ["$localroot/config_files"]
 
-  # Default command for python3
+  # Default command for Python3
   python3_command: "python3"
 
 cartesius:
