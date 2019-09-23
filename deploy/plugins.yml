@@ -10,6 +10,9 @@ FabDummy:
 
 FabUQCampaign:
   repository: https://github.com/wedeling/FabUQCampaign.git
+  
+FabChemShell:
+  repository: https://github.com/gh3orghiu/FabChemShell.git
 
 #Collaborator status required (as a precaution, as this is in development)
 FabMUSCLE:
