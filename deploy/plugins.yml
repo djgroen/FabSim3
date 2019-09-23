@@ -14,6 +14,9 @@ FabUQCampaign:
 FabChemShell:
   repository: https://github.com/gh3orghiu/FabChemShell.git
 
+FabSMD:
+  repository: https://github.com/potterton48/FabSMD.git
+
 #Collaborator status required (as a precaution, as this is in development)
 FabMUSCLE:
   repository: git@github.com:djgroen/FabMUSCLE.git
