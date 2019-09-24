@@ -414,6 +414,8 @@ def job(*option_dictionaries):
     Parameters for the job are determined from the prepared fabric environment
     Execute a generic job on the remote machine. Use hemelb, regress, or test
     instead.
+
+    Returns the name of the remote results directory.
     """
 
     # env.fabsim_git_hash = get_fabsim_git_hash()
@@ -574,6 +576,8 @@ def job(*option_dictionaries):
     if env.get("dumpenv", False) == "True":
         print("DUMPENV mode enabled. Dumping environment:")
         print(env)
+
+    return env.job_results
 
 
 @task
