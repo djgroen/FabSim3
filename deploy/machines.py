@@ -209,7 +209,7 @@ def complete_environment():
     module_commands = generate_module_commands(script=env.get("script", None))
     run_prefix_commands = env.run_prefix_commands[:]
     env.run_prefix = " && ".join(module_commands +
-                                 list(map(template, run_prefix_commands))) \
+                                 list(map(template, map(template, run_prefix_commands)))) \
         or 'echo Running...'
 
     if env.temp_path_template:

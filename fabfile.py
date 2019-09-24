@@ -13,13 +13,16 @@ from base.fab import *
 config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')), Loader=yaml.SafeLoader)
 for key in config.keys():
     plugin = {}
+    print(key)
     try:
         plugin = importlib.import_module('plugins.{}.{}'.format(key, key))
         plugin_dict = plugin.__dict__
         try:
             to_import = plugin.__all__
+            print("A")
         except AttributeError:
             to_import = [name for name in plugin_dict if not name.startswith('_')]
+            print("B")
         globals().update({name: plugin_dict[name] for name in to_import})
         env.localplugins[key] = os.path.join(env.localroot, 'plugins', key)
     except ImportError:
