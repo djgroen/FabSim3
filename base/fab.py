@@ -684,6 +684,24 @@ def run_ensemble(config, sweep_dir, **args):
         print("Sweep dir location: %s" % (sweep_dir))
 
 
+    elif (hasattr(env, 'PilotJob') and
+          env.PilotJob.lower() == 'true'
+          ):
+        env.submitted_jobs_list = ".".join(
+            ["\n\t" + str(i) for i in env.submitted_jobs_list])
+        env.batch_header = env.PJ_PYheader
+        job(dict(memory='2G', label='PJ_PYheader', NoEnvScript=True), args)
+        env.PJ_PATH = env.pather.join(
+            env.job_results, env.pather.basename(env.job_script))
+        env.PJ_FileName = env.pather.basename(env.job_script)
+        env.batch_header = env.PJ_header
+        env.submit_job = True
+        job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
+
+
+
+
+
 
 def input_to_range(arg, default):
     ttype = type(default)
