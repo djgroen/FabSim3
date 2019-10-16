@@ -20,3 +20,6 @@ FabSMD:
 #Collaborator status required (as a precaution, as this is in development)
 FabMUSCLE:
   repository: git@github.com:djgroen/FabMUSCLE.git
+
+FabProfile:
+  repository: https://github.com/NicolasMonnier/FabProfile.git
