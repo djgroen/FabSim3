@@ -420,8 +420,7 @@ def job(*option_dictionaries):
 
     # env.fabsim_git_hash = get_fabsim_git_hash()
 
-    env.submit_time = time.strftime('%Y%m%d%H%M%S')
-    time.sleep(0.5)
+    env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
 
