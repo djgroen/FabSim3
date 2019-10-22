@@ -87,7 +87,7 @@ def fake_sleep_job():
     print("This is a fake sleep job")
     time.sleep(1)
 
-def rsync_job(remote_adress='', remote_path='', filepath='', filename=''):
+def fabsim3_job(remote_adress='', remote_path='', filepath='', filename=''):
     """
     Job that simulate FabSim3 behaviour.
     Send files and execute few commands to the local and the remote machine.
@@ -134,11 +134,11 @@ if __name__ == '__main__':
 
     # Creation of the Worker 
     # ncpu correspond to the number of simultaneous thread you want to set
-    atp = ATP(ncpu=2)
+    atp = ATP(ncpu=1)
 
     for sample in range(nb_samples):
         filename = 'sample_' + str(sample)
-        atp.run_job(jobID=filename, handler=rsync_job, args=(remote_adress, remote_result_path, current_path, filename))
+        atp.run_job(jobID=filename, handler=fabsim3, args=(remote_adress, remote_result_path, current_path, filename))
 
 
     print("The jobs are running")
