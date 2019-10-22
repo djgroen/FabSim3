@@ -1,0 +1,12 @@
+#! /bin/bash
+
+#SBATCH --job-name=VECMA
+#SBATCH -p SKL-20c_edr-ib2_192gb_2666
+#SBATCH --exclusive
+#SBATCH -c 80
+#SBATCH -N 10 
+
+source /home_nfs_robin_ib/bmonniern/VECMA/build_PilotJobManager_gnu_8.2.0/env_bench
+
+python3 -m qcg.appscheduler.service --net &
+python3 $PJ_PATH
