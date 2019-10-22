@@ -218,7 +218,7 @@ def jobs_list(quiet=False, jobsID=None):
     return jobsInfo
 
 
-def save_submitted_job_info():
+def save_submitted_job_info(jobID=''):
     """
         this function save the jobID for the just-submitted task
     """
@@ -243,7 +243,11 @@ def save_submitted_job_info():
         f = open(os.path.join(env.local_jobsDB_path,
                               env.local_jobsDB_filename), "a")
 
+
+
+    """
     # 3) retrieves jobID for the last submitted job on the remote machine
+
     jobsInfo = jobs_list(quiet=True)
     lastTask = {list(jobsInfo.keys())[-1]: jobsInfo[list(jobsInfo.keys())[-1]]}
     JobID = list(lastTask.keys())[0]
@@ -252,6 +256,11 @@ def save_submitted_job_info():
 
     # 4) add the jobID into local_jobsDB_filename
     f.write("%-30s \t %-15s \t %-15s\n" % (JobID, status, host))
+    f.close()
+    """
+
+    # 3) Add the jobID into local_jobsDB_filename (and only the jobID)
+    f.write("%-30s \n" %jobID)
     f.close()
 
 

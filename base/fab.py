@@ -536,6 +536,8 @@ def job(*option_dictionaries):
 
             # Allow option to submit all preparations, but not actually submit
             # the job
+
+            job_info = ''
             if hasattr(env, 'dispatch_jobs_on_localhost') and \
                     isinstance(env.dispatch_jobs_on_localhost, bool) and \
                     env.dispatch_jobs_on_localhost:
@@ -554,13 +556,11 @@ def job(*option_dictionaries):
             elif not env.get("noexec", False):
                 with cd(env.job_results):
                     with prefix(env.run_prefix):
-                        run(template("$job_dispatch $dest_name"))
+                        run_stdout = run(template("$job_dispatch $dest_name")) # run_stdout is a string : "Running... dispatch batch job XXXXX" Work on genji
+                        job_info = run_stdout.split()[4]                # Get the sbatch jobID 
 
             if env.remote != 'localhost':
-                # wait a little bit before fetching the jobID for the
-                # just-submitted task
-                time.sleep(5)
-                save_submitted_job_info()
+                save_submitted_job_info(jobID=job_info)
                 print("jobID is stored into : %s\n" % (os.path.join(
                     env.local_jobsDB_path, env.local_jobsDB_filename)))
 
