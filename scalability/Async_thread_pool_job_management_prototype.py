@@ -7,7 +7,7 @@ import time
 from fabric.contrib.project import *
 from fabric.api import settings
 from fabric.operations import *
-
+from fabric.api import env, run, task
 
 class ClassTimeIt():
     """
@@ -87,10 +87,11 @@ def fake_sleep_job():
     print("This is a fake sleep job")
     time.sleep(1)
 
-def fabsim3_job(remote_adress='', remote_path='', filepath='', filename=''):
+def fabsim3_job(remote_port='', remote_adress='', remote_path='', filepath='', filename=''):
     """
     Job that simulate FabSim3 behaviour.
     Send files and execute few commands to the local and the remote machine.
+    Start to send a ~1MB file 
     Args:
         remote_port     : ssh port of the remote machine (eg. 22)
         remote_adress   : adress of the remote machine (eg. nicolasmonnier@adress.of.my.remote.fr)
@@ -107,7 +108,7 @@ def fabsim3_job(remote_adress='', remote_path='', filepath='', filename=''):
 
     # Transfert file to the remote
     local(
-            "rsync -pthrvz  --rsh='ssh  -p 8522  ' %s/%s %s%s" %(filepath, filename, remote_adress, remote_path)
+            "rsync -pthrvz  --rsh='ssh  -p %s  ' %s/%s %s:%s" %(remote_port, filepath, filename, remote_adress, remote_path)
         )
 
 
@@ -118,18 +119,23 @@ if __name__ == '__main__':
 
     nb_samples = 10
     current_path = '/home/nicolas/scalab_dev/FabSim3/scalability' 
+
     remote_result_path = '/home_nfs_robin_ib/bmonniern/utils/'
-    remote_adress = 'bmonniern@castle.frec.bull.fr:'
-   
+    remote_adress = 'username@remote_adress.fr'
+    remote_port = 2222 
+
+
+    env.hosts = ['%s:%s' %(remote_adress, str(remote_port))] 
+    env.host_string = '%s:%s' %(remote_adress,str(remote_port))
+    run(
+        'mkdir /home_nfs_robin_ib/bmonniern/utils/test_dir_2'
+    )
 
     # Creation (if not exist) of the files to send to the remote 
     for sample in range(nb_samples):
         filename = 'sample_' + str(sample)
         if not os.path.isfile(os.path.join(current_path, filename)):
             os.system('dd if=/dev/urandom of=%s count=2500' %(os.path.join(current_path,filename)))
-            #f = open(os.path.join(current_path, filename), 'w')
-            #f.write("Im the sample number %d"%sample)            
-            #f.close()
     
 
     # Creation of the Worker 
@@ -138,7 +144,7 @@ if __name__ == '__main__':
 
     for sample in range(nb_samples):
         filename = 'sample_' + str(sample)
-        atp.run_job(jobID=filename, handler=fabsim3, args=(remote_adress, remote_result_path, current_path, filename))
+        atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_result_path, current_path, filename))
 
 
     print("The jobs are running")
@@ -147,4 +153,3 @@ if __name__ == '__main__':
     Timer.timeit()
     
 
-#rsync ./cycler-0.10.0.tar.gz  bmonniern@castle.frec.bull.fr:9922:/home_nfs_robin_ib/bmonniern/utils/
