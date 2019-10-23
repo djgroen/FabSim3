@@ -60,8 +60,8 @@ class ATP:
             serial  : Serial mode (not implemented yet) 
         """
         fn = self.job_executor.submit(handler, *args, **kwargs)
-        #self.remote_jobs[jobID] = fn
-        self.remote_jobs[self.counter] = fn
+        self.remote_jobs[jobID] = fn
+        #self.remote_jobs[self.counter] = fn
         self.jobs_ID[self.counter] = jobID
         self.counter += 1
 
@@ -106,10 +106,26 @@ def fabsim3_job(remote_port='', remote_adress='', remote_path='', filepath='', f
     if remote_adress == '':
         raise OSError('Error: remote machine is not defined')
 
+    
+
     # Transfert file to the remote
     local(
             "rsync -pthrvz  --rsh='ssh  -p %s  ' %s/%s %s:%s" %(remote_port, filepath, filename, remote_adress, remote_path)
         )
+    # TODO 
+    # To simulate the behavior of FS3, Remotely create a folder specific of the job, then rsync a bash file, copy bash file & the previous file in the folder, Execute the bash file via slurm
+
+    run(
+        'mkdir -p /home_nfs_robin_ib/bmonniern/utils/results/d1 && rsync -av --progress /home_nfs_robin_ib/bmonniern/utils/config /home_nfs_robin_ib/bmonniern/utils/results/d1 --exclude SWEEP && cp /home_nfs_robin_ib/bmonniern/utils/script/fask_script.sh /home_nfs_robin_ib/bmonniern/utils/results/d1'
+    )
+    run(
+        ' cp -r /home_nfs_robin_ib/bmonniern/utils/config/d1/* home_nfs_robin_ib/bmonniern/utils/results/d1/'
+    )
+    run(
+        'sbatch /home_nfs_robin_ib/bmonniern/utils/config/d1/fake_script.sh'
+    )
+
+
 
 
 if __name__ == '__main__':
@@ -120,22 +136,46 @@ if __name__ == '__main__':
     nb_samples = 10
     current_path = '/home/nicolas/scalab_dev/FabSim3/scalability' 
 
-    remote_result_path = '/home_nfs_robin_ib/bmonniern/utils/'
-    remote_adress = 'username@remote_adress.fr'
+    remote_path_config = '/home_nfs_robin_ib/bmonniern/utils/config'
+    remote_path_results = '/home_nfs_robin_ib/bmonniern/utils/results'
+    remote_path_script = '/home_nfs_robin_ib/bmonniern/utils/script'
+    remote_adress = 'username@adress.fr'
     remote_port = 2222 
 
 
     env.hosts = ['%s:%s' %(remote_adress, str(remote_port))] 
     env.host_string = '%s:%s' %(remote_adress,str(remote_port))
-    run(
-        'mkdir /home_nfs_robin_ib/bmonniern/utils/test_dir_2'
-    )
+    #run(
+    #    'mkdir -p /home_nfs_robin_ib/bmonniern/utils/test_dir_2'
+    #)
 
-    # Creation (if not exist) of the files to send to the remote 
+    # Creation of the SWEEP dir if not exists
+    import os
+    if not os.path.exists(os.path.join(current_path, 'SWEEP')):
+        os.system('mkdir -p %s' %os.path.join(current_path, 'SWEEP'))
+    current_path = os.path.join(current_path, 'SWEEP')
+
+    # Creation (if not exist) of the files and dirs to send to the remote 
     for sample in range(nb_samples):
+        dirname = 'd' + str(sample)
+        if not os.path.isdir(os.path.join(current_path, dirname)):
+            os.system('mkdir -p %s' %os.path.join(current_path, dirname))
+
         filename = 'sample_' + str(sample)
         if not os.path.isfile(os.path.join(current_path, filename)):
             os.system('dd if=/dev/urandom of=%s count=2500' %(os.path.join(current_path,filename)))
+    
+
+
+
+    #####################
+    # FabSim3 behaviour #
+    #####################
+    
+    # Like FS3, Start to send all the SWEEP dir to the remote --> This perf depends on rsync mechanisms && internet connexion
+    local(
+            "rsync -pthrvz  --rsh='ssh  -p %s  ' %s %s:%s" %(remote_port, current_path, remote_adress, remote_path)
+        )
     
 
     # Creation of the Worker 
@@ -144,12 +184,10 @@ if __name__ == '__main__':
 
     for sample in range(nb_samples):
         filename = 'sample_' + str(sample)
-        atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_result_path, current_path, filename))
+        atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_path, current_path, filename))
 
 
     print("The jobs are running")
     atp.awaitJobOver() # Wait for all jobs to be done
     
     Timer.timeit()
-    
-
