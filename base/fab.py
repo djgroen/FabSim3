@@ -408,7 +408,7 @@ def removekey(d, key):
     return r
 
 
-def job(*option_dictionaries):
+def job(*option_dictionaries, sweep_length=1):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
@@ -482,7 +482,11 @@ def job(*option_dictionaries):
                 env.scripts_path,
                 env.pather.basename(env.job_script))
 
-            put(env.job_script, env.dest_name)
+            # DEBUG --> +1
+            #print("[DEBUG] This is put jobs_script to dest_name")
+            if sweep_length == 1:
+                put(env.job_script, env.dest_name)
+            #print("[DEBUG] THis is the end of put")
 
             # Store previous fab commands in bash history.
             # env.fabsim_command_history = get_fabsim_command_history()
@@ -660,11 +664,15 @@ def run_ensemble(config, sweep_dir, **args):
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
-            execute(put_configs, config)
+            #print("[DEBUG] This is put_configs")
+            # It's only necessary to do that for the first iteration
+            if sweep_length == 1:
+                execute(put_configs, config)
+            #print("[DEBUG] This is the end of put_configs")
             job(dict(memory='2G',
                      ensemble_mode=True,
                      label=item),
-                args)
+                args, sweep_length=sweep_length)
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
