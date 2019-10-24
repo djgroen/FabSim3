@@ -133,21 +133,22 @@ if __name__ == '__main__':
 
     Timer = ClassTimeIt(name="Timer")
 
+    
+    # Setting variables 
     nb_samples = 10
     current_path = '/home/nicolas/scalab_dev/FabSim3/scalability' 
 
+    # This directories must be created on the cluster by hand
     remote_path_config = '/home_nfs_robin_ib/bmonniern/utils/config'
     remote_path_results = '/home_nfs_robin_ib/bmonniern/utils/results'
     remote_path_script = '/home_nfs_robin_ib/bmonniern/utils/script'
     remote_adress = 'username@adress.fr'
     remote_port = 2222 
 
-
+    # setting env.* for fabric remote
     env.hosts = ['%s:%s' %(remote_adress, str(remote_port))] 
     env.host_string = '%s:%s' %(remote_adress,str(remote_port))
-    #run(
-    #    'mkdir -p /home_nfs_robin_ib/bmonniern/utils/test_dir_2'
-    #)
+
 
     # Creation of the SWEEP dir if not exists
     import os
@@ -160,12 +161,13 @@ if __name__ == '__main__':
         dirname = 'd' + str(sample)
         if not os.path.isdir(os.path.join(current_path, dirname)):
             os.system('mkdir -p %s' %os.path.join(current_path, dirname))
-
-        filename = 'sample_' + str(sample)
-        if not os.path.isfile(os.path.join(current_path, filename)):
-            os.system('dd if=/dev/urandom of=%s count=2500' %(os.path.join(current_path,filename)))
+        with cd("%s/%s" %(current_path, dirname)):
+            filename = 'sample_' + str(sample)
+            if not os.path.isfile(os.path.join(current_path, filename)):
+                os.system('dd if=/dev/urandom of=%s count=2500' %(os.path.join(current_path,filename)))
     
-
+    for directo in os.listdir(current_path):
+        print(directo)
 
 
     #####################
@@ -174,7 +176,7 @@ if __name__ == '__main__':
     
     # Like FS3, Start to send all the SWEEP dir to the remote --> This perf depends on rsync mechanisms && internet connexion
     local(
-            "rsync -pthrvz  --rsh='ssh  -p %s  ' %s %s:%s" %(remote_port, current_path, remote_adress, remote_path)
+            "rsync -pthrvz  --rsh='ssh  -p %s  ' %s %s:%s" %(remote_port, current_path, remote_adress, remote_path_config)
         )
     
 
@@ -182,7 +184,7 @@ if __name__ == '__main__':
     # ncpu correspond to the number of simultaneous thread you want to set
     atp = ATP(ncpu=1)
 
-    for sample in range(nb_samples):
+    for ite, dire in current_dir:
         filename = 'sample_' + str(sample)
         atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_path, current_path, filename))
 
