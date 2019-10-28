@@ -9,6 +9,11 @@ from fabric.api import settings
 from fabric.operations import *
 from fabric.api import env, run, task
 
+#import asyncio
+from threading import Lock
+
+mutex = Lock()
+
 class ClassTimeIt():
     """
         Class Timer, very useful to time some functions or more.
@@ -88,7 +93,7 @@ def fake_sleep_job():
     print("This is a fake sleep job")
     time.sleep(1)
 
-def fabsim3_job(remote_port='', remote_adress='', remote_path_config='', remote_path_script='', remote_path_results='', job_dir=''):
+def fabsim3_job(remote_port='', remote_adress='', remote_path_config='', remote_path_script='', remote_path_results='', job_dir='', *superdict):
     """
     Job that simulate FabSim3 behaviour.
     Send files and execute few commands to the local and the remote machine.
@@ -116,15 +121,17 @@ def fabsim3_job(remote_port='', remote_adress='', remote_path_config='', remote_
     # TODO 
     # To simulate the behavior of FS3, Remotely create a folder specific of the job, then rsync a bash file, copy bash file & the previous file in the folder, Execute the bash file via slurm
 
-
+    print("[DEBUG]")
+    print((*superdict))
+    print("Remote port = %s"%remote_port)
     run(
-        'mkdir -p /home_nfs_robin_ib/bmonniern/utils/results/RUNS/%s && rsync -av --progress /home_nfs_robin_ib/bmonniern/utils/config/* /home_nfs_robin_ib/bmonniern/utils/results/RUNS/%s --exclude SWEEP && cp /home_nfs_robin_ib/bmonniern/utils/script/fake_script.sh /home_nfs_robin_ib/bmonniern/utils/results/RUNS/%s' %(job_dir, job_dir, job_dir)
+        'mkdir -p %s/RUNS/%s && rsync -av --progress %s/* %s/RUNS/%s --exclude SWEEP && cp %s/fake_script.sh %s/RUNS/%s' %(remote_path_results, job_dir, remote_path_config, remote_path_results, job_dir, remote_path_script, remote_path_results, job_dir)
     )
     run(
-        ' cp -r /home_nfs_robin_ib/bmonniern/utils/config/SWEEP/%s/* /home_nfs_robin_ib/bmonniern/utils/results/RUNS/%s/' %(job_dir, job_dir)
+        ' cp -r %s/SWEEP/%s/* %s/RUNS/%s/' %(remote_path_config, job_dir, remote_path_results, job_dir)
     )
     run(
-        'sbatch /home_nfs_robin_ib/bmonniern/utils/results/RUNS/%s/fake_script.sh'%(job_dir)
+        'sbatch %s/RUNS/%s/fake_script.sh'%(remote_path_results, job_dir)
     )
 
     
@@ -134,10 +141,9 @@ if __name__ == '__main__':
     print("Testing worker management protoype")
 
     Timer = ClassTimeIt(name="Timer")
-
     
     # Setting variables 
-    nb_samples = 30
+    nb_samples = 3
     current_path = '/home/nicolas/scalab_dev/FabSim3/scalability' 
     script_path = '/home/nicolas/scalab_dev/FabSim3/scalability/fake_script.sh'
 
@@ -196,12 +202,16 @@ if __name__ == '__main__':
 
     # Creation of the Worker 
     # ncpu correspond to the number of simultaneous thread you want to set
-    atp = ATP(ncpu=15)
+    atp = ATP(ncpu=1)
+
+
+
 
     for job_dir in list_job_dir:
         print(job_dir)
         filename = 'sample_' + str(sample)
-        atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_path_config, remote_path_script, remote_path_results, job_dir))
+        tmp_dict = dict(test1=1, test2=3)
+        atp.run_job(jobID=filename, handler=fabsim3_job, args=(str(remote_port), remote_adress, remote_path_config, remote_path_script, remote_path_results, job_dir, tmp_dict))
 
     print("The jobs are running")
     atp.awaitJobOver() # Wait for all jobs to be done

@@ -27,6 +27,7 @@ from pprint import PrettyPrinter
 from pathlib import Path
 pp = PrettyPrinter()
 
+import base.AsyncThreadingPool
 
 def get_plugin_path(name, quiet=False):
     """
@@ -408,7 +409,7 @@ def removekey(d, key):
     return r
 
 
-def job(*option_dictionaries, sweep_length=1):
+def job(sweep_length=1, *option_dictionaries):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
@@ -424,6 +425,7 @@ def job(*option_dictionaries, sweep_length=1):
     env.ensemble_mode = False  # setting a default before reading in args.
     update_environment(*option_dictionaries)
 
+    print("[DEBUG] thread is here 1")
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
     if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
@@ -485,6 +487,8 @@ def job(*option_dictionaries, sweep_length=1):
             if sweep_length == 1:
                 put(env.job_script, env.dest_name)
 
+            print("[DEBUG] thread is here 2")
+
             # Store previous fab commands in bash history.
             # env.fabsim_command_history = get_fabsim_command_history()
 
@@ -498,6 +502,8 @@ def job(*option_dictionaries, sweep_length=1):
                 )
             )
 
+            print("[DEBUG] thread is here 3")
+
             # In ensemble mode, also add run-specific file to the results dir.
             if env.ensemble_mode:
                 run(
@@ -506,7 +512,7 @@ def job(*option_dictionaries, sweep_length=1):
                         $job_config_path/SWEEP/$label/* $job_results/"
                     )
                 )
-
+            print("[DEBUG] thread is here 4")
             try:
                 del env["passwords"]
             except KeyError:
@@ -522,7 +528,8 @@ def job(*option_dictionaries, sweep_length=1):
                 )
                 tempf.flush()  # Flush the file before we copy it.
                 put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
-
+            
+            print("[DEBUG] thread is here 4")
             run(template("chmod u+x $dest_name"))
 
             # check for PilotJob option is true, DO NOT submit the job directly
@@ -532,6 +539,7 @@ def job(*option_dictionaries, sweep_length=1):
                     env.submit_job is False):
                 return
 
+            print("[DEBUG] thread is here 5")
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
                 return
 
@@ -658,18 +666,29 @@ def run_ensemble(config, sweep_dir, **args):
                 sweepdir_items.index(
                     env.exec_first)))
 
+
+    atp = base.AsyncThreadingPool.ATP(ncpu=2)
+
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
+            # The first iteration will create folders to the remote and launch sequentialy the first job
             if sweep_length == 1:
                 execute(put_configs, config)
 
-            job(dict(memory='2G',
-                     ensemble_mode=True,
-                     label=item),
-                args, sweep_length=sweep_length)
+                job(sweep_length,
+                         dict(memory='2G',
+                         ensemble_mode=True,
+                         label=item))
+
+            # All the other iteration will launch parallel jobs
+            else:
+                print(" Start multi threading job")
+                atp.run_job(jobID=sweep_length, handler=job, args=(sweep_length, dict(memory='2G', ensemble_mode=True, label=item)))
+
+
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
@@ -680,13 +699,13 @@ def run_ensemble(config, sweep_dir, **args):
                 env.submitted_jobs_list.append(
                     script_template_content('qcg-PJ-task-template'))
 
+
     if sweep_length == 0:
         print(
             "ERROR: no files where found in the sweep_dir of this\
             run_ensemble command."
         )
         print("Sweep dir location: %s" % (sweep_dir))
-
 
     elif (hasattr(env, 'PilotJob') and
           env.PilotJob.lower() == 'true'
@@ -702,7 +721,7 @@ def run_ensemble(config, sweep_dir, **args):
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
 
-
+    atp.awaitJobOver() # Wait for all jobs to be done
 
 
 
