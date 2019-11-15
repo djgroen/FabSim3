@@ -29,6 +29,13 @@ pp = PrettyPrinter()
 
 import base.AsyncThreadingPool
 
+from threading import Lock
+
+mutex = Lock()
+mutex_template = Lock()
+mutex_env = Lock()
+mutex_complete = Lock()
+
 def get_plugin_path(name, quiet=False):
     """
     Get the local base path of plugin <name>.
@@ -61,6 +68,11 @@ def with_template_job(ensemble_mode=False):
     Determine a generated job name from environment parameters,
     and then define additional environment parameters based on it.
     """
+    # The name is now depending of the label name!
+    ###if ensemble_mode is False:
+    ###    name = template(env.job_name_template)
+    ###else:
+    ###    name = template(env.job_name_template) + '_' + env.label
     name = template(env.job_name_template)
     if env.get('label') and not ensemble_mode:
         name = '_'.join((env['label'], name))
@@ -87,6 +99,10 @@ def with_job(name, ensemble_mode=False):
             env.local_results, name), env.label)
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
+
+    # Redefine the job name depending of the label name for ensemble run
+    # Need to be condition of ensemble run
+    env.job_name_template_sh = "%s_%s.sh"%(name, env.label)
 
 
 def with_template_config():
@@ -423,9 +439,14 @@ def job(sweep_length=1, *option_dictionaries):
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
-    update_environment(*option_dictionaries)
+    update_environment(*option_dictionaries) #  DEBUG add label, mem, core to env. 
 
-    print("[DEBUG] thread is here 1")
+    # Save label as local variable since env.label is overwritten by the other threads !
+    label = ''
+    if sweep_length > 1:
+        if 'label' in option_dictionaries[0]:
+            label = option_dictionaries[0]['label']
+
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
     if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
@@ -441,9 +462,29 @@ def job(sweep_length=1, *option_dictionaries):
         # Make sure that prefix and module load definitions are properly
         # updated.
         for i in range(1, int(env.replicas) + 1):
+            with_template_job(env.ensemble_mode) # DEBUG set important path to env (gloabl variable) --> must be reset on local set then reset on gloab for the env.yml file 
+            """  
+            eg.
+            Reserve_mutex()
+            do :
+                with_template_job(env.ensemble_mode)
+                job_results = env.job_results
+                job_results_local = env.job_results_local
+            drop_mutex()
 
-            with_template_job(env.ensemble_mode)
+            Then all the next reference to these env.variables must be replace by the local one
+            """
+            mutex.acquire()
+            try:
+                with_template_job(env.ensemble_mode)
+                job_results = env.job_results
+                job_results_local = env.job_results_local
+            finally:
+                mutex.release()
 
+
+ 
+            # DEBUG all those env.XX must be replace later !
             if int(env.replicas) > 1:
                 if env.ensemble_mode is False:
                     update_environment({
@@ -460,7 +501,9 @@ def job(sweep_length=1, *option_dictionaries):
                         'job_results_contents_local':
                         env.job_results_contents_local + '_' + str(i)})
 
+
             complete_environment()
+
             calc_nodes()
 
             if env.node_type:
@@ -469,50 +512,67 @@ def job(sweep_length=1, *option_dictionaries):
 
             env['job_name'] = env.name[0:env.max_job_name_chars]
 
+
             with settings(cores=1):
                 calc_nodes()
                 env.run_command_one_proc = template(env.run_command)
             calc_nodes()
             env.run_command = template(env.run_command)
 
-            if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
-                env.job_script = script_templates(env.batch_header)
-            else:
-                env.job_script = script_templates(env.batch_header, env.script)
+            # Mutex are used here to temporary set global variable that will be used to create env.dest_name.
+            # env.dest_name is save as a local variable 
+            # The script name is now depending of the job label --> Create N script for N jobs
+            mutex_template.acquire()
+            try:
+                env.label = label
+                env.job_results = job_results
+                env.job_results_local = job_results_local
+                if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
+                    env.job_script = script_templates(env.batch_header)
+                else:
+                    env.job_script = script_templates(env.batch_header, env.script)
 
-            env.dest_name = env.pather.join(
-                env.scripts_path,
-                env.pather.basename(env.job_script))
+                env.dest_name = env.pather.join(
+                                env.scripts_path,
+                                env.pather.basename(env.job_script))
+                dest_name = env.dest_name
+            finally:
+                mutex_template.release()
 
-            if sweep_length == 1:
-                put(env.job_script, env.dest_name)
+            #if sweep_length == 1:
+            #put(env.job_script, env.dest_name)
+            put(env.job_script, dest_name)
 
-            print("[DEBUG] thread is here 2")
 
             # Store previous fab commands in bash history.
             # env.fabsim_command_history = get_fabsim_command_history()
 
             # Make directory, copy input files and job script to results
             # directory
+            
             run(
                 template(
-                    "mkdir -p $job_results && rsync -av --progress \
-                    $job_config_path/* $job_results/ --exclude SWEEP && \
-                    cp $dest_name $job_results"
+                    "mkdir -p %s" %job_results
                 )
             )
 
-            print("[DEBUG] thread is here 3")
+            run(
+                template(
+                    "mkdir -p %s && rsync -av --progress \
+                    $job_config_path/* %s/ --exclude SWEEP && \
+                    cp %s %s"%(job_results, job_results, dest_name, job_results)
+                )
+            )
+
 
             # In ensemble mode, also add run-specific file to the results dir.
             if env.ensemble_mode:
                 run(
                     template(
                         "cp -r \
-                        $job_config_path/SWEEP/$label/* $job_results/"
+                        $job_config_path/SWEEP/%s/* %s/" %(label, job_results)
                     )
                 )
-            print("[DEBUG] thread is here 4")
             try:
                 del env["passwords"]
             except KeyError:
@@ -527,10 +587,9 @@ def job(sweep_length=1, *option_dictionaries):
                     yaml.dump(dict(env))
                 )
                 tempf.flush()  # Flush the file before we copy it.
-                put(tempf.name, env.pather.join(env.job_results, 'env.yml'))
+                put(tempf.name, env.pather.join(job_results, 'env.yml'))
             
-            print("[DEBUG] thread is here 4")
-            run(template("chmod u+x $dest_name"))
+            run(template("chmod u+x %s"%dest_name))
 
             # check for PilotJob option is true, DO NOT submit the job directly
             # , only submit PJ script
@@ -539,7 +598,6 @@ def job(sweep_length=1, *option_dictionaries):
                     env.submit_job is False):
                 return
 
-            print("[DEBUG] thread is here 5")
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
                 return
 
@@ -563,18 +621,29 @@ def job(sweep_length=1, *option_dictionaries):
                 '''
 
             elif not env.get("noexec", False):
-                with cd(env.job_results):
+                with cd(job_results):
                     with prefix(env.run_prefix):
-                        run_stdout = run(template("$job_dispatch $dest_name")) # run_stdout is a string : "Running... dispatch batch job XXXXX" Work on genji
-                        job_info = run_stdout.split()[4]                # Get the sbatch jobID 
+                        run_stdout = run(template("$job_dispatch %s"%dest_name)) # run_stdout is a string : "Running... dispatch batch job XXXXX" Work on genji
+                        job_info = run_stdout.split()[3]                # Get the sbatch jobID 
 
             if env.remote != 'localhost':
+                """
+                # Since the jobs can be launch simultenaously, the jobID 's file is protected by a mutex to prevent concurrent writting
+                mutex.acquire()
+                try:
+                    save_submitted_job_info(jobID=job_info)
+                finally:
+                    mutex.release()
+                """
                 save_submitted_job_info(jobID=job_info)
+
+
+
                 print("jobID is stored into : %s\n" % (os.path.join(
                     env.local_jobsDB_path, env.local_jobsDB_filename)))
 
             print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
-                  (env.remote, env.job_results)
+                  (env.remote, job_results)
                   )
 
         print("Use `fab %s fetch_results` to copy the results back to %s on\
@@ -585,7 +654,7 @@ def job(sweep_length=1, *option_dictionaries):
         print("DUMPENV mode enabled. Dumping environment:")
         print(env)
 
-    return env.job_results
+    return job_results
 
 
 @task
@@ -640,15 +709,16 @@ def run_ensemble(config, sweep_dir, **args):
             wall_time : wall-time job limit
             memory : memory per node
     """
+    print("111")
     update_environment(args)
-
+    print("222")
     if "script" not in env:
         print("ERROR: run_ensemble function has been called,\
                but the parameter 'script' was not specified.")
         sys.exit()
 
     with_config(config)
-
+    print("333")
     # check for PilotJob option
     if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
         # env.batch_header = "no_batch"
