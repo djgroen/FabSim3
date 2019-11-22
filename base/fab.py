@@ -736,7 +736,7 @@ def run_ensemble(config, sweep_dir, **args):
                     env.exec_first)))
 
 
-    atp = base.AsyncThreadingPool.ATP(ncpu=1)
+    atp = base.AsyncThreadingPool.ATP(ncpu=env.nb_thread)
 
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
