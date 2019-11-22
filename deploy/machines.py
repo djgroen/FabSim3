@@ -77,6 +77,7 @@ env.local_jobsDB_path = os.path.join(env.localroot, 'deploy', '.jobsDB')
 env.local_jobsDB_filename = 'jobsDB.txt'
 env.replicas = 1
 
+
 def generate_module_commands(script=None):
     # Not using get as I want this to crash if the all key does not exist (it
     # should always be present).
@@ -98,6 +99,7 @@ def generate_module_commands(script=None):
         print("SCRIPT: ", script)
     # print("MODULE COMMANDS: ", module_commands)
     return module_commands
+
 
 module_commands = generate_module_commands()
 env.run_prefix = " && ".join(module_commands +
@@ -210,9 +212,9 @@ def complete_environment():
     run_prefix_commands = env.run_prefix_commands[:]
     env.run_prefix = " && ".join(module_commands +
                                  list(map(template, map(template, run_prefix_commands)))) \
-            or '/bin/true'
-            # This echo is commented because can cause problem for slurmID saving
-            #or 'echo The Running...'
+        or '/bin/true'
+    # This echo is commented because can cause problem for slurmID saving
+    # or 'echo The Running...'
 
     if env.temp_path_template:
         env.temp_path = template(env.temp_path_template)

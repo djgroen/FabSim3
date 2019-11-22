@@ -3,14 +3,16 @@ import concurrent.futures
 import traceback
 
 # Asynchronous Threads Pool Class
+
+
 class ATP:
     def __init__(self, ncpu=1):
         self.ncpu = ncpu
-        self.job_executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.ncpu)
+        self.job_executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=self.ncpu)
         self.remote_jobs = {}
         self.jobs_ID = {}
         self.counter = 0
-
 
     def run_job(self, jobID, handler, counter=False, serial=False, args=(), **kwargs):
         """
@@ -35,12 +37,11 @@ class ATP:
         jobs = []
         jobs_id = []
 
-
     def awaitJobOver(self):
         """
         Wait for all the jobs to be done.            
         """
         #print([self.remote_jobs[jobID] for jobID in range(self.counter)])
-        concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
+        concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
+            self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
         print("All threads are over")
-

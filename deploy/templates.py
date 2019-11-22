@@ -37,13 +37,13 @@ def script_template_content(template_name):
 
 
 def script_template_save_temporary(content):
-    run_ensemble=True
+    run_ensemble = True
 
     # script name is now depending of the label name to avoid problem with multithreading
     # TODO Add an exception for single job ?
     if run_ensemble is True:
         destname = os.path.join(env.localroot, 'deploy',
-                                '.jobscripts', env['name'] + 
+                                '.jobscripts', env['name'] +
                                 '_' + env.label + '.sh')
     else:
         destname = os.path.join(env.localroot, 'deploy',
