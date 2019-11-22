@@ -402,7 +402,6 @@ eagle_hidalgo:
 genji: 
   home_path_template: "/home_nfs_robin_ib/$username/$project"
   runtime_path_template: "/home_nfs_robin_ib/$username/$project"
-  port: 8522
   batch_header: slurm-genji
   job_name: "VECMA"
   run_command: "mpiexec.hydra -n $cores"

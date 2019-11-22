@@ -709,16 +709,15 @@ def run_ensemble(config, sweep_dir, **args):
             wall_time : wall-time job limit
             memory : memory per node
     """
-    print("111")
     update_environment(args)
-    print("222")
+
     if "script" not in env:
         print("ERROR: run_ensemble function has been called,\
                but the parameter 'script' was not specified.")
         sys.exit()
 
     with_config(config)
-    print("333")
+
     # check for PilotJob option
     if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
         # env.batch_header = "no_batch"
@@ -737,7 +736,7 @@ def run_ensemble(config, sweep_dir, **args):
                     env.exec_first)))
 
 
-    atp = base.AsyncThreadingPool.ATP(ncpu=2)
+    atp = base.AsyncThreadingPool.ATP(ncpu=1)
 
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
