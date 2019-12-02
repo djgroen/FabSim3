@@ -102,7 +102,16 @@ def with_job(name, ensemble_mode=False):
 
     # Redefine the job name depending of the label name for ensemble run
     # Need to be condition of ensemble run
-    env.job_name_template_sh = "%s_%s.sh" % (name, env.label)
+    
+    try:
+        env.label
+    except:
+        env.label = None
+
+    if env.label is not None:
+        env.job_name_template_sh = "%s_%s.sh" % (name, env.label)
+    else: 
+        env.job_name_template_sh = "%s.sh" % (name)
 
 
 def with_template_config():
@@ -525,6 +534,7 @@ def job(sweep_length=1, *option_dictionaries):
                 env.label = label
                 env.job_results = job_results
                 env.job_results_local = job_results_local
+                print(env.script)
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     env.job_script = script_templates(env.batch_header)
                 else:
@@ -733,7 +743,7 @@ def run_ensemble(config, sweep_dir, **args):
                 sweepdir_items.index(
                     env.exec_first)))
 
-    atp = base.AsyncThreadingPool.ATP(ncpu=env.nb_thread)
+    atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
         if os.path.isdir(os.path.join(sweep_dir, item)):
@@ -744,16 +754,15 @@ def run_ensemble(config, sweep_dir, **args):
             if sweep_length == 1:
                 execute(put_configs, config)
 
-                job(sweep_length,
-                    dict(memory='2G',
+                job( sweep_length, dict(memory='2G',
                          ensemble_mode=True,
                          label=item))
 
             # All the other iteration will launch parallel jobs
             else:
                 print(" Start multi threading job")
-                atp.run_job(jobID=sweep_length, handler=job, args=(
-                    sweep_length, dict(memory='2G', ensemble_mode=True, label=item)))
+                atp.run_job(jobID=sweep_length, handler=job, args=(sweep_length,
+                    dict(memory='2G', ensemble_mode=True, label=item)))
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
