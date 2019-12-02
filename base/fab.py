@@ -448,6 +448,13 @@ def job(sweep_length=1, *option_dictionaries):
 
     env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
+
+    # Crapy, In the case where job() is call outside run_ensemble (and usually only with option_dictionaries as arg)
+    # TODO improve it
+    if type(sweep_length) is dict and type(option_dictionaries) is not dict:
+        option_dictionaries = [sweep_length]
+        sweep_length=1
+
     #   DEBUG add label, mem, core to env.
     update_environment(*option_dictionaries)
 
