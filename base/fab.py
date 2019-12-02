@@ -102,15 +102,15 @@ def with_job(name, ensemble_mode=False):
 
     # Redefine the job name depending of the label name for ensemble run
     # Need to be condition of ensemble run
-    
+
     try:
         env.label
-    except:
+    except BaseException:
         env.label = None
 
     if env.label is not None:
         env.job_name_template_sh = "%s_%s.sh" % (name, env.label)
-    else: 
+    else:
         env.job_name_template_sh = "%s.sh" % (name)
 
 
@@ -451,14 +451,16 @@ def job(sweep_length=1, *option_dictionaries):
 
     # Crapy, In the case where job() is call outside run_ensemble (and usually only with option_dictionaries as arg)
     # TODO improve it
-    if type(sweep_length) is dict and type(option_dictionaries) is not dict:
+    if isinstance(sweep_length, dict) and not isinstance(
+            option_dictionaries, dict):
         option_dictionaries = [sweep_length]
-        sweep_length=1
+        sweep_length = 1
 
     #   DEBUG add label, mem, core to env.
     update_environment(*option_dictionaries)
 
-    # Save label as local variable since env.label is overwritten by the other threads !
+    # Save label as local variable since env.label is overwritten by the other
+    # threads !
     label = ''
     if sweep_length > 1:
         if 'label' in option_dictionaries[0]:
@@ -479,9 +481,10 @@ def job(sweep_length=1, *option_dictionaries):
         # Make sure that prefix and module load definitions are properly
         # updated.
         for i in range(1, int(env.replicas) + 1):
-            #  DEBUG set important path to env (gloabl variable) --> must be reset on local set then reset on gloab for the env.yml file
+            #  DEBUG set important path to env (gloabl variable) --> must be
+            # reset on local set then reset on gloab for the env.yml file
             with_template_job(env.ensemble_mode)
-            """  
+            """
             eg.
             Reserve_mutex()
             do :
@@ -535,7 +538,8 @@ def job(sweep_length=1, *option_dictionaries):
 
             # Mutex are used here to temporary set global variable that will be used to create env.dest_name.
             # env.dest_name is save as a local variable
-            # The script name is now depending of the job label --> Create N script for N jobs
+            # The script name is now depending of the job label --> Create N
+            # script for N jobs
             mutex_template.acquire()
             try:
                 env.label = label
@@ -637,7 +641,8 @@ def job(sweep_length=1, *option_dictionaries):
             elif not env.get("noexec", False):
                 with cd(job_results):
                     with prefix(env.run_prefix):
-                        # run_stdout is a string : "Running... dispatch batch job XXXXX" Work on genji
+                        # run_stdout is a string : "Running... dispatch batch
+                        # job XXXXX" Work on genji
                         run_stdout = run(
                             template("$job_dispatch %s" % dest_name))
                         # Get the sbatch jobID
@@ -757,19 +762,20 @@ def run_ensemble(config, sweep_dir, **args):
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
-            # The first iteration will create folders to the remote and launch sequentialy the first job
+            #  The first iteration will create folders to the remote and launch
+            # sequentialy the first job
             if sweep_length == 1:
                 execute(put_configs, config)
 
-                job( sweep_length, dict(memory='2G',
-                         ensemble_mode=True,
-                         label=item))
+                job(sweep_length, dict(memory='2G',
+                                       ensemble_mode=True,
+                                       label=item))
 
             # All the other iteration will launch parallel jobs
             else:
                 print(" Start multi threading job")
                 atp.run_job(jobID=sweep_length, handler=job, args=(sweep_length,
-                    dict(memory='2G', ensemble_mode=True, label=item)))
+                                                                   dict(memory='2G', ensemble_mode=True, label=item)))
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
@@ -807,7 +813,7 @@ def run_ensemble(config, sweep_dir, **args):
 def input_to_range(arg, default):
     ttype = type(default)
     # regexp for a array generator like [1.2:3:0.2]
-    gen_regexp = "\[([\d\.]+):([\d\.]+):([\d\.]+)\]"
+    gen_regexp = r"\[([\d\.]+):([\d\.]+):([\d\.]+)\]"
     if not arg:
         return [default]
     match = re.match(gen_regexp, str(arg))

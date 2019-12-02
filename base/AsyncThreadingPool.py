@@ -14,14 +14,15 @@ class ATP:
         self.jobs_ID = {}
         self.counter = 0
 
-    def run_job(self, jobID, handler, counter=False, serial=False, args=(), **kwargs):
+    def run_job(self, jobID, handler, counter=False,
+                serial=False, args=(), **kwargs):
         """
         Put a job on a threading queue.
         Args:
-            jobID   : string job identifier  
+            jobID   : string job identifier
             handler : function that will be executed by the job
             counter : Counter that will be associated with a job and a jobID  ( Could be merged with jobID ...)
-            serial  : Serial mode (not implemented yet) 
+            serial  : Serial mode (not implemented yet)
         """
         try:
             fn = self.job_executor.submit(handler, *args, **kwargs)
@@ -39,7 +40,7 @@ class ATP:
 
     def awaitJobOver(self):
         """
-        Wait for all the jobs to be done.            
+        Wait for all the jobs to be done.
         """
         #print([self.remote_jobs[jobID] for jobID in range(self.counter)])
         concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
