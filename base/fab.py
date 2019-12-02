@@ -68,7 +68,8 @@ def with_template_job(ensemble_mode=False):
     Determine a generated job name from environment parameters,
     and then define additional environment parameters based on it.
     """
-    # The name is now depending of the label name!
+
+    # The name is now depending of the label name
     # if ensemble_mode is False:
     #    name = template(env.job_name_template)
     # else:
@@ -449,8 +450,8 @@ def job(sweep_length=1, *option_dictionaries):
     env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
 
-    # Crapy, In the case where job() is call outside run_ensemble 
-    # (and usually only with option_dictionaries as arg)
+    # Crapy, In the case where job() is call outside run_ensemble
+    # and usually only with option_dictionnaries as arg
     # TODO improve it
     if isinstance(sweep_length, dict) and not isinstance(
             option_dictionaries, dict):
@@ -494,7 +495,7 @@ def job(sweep_length=1, *option_dictionaries):
                 job_results_local = env.job_results_local
             drop_mutex()
 
-            Then all the next reference to these env.variables 
+            Then all the next reference to these env.variables
             must be replace by the local one
             """
             mutex.acquire()
@@ -538,7 +539,7 @@ def job(sweep_length=1, *option_dictionaries):
             calc_nodes()
             env.run_command = template(env.run_command)
 
-            # Mutex are used here to temporary set global variable 
+            # Mutex are used here to temporary set global variable
             # that will be used to create env.dest_name.
             # env.dest_name is save as a local variable
             # The script name is now depending of the job label --> Create N
@@ -582,8 +583,8 @@ def job(sweep_length=1, *option_dictionaries):
                 template(
                     "mkdir -p %s && rsync -av --progress \
                     $job_config_path/* %s/ --exclude SWEEP && \
-                    cp %s %s" % (job_results, job_results, 
-                                    dest_name, job_results)
+                    cp %s %s" 
+                    % (job_results, job_results, dest_name, job_results)
                 )
             )
 
@@ -654,7 +655,7 @@ def job(sweep_length=1, *option_dictionaries):
 
             if env.remote != 'localhost':
                 """
-                Since the jobs can be launch simultenaously, the jobID 's 
+                Since the jobs can be launch simultenaously, the jobID 's
                 file is protected by a mutex to prevent concurrent writting
                 mutex.acquire()
                 try:
@@ -779,8 +780,10 @@ def run_ensemble(config, sweep_dir, **args):
             # All the other iteration will launch parallel jobs
             else:
                 print(" Start multi threading job")
-                atp.run_job(jobID=sweep_length, handler=job, args=(sweep_length,
-                                                                   dict(memory='2G', ensemble_mode=True, label=item)))
+                atp.run_job(jobID=sweep_length, handler=job, 
+                            args=(sweep_length, 
+                            dict(memory='2G', ensemble_mode=True, 
+                                label=item)))
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and

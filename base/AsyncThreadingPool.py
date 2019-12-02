@@ -21,7 +21,8 @@ class ATP:
         Args:
             jobID   : string job identifier
             handler : function that will be executed by the job
-            counter : Counter that will be associated with a job and a jobID  ( Could be merged with jobID ...)
+            counter : Counter that will be associated with a 
+                      job and a jobID  ( Could be merged with jobID ...)
             serial  : Serial mode (not implemented yet)
         """
         try:
