@@ -29,7 +29,7 @@ class ATP:
         except Exception as e:
             print("Caught excepetion in worker thread X")
             traceback.print_exc()
-        #self.remote_jobs[jobID] = fn
+        # self.remote_jobs[jobID] = fn
         self.remote_jobs[self.counter] = fn
         self.jobs_ID[self.counter] = jobID
         self.counter += 1
@@ -42,7 +42,7 @@ class ATP:
         """
         Wait for all the jobs to be done.
         """
-        #print([self.remote_jobs[jobID] for jobID in range(self.counter)])
+        # print([self.remote_jobs[jobID] for jobID in range(self.counter)])
         concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
             self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
         print("All threads are over")

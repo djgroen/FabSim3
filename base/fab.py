@@ -70,9 +70,9 @@ def with_template_job(ensemble_mode=False):
     """
     # The name is now depending of the label name!
     # if ensemble_mode is False:
-    ###    name = template(env.job_name_template)
+    #    name = template(env.job_name_template)
     # else:
-    ###    name = template(env.job_name_template) + '_' + env.label
+    #    name = template(env.job_name_template) + '_' + env.label
     name = template(env.job_name_template)
     if env.get('label') and not ensemble_mode:
         name = '_'.join((env['label'], name))
@@ -449,7 +449,8 @@ def job(sweep_length=1, *option_dictionaries):
     env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
 
-    # Crapy, In the case where job() is call outside run_ensemble (and usually only with option_dictionaries as arg)
+    # Crapy, In the case where job() is call outside run_ensemble 
+    # (and usually only with option_dictionaries as arg)
     # TODO improve it
     if isinstance(sweep_length, dict) and not isinstance(
             option_dictionaries, dict):
@@ -493,7 +494,8 @@ def job(sweep_length=1, *option_dictionaries):
                 job_results_local = env.job_results_local
             drop_mutex()
 
-            Then all the next reference to these env.variables must be replace by the local one
+            Then all the next reference to these env.variables 
+            must be replace by the local one
             """
             mutex.acquire()
             try:
@@ -536,7 +538,8 @@ def job(sweep_length=1, *option_dictionaries):
             calc_nodes()
             env.run_command = template(env.run_command)
 
-            # Mutex are used here to temporary set global variable that will be used to create env.dest_name.
+            # Mutex are used here to temporary set global variable 
+            # that will be used to create env.dest_name.
             # env.dest_name is save as a local variable
             # The script name is now depending of the job label --> Create N
             # script for N jobs
@@ -560,7 +563,7 @@ def job(sweep_length=1, *option_dictionaries):
                 mutex_template.release()
 
             # if sweep_length == 1:
-            #put(env.job_script, env.dest_name)
+            # put(env.job_script, env.dest_name)
             put(env.job_script, dest_name)
 
             # Store previous fab commands in bash history.
@@ -579,7 +582,8 @@ def job(sweep_length=1, *option_dictionaries):
                 template(
                     "mkdir -p %s && rsync -av --progress \
                     $job_config_path/* %s/ --exclude SWEEP && \
-                    cp %s %s" % (job_results, job_results, dest_name, job_results)
+                    cp %s %s" % (job_results, job_results, 
+                                    dest_name, job_results)
                 )
             )
 
@@ -650,7 +654,8 @@ def job(sweep_length=1, *option_dictionaries):
 
             if env.remote != 'localhost':
                 """
-                # Since the jobs can be launch simultenaously, the jobID 's file is protected by a mutex to prevent concurrent writting
+                Since the jobs can be launch simultenaously, the jobID 's 
+                file is protected by a mutex to prevent concurrent writting
                 mutex.acquire()
                 try:
                     save_submitted_job_info(jobID=job_info)
