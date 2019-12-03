@@ -69,7 +69,7 @@ def with_template_job(ensemble_mode=False):
     and then define additional environment parameters based on it.
     """
 
-    # The name is now depending of the label name
+    # The name is now depending of the label name
     # if ensemble_mode is False:
     #    name = template(env.job_name_template)
     # else:
@@ -458,7 +458,7 @@ def job(sweep_length=1, *option_dictionaries):
         option_dictionaries = [sweep_length]
         sweep_length = 1
 
-    #   DEBUG add label, mem, core to env.
+    #   DEBUG add label, mem, core to env.
     update_environment(*option_dictionaries)
 
     # Save label as local variable since env.label is overwritten by the other
@@ -483,7 +483,7 @@ def job(sweep_length=1, *option_dictionaries):
         # Make sure that prefix and module load definitions are properly
         # updated.
         for i in range(1, int(env.replicas) + 1):
-            #  DEBUG set important path to env (gloabl variable) --> must be
+            #  DEBUG set important path to env (gloabl variable) --> must be
             # reset on local set then reset on gloab for the env.yml file
             with_template_job(env.ensemble_mode)
             """
@@ -541,7 +541,7 @@ def job(sweep_length=1, *option_dictionaries):
 
             # Mutex are used here to temporary set global variable
             # that will be used to create env.dest_name.
-            # env.dest_name is save as a local variable
+            # env.dest_name is save as a local variable
             # The script name is now depending of the job label --> Create N
             # script for N jobs
             mutex_template.acquire()
@@ -583,7 +583,7 @@ def job(sweep_length=1, *option_dictionaries):
                 template(
                     "mkdir -p %s && rsync -av --progress \
                     $job_config_path/* %s/ --exclude SWEEP && \
-                    cp %s %s" 
+                    cp %s %s"
                     % (job_results, job_results, dest_name, job_results)
                 )
             )
@@ -768,7 +768,7 @@ def run_ensemble(config, sweep_dir, **args):
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
-            #  The first iteration will create folders to the remote and launch
+            #  The first iteration will create folders to the remote and launch
             # sequentialy the first job
             if sweep_length == 1:
                 execute(put_configs, config)
@@ -777,13 +777,13 @@ def run_ensemble(config, sweep_dir, **args):
                                        ensemble_mode=True,
                                        label=item))
 
-            # All the other iteration will launch parallel jobs
+            # All the other iteration will launch parallel jobs
             else:
                 print(" Start multi threading job")
-                atp.run_job(jobID=sweep_length, handler=job, 
-                            args=(sweep_length, 
-                            dict(memory='2G', ensemble_mode=True, 
-                                label=item)))
+                atp.run_job(jobID=sweep_length, handler=job,
+                            args=(sweep_length,
+                                  dict(memory='2G', ensemble_mode=True,
+                                       label=item)))
 
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and

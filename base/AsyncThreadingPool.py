@@ -6,6 +6,7 @@ import traceback
 
 
 class ATP:
+
     def __init__(self, ncpu=1):
         self.ncpu = ncpu
         self.job_executor = concurrent.futures.ThreadPoolExecutor(
@@ -21,7 +22,7 @@ class ATP:
         Args:
             jobID   : string job identifier
             handler : function that will be executed by the job
-            counter : Counter that will be associated with a 
+            counter : Counter that will be associated with a
                       job and a jobID  ( Could be merged with jobID ...)
             serial  : Serial mode (not implemented yet)
         """
