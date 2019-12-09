@@ -20,4 +20,4 @@ m.wait4(ids)
 print("jobs details:\n%s\n" % str(m.info(ids)))
 
 m.remove(ids)
-m.finish() 
+m.finish()
