@@ -98,6 +98,7 @@ def with_job(name, ensemble_mode=False):
             env.results_path, name), env.label)
         env.job_results_local = "%s/RUNS/%s" % (os.path.join(
             env.local_results, name), env.label)
+
     env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents_local = os.path.join(env.job_results_local, '*')
 
@@ -109,6 +110,7 @@ def with_job(name, ensemble_mode=False):
     except BaseException:
         env.label = None
 
+    #DEBUG
     if env.label is not None:
         env.job_name_template_sh = "%s_%s.sh" % (name, env.label)
     else:
@@ -464,7 +466,11 @@ def job(sweep_length=1, *option_dictionaries):
     # Save label as local variable since env.label is overwritten by the other
     # threads !
     label = ''
-    if sweep_length > 1:
+    #DEBUG 1st ite do not write label
+    #if sweep_length > 1:
+    print("DEBUUUUUUUUUg")
+    print(env.ensemble_mode)
+    if env.ensemble_mode is True:
         if 'label' in option_dictionaries[0]:
             label = option_dictionaries[0]['label']
 
@@ -501,6 +507,7 @@ def job(sweep_length=1, *option_dictionaries):
             mutex.acquire()
             try:
                 with_template_job(env.ensemble_mode)
+                
                 if int(env.replicas) > 1 : 
                     if env.ensemble_mode is False:
                         job_results = env.job_results + '_replica_' + str(i)
@@ -566,6 +573,10 @@ def job(sweep_length=1, *option_dictionaries):
                     env.scripts_path,
                     env.pather.basename(env.job_script))
                 dest_name = env.dest_name
+
+                print("DEBUUUG")
+                print(env.job_script)
+                print(env.dest_name)
             finally:
                 mutex_template.release()
 
@@ -777,6 +788,8 @@ def run_ensemble(config, sweep_dir, **args):
             #  The first iteration will create folders to the remote and launch
             # sequentialy the first job
             if sweep_length == 1:
+                print("DEBUG")
+                print(item)
                 execute(put_configs, config)
 
                 job(sweep_length, dict(memory='2G',
