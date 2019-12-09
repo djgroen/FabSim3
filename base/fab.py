@@ -501,11 +501,17 @@ def job(sweep_length=1, *option_dictionaries):
             mutex.acquire()
             try:
                 with_template_job(env.ensemble_mode)
-                job_results = env.job_results
-                job_results_local = env.job_results_local
+                if int(env.replicas) > 1 : 
+                    if env.ensemble_mode is False:
+                        job_results = env.job_results + '_replica_' + str(i)
+                        job_results_local = env.job_results_local + '_replica_' + str(i)
+                    else:
+                        job_results = env.job_results + '_' + str(i)
+                        job_results_local = env.job_results_local + '_' + str(i)
             finally:
                 mutex.release()
 
+            """
             # DEBUG all those env.XX must be replace later !
             if int(env.replicas) > 1:
                 if env.ensemble_mode is False:
@@ -522,7 +528,7 @@ def job(sweep_length=1, *option_dictionaries):
                     update_environment({
                         'job_results_contents_local':
                         env.job_results_contents_local + '_' + str(i)})
-
+            """
             complete_environment()
 
             calc_nodes()
