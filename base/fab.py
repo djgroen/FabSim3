@@ -110,7 +110,7 @@ def with_job(name, ensemble_mode=False):
     except BaseException:
         env.label = None
 
-    #DEBUG
+    # Template name is now depending of the label of the job when needed
     if env.label is not None:
         env.job_name_template_sh = "%s_%s.sh" % (name, env.label)
     else:
@@ -460,16 +460,12 @@ def job(sweep_length=1, *option_dictionaries):
         option_dictionaries = [sweep_length]
         sweep_length = 1
 
-    #   DEBUG add label, mem, core to env.
+    #   Add label, mem, core to env.
     update_environment(*option_dictionaries)
 
     # Save label as local variable since env.label is overwritten by the other
     # threads !
     label = ''
-    #DEBUG 1st ite do not write label
-    #if sweep_length > 1:
-    print("DEBUUUUUUUUUg")
-    print(env.ensemble_mode)
     if env.ensemble_mode is True:
         if 'label' in option_dictionaries[0]:
             label = option_dictionaries[0]['label']
@@ -518,8 +514,8 @@ def job(sweep_length=1, *option_dictionaries):
             finally:
                 mutex.release()
 
+            # Next part is done previously and no longer save in env. 
             """
-            # DEBUG all those env.XX must be replace later !
             if int(env.replicas) > 1:
                 if env.ensemble_mode is False:
                     update_environment({
@@ -788,10 +784,7 @@ def run_ensemble(config, sweep_dir, **args):
             #  The first iteration will create folders to the remote and launch
             # sequentialy the first job
             if sweep_length == 1:
-                print("DEBUG")
-                print(item)
                 execute(put_configs, config)
-
                 job(sweep_length, dict(memory='2G',
                                        ensemble_mode=True,
                                        label=item))
