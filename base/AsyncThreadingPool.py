@@ -48,3 +48,13 @@ class ATP:
         concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
             self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
         print("All threads are over")
+
+
+    def shutdownThreads(self):
+        """
+        Shutdown all the Threads spawned
+        """
+        self.job_executor.shutdown()
+        #for jobID in range(self.counter):
+        #    self.remote_jobs[jobID].shutdown()
+

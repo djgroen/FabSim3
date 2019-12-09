@@ -6,4 +6,4 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=100
-#SBATCH --oversubscribe
+#SBATCH --time=0:30:00
