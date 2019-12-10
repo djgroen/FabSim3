@@ -97,9 +97,9 @@ def with_job(name, ensemble_mode=False, label=None):
     """
     env.name = name
     if not ensemble_mode:
-        #env.job_results = env.pather.join(env.results_path, name)
+        # env.job_results = env.pather.join(env.results_path, name)
         job_results = env.pather.join(env.results_path, name)
-        #env.job_results_local = os.path.join(env.local_results, name)
+        # env.job_results_local = os.path.join(env.local_results, name)
         job_results_local = os.path.join(env.local_results, name)
     else:
         # env.job_results = "%s/RUNS/%s" % (env.pather.join(
@@ -111,9 +111,9 @@ def with_job(name, ensemble_mode=False, label=None):
         job_results_local = "%s/RUNS/%s" % (os.path.join(
             env.local_results, name), label)
 
-    #env.job_results_contents = env.pather.join(env.job_results, '*')
+    # env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents = env.pather.join(job_results, '*')
-    #env.job_results_contents_local = os.path.join(env.job_results_local, '*')
+    # env.job_results_contents_local = os.path.join(env.job_results_local, '*')
     env.job_results_contents_local = os.path.join(job_results_local, '*')
     # Redefine the job name depending of the label name for ensemble run
     # Need to be condition of ensemble run
@@ -476,7 +476,7 @@ def job(sweep_length=1, *option_dictionaries):
 
     # Save label as local variable since env.label is overwritten by the other
     # threads !
-    # all these variable are saved in a dict specific to the thread_id
+    # all these variable are saved in a dict specific to the thread_id
     job_results_dir[threading.get_ident()] = {}
     job_results_dir[threading.get_ident()].update({'label': ''})
     if env.ensemble_mode is True:
@@ -502,7 +502,8 @@ def job(sweep_length=1, *option_dictionaries):
             #  DEBUG set important path to env (gloabl variable) --> must be
             # reset on local set then reset on gloab for the env.yml file
 
-            # Responsible of multi-threading non robustness !! (because call twice..)
+            # Responsible of multi-threading non robustness !!
+            # (because call twice..)
             # with_template_job(env.ensemble_mode)
             """
             eg.
@@ -520,24 +521,27 @@ def job(sweep_length=1, *option_dictionaries):
             try:
                 # DEBUG CHanged with_job to avoid env variable
                 job_results, job_results_local = with_template_job(
-                    env.ensemble_mode, job_results_dir[threading.get_ident()]['label'])
+                    env.ensemble_mode,
+                    job_results_dir[threading.get_ident()]['label'])
                 job_results_dir[threading.get_ident()].update(
                     {'job_results': job_results})
                 if int(env.replicas) > 1:
                     if env.ensemble_mode is False:
-                        job_results_dir[threading.get_ident()]['job_results'] = job_results_dir[threading.get_ident(
-                        )]['job_results'] + '_replica_' + str(i)
+                        job_results_dir[threading.get_ident()]['job_results'] =
+                        job_results_dir[threading.get_ident()][
+                            'job_results'] + '_replica_' + str(i)
                         job_results_local = job_results_local + \
                             '_replica_' + str(i)
                     else:
-                        job_results_dir[threading.get_ident(
-                        )]['job_results'] = job_results_dir[threading.get_ident()]['job_results'] + '_' + str(i)
+                        job_results_dir[threading.get_ident()]['job_results'] =
+                        job_results_dir[threading.get_ident()][
+                            'job_results'] + '_' + str(i)
                         job_results_local = job_results_local + '_' + str(i)
 
             finally:
                 mutex_template.release()
 
-            # Next part is done previously and no longer save in env.
+            # Next part is done previously and no longer save in env.
             """
             if int(env.replicas) > 1:
                 if env.ensemble_mode is False:
@@ -587,12 +591,16 @@ def job(sweep_length=1, *option_dictionaries):
                     job_results_dir[threading.get_ident()].update(
                         {'job_script': script_templates(env.batch_header)})
                 else:
-                    job_results_dir[threading.get_ident()].update(
-                        {'job_script': script_templates(env.batch_header, env.script)})
+                    job_results_dir[threading.get_ident()].update({
+                        'job_script':
+                        script_templates(env.batch_header, env.script)
+                    })
 
-                job_results_dir[threading.get_ident()].update({'dest_name': env.pather.join(
-                    env.scripts_path,
-                    env.pather.basename(job_results_dir[threading.get_ident()]['job_script']))})
+                job_results_dir[threading.get_ident()].update({
+                    'dest_name':
+                    env.pather.join(env.scripts_path, env.pather.basename(
+                        job_results_dir[threading.get_ident()]['job_script']))}
+                )
                 destname = job_results_dir[threading.get_ident()]['dest_name']
 
             finally:
@@ -614,7 +622,10 @@ def job(sweep_length=1, *option_dictionaries):
                     "mkdir -p %s && rsync -av --progress \
                     $job_config_path/* %s/ --exclude SWEEP && \
                     cp %s %s"
-                    % (job_results_dir[threading.get_ident()]['job_results'], job_results_dir[threading.get_ident()]['job_results'], job_results_dir[threading.get_ident()]['dest_name'], job_results_dir[threading.get_ident()]['job_results'])
+                    % (job_results_dir[threading.get_ident()]['job_results'],
+                        job_results_dir[threading.get_ident()]['job_results'],
+                        job_results_dir[threading.get_ident()]['dest_name'],
+                        job_results_dir[threading.get_ident()]['job_results'])
                 )
             )
 
@@ -623,7 +634,12 @@ def job(sweep_length=1, *option_dictionaries):
                 run(
                     template(
                         "cp -r \
-                        $job_config_path/SWEEP/%s/* %s/" % (job_results_dir[threading.get_ident()]['label'], job_results_dir[threading.get_ident()]['job_results'])
+                        $job_config_path/SWEEP/%s/* %s/"
+                        % (
+                            job_results_dir[threading.get_ident()]['label'],
+                            job_results_dir[threading.get_ident()][
+                                'job_results']
+                        )
                     )
                 )
             try:
@@ -641,7 +657,7 @@ def job(sweep_length=1, *option_dictionaries):
                 )
                 tempf.flush()  # Flush the file before we copy it.
                 # DEBUG
-                ###put(tempf.name, env.pather.join(job_results, 'env.yml'))
+                # put(tempf.name, env.pather.join(job_results, 'env.yml'))
 
             run(template("chmod u+x %s" %
                          job_results_dir[threading.get_ident()]['dest_name']))
@@ -680,7 +696,9 @@ def job(sweep_length=1, *option_dictionaries):
                 with cd(job_results_dir[threading.get_ident()]['job_results']):
                     with prefix(env.run_prefix):
                         run_stdout = run(
-                            template("$job_dispatch %s" % job_results_dir[threading.get_ident()]['dest_name']))
+                            template("$job_dispatch %s" % job_results_dir[
+                                     threading.get_ident()]['dest_name'])
+                        )
                         # Get the sbatch jobID
                         job_info = run_stdout.split()[3]
 
