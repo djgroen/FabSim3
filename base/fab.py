@@ -528,14 +528,14 @@ def job(sweep_length=1, *option_dictionaries):
                 if int(env.replicas) > 1:
                     if env.ensemble_mode is False:
                         job_results_dir[threading.get_ident()]['job_results'] =
-                        job_results_dir[threading.get_ident()][
-                            'job_results'] + '_replica_' + str(i)
+                            job_results_dir[threading.get_ident()][
+                                'job_results'] + '_replica_' + str(i)
                         job_results_local = job_results_local + \
                             '_replica_' + str(i)
                     else:
                         job_results_dir[threading.get_ident()]['job_results'] =
-                        job_results_dir[threading.get_ident()][
-                            'job_results'] + '_' + str(i)
+                            job_results_dir[threading.get_ident()][
+                                'job_results'] + '_' + str(i)
                         job_results_local = job_results_local + '_' + str(i)
 
             finally:
