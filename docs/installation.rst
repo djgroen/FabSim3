@@ -85,7 +85,7 @@ By default, FabSim3 comes with the FabMD plugin installed. Other plugins can be 
 
 To install a specific plugin, simply type:: 
 
-    fabsim localhost install_plugin:<plug_name
+    fabsim localhost install_plugin:<plug_name>
 
 To create your own plugin, please refer to doc/CreatingPlugins.rst
 
