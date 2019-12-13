@@ -654,7 +654,8 @@ def job(sweep_length=1, *option_dictionaries):
                             )
                             # Get the jobID, Works on Bull cluster, need to check on others
                             if run_stdout:
-                                job_info = run_stdout.split()[3]
+                                if len(run_stdout.split()) > 3:
+                                    job_info = run_stdout.split()[3]
 
                 if env.remote != 'localhost':
                     mutex_jobID.acquire()
