@@ -537,8 +537,10 @@ def job(sweep_length=1, *option_dictionaries):
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     job_results_dir[threading.get_ident()].update(
                         {'job_script': script_templates(env.batch_header)})
-                    # Suppose to be in PJM mode --> no multithreading --> env = ok
-                    env.job_script = job_results_dir[threading.get_ident()]['job_script']
+                    #  Suppose to be in PJM mode --> no multithreading --> env
+                    # = ok
+                    env.job_script = job_results_dir[
+                        threading.get_ident()]['job_script']
                 else:
                     job_results_dir[threading.get_ident()].update({
                         'job_script':
@@ -557,7 +559,6 @@ def job(sweep_length=1, *option_dictionaries):
 
             put(job_results_dir[threading.get_ident()]['job_script'],
                 job_results_dir[threading.get_ident()]['dest_name'])
-
 
             run(
                 template(
@@ -610,18 +611,23 @@ def job(sweep_length=1, *option_dictionaries):
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
 
-                if ((hasattr(env, 'NoEnvScript') and not env.NoEnvScript) or not hasattr(env, 'NoEnvScript')):
+                if ((hasattr(env, 'NoEnvScript') and
+                     not env.NoEnvScript) or
+                        not hasattr(env, 'NoEnvScript')):
                     # Protect concurrent writting
                     mutex.acquire()
                     try:
                         env.idsID = len(env.submitted_jobs_list) + 1
                         env.idsPath = env.pather.join(
-                            job_results_dir[threading.get_ident()]['job_results'], env.pather.basename(job_results_dir[threading.get_ident()]['job_script']))
+                            job_results_dir[threading.get_ident()]
+                            ['job_results'], env.pather.basename(
+                                job_results_dir[threading.get_ident()]
+                                ['job_script']))
                         env.submitted_jobs_list.append(
                             script_template_content('qcg-PJ-task-template'))
                     finally:
                         mutex.release()
-                
+
                 if (i > int(env.replicas)):
                     return
 
@@ -629,7 +635,8 @@ def job(sweep_length=1, *option_dictionaries):
 
                 return
 
-            # We don't want to go next during replicas and pjm until the final job
+            # We don't want to go next during replicas and pjm until the final
+            # job
             if not (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
@@ -644,7 +651,6 @@ def job(sweep_length=1, *option_dictionaries):
                     local(template("$job_dispatch " + env.job_script))
                     print("job dispatch is done locally\n")
 
-
                 elif not env.get("noexec", False):
                     with cd(job_results_dir[threading.get_ident()]['job_results']):
                         with prefix(env.run_prefix):
@@ -652,7 +658,8 @@ def job(sweep_length=1, *option_dictionaries):
                                 template("$job_dispatch %s" % job_results_dir[
                                          threading.get_ident()]['dest_name'])
                             )
-                            # Get the jobID, Works on Bull cluster, need to check on others
+                            # Get the jobID, Works on Bull cluster, need to
+                            # check on others
                             if run_stdout:
                                 if len(run_stdout.split()) > 3:
                                     job_info = run_stdout.split()[3]
@@ -761,10 +768,9 @@ def run_ensemble(config, sweep_dir, **args):
                 sweepdir_items.index(
                     env.exec_first)))
 
-
     # Prevention since some laptop doesn't support more than 4 threads
-    if int(env.nb_thread) > 4 :
-        env.nb_thread = 4 
+    if int(env.nb_thread) > 4:
+        env.nb_thread = 4
 
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
@@ -812,7 +818,6 @@ def run_ensemble(config, sweep_dir, **args):
         env.batch_header = env.PJ_header
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
-
 
 
 def input_to_range(arg, default):
