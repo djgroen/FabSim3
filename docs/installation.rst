@@ -19,18 +19,18 @@ You can install these modules as follows::
     pip3 install numpy and 
     pip3 install fabric3
 
-2. To perform the **Py.test** tests (not required for using FabSim3, but essential for running the tests), you will need **pytest** and **pytest-pep8**.
+2. To perform the ``Py.test`` tests (not required for using FabSim3, but essential for running the tests), you will need ``pytest`` and ``pytest-pep8``.
 
 3. To install FabSim3 plugins, **git** needs to be installed in your machine. 
 
-For Mac users, you might also need **ssh-copy-id**. This can be installed using::
+.. note:: For Mac users, you might also need ``ssh-copy-id``. This can be installed using::
 
     brew install ssh-copy-id
 
 
-Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
+Using apt on Ubuntu (for 18.04 Bionic Beaver)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When using a server version, make sure you add **universe** at the end of the first line of **/etc/apt/sources.list**. Install all dependencies::
+When using a server version, make sure you add **universe** at the end of the first line of ``/etc/apt/sources.list``. Install all dependencies::
 
     sudo apt install sshd (if you want to run jobs on localhost)
     sudo apt install git
@@ -39,7 +39,7 @@ When using a server version, make sure you add **universe** at the end of the fi
     sudo apt install python3-numpy
     sudo apt install python3-pytest-pep8 (this will also install py.test for Python3)
 
-Go to the **fabric3_base** subdirectory and run::
+Go to the ``fabric3_base`` subdirectory and run::
 
     pip3 install Fabric3-1.14.post1-py3-none-any.whl
     
@@ -56,7 +56,7 @@ Installing FabSim3
 
 .. note:: You may have to restart the shell for these changes to apply.
 
-3. Copy **machines_user_example.yml** in the **deploy/** subdirectory to **machines_user.yml**. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections **default:** and **localhost:** so as to update the paths of FabSim3 directory and lammps executable respectively. 
+3. Copy ``machines_user_example.yml`` in the ``deploy/`` subdirectory to``machines_user.yml``. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections **default:** and **localhost:** so as to update the paths of FabSim3 directory and lammps executable respectively. 
 
 For Mac Users, make sure to override the default home directory, by switching the **home_path_template** variable by uncommenting the following line::
 
@@ -68,7 +68,7 @@ For Mac Users, make sure to override the default home directory, by switching th
     
 As part of this command, you will be logging in to your own machine through SSH once, which can trigger a password prompt. In this case, simply type the password for the machine in which you are running these commands.
 
-For Mac Users, in the **deploy/machines.yml**, change::
+.. note:: For Mac Users, in the ``deploy/machines.yml``, change::
     
     runtime_path_template:"$home_path" to runtime_path_template:"~"
 
@@ -76,12 +76,12 @@ For Mac Users, in the **deploy/machines.yml**, change::
 
     fab <machine_name> setup_fabsim
 
-.. note:: FabSim3 commands can now be launched using the **fabsim** command. Note that some older tutorials might use **fab** commands instead of **fabsim**. If **fabsim** command is not found, simply add PATH and PYTHONPATH (step 2) to **~/.bash_profile**, as well as set environment for Python3 in the **bin/fabsim** by replacing **#!/usr/bin/python3** to **#!/usr/bin/env python3**. The two commands can be used interchangably, although the **fabsim** command gives clearer outputs and can be launched from anywhere (**fab** can only be used within the FabSim3 installation directories). 
+.. note:: FabSim3 commands can now be launched using the **fabsim** command. Note that some older tutorials might use **fab** commands instead of **fabsim**. If **fabsim** command is not found, simply add PATH and PYTHONPATH (step 2) to ``~/.bash_profile``, as well as set environment for Python3 in the ``bin/fabsim`` by replacing **#!/usr/bin/python3** to **#!/usr/bin/env python3**. The two commands can be used interchangably, although the **fabsim** command gives clearer outputs and can be launched from anywhere (**fab** can only be used within the FabSim3 installation directories). 
 
 Installing plugins
 ------------------
 
-By default, FabSim3 comes with the FabMD plugin installed. Other plugins can be installed, and are listed in **deploy/plugins.yml**.
+By default, FabSim3 comes with the FabMD plugin installed. Other plugins can be installed, and are listed in ``deploy/plugins.yml``.
 
 To install a specific plugin, simply type:: 
 
@@ -96,7 +96,7 @@ If you have already installed FabSim3 and want to update to the latest version, 
 
     git pull
     
-Your personal settings like the **machines_user.yml** will be unchanged by this.
+Your personal settings like the ``machines_user.yml`` will be unchanged by this.
 
 To update plugins you will have to **git pull** from within each plugin directory as and when required.
 
@@ -107,7 +107,7 @@ Testing FabSim3
 The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the examples below.
 
 Mac users may get a 
-**ssh: connect to host localhost port 22: Connection refused** error. This means you must enable remote login. This is done in **System Preferences > Sharing > Remote Login**.
+``ssh: connect to host localhost port 22: Connection refused`` error. This means you must enable remote login. This is done in ``System Preferences > Sharing > Remote Login``.
 
 List available commands
 -----------------------
@@ -151,7 +151,7 @@ LAMMPS testing on the local host
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Install LAMMPS (see http://lammps.sandia.gov for detailed download and installation instructions).
-2. Modify **machines_user.yml** to make the **lammps_exec** variable point to the location of the LAMMPS executable. e.g.::
+2. Modify ``machines_user.yml`` to make the **lammps_exec** variable point to the location of the LAMMPS executable. e.g.::
     
     lammps_exec: "/home/james/bin/lmp_serial"
     
@@ -168,12 +168,14 @@ LAMMPS testing on the local host
     
     fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0
     
-7. Run **fabsim localhost fetch_results** to copy the output of your job in the results directory. By default this will be a subdirectory in **~/FabSim3/results**.
+7. Run the following command to copy the output of your job in the results directory. By default this will be a subdirectory in ``~/FabSim3/results``::
+
+    fabsim localhost fetch_results
 
 Creating the relevant FabSim3 directories on a local or remote host
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ensure that you have modified **machines_user.yml** to contain correct information for your target machine.
+Ensure that you have modified ``machines_user.yml`` to contain correct information for your target machine.
 
 Auto bash-completion for fabsim
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,7 +184,7 @@ To enable this option, please run on your FabSim3 directory::
      
      source fabsim-completion.bash
      
-or you can add the following command into your **$HOME/.bashrc** file to have enable it everytime that the shell is activated::
+or you can add the following command into your ``$HOME/.bashrc`` file to have enable it everytime that the shell is activated::
 
     source (path of your FabSim3 directory)/fabsim-completion.bash
 
