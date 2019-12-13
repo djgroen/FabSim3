@@ -7,15 +7,15 @@ In this tutorial, we will explain how to download, setup, and run `FabSim3 <http
 
 Dependencies
 ------------
-* `Singularity <https://www.sylabs.io>`_, which you can download and install from `here`<https://www.sylabs.io/guides/3.0/user-guide/installation.html>`_.
+* `Singularity <https://www.sylabs.io>`_, which you can download and install from `here <https://www.sylabs.io/guides/3.0/user-guide/installation.html>`_.
 
 * `OpenSSH Server <https://www.openssh.com/>`_:
 
-    ** Installation under Ubuntu Linux::
+Installation under Ubuntu Linux::
     
         sudo apt install openssh-server
     
-    ** Installations under CentOS Linux::
+Installations under CentOS Linux::
         
         sudo yum install -y openssh-server
 
@@ -31,7 +31,7 @@ Installation
 
     ./fabsim.simg --help
 
-OR 
+or:
 
     ./fabsim.simg -h
 
@@ -39,7 +39,7 @@ OR
 
     ./fabsim.simg --install [fabsim_INSTALL_DIR]
     
-OR
+or:
 
     ./fabsim.simg -i [fabsim_INSTALL_DIR]
 
@@ -65,7 +65,10 @@ To add to your ``~/.bashrc``::
 5. After, loading the environment variable from ``fabsim_env.conf`` into your into the current shell script, **fab** command will be available as a alias name to run for singularity image and accept all FabSim3 command.
 
 6. For `QCG <http://www.qoscosgrid.org/trac/qcg>`_ users, 
-* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in ``{fabsim_INSTALL_DIR}/deploy/machines_user.yml``
+
+* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in:
+
+    {fabsim_INSTALL_DIR}/deploy/machines_user.yml
 
 * Sets up SSH key pairs for FabSim3 access:: 
     
