@@ -27,21 +27,21 @@ Installation
 	
 .. note:: The download image should be kept as ``fabsim.simg``, this filename will be used later for setting environment variable and alias names in your ``bashrc`` file
 
-2. To see How to use Fabsim3 singularity::
+2. To see How to Use Fabsim3 singularity::
 
     ./fabsim.simg --help
 
-or:
+or
 
-    ./fabsim.simg -h
+    ``./fabsim.simg -h``
 
 3. Running the following will download the `FabSim3 <https://github.com/djgroen/FabSim3>`_ library in your local machine::
 
     ./fabsim.simg --install [fabsim_INSTALL_DIR]
     
-or:
+or
 
-    ./fabsim.simg -i [fabsim_INSTALL_DIR]
+    ``./fabsim.simg -i [fabsim_INSTALL_DIR]``
 
 By default, it will be downloaded in sub-folder ``FabSim3`` in your current directory, you also can set the installation directory by setting ``[fabsim_INSTALL_DIR]`` parameter.
 
@@ -66,9 +66,9 @@ To add to your ``~/.bashrc``::
 
 6. For `QCG <http://www.qoscosgrid.org/trac/qcg>`_ users, 
 
-* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in:
+* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in
 
-    {fabsim_INSTALL_DIR}/deploy/machines_user.yml
+    ``{fabsim_INSTALL_DIR}/deploy/machines_user.yml``
 
 * Sets up SSH key pairs for FabSim3 access:: 
     
@@ -80,13 +80,11 @@ To add to your ``~/.bashrc``::
     
 * Copy ``usercert.pem`` and ``userkey.pem`` from your account to ``~/.globus``::
 
-		scp plg<user>@eagle.man.poznan.pl:~/.globus/usercert.pem ~/.globus
-		scp plg<user>@eagle.man.poznan.pl:~/.globus/userkey.pem ~/.globus
+    scp plg<user>@eagle.man.poznan.pl:~/.globus/usercert.pem ~/.globus
+    scp plg<user>@eagle.man.poznan.pl:~/.globus/userkey.pem ~/.globus
 		
 FabSim3 Usage
 -------------
-To enable use of FabSim3 on your local host, type::
+To enable use of FabSim3 on your local host, type the following command and, then you can use all FabSim3 commands::
 
     fab localhost setup_fabsim
-
-and, then you can use all FabSim3 commands as it mentioned in GitHub page.
