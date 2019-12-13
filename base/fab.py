@@ -14,14 +14,12 @@ from fabric.contrib.project import *
 from base.manage_remote_job import *
 from base.setup_fabsim import *
 from fabric.api import settings
-from xml.etree import ElementTree
 import time
 import re
 import numpy as np
 import yaml
 import tempfile
 import os.path
-import subprocess
 import math
 from pprint import PrettyPrinter
 from pathlib import Path
@@ -361,9 +359,6 @@ def put_profiles(name=''):
 
     """
     Sets up directories required for the use of FabSim.
-    """
-    """
-    Creates the necessary fab dirs remotely.
     """
     run(template(get_setup_fabsim_dirs_string()))
 
@@ -750,9 +745,9 @@ def manual_gsissh(cmd):
 
 def run(cmd):
     if env.manual_gsissh:
-        return manual_gsissh(cmd)
+        manual_gsissh(cmd)
     elif env.manual_ssh:
-        return manual(cmd)
+        manual(cmd)
     else:
         return fabric.api.run(cmd)
 
@@ -837,7 +832,6 @@ def install_packages(virtual_env='False'):
         open(os.path.join(env.localroot, 'deploy', 'applications.yml')),
         Loader=yaml.SafeLoader
     )
-    packages = config['packages']
 
     tmp_app_dir = "%s/tmp_app" % (env.localroot)
     local('mkdir -p %s' % (tmp_app_dir))
