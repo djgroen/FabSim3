@@ -52,7 +52,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 * Basic :ref:`installation` instructions
 * Testing simple jobs with FabDummy: https://github.com/djgroen/FabDummy/blob/master/README.md
-* How to set up and use FabSim3 with the Singularity containerization environment: https://github.com/djgroen/FabSim3/blob/master/doc/FabSim3SingularityUsage.md
+* Set up and use :ref:`fabsim3singularity` containerization environment
 
 **Intermediate:**
 
@@ -93,6 +93,7 @@ Table of contents
    :maxdepth: 1
 
    installation
+   fabsim3singularity
 
 
 Indices and tables
