@@ -25,3 +25,15 @@ To run *N* jobs with exactly the same configuration (e.g., to account for stocha
 
 You can also combine replicas with ensemble runs, e.g. using:
 `fab localhost dummy_ensemble:dummy_test,replicas=N`
+
+
+### Multi-thread execution
+
+To make the time to time solution faster (for the machine that launched the command, not the remote machine), it is possible to use several threads instead of 1 (the default configuration).
+
+You just have to specify the number of thread in command line.  eg. with the previous FabDummy command :
+
+`fab <machine_name> dummy_ensemble:<config, e.g. dummy_test>,wall_time=1:00:00,cores=4,nb_thread=3`
+
+This command will launch use 3 threads instead of 1 like before.
+Warning : It's currently recommended to not use more than 6 threads or the reliability of the ssh connexion could be a problem
