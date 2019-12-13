@@ -12,6 +12,7 @@ Dependencies
 * `OpenSSH Server <https://www.openssh.com/>`_:
 
 Installation under Ubuntu Linux::
+
 	sudo apt install openssh-server
     
 Installations under CentOS Linux::
