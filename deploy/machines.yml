@@ -122,39 +122,6 @@ prometheus:
   python_build: "python2.7"
   corespernode: 24
 
-
-supermuc1_thin:
-  max_job_name_chars: 15
-  job_dispatch: "llsubmit"
-  run_command: "poe"
-  batch_header: ll-supermuc
-  bac_ensemble_namd_script: bac-supermuc
-  bac_ties_script: bac-ties-supermuc
-  remote: "sb.supermuc.lrz.de"
-  home_path_template: "/home/hpc/$project/$username"
-  runtime_path_template: "/gpfs/work/$project/$username"
-  modules: ["load namd/2.10"] #-25Sep11"]
-  module_load_at_connect: false
-  temp_path_template: "$work_path/tmp"
-  queue: "standard"
-  python_build: "lib64/python2.6"
-  corespernode: 16
-supermuc1_fat:
-  max_job_name_chars: 15
-  job_dispatch: "llsubmit"
-  run_command: "poe"
-  batch_header: ll-supermuc
-  bac_ensemble_namd_script: bac-supermuc
-  bac_ties_script: bac-ties-supermuc
-  remote: "wm.supermuc.lrz.de"
-  home_path_template: "/home/hpc/$project/$username"
-  runtime_path_template: "/gpfs/work/$project/$username"
-  modules: ["load namd/2.10"] #-25Sep11"]
-  module_load_at_connect: false
-  temp_path_template: "$work_path/tmp"
-  queue: "standard"
-  python_build: "lib64/python2.6"
-  corespernode: 40
 supermuc2:
   max_job_name_chars: 15
   job_dispatch: "llsubmit"
@@ -212,23 +179,6 @@ bluejoule:
   corespernode: 16
   pwd: "#"
   stat: "llq -u $username"
-bluewonder1:
-  job_dispatch: "bsub <"
-  run_command: "mpiexec.hydra -n $cores"
-  run_ensemble_command: "mpiexec.hydra -n $cores_per_replica"
-  batch_header: lsf1
-  bac_ensemble_namd_script: bac-wonder-namd
-  bac_ensemble_nmode_script: bac-wonder1-nmode
-#  bac_ensemble_nmode_script: bac-wonder1-nmode-test
-  bac_ensemble_nm_remote_script: bac-wonder1-nm-remote
-  remote: "phase1.wonder.hartree.stfc.ac.uk"
-  home_path_template: "/gpfs/home/$project/$groupname/$username"
-  runtime_path_template: "/gpfs/home/$project/$groupname/$username"
-  modules: ["load namd/2.9"]
-  queue: "standard"
-  corespernode: 16
-  pwd: "#"
-  stat: "bjobs -W $username"
 bluewonder2:
   job_dispatch: "bsub <"
   run_command: "mpiexec.hydra -n $cores"
@@ -258,20 +208,6 @@ localhost:
   home_path_template: "/home/$username"
   # The setting below can be useful for debugging if you run into problems.
   # manual_ssh: true
-mavrino:
-  max_job_name_chars: 15
-  # on mavrino, job names can't start with a digit, so we'll just prefix the bloody thing with a 'p' to prevent user annoyance.
-  job_name_template: '${config}_${machine_name}_${cores}'
-  job_dispatch: "qsub"
-  run_command: "/opt/mpich2/gnu/bin/mpirun -np $cores"
-  remote: "mavrino"
-  home_path_template: "/home/$username"
-  runtime_path_template: "/home/$username"
-  temp_path_template: "$work_path/tmp"
-  corespernode: 8
-  batch_header: sge
-  queue: "parallel2" #"mapper"
-
 
 QCG_PJ: &QCG_PilotJob
   # pilot job manager installation  
