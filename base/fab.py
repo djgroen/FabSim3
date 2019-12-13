@@ -537,7 +537,7 @@ def job(sweep_length=1, *option_dictionaries):
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     job_results_dir[threading.get_ident()].update(
                         {'job_script': script_templates(env.batch_header)})
-                    #  Suppose to be in PJM mode --> no multithreading --> env
+                    #  Suppose to be in PJM mode --> no multithreading --> env
                     # = ok
                     env.job_script = job_results_dir[
                         threading.get_ident()]['job_script']
@@ -641,8 +641,8 @@ def job(sweep_length=1, *option_dictionaries):
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
 
-                # Allow option to submit all preparations, but not actually submit
-                # the job
+                # Allow option to submit all preparations,
+                # but not actually submit the job
                 job_info = ''
                 if hasattr(env, 'dispatch_jobs_on_localhost') and \
                         isinstance(env.dispatch_jobs_on_localhost, bool) and \
@@ -652,7 +652,8 @@ def job(sweep_length=1, *option_dictionaries):
                     print("job dispatch is done locally\n")
 
                 elif not env.get("noexec", False):
-                    with cd(job_results_dir[threading.get_ident()]['job_results']):
+                    with cd(job_results_dir[threading.get_ident()]
+                            ['job_results']):
                         with prefix(env.run_prefix):
                             run_stdout = run(
                                 template("$job_dispatch %s" % job_results_dir[
@@ -768,7 +769,7 @@ def run_ensemble(config, sweep_dir, **args):
                 sweepdir_items.index(
                     env.exec_first)))
 
-    # Prevention since some laptop doesn't support more than 4 threads
+    # Prevention since some laptop doesn't support more than 4 threads
     if int(env.nb_thread) > 4:
         env.nb_thread = 4
 
