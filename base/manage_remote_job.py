@@ -243,8 +243,6 @@ def save_submitted_job_info(jobID=''):
         f = open(os.path.join(env.local_jobsDB_path,
                               env.local_jobsDB_filename), "a")
 
-
-
     """
     # 3) retrieves jobID for the last submitted job on the remote machine
 
@@ -260,7 +258,7 @@ def save_submitted_job_info(jobID=''):
     """
 
     # 3) Add the jobID into local_jobsDB_filename (and only the jobID)
-    f.write("%-30s \n" %jobID)
+    f.write("%-30s \n" % jobID)
     f.close()
 
 
