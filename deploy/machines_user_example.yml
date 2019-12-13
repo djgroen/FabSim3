@@ -15,8 +15,9 @@ archer:
   username: "user"
   project: "e123"
   budget: "e123-user"
-localhost:
 # SuperMUC phase2 connecting using GSISSH
+localhost:
+  username: "<your-username>"
 supermuc2:
   username: "ab12cde"
   project: "fg34hi"
