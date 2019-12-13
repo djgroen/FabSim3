@@ -10,7 +10,7 @@ default:
     dummy: []
 
   # Number of threads when launch "run_ensemble"command
-  # High number of thread will make the command faster but could impact the reliability of the ssh connexion (limit to 6 threads)
+  # High number of thread will make the command faster but could impact the reliability of the ssh connection (limit to 6 threads)
   nb_thread: 1
 
   # loading virtual environment on the remote machine 
