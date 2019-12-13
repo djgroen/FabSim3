@@ -17,11 +17,9 @@ from os import environ
 from os.path import join
 from sys import version_info
 import sys
-import fabric.api
 from fabric.api import *
 import os
 import sys
-import subprocess
 import posixpath
 import yaml
 from .templates import *
