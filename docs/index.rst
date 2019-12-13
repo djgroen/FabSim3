@@ -52,7 +52,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 * Basic :ref:`installation` instructions
 * Testing simple jobs with FabDummy: https://github.com/djgroen/FabDummy/blob/master/README.md
-* Set up and use :ref:`fabsim3singularity` containerization environment
+* Set up and use FabSim3 with :ref:`fabsim3singularity` containerization environment
 
 **Intermediate:**
 
@@ -61,9 +61,9 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 **Advanced:**
 
-* How to create your own plugin: https://github.com/djgroen/FabSim3/blob/master/doc/CreatePlugins.md
-* How to write automation scripts: https://github.com/djgroen/FabSim3/blob/master/doc/CreateAutomationScripts.md
-* How to use FabSim with QCG middleware: https://github.com/djgroen/FabSim3/blob/master/doc/FabSim%2BQCG.md
+* How to :ref:`createplugin`
+* How to write and :ref:`createautomation`
+* How to use FabSim3 with QCG middleware: :ref:`fabsim3qcg`
 
 Citing FabSim3
 ==============
@@ -94,6 +94,9 @@ Table of contents
 
    installation
    fabsim3singularity
+   createplugin
+   createautomation
+   fabsim3qcg
 
 
 Indices and tables
