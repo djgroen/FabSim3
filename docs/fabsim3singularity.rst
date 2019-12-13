@@ -12,63 +12,60 @@ Dependencies
 * `OpenSSH Server <https://www.openssh.com/>`_:
 
 Installation under Ubuntu Linux::
-    
-        sudo apt install openssh-server
+	sudo apt install openssh-server
     
 Installations under CentOS Linux::
-        
-        sudo yum install -y openssh-server
+
+	sudo yum install -y openssh-server
 
 Installation
 -------------
-1. Download the singularity image from `Singularity Hub <https://singularity-hub.org/>`_::
+Download the singularity image from `Singularity Hub <https://singularity-hub.org/>`_::
 
-    singularity pull --name fabsim.simg shub://arabnejad/FabSim3
+   	singularity pull --name fabsim.simg shub://arabnejad/FabSim3
 	
-.. note:: The download image should be kept as ``fabsim.simg``, this filename will be used later for setting environment variable and alias names in your ``bashrc`` file
+.. note:: The download image should be kept as ``fabsim.simg``, this filename will be used later for setting environment variable and alias names in your ``bashrc`` file.
 
-2. To see How to Use Fabsim3 singularity::
+To see How to Use Fabsim3 singularity::
 
-    ./fabsim.simg --help
+	./fabsim.simg --help
 
 or ::
 
-    ./fabsim.simg -h
+	./fabsim.simg -h
 
-3. Running the following will download the `FabSim3 <https://github.com/djgroen/FabSim3>`_ library in your local machine::
+Running the following will download the `FabSim3 <https://github.com/djgroen/FabSim3>`_ library in your local machine::
 
-    ./fabsim.simg --install [fabsim_INSTALL_DIR]
+	./fabsim.simg --install [fabsim_INSTALL_DIR]
     
 or ::
 
-    ./fabsim.simg -i [fabsim_INSTALL_DIR]
+	./fabsim.simg -i [fabsim_INSTALL_DIR]
 
 By default, it will be downloaded in sub-folder ``FabSim3`` in your current directory, you also can set the installation directory by setting ``[fabsim_INSTALL_DIR]`` parameter.
 
-4. At the end of installation part, you will received a message, which explain how you should setup your PC for further usage::
+At the end of installation part, you will received a message, which explain how you should setup your PC for further usage::
 
-    ./fabsim.simg -i [fabsim_INSTALL_DIR]
+	./fabsim.simg -i [fabsim_INSTALL_DIR]
 
 Please add/load the generated ``fabsim_env.conf`` in your ``~/.bashrc``. 
 
 To load::
 
-    $ source \${fabsim_INSTALL_DIR}/fabsim_env.conf 
+	$ source \${fabsim_INSTALL_DIR}/fabsim_env.conf 
 
 To add to your ``~/.bashrc``::
+
+	$ echo \"source \${fabsim_INSTALL_DIR}/fabsim_env.conf\" >> ~/.bashrc 	
+	$ source ~/.bashrc 	
     
-    $ echo \"source \${fabsim_INSTALL_DIR}/fabsim_env.conf\" >> ~/.bashrc 	
-    $ source ~/.bashrc 	
-    
-``fabsim_INSTALL_DIR`` will be replaced by your local machine path
+``fabsim_INSTALL_DIR`` will be replaced by your local machine path.
 
-5. After, loading the environment variable from ``fabsim_env.conf`` into your into the current shell script, **fab** command will be available as a alias name to run for singularity image and accept all FabSim3 command.
+After, loading the environment variable from ``fabsim_env.conf`` into your into the current shell script, **fab** command will be available as a alias name to run for singularity image and accept all FabSim3 command.
 
-6. For `QCG <http://www.qoscosgrid.org/trac/qcg>`_ users, 
+For `QCG <http://www.qoscosgrid.org/trac/qcg>`_ users, 
 
-* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in
-
-    ``{fabsim_INSTALL_DIR}/deploy/machines_user.yml``
+* Please make sure, you udpate/replace ``username: "plg<your-username>"`` with your username account in ``{fabsim_INSTALL_DIR}/deploy/machines_user.yml``.
 
 * Sets up SSH key pairs for FabSim3 access:: 
     
