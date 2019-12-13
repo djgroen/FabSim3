@@ -34,6 +34,7 @@ mutex = Lock()
 mutex_template = Lock()
 mutex_env = Lock()
 mutex_complete = Lock()
+mutex_jobID = Lock()
 
 
 def get_plugin_path(name, quiet=False):
@@ -70,16 +71,9 @@ def with_template_job(ensemble_mode=False, label=None):
     """
 
     # The name is now depending of the label name
-    # if ensemble_mode is False:
-    #    name = template(env.job_name_template)
-    # else:
-    #    name = template(env.job_name_template) + '_' + env.label
     name = template(env.job_name_template)
-    # DEBUG label from parameters now replace env.get('label)
-    # if env.get('label') and not ensemble_mode:
-    #    name = '_'.join((env['label'], name))
     if label and not ensemble_mode:
-        name = '_'.join(label, name)
+        name = '_'.join((label, name))
 
     job_results, job_results_local = with_job(name, ensemble_mode, label)
 
@@ -97,26 +91,16 @@ def with_job(name, ensemble_mode=False, label=None):
     """
     env.name = name
     if not ensemble_mode:
-        # env.job_results = env.pather.join(env.results_path, name)
         job_results = env.pather.join(env.results_path, name)
-        # env.job_results_local = os.path.join(env.local_results, name)
         job_results_local = os.path.join(env.local_results, name)
     else:
-        # env.job_results = "%s/RUNS/%s" % (env.pather.join(
-            # env.results_path, name), env.label)
         job_results = "%s/RUNS/%s" % (env.pather.join(
             env.results_path, name), label)
-        # env.job_results_local = "%s/RUNS/%s" % (os.path.join(
-        # env.local_results, name), env.label)
         job_results_local = "%s/RUNS/%s" % (os.path.join(
             env.local_results, name), label)
 
-    # env.job_results_contents = env.pather.join(env.job_results, '*')
     env.job_results_contents = env.pather.join(job_results, '*')
-    # env.job_results_contents_local = os.path.join(env.job_results_local, '*')
     env.job_results_contents_local = os.path.join(job_results_local, '*')
-    # Redefine the job name depending of the label name for ensemble run
-    # Need to be condition of ensemble run
 
     # Template name is now depending of the label of the job when needed
     if label is not None:
@@ -464,7 +448,6 @@ def job(sweep_length=1, *option_dictionaries):
 
     # Crapy, In the case where job() is call outside run_ensemble
     # and usually only with option_dictionnaries as arg
-    # TODO improve it
     if isinstance(sweep_length, dict) and not isinstance(
             option_dictionaries, dict):
         option_dictionaries = [sweep_length]
@@ -479,10 +462,9 @@ def job(sweep_length=1, *option_dictionaries):
     # all these variable are saved in a dict specific to the thread_id
     job_results_dir[threading.get_ident()] = {}
     job_results_dir[threading.get_ident()].update({'label': ''})
-    if env.ensemble_mode is True:
-        if 'label' in option_dictionaries[0]:
-            job_results_dir[threading.get_ident(
-            )]['label'] = option_dictionaries[0]['label']
+    if 'label' in option_dictionaries[0]:
+        job_results_dir[threading.get_ident(
+        )]['label'] = option_dictionaries[0]['label']
 
     # Use this to request more cores than we use, to measure performance
     # without sharing impact
@@ -499,27 +481,9 @@ def job(sweep_length=1, *option_dictionaries):
         # Make sure that prefix and module load definitions are properly
         # updated.
         for i in range(1, int(env.replicas) + 1):
-            #  DEBUG set important path to env (gloabl variable) --> must be
-            # reset on local set then reset on gloab for the env.yml file
 
-            # Responsible of multi-threading non robustness !!
-            # (because call twice..)
-            # with_template_job(env.ensemble_mode)
-            """
-            eg.
-            Reserve_mutex()
-            do :
-                with_template_job(env.ensemble_mode)
-                job_results = env.job_results
-                job_results_local = env.job_results_local
-            drop_mutex()
-
-            Then all the next reference to these env.variables
-            must be replace by the local one
-            """
             mutex_template.acquire()
             try:
-                # DEBUG CHanged with_job to avoid env variable
                 job_results, job_results_local = with_template_job(
                     env.ensemble_mode,
                     job_results_dir[threading.get_ident()]['label'])
@@ -542,24 +506,6 @@ def job(sweep_length=1, *option_dictionaries):
             finally:
                 mutex_template.release()
 
-            # Next part is done previously and no longer save in env.
-            """
-            if int(env.replicas) > 1:
-                if env.ensemble_mode is False:
-                    update_environment({
-                        'job_results':
-                        env.job_results + '_replica_' + str(i)})
-                    update_environment({
-                        'job_results_contents_local':
-                        env.job_results_contents_local + '_replica_' + str(i)})
-                else:
-                    update_environment({
-                        'job_results':
-                        env.job_results + '_' + str(i)})
-                    update_environment({
-                        'job_results_contents_local':
-                        env.job_results_contents_local + '_' + str(i)})
-            """
             complete_environment()
 
             calc_nodes()
@@ -591,6 +537,8 @@ def job(sweep_length=1, *option_dictionaries):
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     job_results_dir[threading.get_ident()].update(
                         {'job_script': script_templates(env.batch_header)})
+                    # Suppose to be here in PJM mode --> no multithreading --> env = ok
+                    env.job_script = job_results_dir[threading.get_ident()]['job_script']
                 else:
                     job_results_dir[threading.get_ident()].update({
                         'job_script':
@@ -607,16 +555,9 @@ def job(sweep_length=1, *option_dictionaries):
             finally:
                 mutex_template.release()
 
-            # if sweep_length == 1:
-            # put(env.job_script, env.dest_name)
             put(job_results_dir[threading.get_ident()]['job_script'],
                 job_results_dir[threading.get_ident()]['dest_name'])
 
-            # Store previous fab commands in bash history.
-            # env.fabsim_command_history = get_fabsim_command_history()
-
-            # Make directory, copy input files and job script to results
-            # directory
 
             run(
                 template(
@@ -668,6 +609,18 @@ def job(sweep_length=1, *option_dictionaries):
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
+
+                if ((hasattr(env, 'NoEnvScript') and not env.NoEnvScript) or not hasattr(env, 'NoEnvScript')):
+                    #DEBUG add mutex here
+                    mutex.acquire()
+                    try:
+                        env.idsID = len(env.submitted_jobs_list) + 1
+                        env.idsPath = env.pather.join(
+                            job_results_dir[threading.get_ident()]['job_results'], env.pather.basename(job_results_dir[threading.get_ident()]['job_script']))
+                        env.submitted_jobs_list.append(
+                            script_template_content('qcg-PJ-task-template'))
+                    finally:
+                        mutex.release()
                 return
 
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
@@ -684,14 +637,6 @@ def job(sweep_length=1, *option_dictionaries):
                 local(template("$job_dispatch " + env.job_script))
                 print("job dispatch is done locally\n")
 
-                '''
-                # wait a little bit before fetching the jobID for the
-                # just-submitted task
-                time.sleep(2)
-                save_submitted_job_info()
-                print("jobID is stored into : %s\n" % (os.path.join(
-                    env.local_jobsDB_path, env.local_jobsDB_filename)))
-                '''
 
             elif not env.get("noexec", False):
                 with cd(job_results_dir[threading.get_ident()]['job_results']):
@@ -700,20 +645,15 @@ def job(sweep_length=1, *option_dictionaries):
                             template("$job_dispatch %s" % job_results_dir[
                                      threading.get_ident()]['dest_name'])
                         )
-                        # Get the sbatch jobID
+                        # Get the jobID, Works on Slurm system
                         job_info = run_stdout.split()[3]
 
             if env.remote != 'localhost':
-                """
-                Since the jobs can be launch simultenaously, the jobID 's
-                file is protected by a mutex to prevent concurrent writting
-                mutex.acquire()
+                mutex_jobID.acquire()
                 try:
                     save_submitted_job_info(jobID=job_info)
                 finally:
-                    mutex.release()
-                """
-                save_submitted_job_info(jobID=job_info)
+                    mutex_jobID.release()
 
                 print("jobID is stored into : %s\n" % (os.path.join(
                     env.local_jobsDB_path, env.local_jobsDB_filename)))
@@ -812,6 +752,11 @@ def run_ensemble(config, sweep_dir, **args):
                 sweepdir_items.index(
                     env.exec_first)))
 
+
+    # Prevention since some laptop doesn't support more than 4 threads
+    if int(env.nb_thread) > 4 :
+        env.nb_thread = 4 
+
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
@@ -834,7 +779,7 @@ def run_ensemble(config, sweep_dir, **args):
                             args=(sweep_length,
                                   dict(memory='2G', ensemble_mode=True,
                                        label=item)))
-
+            '''
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
@@ -843,6 +788,10 @@ def run_ensemble(config, sweep_dir, **args):
                     env.job_results, env.pather.basename(env.job_script))
                 env.submitted_jobs_list.append(
                     script_template_content('qcg-PJ-task-template'))
+            '''
+
+    atp.awaitJobOver()  # Wait for all jobs to be done
+    atp.shutdownThreads()
 
     if sweep_length == 0:
         print(
@@ -858,7 +807,6 @@ def run_ensemble(config, sweep_dir, **args):
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
         job(dict(memory='2G', label='PJ_PYheader', NoEnvScript=True), args)
-        # DEBUG no env.job_script
         env.PJ_PATH = env.pather.join(
             env.job_results, env.pather.basename(env.job_script))
         env.PJ_FileName = env.pather.basename(env.job_script)
