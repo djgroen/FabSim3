@@ -41,10 +41,6 @@ def script_template_content(template_name):
 
 
 def script_template_save_temporary(content):
-<<<<<<< HEAD
-
-=======
->>>>>>> a334a18aa545303da309bda944a2f558b930c351
     # script name is now depending of the label name to avoid problem
     # with multithreading
     destname = os.path.join(env.localroot, 'deploy',
