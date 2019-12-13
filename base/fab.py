@@ -621,48 +621,55 @@ def job(sweep_length=1, *option_dictionaries):
                             script_template_content('qcg-PJ-task-template'))
                     finally:
                         mutex.release()
-                return
+                
+                if (i > int(env.replicas)):
+                    return
 
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
+
                 return
 
-            # Allow option to submit all preparations, but not actually submit
-            # the job
+            # We don't want to go next during replicas and pjm until the final job
+            if not (hasattr(env, 'submit_job') and
+                    isinstance(env.submit_job, bool) and
+                    env.submit_job is False):
 
-            job_info = ''
-            if hasattr(env, 'dispatch_jobs_on_localhost') and \
-                    isinstance(env.dispatch_jobs_on_localhost, bool) and \
-                    env.dispatch_jobs_on_localhost:
-                env.job_script = job_script
-                local(template("$job_dispatch " + env.job_script))
-                print("job dispatch is done locally\n")
+                # Allow option to submit all preparations, but not actually submit
+                # the job
+                job_info = ''
+                if hasattr(env, 'dispatch_jobs_on_localhost') and \
+                        isinstance(env.dispatch_jobs_on_localhost, bool) and \
+                        env.dispatch_jobs_on_localhost:
+                    env.job_script = job_script
+                    local(template("$job_dispatch " + env.job_script))
+                    print("job dispatch is done locally\n")
 
 
-            elif not env.get("noexec", False):
-                with cd(job_results_dir[threading.get_ident()]['job_results']):
-                    with prefix(env.run_prefix):
-                        run_stdout = run(
-                            template("$job_dispatch %s" % job_results_dir[
-                                     threading.get_ident()]['dest_name'])
-                        )
-                        # Get the jobID, Works on Slurm system
-                        # output after submition : Submitted batch job XXXX
-                        job_info = run_stdout.split()[3]
+                elif not env.get("noexec", False):
+                    with cd(job_results_dir[threading.get_ident()]['job_results']):
+                        with prefix(env.run_prefix):
+                            run_stdout = run(
+                                template("$job_dispatch %s" % job_results_dir[
+                                         threading.get_ident()]['dest_name'])
+                            )
+                            # Get the jobID, Works on Bull cluster, need to check on others
+                            if run_stdout:
+                                job_info = run_stdout.split()[3]
 
-            if env.remote != 'localhost':
-                mutex_jobID.acquire()
-                try:
-                    save_submitted_job_info(jobID=job_info)
-                finally:
-                    mutex_jobID.release()
+                if env.remote != 'localhost':
+                    mutex_jobID.acquire()
+                    try:
+                        save_submitted_job_info(jobID=job_info)
+                    finally:
+                        mutex_jobID.release()
 
-                print("jobID is stored into : %s\n" % (os.path.join(
-                    env.local_jobsDB_path, env.local_jobsDB_filename)))
+                    print("jobID is stored into : %s\n" % (os.path.join(
+                        env.local_jobsDB_path, env.local_jobsDB_filename)))
 
-            print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
-                  (env.remote,
-                   job_results_dir[threading.get_ident()]['job_results'])
-                  )
+                print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
+                      (env.remote,
+                       job_results_dir[threading.get_ident()]['job_results'])
+                      )
 
         print("Use `fab %s fetch_results` to copy the results back to %s on\
             localhost." % (env.machine_name, job_results_local)
