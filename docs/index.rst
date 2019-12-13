@@ -63,7 +63,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 * How to :ref:`createplugin`
 * How to write and :ref:`createautomation`
-* How to use FabSim3 with QCG middleware: :ref:`fabsim3qcg`
+* How to use :ref:`fabsim3qcg`
 
 Citing FabSim3
 ==============
