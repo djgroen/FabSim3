@@ -14,7 +14,7 @@ matrix:
         - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
         - fab localhost install_plugin:FabDummy
       script:
-        - python -m pytest tests/
+        - python -m pytest --capture=no --verbose tests/
         - py.test --pep8 base/ --ignore=E501
 
     - stage: building docker image
