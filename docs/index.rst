@@ -50,7 +50,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 **Basic:**
 
-* Basic installation and testing instructions: https://github.com/djgroen/FabSim3/docs/installation.rst
+* Basic installation and testing instructions: :ref:`installation`
 * Testing simple jobs with FabDummy: https://github.com/djgroen/FabDummy/blob/master/README.md
 * How to set up and use FabSim3 with the Singularity containerization environment: https://github.com/djgroen/FabSim3/blob/master/doc/FabSim3SingularityUsage.md
 
@@ -90,7 +90,7 @@ Table of contents
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation
 
