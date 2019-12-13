@@ -559,8 +559,10 @@ def job(*option_dictionaries):
                         # run_stdout is a string :
                         # "Running... dispatch batch job XXXXX" Work on genji
                         run_stdout = run(template("$job_dispatch $dest_name"))
-                        # Get the sbatch jobID
-                        job_info = run_stdout.split()[4]
+                        # Get the sbatch jobID (if it exists)
+                        if run_stdout:
+                            if len(run_stdout.split()) > 4:
+                                job_info = run_stdout.split()[4]
 
             if env.remote != 'localhost':
                 save_submitted_job_info(jobID=job_info)
