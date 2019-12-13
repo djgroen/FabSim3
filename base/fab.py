@@ -537,7 +537,7 @@ def job(sweep_length=1, *option_dictionaries):
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     job_results_dir[threading.get_ident()].update(
                         {'job_script': script_templates(env.batch_header)})
-                    # Suppose to be here in PJM mode --> no multithreading --> env = ok
+                    # Suppose to be in PJM mode --> no multithreading --> env = ok
                     env.job_script = job_results_dir[threading.get_ident()]['job_script']
                 else:
                     job_results_dir[threading.get_ident()].update({
@@ -611,7 +611,7 @@ def job(sweep_length=1, *option_dictionaries):
                     env.submit_job is False):
 
                 if ((hasattr(env, 'NoEnvScript') and not env.NoEnvScript) or not hasattr(env, 'NoEnvScript')):
-                    #DEBUG add mutex here
+                    # Protect concurrent writting
                     mutex.acquire()
                     try:
                         env.idsID = len(env.submitted_jobs_list) + 1
@@ -646,6 +646,7 @@ def job(sweep_length=1, *option_dictionaries):
                                      threading.get_ident()]['dest_name'])
                         )
                         # Get the jobID, Works on Slurm system
+                        # output after submition : Submitted batch job XXXX
                         job_info = run_stdout.split()[3]
 
             if env.remote != 'localhost':
@@ -779,16 +780,6 @@ def run_ensemble(config, sweep_dir, **args):
                             args=(sweep_length,
                                   dict(memory='2G', ensemble_mode=True,
                                        label=item)))
-            '''
-            if (hasattr(env, 'submit_job') and
-                    isinstance(env.submit_job, bool) and
-                    env.submit_job is False):
-                env.idsID = len(env.submitted_jobs_list) + 1
-                env.idsPath = env.pather.join(
-                    env.job_results, env.pather.basename(env.job_script))
-                env.submitted_jobs_list.append(
-                    script_template_content('qcg-PJ-task-template'))
-            '''
 
     atp.awaitJobOver()  # Wait for all jobs to be done
     atp.shutdownThreads()
@@ -814,8 +805,6 @@ def run_ensemble(config, sweep_dir, **args):
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
 
-    atp.awaitJobOver()  # Wait for all jobs to be done
-    atp.shutdownThreads()
 
 
 def input_to_range(arg, default):
