@@ -50,7 +50,7 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 **Basic:**
 
-* Basic installation and testing instructions: https://github.com/djgroen/FabSim3/blob/master/INSTALL.md
+* Basic installation and testing instructions: https://github.com/djgroen/FabSim3/docs/installation.rst
 * Testing simple jobs with FabDummy: https://github.com/djgroen/FabDummy/blob/master/README.md
 * How to set up and use FabSim3 with the Singularity containerization environment: https://github.com/djgroen/FabSim3/blob/master/doc/FabSim3SingularityUsage.md
 
@@ -84,10 +84,15 @@ Please find the BibTex reference below of our FabSim3 software paper in *Compute
   author = "Derek Groen and Agastya P. Bhati and James Suter and James Hetherington and Stefan J. Zasada and Peter V. Coveney",
   }
 
+.. _toc:
 
+Table of contents
+-----------------
 
 .. toctree::
    :maxdepth: 2
+
+   installation
 
 
 Indices and tables
