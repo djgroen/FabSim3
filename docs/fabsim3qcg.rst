@@ -42,7 +42,7 @@ Then, set up configuration for remote machine in ``/deploy/machines.yml`` file. 
 
 * ``stat``: filled by the command-line that displays report on the submitted jobs. In this example, according to our grid broker, ``qcg-list`` command displays table with information about tasks. 
 
-.. note:: It should be set in the way that only return jobID, job status, and host in the output (without column header). For example, the template output should be similar to::
+It should be set in the way that only return jobID, job status, and host in the output (without column header). For example, the template output should be similar to::
 
       =======   =========   ===========
       jobID1    FINISHED    eagle
