@@ -27,16 +27,6 @@ def test_fabdummy_install():
         ["fab", "localhost", "install_plugin:FabDummy"]) == 0)
 
 
-def test_fabsim_password_bugfix():
-    """
-    GitHub Issue #56
-    """
-    output = subprocess.check_output(
-        ["fab", "localhost", "dummy:dummy_test,password=ERROR,dumpenv=True"]).decode("utf-8")
-    print(output)
-    assert(output.find('\'password\': \'ERROR\'') < 0)
-
-
 def test_fabdummy_without_manual_ssh():
     assert(subprocess.call(
         ["fab", "localhost", "dummy:dummy_test,manual_ssh=false"]) == 0)
@@ -99,3 +89,13 @@ def test_dummy_ensemble_replicas_with_manual_ssh():
     output = subprocess.check_output(
         ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,manual_ssh=true"]).decode("utf-8")
     assert(output.find('success') >= 0)
+
+    
+def test_fabsim_password_bugfix():
+    """
+    GitHub Issue #56
+    """
+    output = subprocess.check_output(
+        ["fab", "localhost", "dummy:dummy_test,password=ERROR,dumpenv=True"]).decode("utf-8")
+    print(output)
+    assert(output.find('\'password\': \'ERROR\'') < 0)
