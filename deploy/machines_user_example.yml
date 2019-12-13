@@ -15,9 +15,7 @@ archer:
   username: "user"
   project: "e123"
   budget: "e123-user"
-  lammps_exec: "/home/e123/e123/user/lmp_xc30"
 localhost:
-  lammps_exec: "/home/your-username/bin/lmp_serial"
 # SuperMUC phase2 connecting using GSISSH
 supermuc2:
   username: "ab12cde"
