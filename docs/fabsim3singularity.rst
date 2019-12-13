@@ -1,6 +1,6 @@
 .. _fabsim3singularity:
 
-FabSim3 Singularity Usage
+Singularity Usage
 =========================
 
 In this tutorial, we will explain how to download, setup, and run `FabSim3 <https://github.com/djgroen/FabSim3>`_ within a singularity container image.
