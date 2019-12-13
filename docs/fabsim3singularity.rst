@@ -31,17 +31,17 @@ Installation
 
     ./fabsim.simg --help
 
-or
+or ::
 
-``./fabsim.simg -h``
+    ./fabsim.simg -h
 
 3. Running the following will download the `FabSim3 <https://github.com/djgroen/FabSim3>`_ library in your local machine::
 
     ./fabsim.simg --install [fabsim_INSTALL_DIR]
     
-or
+or ::
 
-``./fabsim.simg -i [fabsim_INSTALL_DIR]``
+    ./fabsim.simg -i [fabsim_INSTALL_DIR]
 
 By default, it will be downloaded in sub-folder ``FabSim3`` in your current directory, you also can set the installation directory by setting ``[fabsim_INSTALL_DIR]`` parameter.
 
