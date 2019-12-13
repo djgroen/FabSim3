@@ -16,8 +16,9 @@ Dependencies
 You can install these modules as follows::
   
     pip3 install PyYAML
-    pip3 install numpy and 
     pip3 install fabric3
+    pip3 install numpy
+ 
 
 2. To perform the ``Py.test`` tests (not required for using FabSim3, but essential for running the tests), you will need ``pytest`` and ``pytest-pep8``.
 
