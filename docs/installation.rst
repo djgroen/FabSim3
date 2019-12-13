@@ -62,7 +62,7 @@ For Mac Users, make sure to override the default home directory, by switching th
 
     home_path_template: "/Users/$username"
 
-4. To enable use of FabSim on your local host, type::
+4. To enable use of FabSim3 on your local host, type::
 
     fab localhost setup_fabsim
     
@@ -72,11 +72,11 @@ For Mac Users, in the **deploy/machines.yml**, change::
     
     runtime_path_template:"$home_path" to runtime_path_template:"~"
 
-5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type::
+5. To enable use of FabSim3 on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type::
 
     fab <machine_name> setup_fabsim
 
-.. note:: FabSim commands can now be launched using the **fabsim** command. Note that some older tutorials might use **fab** commands instead of **fabsim**. If **fabsim** command is not found, simply add PATH and PYTHONPATH (step 2) to **~/.bash_profile**, as well as set environment for Python3 in the **bin/fabsim** by replacing **#!/usr/bin/python3** to **#!/usr/bin/env python3**. The two commands can be used interchangably, although the **fabsim** command gives clearer outputs and can be launched from anywhere (**fab** can only be used within the FabSim installation directories). 
+.. note:: FabSim3 commands can now be launched using the **fabsim** command. Note that some older tutorials might use **fab** commands instead of **fabsim**. If **fabsim** command is not found, simply add PATH and PYTHONPATH (step 2) to **~/.bash_profile**, as well as set environment for Python3 in the **bin/fabsim** by replacing **#!/usr/bin/python3** to **#!/usr/bin/env python3**. The two commands can be used interchangably, although the **fabsim** command gives clearer outputs and can be launched from anywhere (**fab** can only be used within the FabSim3 installation directories). 
 
 Installing plugins
 ------------------
@@ -92,7 +92,7 @@ To create your own plugin, please refer to doc/CreatingPlugins.rst
 Updating FabSim3
 ----------------
 
-If you have already installed FabSim and want to update to the latest version, in your local FabSim directory simply type::
+If you have already installed FabSim3 and want to update to the latest version, in your local FabSim3 directory simply type::
 
     git pull
     
@@ -104,7 +104,7 @@ To update plugins you will have to **git pull** from within each plugin director
 Testing FabSim3
 ---------------
 
-The easiest way to test FabSim is to simply go to the base directory of your FabSim installation and try the examples below.
+The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the examples below.
 
 Mac users may get a 
 **ssh: connect to host localhost port 22: Connection refused** error. This means you must enable remote login. This is done in **System Preferences > Sharing > Remote Login**.
@@ -168,9 +168,9 @@ LAMMPS testing on the local host
     
     fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0
     
-7. Run **fabsim localhost fetch_results** to copy the output of your job in the results directory. By default this will be a subdirectory in **~/FabSim/results**.
+7. Run **fabsim localhost fetch_results** to copy the output of your job in the results directory. By default this will be a subdirectory in **~/FabSim3/results**.
 
-Creating the relevant FabSim directories on a local or remote host
+Creating the relevant FabSim3 directories on a local or remote host
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Ensure that you have modified **machines_user.yml** to contain correct information for your target machine.
