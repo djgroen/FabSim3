@@ -556,8 +556,11 @@ def job(*option_dictionaries):
             elif not env.get("noexec", False):
                 with cd(env.job_results):
                     with prefix(env.run_prefix):
-                        run_stdout = run(template("$job_dispatch $dest_name")) # run_stdout is a string : "Running... dispatch batch job XXXXX" Work on genji
-                        job_info = run_stdout.split()[4]                # Get the sbatch jobID 
+                        # run_stdout is a string :
+                        # "Running... dispatch batch job XXXXX" Work on genji
+                        run_stdout = run(template("$job_dispatch $dest_name"))
+                        # Get the sbatch jobID
+                        job_info = run_stdout.split()[4]
 
             if env.remote != 'localhost':
                 save_submitted_job_info(jobID=job_info)
@@ -682,7 +685,6 @@ def run_ensemble(config, sweep_dir, **args):
         )
         print("Sweep dir location: %s" % (sweep_dir))
 
-
     elif (hasattr(env, 'PilotJob') and
           env.PilotJob.lower() == 'true'
           ):
@@ -696,10 +698,6 @@ def run_ensemble(config, sweep_dir, **args):
         env.batch_header = env.PJ_header
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
-
-
-
-
 
 
 def input_to_range(arg, default):
