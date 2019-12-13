@@ -1,6 +1,6 @@
 .. _fabsim3qcg:
 
-FabSim3: Remote job management command
+FabSim3 with QCG middleware
 ======================================
 This document explains how users should set and use remote machine functionality.
 
