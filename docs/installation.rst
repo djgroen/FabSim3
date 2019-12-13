@@ -7,13 +7,11 @@ Installation and Testing
 Dependencies
 ------------
 
-.. note:: To use FabSim3, you will need to have git installed to install FabSim3 plugins.
+1. FabSim3 requires the following Python modules::
 
-The **pip** way: FabSim3 requires the following Python modules::
-
-    PyYAML (any version) 
-    fabric3 (1.1.13.post1 has worked for us)
-    numpy
+* PyYAML (any version) 
+* fabric3 (1.1.13.post1 has worked for us)
+* numpy
 
 You can install these modules as follows::
   
@@ -21,10 +19,18 @@ You can install these modules as follows::
     pip3 install numpy and 
     pip3 install fabric3
 
-To perform the **Py.test** tests (not required for using FabSim3, but essential for running the tests), you will need *pytest* and **pytest-pep8**.
+2. To perform the **Py.test** tests (not required for using FabSim3, but essential for running the tests), you will need **pytest** and **pytest-pep8**.
+
+3. To install FabSim3 plugins, **git** needs to be installed in your machine. 
+
+For Mac users, you might also need **ssh-copy-id**. This can be installed using::
+
+    brew install ssh-copy-id
+
 
 Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
-(when using a server version, make sure you add **universe** at the end of the first line of **/etc/apt/sources.list**)::
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When using a server version, make sure you add **universe** at the end of the first line of **/etc/apt/sources.list**. Install all dependencies::
 
     sudo apt install sshd (if you want to run jobs on localhost)
     sudo apt install git
@@ -36,13 +42,7 @@ Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 Go to the **fabric3_base** subdirectory and run::
 
     pip3 install Fabric3-1.14.post1-py3-none-any.whl
-
-
-For Mac users, you might also need **ssh-copy-id**. This can be installed using::
-
-    brew install ssh-copy-id
-
-
+    
 
 Installing FabSim3
 ------------------
@@ -63,7 +63,7 @@ For Mac Users, make sure to override the default home directory, by switching th
     home_path_template: "/Users/$username"
 
 4. To enable use of FabSim on your local host, type::
-    
+
     fab localhost setup_fabsim
     
 As part of this command, you will be logging in to your own machine through SSH once, which can trigger a password prompt. In this case, simply type the password for the machine in which you are running these commands.
@@ -72,11 +72,7 @@ For Mac Users, in the **deploy/machines.yml**, change::
     
     runtime_path_template:"$home_path" to runtime_path_template:"~"
 
-5. To enable use of FabSim on any other remote machine, make sure that 
-
-(a) machines.yml contains the specific details of the remote machine, and 
-
-(b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type::
+5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type::
 
     fab <machine_name> setup_fabsim
 
@@ -110,12 +106,14 @@ Testing FabSim3
 
 The easiest way to test FabSim is to simply go to the base directory of your FabSim installation and try the examples below.
 
-Mac users may get a **ssh: connect to host localhost port 22: Connection refused** error. This means you must enable remote login. This is done in **System Preferences > Sharing > Remote Login**.
+Mac users may get a 
+**ssh: connect to host localhost port 22: Connection refused** error. This means you must enable remote login. This is done in **System Preferences > Sharing > Remote Login**.
 
 List available commands
 -----------------------
 
 Simply type::
+
     fabsim -l
 
 FabDummy testing on the local host
@@ -180,12 +178,11 @@ Ensure that you have modified **machines_user.yml** to contain correct informati
 Auto bash-completion for fabsim
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To enable this option, please run::
+To enable this option, please run on your FabSim3 directory::
      
      source fabsim-completion.bash
      
-on your FabSim3 directory, or you can add::
+or you can add the following command into your **$HOME/.bashrc** file to have enable it everytime that the shell is activated::
 
     source (path of your FabSim3 directory)/fabsim-completion.bash
 
-into your **$HOME/.bashrc** file to have enable it everytime that the shell is activated.
