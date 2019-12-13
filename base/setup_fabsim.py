@@ -2,10 +2,6 @@ from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
 
-import fileinput
-import sys
-
-
 @task
 def install_plugin(name):
     """
@@ -40,7 +36,6 @@ def remove_plugin(name):
         open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
     )
-    info = config[name]
     plugin_dir = '{}/plugins'.format(env.localroot)
     local('rm -rf {}/{}'.format(plugin_dir, name))
 

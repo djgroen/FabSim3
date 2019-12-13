@@ -13,13 +13,16 @@ processing workflows, licensed under the BSD 3-clause license. It is developed
 as part of VECMA (http://www.vecma.eu), and is part of the VECMA Toolkit 
 (http://www.vecma-toolkit.eu).
 
-FabSim3 is an automation toolkit for complex simulation tasks. FabSim3 helps
-users to perform complex remote tasks from a local command-line, and to
-automatically organise their data and environment variables when they
-perform these tasks. FabSim3 supports the execution of single jobs, ensembles
-of multiple jobs, and dynamic workflows through schedulers such as SLURM,
-PBSPro, LoadLeveller and QCG. It stores
-machine-specific configurations in the repository, and applies it to all
+Among other things, FabSim3 supports the use of simple one-liner commands to:
+
+* Enable execution of simulation and analysis tasks on supercomputers.
+* Establish and run coupled models using the workflow automation functionalities.
+* Organize input, output and environment information, creating a consistent log and making it possible by default to repeat/reproduce runs.
+* Perform large ensemble simulations (or replicated ones) using a one-liner command.
+
+Users can perform complex remote tasks from a local command-line, and 
+run single jobs, ensembles of multiple jobs, and dynamic workflows through schedulers such as SLURM,
+PBSPro, LoadLeveller and QCG. FabSim3 stores machine-specific configurations in the repository, and applies it to all
 applications run on that machine. These configurations are updated by any
 contributor who feels that a fix or improvement is required.
 
@@ -32,12 +35,13 @@ FabSim3 is publicly available at: http://www.github.com/djgroen/FabSim3 The
 accompanying software paper can be found here:
 https://doi.org/10.1016/j.cpc.2016.05.020
 
-The public plugins for FabSim3 include:
+The main plugins for FabSim3 include:
 
 * FabMD, focused on molecular dynamics.
 * FabFlee, focused on agent-based modelling.
 * FabUQCampaign, focused on UQ ensemble sampling.
 * FabDummy, a dummy plugin used for testing the toolkit.
+* FabMUSCLE, a preliminary integration with the MUSCLE3 coupling toolkit.
 
 
 Key reference documents
@@ -46,9 +50,9 @@ Here's a list of particularly useful reference documents for FabSim3.
 
 **Basic:**
 
-* Basic installation and testing instructions: https://github.com/djgroen/FabSim3/blob/master/INSTALL.md
+* Basic :ref:`installation` instructions
 * Testing simple jobs with FabDummy: https://github.com/djgroen/FabDummy/blob/master/README.md
-* How to set up and use FabSim3 with the Singularity containerization environment: https://github.com/djgroen/FabSim3/blob/master/doc/FabSim3SingularityUsage.md
+* Set up and use :ref:`fabsim3singularity` containerization environment
 
 **Intermediate:**
 
@@ -80,10 +84,16 @@ Please find the BibTex reference below of our FabSim3 software paper in *Compute
   author = "Derek Groen and Agastya P. Bhati and James Suter and James Hetherington and Stefan J. Zasada and Peter V. Coveney",
   }
 
+.. _toc:
 
+Table of contents
+-----------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+
+   installation
+   fabsim3singularity
 
 
 Indices and tables
