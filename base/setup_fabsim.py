@@ -2,6 +2,7 @@ from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
 
+
 @task
 def install_plugin(name):
     """
