@@ -290,7 +290,7 @@ def fetch_results(name='', regex='', debug=False):
 
     if debug:
         pp.pprint(env)
-    with_job(name)
+    env.job_results, env.job_results_local = with_job(name)
     if env.manual_gsissh:
         local(
             template(
@@ -601,7 +601,7 @@ def job(sweep_length=1, *option_dictionaries):
                          job_results_dir[threading.get_ident()]['dest_name']))
 
             # check for PilotJob option is true, DO NOT submit the job directly
-            # , only submit PJ script
+            # only submit PJ script
             if (hasattr(env, 'submit_job') and
                     isinstance(env.submit_job, bool) and
                     env.submit_job is False):
@@ -627,7 +627,6 @@ def job(sweep_length=1, *option_dictionaries):
                     return
 
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
-
                 return
 
             # We don't want to go next during replicas and pjm until the final
@@ -638,7 +637,7 @@ def job(sweep_length=1, *option_dictionaries):
 
                 # Allow option to submit all preparations,
                 # but not actually submit the job
-                job_info = ''
+                # job_info = ''
                 if hasattr(env, 'dispatch_jobs_on_localhost') and \
                         isinstance(env.dispatch_jobs_on_localhost, bool) and \
                         env.dispatch_jobs_on_localhost:
@@ -656,19 +655,16 @@ def job(sweep_length=1, *option_dictionaries):
                             )
                             # Get the jobID, Works on Bull cluster, need to
                             # check on others
-                            if run_stdout:
-                                if len(run_stdout.split()) > 3:
-                                    job_info = run_stdout.split()[3]
+                            # if run_stdout:
+                            #     if len(run_stdout.split()) > 3:
+                            #         job_info = run_stdout.split()[3]
 
-                if env.remote != 'localhost':
-                    mutex_jobID.acquire()
-                    try:
-                        save_submitted_job_info(jobID=job_info)
-                    finally:
-                        mutex_jobID.release()
-
-                    print("jobID is stored into : %s\n" % (os.path.join(
-                        env.local_jobsDB_path, env.local_jobsDB_filename)))
+                # if env.remote != 'localhost':
+                #     mutex_jobID.acquire()
+                #     try:
+                #         save_submitted_job_info(jobID=job_info)
+                #     finally:
+                #         mutex_jobID.release()
 
                 print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
                       (env.remote,
@@ -753,7 +749,8 @@ def run_ensemble(config, sweep_dir, **args):
         env.submitted_jobs_list = []
         env.submit_job = False
 
-    sweep_length = 0  # number of runs performed in this sweep
+    # number of runs performed in this sweep
+    sweep_length = 0
 
     sweepdir_items = os.listdir(sweep_dir)
 
@@ -775,7 +772,7 @@ def run_ensemble(config, sweep_dir, **args):
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
-            #  The first iteration will create folders to the remote and launch
+            # The first iteration will create folders to the remote and launch
             # sequentialy the first job
             if sweep_length == 1:
                 execute(put_configs, config)
@@ -791,7 +788,8 @@ def run_ensemble(config, sweep_dir, **args):
                                   dict(memory='2G', ensemble_mode=True,
                                        label=item)))
 
-    atp.awaitJobOver()  # Wait for all jobs to be done
+    # Wait for all jobs to be done
+    atp.awaitJobOver()
     atp.shutdownThreads()
 
     if sweep_length == 0:
@@ -804,6 +802,9 @@ def run_ensemble(config, sweep_dir, **args):
     elif (hasattr(env, 'PilotJob') and
           env.PilotJob.lower() == 'true'
           ):
+        # to avoid apply replicas functionality on PilotJob folders
+        env.replicas = 1
+
         env.submitted_jobs_list = ".".join(
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
