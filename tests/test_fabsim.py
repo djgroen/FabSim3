@@ -63,39 +63,39 @@ def test_dummy_fabdummy_replicas_without_manual_ssh():
 
 def test_dummy_fabdummy_replicas_with_manual_ssh():
     assert(subprocess.call(
-        ["fab", "localhost", "dummy:dummy_test,replicas=5,manual_ssh=true"]) == 0)
+        ["fab", "localhost", "dummy:dummy_test,replicas=5,nb_thread=2,manual_ssh=true"]) == 0)
     output = subprocess.check_output(
-        ["fab", "localhost", "dummy:dummy_test,replicas=5,manual_ssh=true"]).decode("utf-8")
+        ["fab", "localhost", "dummy:dummy_test,replicas=5,nb_thread=2,manual_ssh=true"]).decode("utf-8")
     assert(output.find('success') >= 0)
 
 
 def test_dummy_ensemble_without_manual_ssh():
     assert(subprocess.call(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,manual_ssh=false"]) == 0)
+        ["fab", "localhost", "dummy_ensemble:dummy_test,nb_thread=2,manual_ssh=false"]) == 0)
     output = subprocess.check_output(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,manual_ssh=false"]).decode("utf-8")
+        ["fab", "localhost", "dummy_ensemble:dummy_test,nb_thread=2,manual_ssh=false"]).decode("utf-8")
     assert(output.find('success') >= 0)
 
 
 def test_dummy_ensemble_with_manual_ssh():
     assert(subprocess.call(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,manual_ssh=true"]) == 0)
+        ["fab", "localhost", "dummy_ensemble:dummy_test,nb_thread=2,manual_ssh=true"]) == 0)
     output = subprocess.check_output(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,manual_ssh=true"]).decode("utf-8")
+        ["fab", "localhost", "dummy_ensemble:dummy_test,nb_thread=2,manual_ssh=true"]).decode("utf-8")
     assert(output.find('success') >= 0)
 
 
 def test_dummy_ensemble_replicas_without_manual_ssh():
     assert(subprocess.call(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,manual_ssh=false"]) == 0)
+        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,nb_thread=2,manual_ssh=false"]) == 0)
     output = subprocess.check_output(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,manual_ssh=false"]).decode("utf-8")
+        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,nb_thread=2,manual_ssh=false"]).decode("utf-8")
     assert(output.find('success') >= 0)
 
 
 def test_dummy_ensemble_replicas_with_manual_ssh():
     assert(subprocess.call(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,manual_ssh=true"]) == 0)
+        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,nb_thread=2,manual_ssh=true"]) == 0)
     output = subprocess.check_output(
-        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,manual_ssh=true"]).decode("utf-8")
+        ["fab", "localhost", "dummy_ensemble:dummy_test,replicas=5,nb_thread=2,manual_ssh=true"]).decode("utf-8")
     assert(output.find('success') >= 0)
