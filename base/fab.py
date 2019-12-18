@@ -1026,7 +1026,7 @@ def install_packages(virtual_env='False'):
 
     # Determine a generated job name from environment parameters
     # and then define additional environment parameters based on it.
-    with_template_job()
+    env.job_results, env.job_results_local = with_template_job()
 
     # Create job script based on "sbatch header" and script created above in
     # deploy/.jobscript/
