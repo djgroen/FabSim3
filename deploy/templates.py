@@ -43,9 +43,13 @@ def script_template_content(template_name):
 def script_template_save_temporary(content):
     # script name is now depending of the label name to avoid problem
     # with multithreading
-    destname = os.path.join(env.localroot, 'deploy',
-                            '.jobscripts', env['name'] +
-                            '_' + env.label + '.sh')
+    if hasattr(env, 'label'):
+        destname = os.path.join(env.localroot, 'deploy',
+                                '.jobscripts', env['name'] +
+                                '_' + env.label + '.sh')
+    else:
+        destname = os.path.join(env.localroot, 'deploy',
+                                '.jobscripts', env['name'] + '.sh')
 
     # Support for multi-level directories in the configuration files.
     if not os.path.exists(os.path.dirname(destname)):
