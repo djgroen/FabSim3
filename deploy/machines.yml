@@ -62,7 +62,7 @@ default:
   temp_path_template: "/tmp"
   
   # Default naming scheme used to label FabSim3 jobs.
-  job_name_template: '${config}_${machine_name}_${cores}'  
+  job_name_template: '${config}_${machine_name}_${cores}'
   
   # Flag to bypass paramiko and do direct remote SSH commands.
   manual_ssh: false
@@ -245,11 +245,13 @@ Eagle : &Eagle_Default_Config
   PJ_size : "3"
   PJ_wall_time : "20:00"
 
+  # ref : https://slurm.schedmd.com/squeue.html#lbAG
+  finishedJobTags: ["CANCELLED", "COMPLETED", "DEADLINE", "FAILED", "NODE_FAIL", "OUT_OF_MEMORY", "PREEMPTED", "TIMEOUT"   ]
+  unfinishedJobTags: ["BOOT_FAIL", "CONFIGURING", "COMPLETING", "PENDING", "RUNNING", "REQUEUED", "STOPPED", "SUSPENDED"]
 
 qcg:
   <<: *QCG_PilotJob
-  remote: "eagle.man.poznan.pl" 
-  job_wall_time : "PT10M"
+  remote: "eagle.man.poznan.pl"   
   budget: "vecma2019"
   corespernode: 28
   cores: 1
@@ -262,8 +264,10 @@ qcg:
   PJ_PYheader: qcg-PJ.py
   PJ_header: qcg-PJ-header
   #PJ_header: no_batch
-  PJ_size : "20"
-  PJ_wall_time : "P2D"
+  PJ_size : "4"
+  # qcg walltime : P[nY][nM][nD][T[nH][nM]nS]  : P3DT12H
+  job_wall_time : "PT30M"
+  PJ_wall_time : "PT3H"
 
   home_path_template: "/home/plgrid/$username"
   manual_ssh: false
@@ -294,7 +298,8 @@ qcg:
   #           job2  FAILED    eagle
   #           job2  CANCELED  eagle
   #           ...   ...       ...  
-  stat: 'qcg-list -Q -s all -F "%-22I %-16S %-8H" | awk "{if(NR>2)print}"'
+  # stat: 'qcg-list -Q -s all -F "%-22I %-16S %-8H" | awk "{if(NR>2)print}"'
+  stat: 'qcg-list -Q -F "%-22I %-16S %-8H"'
 
   # job_dispatch : the command to submit the task to be processed by remote machine
   job_dispatch: "qcg-sub"
@@ -302,6 +307,10 @@ qcg:
   # cancel_job_command : cancel submitted task based on input $jobID 
   # the $jobID variable will be set during the execution, keep the format as '$jobID' in the parameters list
   cancel_job_command: 'qcg-cancel $jobID'
+
+  # ref : http://apps.man.poznan.pl/trac/qcg-broker/wiki/qcg-tools#qcg-list
+  finishedJobTags: ["FINISHED","FAILED", "CANCELED"]
+  unfinishedJobTags: ["UNSUBMITED", "UNCOMMITED", "QUEUED", "PREPROCESSING", "PENDING", "RUNNING", "STOPPED", "POSTPROCESSING"]
 
 eagle_vecma:
   <<: *Eagle_Default_Config

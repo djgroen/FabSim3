@@ -72,8 +72,8 @@ env.pythonroot = os.path.join(env.localroot, 'python')
 env.blackboxroot = os.path.join(env.localroot, 'blackbox')
 
 # job database configuration for remote machines
-env.local_jobsDB_path = os.path.join(env.localroot, 'deploy', '.jobsDB')
-env.local_jobsDB_filename = 'jobsDB.txt'
+# env.local_jobsDB_path = os.path.join(env.localroot, 'deploy', '.jobsDB')
+# env.local_jobsDB_filename = 'jobsDB.txt'
 env.replicas = 1
 
 
