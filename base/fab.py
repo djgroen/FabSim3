@@ -290,7 +290,9 @@ def fetch_results(name='', regex='', debug=False):
 
     if debug:
         pp.pprint(env)
-    with_job(name)
+        
+    env.job_results, env.job_results_local = with_job(name)
+    
     if env.manual_gsissh:
         local(
             template(
