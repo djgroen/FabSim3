@@ -1081,7 +1081,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     # (it's not a cross-plateform install yet)
     local('pip3 download --no-binary=:all: -d %s git+%s@v%s' %
           (tmp_app_dir, info['repository'], info['version']))
-    
+
     # Create  directory in the remote machine to store dependency packages
     run(
         template(
