@@ -232,7 +232,7 @@ Eagle : &Eagle_Default_Config
   #job_info_command : 'sacct -X -j $jobID'  
   job_info_command : 'sacct --allocations --job $jobID'
   manual_ssh: false
-  corespernode: 28
+  corespernode: 1
   cores: 8
 
   # template header for VirtualEnv
@@ -249,11 +249,12 @@ Eagle : &Eagle_Default_Config
   finishedJobTags: ["CANCELLED", "COMPLETED", "DEADLINE", "FAILED", "NODE_FAIL", "OUT_OF_MEMORY", "PREEMPTED", "TIMEOUT"   ]
   unfinishedJobTags: ["BOOT_FAIL", "CONFIGURING", "COMPLETING", "PENDING", "RUNNING", "REQUEUED", "STOPPED", "SUSPENDED"]
 
+
 qcg:
   <<: *QCG_PilotJob
   remote: "eagle.man.poznan.pl"   
   budget: "vecma2019"
-  corespernode: 28
+  corespernode: 1
   cores: 1
   queue: "plgrid"
   # template header for VirtualEnv
@@ -283,9 +284,9 @@ qcg:
 
   modules:
     # list of modules to be loaded on remote machine
-    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620"]
     # list of modules to be unloaded on remote machine
-    unloaded: []
+    unloaded: ["python"]
 
 
 
@@ -323,13 +324,13 @@ eagle_vecma:
   queue: "plgrid"
 
   # wall time in format days-hours:minutes:seconds
-  job_wall_time : "0-0:10:00"
+  job_wall_time : "0-0:30:00"
 
   modules:
     # list of modules to be loaded on remote machine
-    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620"]
     # list of modules to be unloaded on remote machine
-    unloaded: []
+    unloaded: ["python"]
   
 eagle_hidalgo:
   <<: *Eagle_Default_Config
@@ -340,13 +341,17 @@ eagle_hidalgo:
   batch_header: slurm-eagle
   budget: "394"
   # wall time in format days-hours:minutes:seconds
-  job_wall_time : "0-0:40:00"
+  job_wall_time : "0-0:30:00"
+
+  PJ_size : "4"
+  PJ_wall_time : "0-3:00:00"
+
 
   modules:
     # list of modules to be loaded on remote machine
-    loaded: ["python", "openmpi/1.8.1-1_gcc482"]
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620"]
     # list of modules to be unloaded on remote machine
-    unloaded: []
+    unloaded: ["python"]
 
 genji: 
   home_path_template: "/home_nfs_robin_ib/$username/$project"

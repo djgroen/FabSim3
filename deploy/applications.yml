@@ -6,11 +6,10 @@ QCG-PilotJob:
         - pandas
         - numpy
         - pytest
-        
+        - scipy
+        - mpi4py
+
 
 
 packages:
-    - numpy
-    - scipy
     - matplotlib
-    - mpi4py
