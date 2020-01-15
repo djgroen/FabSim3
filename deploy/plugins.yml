@@ -23,3 +23,6 @@ FabMUSCLE:
 
 FabProfile:
   repository: https://github.com/NicolasMonnier/FabProfile.git
+
+fabmogp:
+  repository: https://github.com/edaub/fabmogp
