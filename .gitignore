@@ -11,3 +11,5 @@ deploy/__pycache__/
 __pycache__/
 
 plugins/
+
+results/

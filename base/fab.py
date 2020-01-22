@@ -993,7 +993,7 @@ def install_packages(virtual_env='False'):
     with open(script, "w") as sc:
         install_dir = "--user"
         if virtual_env == 'True':
-            sc.write("if [ ! -d %s ]; then \n\tvirtualenv -p python3 \
+            sc.write("if [ ! -d %s ]; then \n\t python -m virtualenv \
                     %s || echo 'WARNING : virtualenv is not installed \
                     or has a problem' \nfi\n\nsource %s/bin/activate\n" %
                      (env.virtual_env_path, env.virtual_env_path,
@@ -1079,8 +1079,8 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     # but for the local plateform !
     # --> Possible Issue during the installation in the remote
     # (it's not a cross-plateform install yet)
-    local('pip3 download --no-binary=:all: -d %s git+%s' %
-          (tmp_app_dir, info['repository']))
+    local('pip3 download --no-binary=:all: -d %s git+%s@v%s' %
+          (tmp_app_dir, info['repository'], info['version']))
 
     # Create  directory in the remote machine to store dependency packages
     run(
@@ -1116,7 +1116,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
             # TODO Check python version and raised a Warning if not the
             # right version ?
             # TODO
-            sc.write("if [ ! -d %s ]; then \n\tvirtualenv -p python3 \
+            sc.write("if [ ! -d %s ]; then \n\t python -m virtualenv \
                     %s || echo 'WARNING : virtualenv is not installed \
                     or has a problem' \nfi\n\nsource %s/bin/activate\n" %
                      (env.virtual_env_path, env.virtual_env_path,
