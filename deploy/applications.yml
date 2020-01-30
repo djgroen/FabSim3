@@ -1,3 +1,6 @@
+Miniconda-installer:
+    repository: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
 QCG-PilotJob:
     repository: https://github.com/vecma-project/QCG-PilotJob.git
     name: QCGPilotManager
@@ -8,8 +11,6 @@ QCG-PilotJob:
         - pytest
         - scipy
         - mpi4py
-
-
 
 packages:
     - matplotlib

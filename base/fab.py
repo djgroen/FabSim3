@@ -1065,9 +1065,14 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     tmp_app_dir = "%s/tmp_app" % (env.localroot)
     local('mkdir -p %s' % (tmp_app_dir))
 
-    # First download all the additional dependencies
+    # First download all the Miniconda3 installation script
+    local('wget %s -O %s/miniconda.sh' %
+          (config['Miniconda-installer']['repository'], tmp_app_dir))
+
+    # Next download all the additional dependencies
     for dep in info['additional_dependencies']:
-        local('pip3 download --no-binary=:all: -d %s %s' % (tmp_app_dir, dep))
+        local('pip3 download --no-binary=:all: -d %s %s' %
+              (tmp_app_dir, dep))
     add_dep_list_compressed = sorted(Path(tmp_app_dir).iterdir(),
                                      key=lambda f: f.stat().st_mtime)
     for it in range(len(add_dep_list_compressed)):
@@ -1116,31 +1121,35 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
             # TODO Check python version and raised a Warning if not the
             # right version ?
             # TODO
-            sc.write("if [ ! -d %s ]; then \n\t python -m virtualenv \
-                    %s || echo 'WARNING : virtualenv is not installed \
-                    or has a problem' \nfi\n\nsource %s/bin/activate\n" %
-                     (env.virtual_env_path, env.virtual_env_path,
-                      env.virtual_env_path))
-            install_dir = ""
+            #
+            sc.write("if [ ! -d %s ]; then \n\t bash %s/miniconda.sh -b -p %s \
+                || echo 'WARNING : virtualenv is not installed \
+                or has a problem' \nfi" %
+                     (env.virtual_env_path,
+                      env.app_repository, env.virtual_env_path))
+            sc.write("\n\neval \"$$(%s/bin/conda shell.bash hook)\"\n\n" %
+                     (env.virtual_env_path))
+            # install_dir = ""
 
         # First install the additional_dependencies
         for dep in reversed(add_dep_list_compressed):
             print(dep)
             if dep.endswith('.zip'):
                 sc.write("\nunzip %s/%s -d %s && cd %s/%s \
-                        && python3 setup.py install %s"
+                    && %s/bin/python3 setup.py install %s"
                          % (env.app_repository, dep, env.app_repository,
                             env.app_repository, dep.replace(".zip", ""),
-                            install_dir))
+                            env.virtual_env_path, install_dir))
             elif dep.endswith('.tar.gz'):
                 sc.write("\ntar xf %s/%s -C %s && cd %s/%s \
-                        && python3 setup.py install %s\n"
+                    && %s/bin/python3 setup.py install %s\n"
                          % (env.app_repository, dep, env.app_repository,
                             env.app_repository, dep.replace(".tar.gz", ""),
-                            install_dir))
+                            env.virtual_env_path, install_dir))
 
-        sc.write("pip3 install --no-index --find-links=file:%s %s/%s-%s.zip %s \
-                || pip3 install --no-index --find-links=file:%s %s/%s-%s.zip"
+        sc.write("pip3 install --no-index --no-build-isolation \
+            --find-links=file:%s %s/%s-%s.zip %s \
+            || pip3 install --no-index --find-links=file:%s %s/%s-%s.zip"
                  % (env.app_repository, env.app_repository,
                     info['name'], info['version'],
                     install_dir, env.app_repository,
@@ -1160,6 +1169,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
 
     # Create job script based on "sbatch header" and script created above in
     # deploy/.jobscript/
+
     env.job_script = script_templates(env.batch_header_install_app, env.script)
 
     # Create script's destination path to remote machine based on
