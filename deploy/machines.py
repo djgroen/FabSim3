@@ -106,8 +106,8 @@ env.run_prefix = " && ".join(module_commands +
     or 'echo THE FIRST Running...'
 
 if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
-    env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
-        " && " + env.run_prefix
+    env.run_prefix = env.run_prefix + " && " + \
+        "source %s/bin/activate" % (env.virtual_env_path)
 
 
 @task
@@ -226,9 +226,10 @@ def complete_environment():
         env.app_repository = template(env.app_repository)
 
     if (hasattr(env, 'virtualenv') and str(env.virtualenv).lower() == 'true'):
-        env.run_prefix = "source %s/bin/activate" % (env.virtual_env_path) + \
-            " && " + env.run_prefix
+        env.run_prefix = env.run_prefix + " && " + \
+            "source %s/bin/activate" % (env.virtual_env_path)
 
+        
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
     # cmd=os.popen(template("hg id -q -i"))
