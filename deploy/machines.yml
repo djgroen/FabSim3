@@ -319,7 +319,7 @@ qcg:
 eagle_vecma:
   <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
-  run_command: "mpirun -np $cores"
+  run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
   home_path_template: "/home/plgrid/$username"
   batch_header: slurm-eagle
@@ -339,7 +339,7 @@ eagle_vecma:
 eagle_hidalgo:
   <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
-  run_command: "mpirun -np $cores"
+  run_command: "mpirun -n $cores"
   remote: "eagle.man.poznan.pl"
   home_path_template: "/home/users/$username"
   batch_header: slurm-eagle
