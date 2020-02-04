@@ -235,7 +235,7 @@ Eagle : &Eagle_Default_Config
   job_info_command : 'squeue --jobs $jobID'
   
   manual_ssh: false
-  corespernode: 1
+  corespernode: 28
   cores: 8
 
   # template header for VirtualEnv
