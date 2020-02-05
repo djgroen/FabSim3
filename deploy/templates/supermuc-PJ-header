@@ -23,8 +23,8 @@
 
 
 ## load QCG-PilotJob
-module load python/3.6_intel
-source $virtual_env_path/bin/activate
-
+# module load python/3.6_intel
+# source $virtual_env_path/bin/activate
+eval "$$($virtual_env_path/bin/conda shell.bash hook)"
 
 python3 $PJ_PATH
