@@ -11,6 +11,7 @@ QCG-PilotJob:
         - pytest
         - scipy
         - mpi4py
+        - cython
 
 packages:
     - matplotlib
