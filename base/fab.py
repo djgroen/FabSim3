@@ -940,7 +940,7 @@ def print_config(args=''):
 
 
 @task
-def install_packages(virtual_env='False'):
+def install_packages(virtualenv='False'):
     """
     Install list of packages defined in deploy/applications.yml
     note : if you got an error on your local machine during the build wheel
@@ -992,7 +992,7 @@ def install_packages(virtual_env='False'):
     # Write the Install command in a file
     with open(script, "w") as sc:
         install_dir = "--user"
-        if virtual_env == 'True':
+        if virtualenv == 'True':
             sc.write("if [ ! -d %s ]; then \n\t python -m virtualenv \
                     %s || echo 'WARNING : virtualenv is not installed \
                     or has a problem' \nfi\n\nsource %s/bin/activate\n" %
@@ -1048,7 +1048,7 @@ def install_packages(virtual_env='False'):
 
 
 @task
-def install_app(name="", external_connexion='no', virtual_env='False'):
+def install_app(name="", external_connexion='no', virtualenv='False'):
     """
     Install a specific Application through FasbSim3
 
@@ -1112,7 +1112,7 @@ def install_app(name="", external_connexion='no', virtual_env='False'):
     # Write the Install command in a file
     with open(script, "w") as sc:
         install_dir = "--user"
-        if virtual_env == 'True':
+        if virtualenv == 'True':
             # It seems some version of python/virtualenv doesn't support
             # the option --no-download. So there is sometime a problem :
             # from pip import main
