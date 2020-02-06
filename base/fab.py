@@ -804,7 +804,7 @@ def run_ensemble(config, sweep_dir, **args):
           ):
         # to avoid apply replicas functionality on PilotJob folders
         env.replicas = 1
-
+        backup_header = env.batch_header
         env.submitted_jobs_list = ".".join(
             ["\n\t" + str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
@@ -815,6 +815,7 @@ def run_ensemble(config, sweep_dir, **args):
         env.batch_header = env.PJ_header
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
+        env.batch_header = backup_header
 
 
 def input_to_range(arg, default):
