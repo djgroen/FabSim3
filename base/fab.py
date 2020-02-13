@@ -589,7 +589,7 @@ def job(sweep_length=1, *option_dictionaries):
             except KeyError:
                 pass
 
-            # For curation purposes, we store env.yml, which 
+            # For curation purposes, we store env.yml, which
             # contains the FabSim3 env, for each job.
             with tempfile.NamedTemporaryFile(mode='r+') as tempf:
                 tempf.write(
