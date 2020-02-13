@@ -589,14 +589,15 @@ def job(sweep_length=1, *option_dictionaries):
             except KeyError:
                 pass
 
-            # For curation purposes, we store env.yml, which contains the FabSim3 env, for each job.
+            # For curation purposes, we store env.yml, which 
+            # contains the FabSim3 env, for each job.
             with tempfile.NamedTemporaryFile(mode='r+') as tempf:
                 tempf.write(
                     yaml.dump(dict(env))
                 )
                 tempf.flush()  # Flush the file before we copy it.
-                put(tempf.name, env.pather.join(job_results_dir[threading.get_ident()][
-                                'job_results'], 'env.yml'))
+                put(tempf.name, env.pather.join(job_results_dir[
+                    threading.get_ident()]['job_results'], 'env.yml'))
 
             run(template("chmod u+x %s" %
                          job_results_dir[threading.get_ident()]['dest_name']))
