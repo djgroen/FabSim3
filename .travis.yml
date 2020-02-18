@@ -6,12 +6,7 @@ matrix:
         - "3.6"
       install:
         - pip install -r requirements.txt
-        - sed "s/your-username/`whoami`/g" <<< cat deploy/machines_user_example.yml > deploy/machines_user.yml
-        - rm -f ~/.ssh/id_rsa
-        - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-        - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-        - chmod og-wx ~/.ssh/authorized_keys
-        - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+        - python setup_fabsim.py
         - fab localhost install_plugin:FabDummy
       script:
         - python -m pytest --log-cli-level=10 tests/
