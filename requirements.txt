@@ -2,4 +2,5 @@ fabric3
 pyyaml
 pytest
 pytest-pep8
+ruamel.yaml
 
