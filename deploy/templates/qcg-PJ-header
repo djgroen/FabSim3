@@ -2,7 +2,7 @@
 
 #QCG host=eagle
 #QCG queue=$queue
-#QCG nodes=$PJ_size:1
+#QCG nodes=$PJ_size:$corespernode
 #QCG walltime=$PJ_wall_time
 #QCG grant=$budget
 
@@ -11,6 +11,9 @@
 
 #QCG stage-in-file=$PJ_PATH
 #QCG stage-out-dir=.->$job_results/eagle.wd.$${JOB_ID}
-#QCG application=qcg-pm-client
+
+##QCG application=qcg-pm-client
+#QCG application=qcg-pm-api/master-3.7.3
+
 #QCG argument=$PJ_FileName
 
