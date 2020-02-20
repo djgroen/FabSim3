@@ -2,7 +2,7 @@
 
 #PBS -N $job_name
 #PBS -l select=$nodes
-#PBS -l walltime=$wall_time
+#PBS -l walltime=$job_wall_time
 #PBS -A $budget
 #PBS -q $queue
 #PBS -m abe

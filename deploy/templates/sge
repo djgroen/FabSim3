@@ -4,5 +4,5 @@
 #$dollar -v PATH,LD_LIBRARY_PATH
 #$dollar -pe mpi $cores_reserved
 #$dollar -N $job_name
-#$dollar -l h_rt=$wall_time
+#$dollar -l h_rt=$job_wall_time
 #$dollar -q $queue

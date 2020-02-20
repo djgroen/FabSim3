@@ -8,7 +8,7 @@
 #BSUB -e stderr.%J.txt
 #BSUB -R "span[ptile=24]"
 #BSUB -n $cores
-#BSUB -W $wall_time
+#BSUB -W $job_wall_time
 
 # setup modules
 . /etc/profile.d/modules.sh

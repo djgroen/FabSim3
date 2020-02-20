@@ -3,7 +3,7 @@
 #SBATCH --job-name=$job_name
 #SBATCH --nodes $nodes
 #SBATCH --ntasks-per-node=$corespernode
-#SBATCH --time=$wall_time
+#SBATCH --time=$job_wall_time
 #SBATCH -A $budget
 #SBATCH -p $queue
 #SBATCH --output="job.out"

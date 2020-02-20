@@ -8,7 +8,7 @@
 #@environment=COPY_ALL
 #@output=$$(jobid).output.txt
 #@error=$$(jobid).error.txt
-#@wall_clock_limit=$wall_time
+#@wall_clock_limit=$job_wall_time
 #@notification=complete
 #@queue
 

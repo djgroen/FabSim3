@@ -3,7 +3,7 @@
 #PBS -N $job_name
 #PBS -l mppwidth=$cores_reserved
 #PBS -l mppnppn=$corespernode
-#PBS -l walltime=$wall_time
+#PBS -l walltime=$job_wall_time
 #PBS -A $budget
 #PBS -q $queue
 #PBS -m e
