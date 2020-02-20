@@ -1,7 +1,9 @@
+from qcg.appscheduler.api.manager import Manager
 from qcg.appscheduler.api.manager import LocalManager
 from qcg.appscheduler.api.job import Jobs
 
-m = LocalManager(cfg={'log_level': 'DEBUG'})
+m = LocalManager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
+# m = Manager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
 
 
 # get available resources
