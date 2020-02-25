@@ -1,7 +1,7 @@
 Installing and Testing FabSim
 ======
 
-This document describes how to install FabSim3 and perform basic tests. The full documentation is available at http://fabsim3.readthedocs.io or in docs/index.rst (locally).
+This document describes how to install FabSim3 and perform basic tests. The full and most up-to-date documentation is available at http://fabsim3.readthedocs.io or in docs/index.rst (locally).
 
 ## Dependencies
 
