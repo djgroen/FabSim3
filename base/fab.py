@@ -35,6 +35,15 @@ mutex_complete = Lock()
 mutex_jobID = Lock()
 
 
+class dummy_context_mgr():
+
+    def __enter__(self):
+        return None
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
+
+
 def get_plugin_path(name, quiet=False):
     """
     Get the local base path of plugin <name>.
@@ -649,9 +658,12 @@ def job(sweep_length=1, *option_dictionaries):
 
                 elif not env.get("noexec", False):
                     with cd(job_results_dir[threading.get_ident()]
-                            ['job_results']):
-                        with prefix(env.run_prefix):
-                            run_stdout = run(
+                            ['job_results']) if env.remote == 'localhost' \
+                            else dummy_context_mgr():
+                        with prefix(env.run_prefix) \
+                            if env.remote == 'localhost' \
+                                else dummy_context_mgr():
+                            run(
                                 template("$job_dispatch %s" % job_results_dir[
                                          threading.get_ident()]['dest_name'])
                             )
