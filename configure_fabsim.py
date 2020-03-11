@@ -58,43 +58,34 @@ FS3_env = AttributeDict({
     # os.getcwd() : not working is you call is outside of FabSim3 folder
     'FabSim3_PATH': os.path.dirname(os.path.realpath(__file__)),
     'user_name': getpass.getuser(),
-    'machines_yml': None,
     'machines_user_yml': None
-
 })
 
 
 def config_yml_files():
     # Load and invoke the default non-machine specific config JSON
     # dictionaries.
-    FS3_env.machines_yml = yaml.load(
-        open(os.path.join(FS3_env.FabSim3_PATH,
-                          'deploy',
-                          'machines.yml'))
-    )
 
     FS3_env.machines_user_yml = yaml.load(
         open(os.path.join(FS3_env.FabSim3_PATH,
                           'deploy',
                           'machines_user_example.yml'))
     )
-    # set localhost execution folder in machines.yml
-    FS3_env.machines_yml['localhost']['home_path_template'] = os.path.join(
-        FS3_env.FabSim3_PATH, 'localhost_exe')
-    FS3_env.machines_yml['default']['home_path_template'] = os.path.join(
-        FS3_env.FabSim3_PATH, 'localhost_exe')
-    # save machines.yml
-    with open(os.path.join(FS3_env.FabSim3_PATH,
-                           'deploy', 'machines.yml'), 'w') as yaml_file:
-        yaml.dump(FS3_env.machines_yml, yaml_file)
 
     # setup machines_user.yml
+    S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
+    FS3_env.machines_user_yml['localhost']['home_path_template'] = S(
+        os.path.join(FS3_env.FabSim3_PATH, 'localhost_exe'))
+    FS3_env.machines_user_yml['default']['home_path_template'] = S(
+        os.path.join(FS3_env.FabSim3_PATH, 'localhost_exe'))
+
     FS3_env.machines_user_yml['default'][
         'local_results'] = os.path.join(FS3_env.FabSim3_PATH, 'results')
     FS3_env.machines_user_yml['default']['local_configs'] = os.path.join(
         FS3_env.FabSim3_PATH, 'config_files')
     FS3_env.machines_user_yml['default']['username'] = FS3_env.user_name
     FS3_env.machines_user_yml['localhost']['username'] = FS3_env.user_name
+
     # save machines_user.yml
     with open(os.path.join(FS3_env.FabSim3_PATH,
                            'deploy', 'machines_user.yml'), 'w') as yaml_file:
@@ -143,14 +134,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# https://shreevatsa.wordpress.com/2008/03/30/zshbash-startup-files-loading-order-bashrc-zshrc-etc/
-'''
-
-with open("file.txt", "w") as out_file:
-    for line in buf:
-        if line == "; Include this text\n":
-            line = line + "Include below\n"
-        out_file.write(line)
-'''
