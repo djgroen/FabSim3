@@ -19,7 +19,7 @@ To perform the Py.test tests (not required for using FabSim, but essential for r
 
 ### Using apt on Ubuntu (tried with 18.04 Bionic Beaver)
 (when using a server version, make sure you add `universe` at the end of the first line of `/etc/apt/sources.list`)
-* `sudo apt install sshd` (if you want to run jobs on localhost)
+* `sudo apt install openssh-server openssh-client` (if you want to run jobs on localhost)
 * `sudo apt install git`
 * `sudo apt install python3-yaml`
 * `sudo apt install python3-numpy`
