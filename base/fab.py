@@ -30,18 +30,6 @@ pp = PrettyPrinter()
 
 mutex = Lock()
 mutex_template = Lock()
-mutex_env = Lock()
-mutex_complete = Lock()
-mutex_jobID = Lock()
-
-
-class dummy_context_mgr():
-
-    def __enter__(self):
-        return None
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        return False
 
 
 def get_plugin_path(name, quiet=False):
@@ -657,28 +645,22 @@ def job(sweep_length=1, *option_dictionaries):
                     print("job dispatch is done locally\n")
 
                 elif not env.get("noexec", False):
-                    with cd(job_results_dir[threading.get_ident()]
-                            ['job_results']) if env.remote == 'localhost' \
-                            else dummy_context_mgr():
-                        with prefix(env.run_prefix) \
-                            if env.remote == 'localhost' \
-                                else dummy_context_mgr():
-                            run(
-                                template("$job_dispatch %s" % job_results_dir[
-                                         threading.get_ident()]['dest_name'])
-                            )
-                            # Get the jobID, Works on Bull cluster, need to
-                            # check on others
-                            # if run_stdout:
-                            #     if len(run_stdout.split()) > 3:
-                            #         job_info = run_stdout.split()[3]
-
-                # if env.remote != 'localhost':
-                #     mutex_jobID.acquire()
-                #     try:
-                #         save_submitted_job_info(jobID=job_info)
-                #     finally:
-                #         mutex_jobID.release()
+                    if env.remote == 'localhost':
+                        with cd(job_results_dir[threading.get_ident()]
+                                ['job_results']):
+                            with prefix(env.run_prefix):
+                                run(
+                                    template("$job_dispatch %s" %
+                                             job_results_dir[
+                                                 threading.get_ident()]
+                                             ['dest_name'])
+                                )
+                    else:
+                        run(
+                            template("$job_dispatch %s" %
+                                     job_results_dir[threading.get_ident()]
+                                     ['dest_name'])
+                        )
 
                 print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
                       (env.remote,
