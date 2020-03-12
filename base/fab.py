@@ -654,13 +654,22 @@ def job(sweep_length=1, *option_dictionaries):
                     print("job dispatch is done locally\n")
 
                 elif not env.get("noexec", False):
-                    with cd(job_results_dir[threading.get_ident()]
-                            ['job_results']):
-                        with prefix(env.run_prefix):
-                            run(
-                                template("$job_dispatch %s" % job_results_dir[
-                                         threading.get_ident()]['dest_name'])
-                            )
+                    if env.remote == 'localhost':
+                        with cd(job_results_dir[threading.get_ident()]
+                                ['job_results']):
+                            with prefix(env.run_prefix):
+                                run(
+                                    template("$job_dispatch %s" %
+                                             job_results_dir[
+                                                 threading.get_ident()]
+                                             ['dest_name'])
+                                )
+                    else:
+                        run(
+                            template("$job_dispatch %s" %
+                                     job_results_dir[threading.get_ident()]
+                                     ['dest_name'])
+                        )
 
                 print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
                       (env.remote,
