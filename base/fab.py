@@ -24,15 +24,11 @@ import tempfile
 import os.path
 import math
 from pprint import PrettyPrinter
+from pprint import pprint
 from pathlib import Path
 pp = PrettyPrinter()
-
-
 mutex = Lock()
 mutex_template = Lock()
-mutex_env = Lock()
-mutex_complete = Lock()
-mutex_jobID = Lock()
 
 
 def get_plugin_path(name, quiet=False):
@@ -531,15 +527,21 @@ def job(sweep_length=1, *option_dictionaries):
                 env.job_results_local = job_results_local
                 if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
                     job_results_dir[threading.get_ident()].update(
-                        {'job_script': script_templates(env.batch_header)})
+                        {'job_script': script_templates(
+                            env.batch_header,
+                            thread_data=job_results_dir[threading.get_ident()])
+                         })
                     #  Suppose to be in PJM mode --> no multithreading --> env
                     # = ok
                     env.job_script = job_results_dir[
                         threading.get_ident()]['job_script']
                 else:
                     job_results_dir[threading.get_ident()].update({
-                        'job_script':
-                        script_templates(env.batch_header, env.script)
+                        'job_script': script_templates(
+                            env.batch_header,
+                            env.script,
+                            thread_data=job_results_dir[threading.get_ident()]
+                        )
                     })
 
                 job_results_dir[threading.get_ident()].update({
@@ -598,6 +600,8 @@ def job(sweep_length=1, *option_dictionaries):
                 tempf.flush()  # Flush the file before we copy it.
                 put(tempf.name, env.pather.join(job_results_dir[
                     threading.get_ident()]['job_results'], 'env.yml'))
+                # DEBUG
+                put(tempf.name, env.pather.join(job_results, 'env.yml'))
 
             run(template("chmod u+x %s" %
                          job_results_dir[threading.get_ident()]['dest_name']))
@@ -629,7 +633,8 @@ def job(sweep_length=1, *option_dictionaries):
                     return
 
             if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
-                return
+                # return
+                continue
 
             # We don't want to go next during replicas and pjm until the final
             # job
@@ -640,6 +645,7 @@ def job(sweep_length=1, *option_dictionaries):
                 # Allow option to submit all preparations,
                 # but not actually submit the job
                 # job_info = ''
+
                 if hasattr(env, 'dispatch_jobs_on_localhost') and \
                         isinstance(env.dispatch_jobs_on_localhost, bool) and \
                         env.dispatch_jobs_on_localhost:
@@ -651,22 +657,10 @@ def job(sweep_length=1, *option_dictionaries):
                     with cd(job_results_dir[threading.get_ident()]
                             ['job_results']):
                         with prefix(env.run_prefix):
-                            run_stdout = run(
+                            run(
                                 template("$job_dispatch %s" % job_results_dir[
                                          threading.get_ident()]['dest_name'])
                             )
-                            # Get the jobID, Works on Bull cluster, need to
-                            # check on others
-                            # if run_stdout:
-                            #     if len(run_stdout.split()) > 3:
-                            #         job_info = run_stdout.split()[3]
-
-                # if env.remote != 'localhost':
-                #     mutex_jobID.acquire()
-                #     try:
-                #         save_submitted_job_info(jobID=job_info)
-                #     finally:
-                #         mutex_jobID.release()
 
                 print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
                       (env.remote,

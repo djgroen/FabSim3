@@ -21,9 +21,10 @@ import sys
 
 def script_templates(*names, **options):
     commands = options.get('commands', [])
+    thread_data = options.get('thread_data', None)
     result = "\n".join([script_template_content(name)
                         for name in names] + commands)
-    return script_template_save_temporary(result)
+    return script_template_save_temporary(result, thread_data)
 
 
 def script_template_content(template_name):
@@ -40,10 +41,14 @@ def script_template_content(template_name):
               env.local_templates_path)
 
 
-def script_template_save_temporary(content):
+def script_template_save_temporary(content, thread_data=None):
     # script name is now depending of the label name to avoid problem
     # with multithreading
-    if hasattr(env, 'label'):
+    if thread_data is not None:
+        destname = os.path.join(env.localroot, 'deploy',
+                                '.jobscripts', env['name'] +
+                                '_' + thread_data['label'] + '.sh')
+    elif hasattr(env, 'label'):
         destname = os.path.join(env.localroot, 'deploy',
                                 '.jobscripts', env['name'] +
                                 '_' + env.label + '.sh')
