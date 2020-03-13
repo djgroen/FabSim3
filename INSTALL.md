@@ -36,30 +36,11 @@ To perform the Py.test tests (not required for using FabSim, but essential for r
 ## Installing FabSim3
 
 1. Clone the code from the GitHub repository.
+ 
+2. To enable use of FabSim on your local host, go to the FabSim3 directory, and simply type: `python configure_fabsim.py`. This command generates a `machines_user.yml` in the `<FabSim3 folder>/deploy/` and automatically modifies its contents so that it matches with your local settings. Additionally, your $PYTHONPATH and $PATH environment variables are added to your `.bashrc` for Linux based machine or `.bash_profile` for Mac users.
 
-2. Ensure that the main FabSim3 directory is in your $PYTHONPATH environment variable and that the `fabsim` command can be launched from the command line. An easy way to accomplish this is by adding the following to the end of your $HOME/.bashrc file:
-```
-export PATH=(path of your FabSim3 directory)/bin:$PATH
-export PYTHONPATH=(path of your FabSim3 directory):$PYTHONPATH
-```
-Note that you may have to restart the shell for these changes to apply.
+* NOTE: FabSim commands can now be launched using the `fabsim` command. Note that some older tutorials might use `fab` commands instead of `fabsim`. If `fabsim` command is not found, please restart your terminal or reload your shell .The two commands can be used interchangably, although the `fabsim` command gives clearer outputs and can be launched from anywhere (`fab` can only be used within the FabSim installation directories). 
 
-3. Copy `machines_user_example.yml` in the `deploy/` subdirectory to `machines_user.yml`. Modify its contents so that it matches with your local settings. For first (local) testing, one must change the settings under the sections `default:` and `localhost:` so as to update the paths of FabSim directory and lammps executable respectively. 
-
-**Note for Mac Users**
-> For Mac Users, be sure to override the default home directory, 
-> by switching the `home_path_template` variable by uncommenting the following line: 
-> `home_path_template: "/Users/$username`
-
-4. To enable use of FabSim on your local host, type `fab localhost setup_fabsim`. 
-   - As part of this command, you will be logging in to your own machine through SSH once, which can trigger a password prompt. In this case, simply type the password for the machine in which you are running these commands.
-   
-**Note for Mac Users**
-> For Mac Users, change`runtime_path_template:"$home_path"` to `runtime_path_template:"~"`in the `deploy/machines.yml`.    
-
-5. To enable use of FabSim on any other remote machine, make sure that (a) machines.yml contains the specific details of the remote machine, and (b) machines_user.yml contains the specific information for your user account and home directory for the machine. After that, simply type 'fab <machine_name> setup_fabsim'.
-
-* NOTE: FabSim commands can now be launched using the `fabsim` command. Note that some older tutorials might use `fab` commands instead of `fabsim`. If `fabsim` command is not found, simply add PATH and PYTHONPATH (step 2) to `~/.bash_profile`, as well as set environment for Python3 in the `bin/fabsim` by replacing `#!/usr/bin/python3` to `#!/usr/bin/env python3`. The two commands can be used interchangably, although the `fabsim` command gives clearer outputs and can be launched from anywhere (`fab` can only be used within the FabSim installation directories). 
 
 ### Installing plugins
 
