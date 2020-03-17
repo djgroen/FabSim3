@@ -665,11 +665,10 @@ def job(sweep_length=1, *option_dictionaries):
                                              ['dest_name'])
                                 )
                     else:
-                        run(
-                            template("$job_dispatch %s" %
-                                     job_results_dir[threading.get_ident()]
-                                     ['dest_name'])
-                        )
+                        with cd(job_results_dir[threading.get_ident()]
+                                ['job_results']):
+                            run(template("$job_dispatch %s" % job_results_dir[
+                                threading.get_ident()]['dest_name']))
 
                 print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
                       (env.remote,
@@ -810,8 +809,8 @@ def run_ensemble(config, sweep_dir, **args):
         # to avoid apply replicas functionality on PilotJob folders
         env.replicas = 1
         backup_header = env.batch_header
-        env.submitted_jobs_list = ".".join(
-            ["\n\t" + str(i) for i in env.submitted_jobs_list])
+        env.submitted_jobs_list = "\n".join(
+            [str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
         job(dict(memory='2G', label='PJ_PYheader', NoEnvScript=True), args)
         env.PJ_PATH = env.pather.join(

@@ -9,10 +9,12 @@ m = LocalManager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
 # get available resources
 print("available resources:\n%s\n" % str(m.resources()))
 
-
 # submit jobs and save their names in 'ids' list
-ids = m.submit(Jobs().$submitted_jobs_list)
+jobs = Jobs()
 
+$submitted_jobs_list
+
+ids = m.submit(jobs)
 
 # wait until submited jobs finish
 m.wait4(ids)
