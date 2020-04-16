@@ -820,6 +820,7 @@ def run_ensemble(config, sweep_dir, **args):
         env.submit_job = True
         job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
         env.batch_header = backup_header
+        env.NoEnvScript = False
 
 
 def input_to_range(arg, default):
