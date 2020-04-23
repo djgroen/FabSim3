@@ -26,3 +26,7 @@ FabProfile:
 
 fabmogp:
   repository: https://github.com/edaub/fabmogp
+
+FabCovid19:
+  repository: https://github.com/djgroen/FabCovid19
+
