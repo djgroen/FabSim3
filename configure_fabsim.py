@@ -1,8 +1,27 @@
-from pprint import pprint
+import os
+import pkg_resources
+
+
+def install(package):
+    print("Trying to Install required module: %s" % (package))
+    os.system('sudo python -m pip install %s' % (package))
+
+required = ['ruamel.yaml',
+            'numpy',
+            'pyyaml',
+            'fabric3==1.13.1.post1',
+            'cryptography']
+installed = [pkg.key for pkg in pkg_resources.working_set]
+missing = [x for x in required if x not in installed]
+
+if missing:
+    for pkg_missing in missing:
+        install(pkg_missing)
+
+
 import platform
 import sys
 import getpass
-import os
 import ruamel.yaml
 import subprocess
 
@@ -65,7 +84,6 @@ FS3_env = AttributeDict({
 def config_yml_files():
     # Load and invoke the default non-machine specific config JSON
     # dictionaries.
-
     FS3_env.machines_user_yml = yaml.load(
         open(os.path.join(FS3_env.FabSim3_PATH,
                           'deploy',
@@ -101,8 +119,10 @@ def main():
     config_yml_files()
 
     # run fab localhost setup_fabsim
+
     assert(subprocess.call(["fab", "localhost", "setup_fabsim"],
                            cwd=FS3_env.FabSim3_PATH) == 0)
+
     # use ssh-add instead of ssh-copy-id for MacOSX
     if FS3_env.OS_system == 'OSX':
         assert(subprocess.call(["ssh-add", "~/.ssh/id_rsa"]) == 0)
@@ -124,10 +144,13 @@ def main():
         FabSim_env_setting.append('export PATH=%s/bin:$PATH'
                                   % (FS3_env.FabSim3_PATH))
     # check if <FabSim3_PATH> is already in PYTHONPATH variable or not
-    if FS3_env.FabSim3_PATH not in os.environ.get('PYTHONPATH'):
+    if os.environ.get('PYTHONPATH') is None:
+        FabSim_env_setting.append(
+            'export PYTHONPATH=%s' % (FS3_env.FabSim3_PATH))
+    elif FS3_env.FabSim3_PATH not in os.environ.get('PYTHONPATH'):
         FabSim_env_setting.append('export PYTHONPATH=%s:$PYTHONPATH'
                                   % (FS3_env.FabSim3_PATH))
-
+    FabSim_env_setting.append('\n' * 2)
     with open(bash_file_name, 'a+') as out:
         out.write('\n'.join(FabSim_env_setting))
 
