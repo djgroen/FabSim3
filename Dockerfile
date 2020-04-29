@@ -25,7 +25,7 @@ RUN mkdir -p QCG && \
 FROM ubuntu:latest
 
 COPY --from=QCG_base_image /QCG /QCG
-
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends sudo git wget gnupg python3-pip python3-dev openssh-server rsync openjdk-8-jdk nano systemd && \
