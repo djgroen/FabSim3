@@ -4,7 +4,7 @@ import pkg_resources
 
 def install(package):
     print("Trying to Install required module: %s" % (package))
-    os.system('sudo python -m pip install %s' % (package))
+    os.system('sudo python3 -m pip install %s' % (package))
 
 required = ['ruamel.yaml',
             'numpy',
