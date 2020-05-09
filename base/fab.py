@@ -780,8 +780,7 @@ def run_ensemble(config, sweep_dir, **args):
             # sequentialy the first job
             if sweep_length == 1:
                 execute(put_configs, config)
-                job(sweep_length, dict(memory='2G',
-                                       ensemble_mode=True,
+                job(sweep_length, dict(ensemble_mode=True,
                                        label=item))
 
             # All the other iteration will launch parallel jobs
@@ -789,7 +788,7 @@ def run_ensemble(config, sweep_dir, **args):
                 print(" Start multi threading job")
                 atp.run_job(jobID=sweep_length, handler=job,
                             args=(sweep_length,
-                                  dict(memory='2G', ensemble_mode=True,
+                                  dict(ensemble_mode=True,
                                        label=item)))
 
     # Wait for all jobs to be done
@@ -812,13 +811,13 @@ def run_ensemble(config, sweep_dir, **args):
         env.submitted_jobs_list = "\n".join(
             [str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
-        job(dict(memory='2G', label='PJ_PYheader', NoEnvScript=True), args)
+        job(dict(label='PJ_PYheader', NoEnvScript=True), args)
         env.PJ_PATH = env.pather.join(
             env.job_results, env.pather.basename(env.job_script))
         env.PJ_FileName = env.pather.basename(env.job_script)
         env.batch_header = env.PJ_header
         env.submit_job = True
-        job(dict(memory='2G', label='PJ_header', NoEnvScript=True), args)
+        job(dict(label='PJ_header', NoEnvScript=True), args)
         env.batch_header = backup_header
         env.NoEnvScript = False
 
