@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+## eagle-app
 ## number of nodes
 #SBATCH --nodes $nodes
 
@@ -18,6 +18,9 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Memory limit per compute node for the job.
+## Do not use with mem-per-cpu flag.
+#SBATCH --mem=$memory
 
 $run_prefix
 

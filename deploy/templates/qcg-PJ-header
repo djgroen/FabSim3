@@ -5,6 +5,7 @@
 #QCG nodes=$PJ_size:$corespernode
 #QCG walltime=$PJ_wall_time
 #QCG grant=$budget
+#QCG memory=$memory
 
 #QCG output=$job_results/$${JOB_ID}.output
 #QCG error=$job_results/$${JOB_ID}.error

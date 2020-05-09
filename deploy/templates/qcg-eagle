@@ -8,6 +8,7 @@
 #QCG error=$job_results/$${JOB_ID}.error
 #QCG grant=$budget
 #QCG nodes=1:$cores
+#QCG memory=$memory
 
 export MODULEPATH=$$MODULEPATH:$eagle_MODULEPATH
 
