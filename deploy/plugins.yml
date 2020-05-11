@@ -30,3 +30,5 @@ fabmogp:
 FabCovid19:
   repository: https://github.com/djgroen/FabCovid19
 
+FabCovidsim:
+  repository: https://github.com/arabnejad/FabCovidSim
