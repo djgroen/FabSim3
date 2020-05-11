@@ -573,8 +573,8 @@ def job(sweep_length=1, *option_dictionaries):
             if env.ensemble_mode:
                 run(
                     template(
-                        "cp -r \
-                        $job_config_path/SWEEP/%s/* %s/"
+                        "rsync -pthrvz \
+                        $job_config_path/SWEEP/%s/ %s/"
                         % (
                             job_results_dir[threading.get_ident()]['label'],
                             job_results_dir[threading.get_ident()][
@@ -695,7 +695,7 @@ def ensemble2campaign(results_dir, campaign_dir, **args):
     """
     update_environment(args)
 
-    local("cp -r %s/RUNS/* %s/runs" % (results_dir, campaign_dir))
+    local("rsync -pthrvz %s/RUNS/ %s/runs" % (results_dir, campaign_dir))
 
 
 @task
@@ -714,7 +714,7 @@ def campaign2ensemble(config, campaign_dir, **args):
     sweep_dir = config_path + "/SWEEP"
     local("mkdir -p %s" % (sweep_dir))
 
-    local("cp -r %s/runs/* %s" % (campaign_dir, sweep_dir))
+    local("rsync -pthrz %s/runs/ %s" % (campaign_dir, sweep_dir))
 
 
 def run_ensemble(config, sweep_dir, **args):
