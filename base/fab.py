@@ -403,18 +403,19 @@ def calc_total_mem():
 
     mem_size = int(re.findall("\d+", env.memory)[0])
     try:
-        mem_unit = re.findall("[a-zA-Z]+", env.memory)[0]
+        mem_unit_str = re.findall("[a-zA-Z]+", env.memory)[0]
     except:
-        mem_unit = ''
-    print(mem_size)
-    print(mem_unit)
+        mem_unit_str = ''
+
+    if mem_unit_str.upper() == 'GB' or mem_unit_str.upper() == 'G':
+        mem_unit = 1000
+    else:
+        mem_unit = 1
 
     if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
-        env.total_mem = mem_size * int(env.PJ_size)
+        env.total_mem = mem_size * int(env.PJ_size) * mem_unit
     else:
-        env.total_mem = mem_size * int(env.nodes)
-
-    env.total_mem = '{:d}{}'.format(env.total_mem, mem_unit)
+        env.total_mem = mem_size * int(env.nodes) * mem_unit
 
 
 @task
