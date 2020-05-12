@@ -396,6 +396,14 @@ def calc_nodes():
     env.nodes = int(math.ceil(float(env.cores) / float(env.coresusedpernode)))
 
 
+def calc_total_mem():
+    # for qcg scheduler, #QCG memory requires total memory for all nodes
+    if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
+        env.total_mem = int(env.memory) * int(env.PJ_size)
+    else:
+        env.total_mem = int(env.memory) * int(env.nodes)
+
+
 @task
 def get_fabsim_git_hash(verbose=True):
     with settings(warn_only=True):
@@ -511,6 +519,8 @@ def job(sweep_length=1, *option_dictionaries):
                 calc_nodes()
                 env.run_command_one_proc = template(env.run_command)
             calc_nodes()
+
+            calc_total_mem()
             env.run_command = template(env.run_command)
 
             # Mutex are used here to temporary set global variable
