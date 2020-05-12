@@ -2,10 +2,10 @@
 
 #QCG host=eagle
 #QCG queue=$queue
-#QCG nodes=$PJ_size:$corespernode
+#QCG nodes=$PJ_size:$cores
 #QCG walltime=$PJ_wall_time
 #QCG grant=$budget
-#QCG memory=$memory
+#QCG memory=$total_mem
 
 #QCG output=$job_results/$${JOB_ID}.output
 #QCG error=$job_results/$${JOB_ID}.error
