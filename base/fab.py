@@ -398,10 +398,20 @@ def calc_nodes():
 
 def calc_total_mem():
     # for qcg scheduler, #QCG memory requires total memory for all nodes
+    mem_size = int(re.findall("\d+", env.memory)[0])
+    try:
+        mem_unit = re.findall("[a-zA-Z]+", env.memory)[0]
+    except:
+        mem_unit = ''
+    print(mem_size)
+    print(mem_unit)
+
     if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
-        env.total_mem = int(env.memory) * int(env.PJ_size)
+        env.total_mem = mem_size * int(env.PJ_size)
     else:
-        env.total_mem = int(env.memory) * int(env.nodes)
+        env.total_mem = mem_size * int(env.nodes)
+
+    env.total_mem = '{:d}{}'.format(env.total_mem, mem_unit)
 
 
 @task
