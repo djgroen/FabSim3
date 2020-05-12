@@ -398,6 +398,9 @@ def calc_nodes():
 
 def calc_total_mem():
     # for qcg scheduler, #QCG memory requires total memory for all nodes
+    if not hasattr(env, 'PilotJob'):
+        env.memory = '2GB'
+
     mem_size = int(re.findall("\d+", env.memory)[0])
     try:
         mem_unit = re.findall("[a-zA-Z]+", env.memory)[0]
