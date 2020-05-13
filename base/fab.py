@@ -398,7 +398,7 @@ def calc_nodes():
 
 def calc_total_mem():
     # for qcg scheduler, #QCG memory requires total memory for all nodes
-    if not hasattr(env, 'PilotJob'):
+    if not hasattr(env, 'memory'):
         env.memory = '2GB'
 
     mem_size = int(re.findall("\d+", env.memory)[0])
@@ -648,6 +648,10 @@ def job(sweep_length=1, *option_dictionaries):
                             ['job_results'], env.pather.basename(
                                 job_results_dir[threading.get_ident()]
                                 ['job_script']))
+
+                        if not hasattr(env, 'task_model'):
+                            env.task_model = 'default'
+
                         env.submitted_jobs_list.append(
                             script_template_content('qcg-PJ-task-template'))
                     finally:
