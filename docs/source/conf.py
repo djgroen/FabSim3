@@ -46,6 +46,7 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx_tabs.tabs',
+    'readthedocs_ext.readthedocs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
