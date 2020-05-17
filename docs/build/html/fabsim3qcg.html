@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FabSim3 with QCG middleware &mdash; FabSim3 Initial Release documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/js/versions.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/msmb.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Singularity Usage" href="containerizedversion.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/logo.jpg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Installation and Testing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installing-fabsim3">Installing FabSim3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#updating-fabsim3">Updating FabSim3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#known-issues">Known Issues</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#ssh-connect-to-host-localhost-port-22-connection-refused">ssh: connect to host localhost port 22: Connection refused</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#macos">MacOS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#list-available-commands">List available commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installationback.html">Installation and Testing (old)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#installing-fabsim3">Installing FabSim3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#installing-plugins">Installing plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#updating-fabsim3">Updating FabSim3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#testing-fabsim3">Testing FabSim3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#list-available-commands">List available commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installationback.html#fabdummy-testing-on-the-local-host">FabDummy testing on the local host</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="installationback.html#plugin-installation">Plugin Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installationback.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installationback.html#lammps-testing-on-the-local-host">LAMMPS testing on the local host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installationback.html#creating-the-relevant-fabsim3-directories-on-a-local-or-remote-host">Creating the relevant FabSim3 directories on a local or remote host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installationback.html#auto-bash-completion-for-fabsim">Auto bash-completion for fabsim</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Plugins</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Installing plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html#creating-a-new-plugin">Creating a new plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html#fabdummy-testing-on-the-local-host">FabDummy testing on the local host</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#plugin-installation">Plugin Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html#lammps-testing-on-the-local-host">LAMMPS testing on the local host</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#dependencies-and-pre-configurations">Dependencies and Pre-Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#id1">Plugin Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#id2">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Create automation scripts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="createautomation.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="createautomation.html#how-to-write-automation-functions">How to write automation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="createautomation.html#examples">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="createautomation.html#accessing-fabsim-commands-from-python-scripts">Accessing FabSim commands from Python scripts</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Remote Machine Configuration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html#how-to-add-new-remote-a-machine-configuration">How to add new remote a machine configuration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Containerized versions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="containerizedversion.html">Singularity Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="containerizedversion.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="containerizedversion.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FabSim3 with QCG middleware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#machine-configuration">Machine configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#job-executing-monitoring-and-fetching-results-on-a-remote-host">Job Executing, Monitoring, and Fetching results on a remote host</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#job-submisson">Job Submisson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#job-monitoring">Job Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetaching-results">Fetaching results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FabSim3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>FabSim3 with QCG middleware</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/fabsim3qcg.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fabsim3-with-qcg-middleware">
+<span id="fabsim3qcg"></span><h1>FabSim3 with QCG middleware<a class="headerlink" href="#fabsim3-with-qcg-middleware" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how users should set and use remote machine functionality.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this tutorial, all parameters are set based on our tested target machine  (the Eagle cluster at PSNC), which uses <a class="reference external" href="http://apps.man.poznan.pl/trac/qcg">QCG Middleware</a> for resource management. For the local testing, you need to change them based your remote machine configuration and usage software.</p>
+</div>
+<div class="section" id="machine-configuration">
+<h2>Machine configuration<a class="headerlink" href="#machine-configuration" title="Permalink to this headline">¶</a></h2>
+<p>To execute jobs through remote resource schedulers, some <strong>essential</strong> machine-specific configurations are required to be set and stored. These parameters will be applied to all applications run on that remote machine.</p>
+<p>First, you need to add your <strong>username</strong> for remote machine in <code class="docutils literal notranslate"><span class="pre">/deploy/machines_user.yml</span></code> file as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qcg</span><span class="p">:</span> <span class="c1"># machine name</span>
+     <span class="n">username</span><span class="p">:</span> <span class="s2">&quot;plg...&quot;</span>
+</pre></div>
+</div>
+<p>Then, set up configuration for remote machine in <code class="docutils literal notranslate"><span class="pre">/deploy/machines.yml</span></code> file. Here is a simple example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qcg</span><span class="p">:</span> <span class="c1"># machine name</span>
+     <span class="n">remote</span><span class="p">:</span> <span class="s1">&#39;eagle.man.poznan.pl&#39;</span>
+     <span class="n">home_path_template</span><span class="p">:</span> <span class="s1">&#39;/home/plgrid/$username&#39;</span>
+     <span class="n">manual_ssh</span><span class="p">:</span> <span class="n">true</span>
+     <span class="n">dispatch_jobs_on_localhost</span><span class="p">:</span> <span class="n">true</span>
+     <span class="n">job_dispatch</span> <span class="p">:</span> <span class="s1">&#39;qcg-sub&#39;</span>
+     <span class="n">batch_header</span><span class="p">:</span> <span class="n">qcg</span><span class="o">-</span><span class="n">eagle</span>
+     <span class="n">stat</span><span class="p">:</span> <span class="s1">&#39;qcg-list -Q -s all -F &quot;%-22I %-16S %-8H&quot; | awk &quot;{if(NR&gt;2)print}&quot;&#39;</span>
+     <span class="n">job_dispatch</span><span class="p">:</span> <span class="s1">&#39;qcg-sub&#39;</span>
+     <span class="n">cancel_job_command</span><span class="p">:</span> <span class="s1">&#39;qcg-cancel $jobID&#39;</span>
+     <span class="n">job_info_command</span> <span class="p">:</span> <span class="s1">&#39;qcg-info -Q $jobID&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">qcg</span></code>: the name of target remote machine machine , it will use by FabSim3 as <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">qcg</span> <span class="pre">&lt;command&gt;</span></code>. Internally, FabSim3 uses <code class="docutils literal notranslate"><span class="pre">&lt;$user_name&gt;&#64;&lt;$remote&gt;</span></code> to connect to the remote machine.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote</span></code>: the remote machine address. FabSim3 uses <code class="docutils literal notranslate"><span class="pre">&lt;$user_name&gt;&#64;&lt;$remote&gt;</span></code> template internally all connection. The <code class="docutils literal notranslate"><span class="pre">user_name</span></code> parameter is taken from <code class="docutils literal notranslate"><span class="pre">/deploy/machines.yml</span></code> file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">home_path_template</span></code>: used to the storage space to checkout and build on the remote machine.</li>
+<li><code class="docutils literal notranslate"><span class="pre">manual_ssh</span></code>: when enabled, FabSim3 will connect directly using an ssh client instead of using the paramiko api.</li>
+<li><code class="docutils literal notranslate"><span class="pre">dispatch_jobs_on_localhost</span></code>: if it is set to <strong>true</strong>, job dispatch is done locally. Otherwise, FabSim3 executes commands directly inside the remote machine by <strong>ssh</strong> connection. To dispatch job locally, the command-line interface for job management should be installed in your local machine.</li>
+<li><code class="docutils literal notranslate"><span class="pre">batch_header</span></code>: it can be used to add some predefined templates to the submitted job script. The template file should be store at <code class="docutils literal notranslate"><span class="pre">/deploy/templates</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">stat</span></code>: filled by the command-line that displays report on the submitted jobs. In this example, according to our grid broker, <code class="docutils literal notranslate"><span class="pre">qcg-list</span></code> command displays table with information about tasks.</li>
+</ul>
+<p>It should be set in the way that only return jobID, job status, and host in the output (without column header). For example, the template output should be similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">=======</span>   <span class="o">=========</span>   <span class="o">===========</span>
+<span class="n">jobID1</span>    <span class="n">FINISHED</span>    <span class="n">eagle</span>
+<span class="n">jobID2</span>    <span class="n">FAILED</span>      <span class="n">tryton</span>
+<span class="n">jobID3</span>    <span class="n">CANCELED</span>    <span class="n">prometheus</span>
+<span class="o">=======</span>   <span class="o">=========</span>   <span class="o">===========</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">job_dispatch</span></code>: the command to submit the task to be processed by remote machine.</li>
+<li><code class="docutils literal notranslate"><span class="pre">cancel_job_command</span></code>: the command to cancel the submitted task based on input <strong>$jobID</strong>. the <strong>$jobID</strong> variable will be set during the execution, keep the format as <strong>$jobID</strong> in the parameters list.</li>
+<li><code class="docutils literal notranslate"><span class="pre">job_info_command</span></code>: the command to display a comprehensive information of a specific <strong>jobID</strong>. Please set this parameters based on the workload manager of target remote machine, i.e : <code class="docutils literal notranslate"><span class="pre">&lt;command&gt;</span> <span class="pre">&lt;parameters&gt;</span> <span class="pre">$jobID</span></code>. The <strong>$jobID</strong> variable will be set during the execution, keep the format as <strong>$jobID</strong> in the parameters list.</li>
+</ul>
+</div>
+<div class="section" id="job-executing-monitoring-and-fetching-results-on-a-remote-host">
+<h2>Job Executing, Monitoring, and Fetching results on a remote host<a class="headerlink" href="#job-executing-monitoring-and-fetching-results-on-a-remote-host" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="job-submisson">
+<h3>Job Submisson<a class="headerlink" href="#job-submisson" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">To submit a job on the remote mahcine, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fab</span> <span class="o">&lt;</span><span class="n">machine</span> <span class="n">name</span><span class="o">&gt;</span> <span class="n">install_plugin</span><span class="p">:</span><span class="o">&lt;</span><span class="n">plug_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>This does the following:
+* Copy your job input to the remote machine location specified in the variable.
+* By each job submssion, the associated jobID will be stored in the jobs database in <code class="docutils literal notranslate"><span class="pre">/deploy/.jobsDB</span></code>  at your local machine.</p>
+</div>
+<div class="section" id="job-monitoring">
+<h3>Job Monitoring<a class="headerlink" href="#job-monitoring" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">job_stat</span></code>: returns a report for all submitted jobs or a one in Particular. By default <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">&lt;machine&gt;</span> <span class="pre">job_stat</span></code> reports the status of jobs saved in the local jobs database.</p>
+<blockquote>
+<div><p>$ fab &lt;machine&gt; job_stat</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="33%" />
+<col width="22%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>JobID</td>
+<td>Job Status</td>
+<td>Host</td>
+</tr>
+<tr class="row-even"><td>J1550579738985__5903</td>
+<td>FINISHED</td>
+<td>eagle</td>
+</tr>
+<tr class="row-odd"><td>J1550579822765__3295</td>
+<td>FAILED</td>
+<td>eagle</td>
+</tr>
+<tr class="row-even"><td>J1551348984148__7461</td>
+<td>CANCELED</td>
+<td>eagle</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</li>
+</ul>
+<p>To return task information for all submitted jobs, you can use <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">&lt;machine&gt;</span> <span class="pre">job_stat:period=all</span></code>. Also, to return the status for a specific task, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fab</span> <span class="o">&lt;</span><span class="n">machine</span><span class="o">&gt;</span> <span class="n">job_stat</span><span class="p">:</span><span class="n">jobID</span><span class="o">=...</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">job_stat_update</span></code>: updates the job status in the local database file</p>
+<blockquote>
+<div><p>$ fab &lt;machine&gt; job_stat_update</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="30%" />
+<col width="30%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>JobID</td>
+<td>current Status</td>
+<td>New Status</td>
+</tr>
+<tr class="row-even"><td>J1550579738985__5925</td>
+<td>FAILED</td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>J1550579822765__9151</td>
+<td>PREPROCESSING</td>
+<td>PENDING</td>
+</tr>
+<tr class="row-even"><td>J1551348984148__8504</td>
+<td>PENDING</td>
+<td>FINISHED</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">job_info</span></code>: returns an extened reports on for a specefic job, <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">&lt;machine&gt;</span> <span class="pre">job_info:&lt;jobID&gt;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cancel_job</span></code>: will cancel a remote job, <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">&lt;machine&gt;</span> <span class="pre">cancel_job:&lt;jobID&gt;</span></code></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="fetaching-results">
+<h3>Fetaching results<a class="headerlink" href="#fetaching-results" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">You can fetch the remote data using</p>
+<blockquote>
+<div><p>fab &lt;machine&gt; fetch_results</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="containerizedversion.html" class="btn btn-neutral float-left" title="Singularity Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Derek Groen, Hamid Arabnejad, Robin Richardson, Robert Sinclair, Vytautas Jancauskas, Nicolas Monnier, Paul Karlshoefer, Peter Coveney, , Maxime Vassaux
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  <script>
+    var versions_json_url = ''
+</script>
+
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"></span>
+        Initial Release
+      <span class="fa fa-caret-down"></span>
+    </span>
+
+    <div class="rst-other-versions">
+        <dl id="versionselector">
+            <dt>Other Versions</dt>
+        </dl>
+
+    </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
