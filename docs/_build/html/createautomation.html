@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; FabSim3 Initial Release documentation</title>
+  <title>Create automation scripts &mdash; FabSim3 Initial Release documentation</title>
   
 
   
@@ -91,7 +91,6 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#updating-fabsim3">Updating FabSim3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#known-issues">Known Issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#list-available-commands">List available commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installationback.html">Installation and Testing (old)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Plugins</span></p>
 <ul>
@@ -100,19 +99,41 @@
 <li class="toctree-l1"><a class="reference internal" href="plugins.html#fabdummy-testing-on-the-local-host">FabDummy testing on the local host</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html#lammps-testing-on-the-local-host">LAMMPS testing on the local host</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Create automation scripts</span></p>
+<p class="caption"><span class="caption-text">Advanced Topics</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#how-to-write-automation-functions">How to write automation functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#examples">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#accessing-fabsim-commands-from-python-scripts">Accessing FabSim commands from Python scripts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Create automation scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-write-automation-functions">How to write automation functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#accessing-fabsim-commands-from-python-scripts">Accessing FabSim commands from Python scripts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#create-config-directories">Create Config Directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#fabsim-variables">FabSim variables</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-variables-are-obtained-or-introduced">How variables are obtained or introduced:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-variables-are-applied">How variables are applied:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-applying-a-variable">Example of applying a variable</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#creating-job-submission-templates">Creating Job Submission Templates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#header-templates">Header templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#job-execution-templates">Job execution templates</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Remote Machine Configuration</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html#fabsim3-remote-job-management-command">FabSim3 Remote Job Management Command</a></li>
 <li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html#how-to-add-new-remote-a-machine-configuration">How to add new remote a machine configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remotemachineconfig.html#qcg-pilot-job-manager">QCG Pilot Job Manager</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Containerized versions</span></p>
 <ul>
@@ -163,7 +184,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Overview</li>
+      <li>Create automation scripts</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -182,9 +203,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <p id="createautomation">This document briefly details how user/developers can create their own FabSim3 automations.</p>
+  <div class="section" id="create-automation-scripts">
+<span id="createautomation"></span><h1>Create automation scripts<a class="headerlink" href="#create-automation-scripts" title="Permalink to this headline">¶</a></h1>
+<p>This document briefly details how user/developers can create their own FabSim3 automations.</p>
 <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Automation scripts allow user/developers to create their own FabSim3 functionalities. They are usually created and modified within individual plugins.</li>
 <li>Base automation scripts reside within the <code class="docutils literal notranslate"><span class="pre">base/</span></code> subdirectory. These should normally not be modified, but they can serve as examples to create your own functionalities, or as building blocks to create complex functions.</li>
@@ -192,7 +215,7 @@
 </ul>
 </div>
 <div class="section" id="how-to-write-automation-functions">
-<h1>How to write automation functions<a class="headerlink" href="#how-to-write-automation-functions" title="Permalink to this headline">¶</a></h1>
+<h2>How to write automation functions<a class="headerlink" href="#how-to-write-automation-functions" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>All automation functions are written using Python 3.</li>
 <li>On top of that, they rely on shorthand functionalities as provided by Fabric3. See <a class="reference external" href="http://docs.fabfile.org/en/1.14/usage/tasks.html">documentation</a> for more information.</li>
@@ -201,7 +224,7 @@
 </ul>
 </div>
 <div class="section" id="examples">
-<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>To access a remote resource and scan available modules for a specific name one could write:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@task</span>
 <span class="k">def</span> <span class="nf">probe</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;undefined&quot;</span><span class="p">):</span>
@@ -255,9 +278,177 @@
 <li>On the last line, LAMMPS is run remotely (shown by <cite>script=’lammps’</cite>), and the values of <code class="docutils literal notranslate"><span class="pre">args</span></code> are passed on to that function as well, overriding the default <strong>wall_time</strong> and memory specification on that line if the user has specified those variables explicitly already.</li>
 </ul>
 <div class="section" id="accessing-fabsim-commands-from-python-scripts">
-<h2>Accessing FabSim commands from Python scripts<a class="headerlink" href="#accessing-fabsim-commands-from-python-scripts" title="Permalink to this headline">¶</a></h2>
+<h3>Accessing FabSim commands from Python scripts<a class="headerlink" href="#accessing-fabsim-commands-from-python-scripts" title="Permalink to this headline">¶</a></h3>
 <p>To launch FabSim3 commands from Python scripts, we have established a basic Python API. This file can be found <a class="reference external" href="https://github.com/djgroen/FabSim3/blob/master/lib/fabsim3_cmd_api.py">here</a>.</p>
 <p>We recommend using this API rather than <code class="docutils literal notranslate"><span class="pre">os.system()</span></code> or <code class="docutils literal notranslate"><span class="pre">subprocess()</span></code> directly, as it will allow us to fix any emerging bugs in future versions for you.</p>
+</div>
+</div>
+</div>
+<div class="section" id="create-config-directories">
+<h1>Create Config Directories<a class="headerlink" href="#create-config-directories" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Configuration information is stored in subdirectories of either <cite>config</cite> or <cite>plugins/&lt;module_name&gt;/configs</cite> (to be implemented).</li>
+<li>One directory should be created for each individual simulation problem type.</li>
+<li>Typically, input file names are standardized using default names, to reduce the number of user-specified arguments on the command line (e.g., config.xml for HemeLB).</li>
+<li>Examples for LAMMPS are provided in the base installation of FabSim3.</li>
+</ul>
+</div>
+<div class="section" id="fabsim-variables">
+<h1>FabSim variables<a class="headerlink" href="#fabsim-variables" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt>FabSim variables are represented in three different ways:</dt>
+<dd><ul class="first last">
+<li><p class="first">in <code class="docutils literal notranslate"><span class="pre">.yml</span></code> files as a key-value pair, e.g.:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">number_of_cores</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">within the FabSim Python environment as a member of the env dictionary, e.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">.</span><span class="n">number_of_cores</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="ow">or</span>
+<span class="n">update_environment</span><span class="p">({</span><span class="s2">&quot;number_of_cores&quot;</span><span class="p">:</span><span class="mi">16</span><span class="p">})</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">within templates as a <code class="docutils literal notranslate"><span class="pre">$</span></code> denominated variable, which is to be substituted. For example:</p>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="how-variables-are-obtained-or-introduced">
+<h2>How variables are obtained or introduced:<a class="headerlink" href="#how-variables-are-obtained-or-introduced" title="Permalink to this headline">¶</a></h2>
+<p>Variable are obtained from the following sources:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Parsed from <code class="docutils literal notranslate"><span class="pre">.yml</span></code> files such as <code class="docutils literal notranslate"><span class="pre">machines.yml</span></code> and <code class="docutils literal notranslate"><span class="pre">machines_user.yml</span></code>, which are loaded on startup.</li>
+<li>Explicitly written/created in the Python code environment. This should be implemented such that the third method will still override this method.</li>
+<li>Overridden or introduced using command-line arguments.</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="how-variables-are-applied">
+<h2>How variables are applied:<a class="headerlink" href="#how-variables-are-applied" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Directly, by reading values from <code class="docutils literal notranslate"><span class="pre">env.&lt;variable_name&gt;</span></code> in the Python code base.</li>
+<li>Through template substitution, where instances of <code class="docutils literal notranslate"><span class="pre">$&lt;variable_name&gt;</span></code> are replaced with <code class="docutils literal notranslate"><span class="pre">&lt;variable_value&gt;</span></code> in the substitution output.</li>
+</ol>
+<div class="section" id="example-of-applying-a-variable">
+<h3>Example of applying a variable<a class="headerlink" href="#example-of-applying-a-variable" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">test_sim</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="o">**</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Submit a my_sim job to the remote queue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">env</span><span class="o">.</span><span class="n">test_var</span> <span class="o">=</span> <span class="mf">300.0</span> <span class="c1"># test variable is set to a default value in the FabSim environment.</span>
+    <span class="c1"># This will override any defaults set in other parts of FabSim (e.g. machines_user.yml)</span>
+
+    <span class="n">update_environment</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="c1"># If a value for test_var is given as a command-line argument,</span>
+    <span class="c1"># then the default set above will be overridden.</span>
+
+    <span class="n">env</span><span class="o">.</span><span class="n">sim_args</span> <span class="o">=</span> <span class="s2">&quot;-test-var=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">test_var</span><span class="p">)</span>
+    <span class="c1"># Optional example how to use your created variable</span>
+    <span class="c1"># to create some parameter syntax for your job.</span>
+
+    <span class="n">test_sim</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="c1"># start a fictitious job, with the variable present in your FabSim environment.</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="creating-job-submission-templates">
+<h1>Creating Job Submission Templates<a class="headerlink" href="#creating-job-submission-templates" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><ul class="simple">
+<li>Job submission templates are used to convert FabSim environmental information to batch job scripts which can be submitted to remote resource schedulers.</li>
+<li>Domain-independent templates are stored in <code class="docutils literal notranslate"><span class="pre">deploy/templates</span></code>, while domain-specific templates should be stored in <code class="docutils literal notranslate"><span class="pre">deploy/&lt;module_name&gt;/templates</span></code>.</li>
+<li>Templates consist of two parts, <cite>Header templates</cite> which are scheduler-specific, and <cite>job execution</cite> templates which are code-specific.</li>
+<li>Normally, one new template needs to be added when adding a new machine definition to FabSim3, regardless of the number of codes used on that machine.</li>
+<li>Also one new template needs to be added for each new code definition to FabSim3, regardless of the number of machines supported.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="header-templates">
+<h2>Header templates<a class="headerlink" href="#header-templates" title="Permalink to this headline">¶</a></h2>
+<p>Header templates are usually created as follows:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Take a batch script header example from the user guide of the respective resource.</li>
+<li>Any existing variable denoted with $name should normally be replaced with <code class="docutils literal notranslate"><span class="pre">$$name</span></code> (to prevent substitution with FabSim variables).</li>
+<li>Any hard-coded value should be replaced with a FabSim environment variable name, prefixed with a <code class="docutils literal notranslate"><span class="pre">$</span></code> symbol.</li>
+<li>One then needs to ensure that the respective variables are properly created in FabSim3, e.g. by adding default definitions for them to <code class="docutils literal notranslate"><span class="pre">machines.yml</span></code> if necessary.</li>
+</ol>
+</div></blockquote>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>The example below is the batch header template for the SuperMUC supercomputer.</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">##</span>
+<span class="c1">## Copyright (C) University College London, 2007-2012, all rights reserved.</span>
+<span class="c1">##</span>
+<span class="c1">## This file is part of HemeLB and is CONFIDENTIAL. You may not work</span>
+<span class="c1">## with, install, use, duplicate, modify, redistribute or share this</span>
+<span class="c1">## file, or any part thereof, other than as allowed by any agreement</span>
+<span class="c1">## specifically made by you with University College London.</span>
+<span class="c1">###</span>
+<span class="c1">## optional: energy policy tags</span>
+<span class="c1">##</span>
+<span class="c1"># DO NOT USE environment = COPY_ALL</span>
+
+<span class="c1">#@ job_name = $job_name_template_sh</span>
+<span class="c1">#@ job_type = $job_type</span>
+<span class="c1">#@ output = job$$(jobid).out</span>
+<span class="c1">#@ error = job$$(jobid).err</span>
+<span class="c1">#@ class = $job_class</span>
+<span class="c1">#@ tasks_per_node = $corespernode</span>
+<span class="c1">#@ island_count = $island_count</span>
+<span class="c1">#@ node = $nodes</span>
+<span class="c1">#@ wall_clock_limit = $wall_time</span>
+<span class="c1">#@ network.MPI = sn_all,shared,us</span>
+<span class="c1">#@ notification = never</span>
+<span class="c1">#@ initialdir = .</span>
+<span class="c1">#@ node_usage = shared</span>
+<span class="c1">#@ queue</span>
+
+
+<span class="c1"># setup modules</span>
+. /etc/profile
+. /etc/profile.d/modules.sh
+</pre></div>
+</div>
+<ul class="simple">
+<li>Here, <code class="docutils literal notranslate"><span class="pre">#&#64;</span> <span class="pre">output</span> <span class="pre">=</span> <span class="pre">job$$(jobid).out</span></code> will become <code class="docutils literal notranslate"><span class="pre">#&#64;</span> <span class="pre">output</span> <span class="pre">=</span> <span class="pre">job$(jobid).out</span></code> after templating, preserving the supercomputer-specific environment variable.</li>
+<li>However, <code class="docutils literal notranslate"><span class="pre">#&#64;</span> <span class="pre">node</span> <span class="pre">=</span> <span class="pre">$nodes</span></code> will for example become <code class="docutils literal notranslate"><span class="pre">#&#64;</span> <span class="pre">node</span> <span class="pre">=</span> <span class="pre">16</span></code> if the env.nodes value within FabSim3 equals to <code class="docutils literal notranslate"><span class="pre">16</span></code>.</li>
+<li>Note also that the (MPI) execution command should not reside in this template, as this is supplied separately.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="job-execution-templates">
+<h2>Job execution templates<a class="headerlink" href="#job-execution-templates" title="Permalink to this headline">¶</a></h2>
+<p>Job execution templates are typically straightforward in their structure, and usually contain just a few preparation commands and a generic MPI job execution formulation.</p>
+<p>Here is an example job execution template for the LAMMPS code:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="nv">$job_results</span> <span class="c1"># change directory to the FabSim results dir. Featured in almost all templates.</span>
+<span class="nv">$run_prefix</span>     <span class="c1"># run preparatory commands, as specified within FabSim.</span>
+
+cp -r <span class="nv">$job_config_path</span>/* . <span class="c1"># Copy over initial conditions to results directory. Featured in almost all templates.</span>
+/usr/bin/env &gt; env.log     <span class="c1"># Store local supercomputer environment variables. Featured in almost all templates.</span>
+<span class="nv">$run_command</span> <span class="nv">$lammps_exec</span> <span class="nv">$lammps_args</span> &lt; <span class="nv">$lammps_input</span> &gt; log.lammps <span class="c1"># Generically formulated LAMMPS execution command.</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The last command will likely depend on how parameters are passed to the target code.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">$run_command</span></code> will be substituted by a job execution command such as <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> or <code class="docutils literal notranslate"><span class="pre">aprun</span></code>.</li>
+<li>other variables contain code/domain-specific information such as input and output destinations, relevant flags or the location of the executable.</li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 

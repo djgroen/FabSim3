@@ -47,7 +47,6 @@ The main plugins for FabSim3 include:
    :maxdepth: 1
 
    installation
-   installationback
 
 .. toctree::
    :caption: Plugins
@@ -57,7 +56,7 @@ The main plugins for FabSim3 include:
 
 
 .. toctree::
-   :caption: Create automation scripts
+   :caption: Advanced Topics
    :maxdepth: 1
 
    createautomation
