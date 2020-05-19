@@ -37,13 +37,13 @@ Job Monitoring
 
     .. code-block:: console
 
-		fab <machine> job_stat
+		fab <remote machine name> job_stat
 
 reports the status of jobs. You can also ask for reporting on specific job by 
 
     .. code-block:: console
 
-		fab <machine> job_stat:<jobID>
+		fab <remote machine name> job_stat:<jobID>
 
 
 Fetching results
@@ -52,7 +52,7 @@ You can fetch the remote data using
 
     .. code-block:: console
 
-		fab <machine> fetch_results
+		fab <remote machine name> fetch_results
 
 
 
@@ -120,7 +120,7 @@ To define an alias, simply type
 
     .. code-block:: console
 
-		fabsim <machine_name> bash_machine_alias:name=<name_of_alias>
+		fabsim <remote machine name> bash_machine_alias:name=<name_of_alias>
 
 So, given the previous example, one could type 
 
