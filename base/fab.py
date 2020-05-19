@@ -401,9 +401,9 @@ def calc_total_mem():
     if not hasattr(env, 'memory'):
         env.memory = '2GB'
 
-    mem_size = int(re.findall("\d+", env.memory)[0])
+    mem_size = int(re.findall("\d+", str(env.memory))[0])
     try:
-        mem_unit_str = re.findall("[a-zA-Z]+", env.memory)[0]
+        mem_unit_str = re.findall("[a-zA-Z]+", str(env.memory))[0]
     except:
         mem_unit_str = ''
 
@@ -624,8 +624,6 @@ def job(sweep_length=1, *option_dictionaries):
                 tempf.flush()  # Flush the file before we copy it.
                 put(tempf.name, env.pather.join(job_results_dir[
                     threading.get_ident()]['job_results'], 'env.yml'))
-                # DEBUG
-                put(tempf.name, env.pather.join(job_results, 'env.yml'))
 
             run(template("chmod u+x %s" %
                          job_results_dir[threading.get_ident()]['dest_name']))
