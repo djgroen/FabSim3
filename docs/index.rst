@@ -29,8 +29,8 @@ versions 1.5.3 and 1.10.0) and PyYAML. It has been used to run simulation
 workflows on supercomputers such as ARCHER, SuperMUC, Carthesius, Eagle, as well
 as local clusters and desktops.
 
-FabSim3 is publicly available at: http://www.github.com/djgroen/FabSim3 The
-accompanying software paper can be found here:
+FabSim3 is publicly available at: http://www.github.com/djgroen/FabSim3 
+The accompanying software paper can be found here:
 https://doi.org/10.1016/j.cpc.2016.05.020
 
 The main plugins for FabSim3 include:
