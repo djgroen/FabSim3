@@ -6,13 +6,26 @@ def install(package):
     print("Trying to Install required module: %s" % (package))
     os.system('sudo python3 -m pip install %s' % (package))
 
+
+def get_version(package):
+    package = package.lower()
+    return next((pkg.version for pkg in pkg_resources.working_set
+                 if pkg.project_name.lower() == package), "No match")
+
 required = ['ruamel.yaml',
             'numpy',
             'pyyaml',
             'fabric3==1.13.1.post1',
             'cryptography']
-installed = [pkg.key for pkg in pkg_resources.working_set]
-missing = [x for x in required if x not in installed]
+
+missing = []
+for x in required:
+    pkg = x.split('==')[0]
+    pkg_ver = get_version(pkg)
+    if pkg_ver == "No match":
+        missing.append(x)
+    elif '==' in x and x.lower() != "{}=={}".format(pkg, pkg_ver).lower():
+        missing.append(x)
 
 if missing:
     for pkg_missing in missing:
