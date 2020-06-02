@@ -138,7 +138,9 @@ def main():
 
     # use ssh-add instead of ssh-copy-id for MacOSX
     if FS3_env.OS_system == 'OSX':
-        subprocess.call(["ssh-add", "~/.ssh/id_rsa"])
+        assert(subprocess.call(
+            ["ssh-add", "/Users/{}/.ssh/id_rsa".format(FS3_env.user_name)])
+            == 0)
         #assert(subprocess.call(["ssh-add", "~/.ssh/id_rsa"]) == 0)
 
     # setup PATH and PYTHONPATH in bashrc
