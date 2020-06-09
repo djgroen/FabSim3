@@ -114,7 +114,7 @@ A full list of fabric ``env`` variables can be found on www.fabfile.org, e.g. he
 Adding shortened commands for specific machines
 -----------------------------------------------
 
-In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a ``feh`` command to use in place of ``fab eagle_hidalgo``. Such aliases can help speed up the typing of interactive commands.
+In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a ``feh`` command to use in place of ``fab eagle_vecma``. Such aliases can help speed up the typing of interactive commands.
 
 To define an alias, simply type 
 
@@ -126,7 +126,7 @@ So, given the previous example, one could type
 
     .. code-block:: console
 
-		fabsim eagle_hidalgo bash_machine_alias:name=feh
+		fabsim eagle_vecma bash_machine_alias:name=feh
 
 
 Aliases are stored in ``$FabSim3/bin`` and cannot be named ``fabsim``, as that would break the main ``fabsim`` command.
