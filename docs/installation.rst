@@ -35,7 +35,7 @@ Installing FabSim3
             git clone https://github.com/djgroen/FabSim3.git
 
 
-2. To install **all** packages automatically and configure yml files, please got to your FabSim3 directory, and type
+2. To install **all** packages automatically and configure yml files, please go to your FabSim3 directory, and type
 
     .. code:: console
 
