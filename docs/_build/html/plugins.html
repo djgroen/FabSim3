@@ -278,9 +278,38 @@
 <div class="section" id="dependencies-and-pre-configurations">
 <h2>Dependencies and Pre-Configurations<a class="headerlink" href="#dependencies-and-pre-configurations" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><ol class="arabic simple">
-<li>Install LAMMPS (see <a class="reference external" href="http://lammps.sandia.gov">http://lammps.sandia.gov</a>) for detailed download and installation instructions).</li>
-<li>Modify <code class="docutils literal notranslate"><span class="pre">machines_user.yml</span></code> to make the <strong>lammps_exec</strong> variable point to the location of the LAMMPS executable. e.g.</li>
+<div><ol class="arabic">
+<li><dl class="first docutils">
+<dt>Install LAMMPS (see <a class="reference external" href="http://lammps.sandia.gov">http://lammps.sandia.gov</a>). We suggest to install it from source files.</dt>
+<dd><ul class="first last">
+<li><p class="first">Download the latest stable version from <a class="reference external" href="https://lammps.sandia.gov/tars/lammps-stable.tar.gz">https://lammps.sandia.gov/tars/lammps-stable.tar.gz</a></p>
+</li>
+<li><p class="first">Extract tar file by <code class="docutils literal notranslate"><span class="pre">tar</span> <span class="pre">xvf</span> <span class="pre">lammps-stable.tar.gz</span></code>. This will create a folder named: <em>lammps-3Mar20</em> (The date may change depending of the updates in the website).</p>
+</li>
+<li><p class="first">Before keep going it is necessary to solve some dependencies: build-essential (to compile in C), MPIch (to work in parallel) , FFTW ( to compute long-range interactions), libxaw7 (to compute the movies). In one line code you choose</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span> <span class="n">libxaw7</span><span class="o">-</span><span class="n">dev</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Then, go to the extract folder, and execute following commands</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~$ cd lammps-3Mar20
+~/lammps-3Mar20$ cd src/STUBS
+~/lammps-3Mar20/src/STUBS$ make clean
+~/lammps-3Mar20/src/STUBS$ make
+~/lammps-3Mar20/src/STUBS$ cd ..
+~/lammps-3Mar20/src$ make clean-all
+~/lammps-3Mar20/src$ make serial
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the installation part worked correctly, you should be able to find <code class="docutils literal notranslate"><span class="pre">lmp_serial</span></code> executable file inside <code class="docutils literal notranslate"><span class="pre">lammps-3Mar20/src</span></code> folder</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Modify <code class="docutils literal notranslate"><span class="pre">machines_user.yml</span></code> to make the <strong>lammps_exec</strong> variable point to the location of the LAMMPS executable. e.g.</p>
+</li>
 </ol>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">localhost</span><span class="p">:</span>
         <span class="nt">lammps_exec</span><span class="p">:</span> <span class="s">&quot;/home/james/bin/lmp_serial&quot;</span>

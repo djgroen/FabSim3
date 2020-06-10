@@ -67,7 +67,26 @@ LAMMPS testing on the local host
 
 Dependencies and Pre-Configurations
 -----------------------------------
-	1. Install LAMMPS (see http://lammps.sandia.gov) for detailed download and installation instructions).
+	1. Install LAMMPS (see http://lammps.sandia.gov). We suggest to install it from source files.
+		* Download the latest stable version from `https://lammps.sandia.gov/tars/lammps-stable.tar.gz <https://lammps.sandia.gov/tars/lammps-stable.tar.gz>`__ 
+		* Extract tar file by ``tar xvf lammps-stable.tar.gz``. This will create a folder named: *lammps-3Mar20* (The date may change depending of the updates in the website).  
+		* Before keep going it is necessary to solve some dependencies: build-essential (to compile in C), MPIch (to work in parallel) , FFTW ( to compute long-range interactions), libxaw7 (to compute the movies). In one line code you choose ::
+
+			sudo apt-get install build-essential libxaw7-dev 
+
+		* Then, go to the extract folder, and execute following commands ::
+
+			~$ cd lammps-3Mar20
+			~/lammps-3Mar20$ cd src/STUBS
+			~/lammps-3Mar20/src/STUBS$ make clean
+			~/lammps-3Mar20/src/STUBS$ make
+			~/lammps-3Mar20/src/STUBS$ cd ..
+			~/lammps-3Mar20/src$ make clean-all
+			~/lammps-3Mar20/src$ make serial
+
+		* If the installation part worked correctly, you should be able to find ``lmp_serial`` executable file inside ``lammps-3Mar20/src`` folder
+
+
 
 	2. Modify ``machines_user.yml`` to make the **lammps_exec** variable point to the location of the LAMMPS executable. e.g.
 	    

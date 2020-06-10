@@ -227,7 +227,7 @@
 <ul>
 <li><p class="first"><code class="docutils literal notranslate"><span class="pre">stat</span></code> : returns a report for all submitted jobs or a one in Particular. By default</p>
 <blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;machine&gt; job_stat</span>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;remote machine name&gt; job_stat</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -235,7 +235,7 @@
 </ul>
 <p>reports the status of jobs. You can also ask for reporting on specific job by</p>
 <blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;machine&gt; job_stat:&lt;jobID&gt;</span>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;remote machine name&gt; job_stat:&lt;jobID&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -244,7 +244,7 @@
 <h2>Fetching results<a class="headerlink" href="#fetching-results" title="Permalink to this headline">¶</a></h2>
 <p>You can fetch the remote data using</p>
 <blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;machine&gt; fetch_results</span>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fab &lt;remote machine name&gt; fetch_results</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -304,16 +304,16 @@
 </div>
 <div class="section" id="adding-shortened-commands-for-specific-machines">
 <h2>Adding shortened commands for specific machines<a class="headerlink" href="#adding-shortened-commands-for-specific-machines" title="Permalink to this headline">¶</a></h2>
-<p>In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a <code class="docutils literal notranslate"><span class="pre">feh</span></code> command to use in place of <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">eagle_hidalgo</span></code>. Such aliases can help speed up the typing of interactive commands.</p>
+<p>In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a <code class="docutils literal notranslate"><span class="pre">feh</span></code> command to use in place of <code class="docutils literal notranslate"><span class="pre">fab</span> <span class="pre">eagle_vecma</span></code>. Such aliases can help speed up the typing of interactive commands.</p>
 <p>To define an alias, simply type</p>
 <blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim &lt;machine_name&gt; bash_machine_alias:name=&lt;name_of_alias&gt;</span>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim &lt;remote machine name&gt; bash_machine_alias:name=&lt;name_of_alias&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p>So, given the previous example, one could type</p>
 <blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle_hidalgo bash_machine_alias:name=feh</span>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle_vecma bash_machine_alias:name=feh</span>
 </pre></div>
 </div>
 </div></blockquote>
