@@ -325,7 +325,7 @@ eagle_vecma:
   remote: "eagle.man.poznan.pl"
   home_path_template: "/home/plgrid/$username"
   batch_header: slurm-eagle
-  budget: "vecma2019"
+  budget: "vecma2020"
   # list of available partitions : sinfo --Format=partition
   partition_name: "standard"
 
