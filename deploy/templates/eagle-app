@@ -4,7 +4,7 @@
 #SBATCH --nodes $nodes
 
 ## task per node
-#SBATCH --tasks-per-node=$cores
+#SBATCH --tasks-per-node=$corespernode
 
 ## wall time in format MINUTES:SECONDS
 #SBATCH --time=$job_wall_time

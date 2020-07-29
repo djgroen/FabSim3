@@ -4,7 +4,7 @@
 #SBATCH --nodes $nodes
 
 ## task per node
-#SBATCH --tasks-per-node=$cores
+#SBATCH --tasks-per-node=$corespernode
 
 ## wall time in format MINUTES:SECONDS
 #SBATCH --time=$job_wall_time
@@ -22,3 +22,4 @@
 ## Do not use with mem-per-cpu flag.
 #SBATCH --mem=$memory
 
+#SBATCH --partition=covid
