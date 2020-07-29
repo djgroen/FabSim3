@@ -792,9 +792,9 @@ def run_ensemble(config, sweep_dir, **args):
                     env.exec_first)))
 
     # Prevention since some laptop doesn't support more than 4 threads
-    if int(env.nb_thread) > 4:
-        env.nb_thread = 4
-
+    # if int(env.nb_thread) > 4:
+    #     env.nb_thread = 4
+    
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
