@@ -23,7 +23,7 @@
 
 ## Memory limit per compute node for the job.
 ## Do not use with mem-per-cpu flag.
-#SBATCH --mem=$memory
+#SBATCH --mem=$total_mem
 
 ## load QCG-PilotJob
 eval "$$($virtual_env_path/bin/conda shell.bash hook)"
