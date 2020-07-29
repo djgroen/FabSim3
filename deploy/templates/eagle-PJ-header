@@ -25,6 +25,9 @@
 ## Do not use with mem-per-cpu flag.
 #SBATCH --mem=$total_mem
 
+## Request a specific partition ("queue") for the resource allocation
+#SBATCH --partition=$partition_name
+
 ## load QCG-PilotJob
 eval "$$($virtual_env_path/bin/conda shell.bash hook)"
 $virtual_env_path/bin/python3 $PJ_PATH
