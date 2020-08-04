@@ -1,6 +1,8 @@
-fabric3
+fabric3==1.13.1.post1
 pyyaml
 pytest
 pytest-pep8
 ruamel.yaml
+numpy
+cryptography
 

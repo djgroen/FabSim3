@@ -22,6 +22,10 @@
 ## Do not use with mem-per-cpu flag.
 #SBATCH --mem=$memory
 
+## Request a specific partition ("queue") for the resource allocation
+#SBATCH --partition=$partition_name
+
+
 $run_prefix
 
 

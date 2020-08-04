@@ -16,14 +16,17 @@
 #SBATCH --nodes=$PJ_size
 
 ## task per node
-#SBATCH --tasks-per-node=$cores
+#SBATCH --tasks-per-node=$corespernode
 
 ## grant
 #SBATCH --account=$budget
 
 ## Memory limit per compute node for the job.
 ## Do not use with mem-per-cpu flag.
-#SBATCH --mem=$memory
+#SBATCH --mem=$total_mem
+
+## Request a specific partition ("queue") for the resource allocation
+#SBATCH --partition=$partition_name
 
 #SBATCH --partition=fast
 
