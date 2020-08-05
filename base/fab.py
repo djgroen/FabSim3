@@ -759,7 +759,7 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     local("mkdir -p %s" % (sweep_dir))
 
     #if skip > 0: only copy the run directories run_X for X > skip to the
-    #FabSim3 sweep directory. This avoid recomputing already computed samples
+    #FabSim3 sweep directory. This avoids recomputing already computed samples
     #when the EasyVVUQ grid is refined adaptively.
     if int(skip) > 0:
         #all runs in the campaign dir
