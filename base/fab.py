@@ -731,7 +731,6 @@ def ensemble2campaign(results_dir, campaign_dir, skip=0, **args):
             run_id = int(run.split('_')[-1])
             #if X > skip copy results back
             if run_id > int(skip):
-                print("Copying %s" % run)
                 local("rsync -pthrvz %s/RUNS/%s %s/runs" % (results_dir, run,
                                                             campaign_dir))
     #copy all runs from FabSim results directory to campaign directory
@@ -758,17 +757,18 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     sweep_dir = config_path + "/SWEEP"
     local("mkdir -p %s" % (sweep_dir))
 
+    #the previous ensemble in the sweep directory
+    prev_runs = os.listdir(sweep_dir)
+    #empty sweep directory
+    for prev_run in prev_runs:
+        local('rm -r %s/%s' % (sweep_dir, prev_run))
+
     #if skip > 0: only copy the run directories run_X for X > skip to the
     #FabSim3 sweep directory. This avoids recomputing already computed samples
     #when the EasyVVUQ grid is refined adaptively.
     if int(skip) > 0:
         #all runs in the campaign dir
         runs = os.listdir('%s/runs/' % campaign_dir)
-        #the previous ensemble in the sweep directory
-        prev_runs = os.listdir(sweep_dir)
-        #empty sweep directory
-        for prev_run in prev_runs:
-            local('rm -r %s/%s' % (sweep_dir, prev_run))
 
         for run in runs:
             #extract X from run_X
