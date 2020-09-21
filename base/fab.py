@@ -1144,6 +1144,14 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
     with open(script, "w") as sc:
         install_dir = "--user"
         if virtualenv == 'True':
+            # clean virtualenv and App_repo directory on remote machine side
+            # To make sure everything is going to be installed from scratch
+            '''
+            sc.write("find %s/ -maxdepth 1 -mindepth 1 -type d \
+                -exec rm -rf \"{}\" \\;\n" % (env.app_repository))
+            sc.write("rm -rf %s\n" % (env.virtual_env_path))
+            '''
+
             # It seems some version of python/virtualenv doesn't support
             # the option --no-download. So there is sometime a problem :
             # from pip import main
@@ -1161,13 +1169,23 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
             sc.write("\n\neval \"$$(%s/bin/conda shell.bash hook)\"\n\n" %
                      (env.virtual_env_path))
             # install_dir = ""
+            '''
+            with the latest version of numpy, I got this error:
+            1. Check that you expected to use Python3.8 from ...,
+                and that you have no directories in your PATH or PYTHONPATH
+                that can interfere with the Python and numpy version "1.18.1"
+                you're trying to use.
+            so, since that we are using VirtualEnv, to avoid any conflict,
+            it is better to clear PYTHONPATH
+            '''
+            sc.write("\nexport PYTHONPATH=\"\"\n")
 
         # First install the additional_dependencies
         for dep in reversed(add_dep_list_compressed):
             print(dep)
             if dep.endswith('.zip'):
                 sc.write("\nunzip %s/%s -d %s && cd %s/%s \
-                    && %s/bin/python3 setup.py install %s"
+                    && %s/bin/python3 setup.py install %s\n"
                          % (env.app_repository, dep, env.app_repository,
                             env.app_repository, dep.replace(".zip", ""),
                             env.virtual_env_path, install_dir))
@@ -1178,12 +1196,15 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
                             env.app_repository, dep.replace(".tar.gz", ""),
                             env.virtual_env_path, install_dir))
 
-        sc.write("pip3 install --no-index --no-build-isolation \
+        sc.write("%s/bin/pip install --no-index --no-build-isolation \
             --find-links=file:%s %s/%s-%s.zip %s \
-            || pip3 install --no-index --find-links=file:%s %s/%s-%s.zip"
-                 % (env.app_repository, env.app_repository,
+            || %s/bin/pip install --no-index --find-links=file:%s %s/%s-%s.zip"
+                 % (env.virtual_env_path,
+                    env.app_repository, env.app_repository,
                     info['name'], info['version'],
-                    install_dir, env.app_repository,
+                    install_dir,
+                    env.virtual_env_path,
+                    env.app_repository,
                     env.app_repository, info['name'], info['version']))
 
     # Add the tmp_app_dir directory in the local templates path because the
@@ -1217,4 +1238,4 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
     with cd(env.pather.dirname(env.job_results)):
         run(template("%s %s") % (env.job_dispatch, env.dest_name))
 
-    local('rm -rf %s' % tmp_app_dir)
+    # local('rm -rf %s' % tmp_app_dir)
