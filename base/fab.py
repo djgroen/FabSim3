@@ -1238,4 +1238,4 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
     with cd(env.pather.dirname(env.job_results)):
         run(template("%s %s") % (env.job_dispatch, env.dest_name))
 
-    # local('rm -rf %s' % tmp_app_dir)
+    local('rm -rf %s' % tmp_app_dir)
