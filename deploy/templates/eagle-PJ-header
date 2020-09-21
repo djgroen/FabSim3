@@ -28,6 +28,13 @@
 ## Request a specific partition ("queue") for the resource allocation
 #SBATCH --partition=$partition_name
 
+## create sub-directory to save output job log
+logJob_dir="tasks-log"
+if [ -d "$$logJob_dir" ]; then
+  rm -rf $$logJob_dir
+fi  
+mkdir $$logJob_dir
+
 ## load QCG-PilotJob
 eval "$$($virtual_env_path/bin/conda shell.bash hook)"
 $virtual_env_path/bin/python3 $PJ_PATH
