@@ -13,3 +13,10 @@ __pycache__/
 plugins/
 
 results/
+
+ssh_copy_id.log
+
+tmp_app/
+
+localhost_exe/
+
