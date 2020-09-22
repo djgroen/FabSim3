@@ -721,19 +721,19 @@ def ensemble2campaign(results_dir, campaign_dir, skip=0, **args):
     skip: The number of runs (run_1 to run_skip) not to copy to the campaign
     """
     update_environment(args)
-    #if skip > 0: only copy the run directories run_X for X > skip back
-    #to the EasyVVUQ campaign dir
+    # if skip > 0: only copy the run directories run_X for X > skip back
+    # to the EasyVVUQ campaign dir
     if int(skip) > 0:
-        #all run directories
+        # all run directories
         runs = os.listdir('%s/RUNS/' % results_dir)
         for run in runs:
-            #extract X from run_X
+            # extract X from run_X
             run_id = int(run.split('_')[-1])
-            #if X > skip copy results back
+            # if X > skip copy results back
             if run_id > int(skip):
                 local("rsync -pthrvz %s/RUNS/%s %s/runs" % (results_dir, run,
                                                             campaign_dir))
-    #copy all runs from FabSim results directory to campaign directory
+    # copy all runs from FabSim results directory to campaign directory
     else:
         local("rsync -pthrvz %s/RUNS/ %s/runs" % (results_dir, campaign_dir))
 
@@ -745,7 +745,7 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     config: FabSim3 configuration name (will create in top level if
     non-existent, and overwrite existing content).
     campaign_dir: EasyVVUQ root campaign directory.
-    skip: The number of runs (run_1 to run_skip) not to copy to the FabSim3 
+    skip: The number of runs (run_1 to run_skip) not to copy to the FabSim3
           sweep directory. The first skip number of samples will then not
           be computed.
     """
@@ -757,28 +757,28 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     sweep_dir = config_path + "/SWEEP"
     local("mkdir -p %s" % (sweep_dir))
 
-    #the previous ensemble in the sweep directory
+    # the previous ensemble in the sweep directory
     prev_runs = os.listdir(sweep_dir)
-    #empty sweep directory
+    # empty sweep directory
     for prev_run in prev_runs:
         local('rm -r %s/%s' % (sweep_dir, prev_run))
 
-    #if skip > 0: only copy the run directories run_X for X > skip to the
-    #FabSim3 sweep directory. This avoids recomputing already computed samples
-    #when the EasyVVUQ grid is refined adaptively.
+    # if skip > 0: only copy the run directories run_X for X > skip to the
+    # FabSim3 sweep directory. This avoids recomputing already computed samples
+    # when the EasyVVUQ grid is refined adaptively.
     if int(skip) > 0:
-        #all runs in the campaign dir
+        # all runs in the campaign dir
         runs = os.listdir('%s/runs/' % campaign_dir)
 
         for run in runs:
-            #extract X from run_X
+            # extract X from run_X
             run_id = int(run.split('_')[-1])
-            #if X > skip, copy run directory to the sweep dir 
+            # if X > skip, copy run directory to the sweep dir
             if run_id > int(skip):
                 print("Copying %s" % run)
                 local("rsync -pthrz %s/runs/%s %s" % (campaign_dir, run,
                                                       sweep_dir))
-    #if skip = 0: copy all runs from EasyVVUQ run directort to the sweep dir
+    # if skip = 0: copy all runs from EasyVVUQ run directort to the sweep dir
     else:
         local("rsync -pthrz %s/runs/ %s" % (campaign_dir, sweep_dir))
 
