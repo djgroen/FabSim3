@@ -1142,7 +1142,7 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
     with open(script, "w") as sc:
-        install_dir = "--user"
+        install_dir = ""
         if virtualenv == 'True':
             # clean virtualenv and App_repo directory on remote machine side
             # To make sure everything is going to be installed from scratch
@@ -1178,7 +1178,8 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
             so, since that we are using VirtualEnv, to avoid any conflict,
             it is better to clear PYTHONPATH
             '''
-            sc.write("\nexport PYTHONPATH=\"\"\n")
+            #sc.write("\nexport PYTHONPATH=\"\"\n")
+            sc.write("\nmodule unload python\n")
 
         # First install the additional_dependencies
         for dep in reversed(add_dep_list_compressed):
