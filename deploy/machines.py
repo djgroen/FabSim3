@@ -107,8 +107,8 @@ env.run_prefix = " && ".join(module_commands +
 
 if (not any("install_app" in str or "install_packages" in str
             for str in env.tasks) and
-        hasattr(env, 'virtualenv') and
-        str(env.virtualenv).lower() == 'true'):
+        hasattr(env, 'venv') and
+        str(env.venv).lower() == 'true'):
     env.run_prefix = env.run_prefix + " && " + \
         "source %s/bin/activate" % (env.virtual_env_path)
 
@@ -230,8 +230,8 @@ def complete_environment():
 
     if (not any("install_app" in str or "install_packages" in str
                 for str in env.tasks) and
-            hasattr(env, 'virtualenv') and
-            str(env.virtualenv).lower() == 'true'):
+            hasattr(env, 'venv') and
+            str(env.venv).lower() == 'true'):
         env.run_prefix = env.run_prefix + " && " + \
             "source %s/bin/activate" % (env.virtual_env_path)
 

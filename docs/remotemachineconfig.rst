@@ -151,7 +151,7 @@ QCG-PJ installation on your remote machine
 To install QCG-PJ on your remote machine, simply type:
     ::
 
-            fabsim <remote machine name> install_app:QCG-PilotJob,virtualenv=True
+            fabsim <remote machine name> install_app:QCG-PilotJob,venv=True
 
     .. note :: All required packages are downloaded and transferred to the remote machine. Therefore, even if the compute nodes do not have an access to Internet, the installation part will be done in off-line mode
 
@@ -167,5 +167,5 @@ If you application requires a python package which is not available on pre-insta
 and then type
     ::
 
-            fabsim <remote machine name> install_packages:virtualenv=True
+            fabsim <remote machine name> install_packages:venv=True
 

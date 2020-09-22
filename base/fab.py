@@ -412,7 +412,7 @@ def calc_total_mem():
     else:
         mem_unit = 1
 
-    if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
+    if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
         env.total_mem = mem_size * int(env.PJ_size) * mem_unit
     else:
         env.total_mem = mem_size * int(env.nodes) * mem_unit
@@ -814,7 +814,7 @@ def run_ensemble(config, sweep_dir, **args):
     with_config(config)
 
     # check for PilotJob option
-    if(hasattr(env, 'PilotJob') and env.PilotJob.lower() == 'true'):
+    if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
         # env.batch_header = "no_batch"
         env.submitted_jobs_list = []
         env.submit_job = False
@@ -868,9 +868,7 @@ def run_ensemble(config, sweep_dir, **args):
         )
         print("Sweep dir location: %s" % (sweep_dir))
 
-    elif (hasattr(env, 'PilotJob') and
-          env.PilotJob.lower() == 'true'
-          ):
+    elif (hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
         # to avoid apply replicas functionality on PilotJob folders
         env.replicas = 1
         backup_header = env.batch_header
@@ -1011,7 +1009,7 @@ def print_config(args=''):
 
 
 @task
-def install_packages(virtualenv='False'):
+def install_packages(venv='False'):
     """
     Install list of packages defined in deploy/applications.yml
     note : if you got an error on your local machine during the build wheel
@@ -1063,7 +1061,7 @@ def install_packages(virtualenv='False'):
     # Write the Install command in a file
     with open(script, "w") as sc:
         install_dir = "--user"
-        if virtualenv == 'True':
+        if venv == 'True':
             sc.write("if [ ! -d %s ]; then \n\t python -m virtualenv \
                     %s || echo 'WARNING : virtualenv is not installed \
                     or has a problem' \nfi\n\nsource %s/bin/activate\n" %
@@ -1119,7 +1117,7 @@ def install_packages(virtualenv='False'):
 
 
 @task
-def install_app(name="", external_connexion='no', virtualenv='False'):
+def install_app(name="", external_connexion='no', venv='False'):
     """
     Install a specific Application through FasbSim3
 
@@ -1183,7 +1181,7 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
     # Write the Install command in a file
     with open(script, "w") as sc:
         install_dir = ""
-        if virtualenv == 'True':
+        if venv == 'True':
             # clean virtualenv and App_repo directory on remote machine side
             # To make sure everything is going to be installed from scratch
             '''
