@@ -1218,7 +1218,7 @@ def install_app(name="", external_connexion='no', virtualenv='False'):
             so, since that we are using VirtualEnv, to avoid any conflict,
             it is better to clear PYTHONPATH
             '''
-            #sc.write("\nexport PYTHONPATH=\"\"\n")
+            # sc.write("\nexport PYTHONPATH=\"\"\n")
             sc.write("\nmodule unload python\n")
 
         # First install the additional_dependencies
