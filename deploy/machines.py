@@ -111,6 +111,11 @@ if (not any("install_app" in str or "install_packages" in str
         str(env.venv).lower() == 'true'):
     env.run_prefix = env.run_prefix + " && " + \
         "source %s/bin/activate" % (env.virtual_env_path)
+    # since we are going to load python VirtualEnv, so, it would be better
+    # to unload any current loaded python modules, in order to avoid
+    # conflicts during the execution of python program
+    env.run_prefix = env.run_prefix + " && " + \
+        "module unload python"
 
 
 @task
@@ -234,6 +239,11 @@ def complete_environment():
             str(env.venv).lower() == 'true'):
         env.run_prefix = env.run_prefix + " && " + \
             "source %s/bin/activate" % (env.virtual_env_path)
+        # since we are going to load python VirtualEnv, so, it would be better
+        # to unload any current loaded python modules, in order to avoid
+        # conflicts during the execution of python program
+        env.run_prefix = env.run_prefix + " && " + \
+            "module unload python"
 
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
