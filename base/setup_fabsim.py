@@ -20,6 +20,22 @@ def install_plugin(name):
 
 
 @task
+def avail_plugin():
+    """
+    print list of available plugins.
+    """
+    config = yaml.load(
+        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
+        Loader=yaml.SafeLoader
+    )
+    print("\nList of available plugins\n")
+    print("%-20s %s" % ('plugin name', 'repository'))
+    print("%-20s %s" % ('-----------', '----------'))
+    for name, repo in config.items():
+        print("%-20s %s" % (name, repo['repository']))
+
+
+@task
 def update_plugin(name):
     """
     Update a specific FabSim3 plugin.

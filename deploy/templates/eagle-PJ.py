@@ -1,6 +1,6 @@
-from qcg.appscheduler.api.manager import Manager
-from qcg.appscheduler.api.manager import LocalManager
-from qcg.appscheduler.api.job import Jobs
+from qcg.pilotjob.api.manager import Manager
+from qcg.pilotjob.api.manager import LocalManager
+from qcg.pilotjob.api.job import Jobs
 
 m = LocalManager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
 # m = Manager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
@@ -23,5 +23,5 @@ m.wait4(ids)
 print("jobs details:\n%s\n" % str(m.info(ids)))
 
 m.finish()
-m.stopManager()
+m.kill_manager_process()
 m.cleanup()

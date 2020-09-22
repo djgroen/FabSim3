@@ -3,8 +3,8 @@ Miniconda-installer:
 
 QCG-PilotJob:
     repository: https://github.com/vecma-project/QCG-PilotJob.git
-    name: QCGPilotManager
-    version: 0.7.2
+    name: qcg-pilotjob
+    version: 0.8.0
     additional_dependencies:
         - pandas
         - numpy
