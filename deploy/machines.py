@@ -128,8 +128,10 @@ def machine(name):
     if "import" in config[name]:
         # Config for this machine is based on another
         env.update(config[config[name]["import"]])
+
         if config[name]["import"] in user_config:
             env.update(user_config[config[name]["import"]])
+
     env.update(config[name])
     if name in user_config:
         env.update(user_config[name])
@@ -148,8 +150,6 @@ def machine(name):
 
     env.modules.update(user_config[name].get("modules", {}))
 
-    # print(env.modules)
-
     complete_environment()
 
 
@@ -159,14 +159,59 @@ def print_machine_config_info(name=""):
         print("Usage: \
             fabsim localhost print_machine_config_info:<machine_name>")
         sys.exit()
-    print("Defaults: ", config[name])
-    print("User overrides: ", user_config[name])
+    print_msg_box("Defaults: ")
+    pp.pprint(config[name])
+    print_msg_box("User overrides: ", )
+    pp.pprint(user_config[name])
 
+    for plugin_name in plugins_config:
+        try:
+            print_msg_box("%s plugin overrides: " % (plugin_name))
+            pp.pprint(plugins_config[plugin_name][name])
+        except KeyError:
+            pass
 
 # Metaprogram the machine wrappers
 for machine_name in set(config.keys()) - set(['default']):
     globals()[machine_name] = task(alias=machine_name)(
         partial(machine, machine_name))
+
+
+def add_pluing_environment_variable(plugin_name, plugin_path, machine_name):
+    # machines_<plugin>.yml
+    # machines_<plugin>_user.yml
+    plugin_machines_user = os.path.join(plugin_path,
+                                        "machines_%s_user.yml" % (plugin_name)
+                                        )
+
+    if not os.path.isfile(plugin_machines_user):
+        return
+
+    plugin_config = yaml.load(open(plugin_machines_user),
+                              Loader=yaml.SafeLoader
+                              )
+
+    # only update environment variable based on plugin_machines_user yaml file
+    old_env = my_deepcopy(env)
+    if "import" in config[machine_name]:
+        if config[machine_name]["import"] in plugin_config:
+            env.update(plugin_config[config[machine_name]["import"]])
+
+    if machine_name in plugin_config:
+        env.update(plugin_config[machine_name])
+
+    env.modules = config["default"]["modules"]
+    if "import" in config[machine_name]:
+        if config[machine_name]["import"] in plugin_config:
+            env.modules.update(
+                plugin_config[config[machine_name]["import"]].modules)
+
+    env.modules.update(plugin_config[machine_name].get("modules", {}))
+
+    complete_environment()
+    print_msg_box("\n".join(findDiff(env, old_env, path="env")),
+                  title="New/Updated environment variables from %s plugin"
+                  % (plugin_name))
 
 
 def complete_environment():
@@ -252,3 +297,81 @@ def complete_environment():
     # env.build_number=run("hg id -q -i")
 
 # complete_environment()
+
+
+def my_deepcopy(obj):
+    new_obj = {}
+    for key in obj:
+        if type(obj[key]) in [dict, fabric.utils._AliasDict]:
+            new_obj[key] = my_deepcopy(obj[key])
+        elif isinstance(obj[key], (list)):
+            new_obj[key] = obj[key][:]
+        else:
+            new_obj[key] = obj[key]
+    return new_obj
+
+
+def findDiff(d1, d2, path=""):
+    ret_str = []
+    for key in d1:
+        if (key not in d2):
+            ret_str.append("%s :" % (path))
+            ret_str.append("  +++ %s is a new added key" % (key))
+        else:
+            if type(d1[key]) in [dict, fabric.utils._AliasDict]:
+                if path == "":
+                    nested_path = key
+                else:
+                    nested_path = path + "->" + key
+                ret_str += findDiff(d1[key], d2[key], nested_path)
+            elif isinstance(d1[key], (bool, str, int)):
+                if d1[key] != d2[key]:
+                    ret_str.append("%s :" % (path))
+                    ret_str.append("  --- %s : %s" % (key, str(d2[key])))
+                    ret_str.append("  +++ %s : %s" % (key, str(d1[key])))
+                else:
+                    pass
+            elif isinstance(d1[key], (list)):
+                if set(d1[key]) != set(d2[key]):
+                    ret_str.append("%s :" % (path))
+                    ret_str.append("  --- %s : %s" % (key, str(d2[key])))
+                    ret_str.append("  +++ %s : %s" % (key, str(d1[key])))
+
+    return ret_str
+
+
+def print_msg_box(msg, indent=1, width=None, title=None, border="═"):
+    """
+        Print message-box with optional title.
+        source : https://stackoverflow.com/questions/39969064/how-to-print-a-message-box-in-python
+    """
+    if len(msg) == 0:
+        return
+
+    if border == "═":
+        t_l = "╔"
+        t_r = "╗"
+        b_l = "╚"
+        b_r = "╝"
+        l = r = "║"
+        t = b = "═"
+    elif border == "-":
+        t_l = "┌"
+        t_r = "┐"
+        b_l = "└"
+        b_r = "┘"
+        l = r = "|"
+        t = b = "─"
+    lines = msg.split('\n')
+
+    space = " " * indent
+    if not width:
+        width = max(map(len, lines))
+    box = f'{t_l}{t * (width + indent * 2)}{t_r}\n'  # upper_border
+    if title:
+        box += f'{l}{space}{title:<{width}}{space}{r}\n'  # title
+        # underscore
+        box += f'{l}{space}{"-" * len(title):<{width}}{space}{r}\n'
+    box += ''.join([f'{l}{space}{line:<{width}}{space}{r}\n' for line in lines])
+    box += f'{b_l}{b * (width + indent * 2)}{b_r}'  # lower_border
+    print(box)

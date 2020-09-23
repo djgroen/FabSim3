@@ -10,7 +10,11 @@ import importlib
 
 from base.fab import *
 
-config = yaml.load(open(os.path.join(env.localroot, 'deploy', 'plugins.yml')), Loader=yaml.SafeLoader)
+config = yaml.load(open(os.path.join(env.localroot,
+                                     'deploy',
+                                     'plugins.yml')),
+                   Loader=yaml.SafeLoader)
+
 for key in config.keys():
     plugin = {}
     try:
@@ -19,9 +23,9 @@ for key in config.keys():
         try:
             to_import = plugin.__all__
         except AttributeError:
-            to_import = [name for name in plugin_dict if not name.startswith('_')]
+            to_import = [name for name in plugin_dict
+                         if not name.startswith('_')]
         globals().update({name: plugin_dict[name] for name in to_import})
         env.localplugins[key] = os.path.join(env.localroot, 'plugins', key)
     except ImportError:
         pass
-
