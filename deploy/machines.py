@@ -177,7 +177,7 @@ for machine_name in set(config.keys()) - set(['default']):
         partial(machine, machine_name))
 
 
-def add_pluing_environment_variable(plugin_name, plugin_path, machine_name):
+def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
     # machines_<plugin>.yml
     # machines_<plugin>_user.yml
     plugin_machines_user = os.path.join(plugin_path,

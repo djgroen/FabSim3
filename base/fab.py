@@ -155,7 +155,7 @@ def with_config(name):
 
     plugin_local_path = env.job_config_path_local.split("/config_files/")[0]
     plugin_name = plugin_local_path.split("/plugins/")[1]
-    add_pluing_environment_variable(plugin_name,
+    add_plugin_environment_variable(plugin_name,
                                     plugin_local_path,
                                     env.machine_name)
 
