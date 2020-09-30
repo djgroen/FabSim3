@@ -839,6 +839,7 @@ def run_ensemble(config, sweep_dir, **args):
         # env.batch_header = "no_batch"
         env.submitted_jobs_list = []
         env.submit_job = False
+        env.batch_header = "bash_header"
 
     # number of runs performed in this sweep
     sweep_length = 0
