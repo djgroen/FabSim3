@@ -115,6 +115,21 @@ def with_template_config():
 
 
 def find_config_file_path(name, ExceptWhenNotFound=True):
+
+    # Prevent of executing localhost runs on the FabSim3 root directory
+    if env.host == 'localhost' and env.work_path == env.localroot:
+        print("Error : the localhost run dir is same as your FabSim3 folder")
+        print("To avoid any conflict of config folder, please consider")
+        print("changing your home_path_template variable")
+        print("you can easily modify it by updating localhost entry in")
+        print("your FabSim3/machines_user.yml file")
+        print("Here is the suggested changes ")
+        print("\nlocalhost:")
+        print("  ...")
+        print("  home_path_template: \"%s/localhost_exe\"\n"
+              % (env.localroot))
+        exit()
+
     path_used = None
     for p in env.local_config_file_path:
         config_file_path = os.path.join(p, name)
