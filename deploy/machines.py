@@ -197,6 +197,9 @@ def add_pluing_environment_variable(plugin_name, plugin_path, machine_name):
         if config[machine_name]["import"] in plugin_config:
             env.update(plugin_config[config[machine_name]["import"]])
 
+    if "default" in plugin_config:
+        env.update(plugin_config['default'])
+
     if machine_name in plugin_config:
         env.update(plugin_config[machine_name])
 
