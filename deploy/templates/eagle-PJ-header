@@ -35,6 +35,9 @@ if [ -d "$$logJob_dir" ]; then
 fi  
 mkdir $$logJob_dir
 
+$run_prefix
+
 ## load QCG-PilotJob
-eval "$$($virtual_env_path/bin/conda shell.bash hook)"
-$virtual_env_path/bin/python3 $PJ_PATH
+
+$run_QCG_PilotJob
+

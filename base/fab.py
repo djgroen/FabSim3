@@ -929,6 +929,26 @@ def run_ensemble(config, sweep_dir, **args):
         env.PJ_FileName = env.pather.basename(env.job_script)
         env.batch_header = env.PJ_header
         env.submit_job = True
+        # load QCG-PJ-PY file
+        PJ_CMD = []
+        if (hasattr(env, 'venv') and env.venv.lower() == 'true'):
+            # QCG-PJ should load from virtualenv
+            PJ_CMD.append('# unload any previous loaded python module')
+            PJ_CMD.append('module unload python\n')
+            PJ_CMD.append('# load QCG-PilotJob from VirtualEnv')
+            PJ_CMD.append('eval "$(%s/bin/conda shell.bash hook)"\n' %
+                          (env.virtual_env_path))
+            PJ_CMD.append('# load QCG-PJ-Python file')
+            PJ_CMD.append('%s/bin/python3 %s' % (env.virtual_env_path,
+                                                 env.PJ_PATH))
+
+        else:
+            PJ_CMD.append('# Install QCG-PJ in user\'s home space')
+            PJ_CMD.append('pip install --user --upgrade  qcg-pilotjob\n')
+            PJ_CMD.append('# load QCG-PJ-Python file')
+            PJ_CMD.append('python3 %s' % (env.PJ_PATH))
+
+        env.run_QCG_PilotJob = "\n".join(PJ_CMD)
         job(dict(label='PJ_header', NoEnvScript=True), args)
         env.batch_header = backup_header
         env.NoEnvScript = False

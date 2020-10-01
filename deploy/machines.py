@@ -101,21 +101,22 @@ def generate_module_commands(script=None):
 
 
 module_commands = generate_module_commands()
-env.run_prefix = " && ".join(module_commands +
-                             list(map(template, run_prefix_commands))) \
+env.run_prefix = " \n".join(module_commands +
+                            list(map(template, run_prefix_commands))) \
     or 'echo THE FIRST Running...'
 
 if (not any("install_app" in str or "install_packages" in str
             for str in env.tasks) and
         hasattr(env, 'venv') and
         str(env.venv).lower() == 'true'):
-    env.run_prefix = env.run_prefix + " && " + \
-        "source %s/bin/activate" % (env.virtual_env_path)
+
     # since we are going to load python VirtualEnv, so, it would be better
     # to unload any current loaded python modules, in order to avoid
     # conflicts during the execution of python program
-    env.run_prefix = env.run_prefix + " && " + \
-        "module unload python"
+    env.run_prefix = env.run_prefix +\
+        "\n# load python from VirtualEnv" +\
+        "\nmodule unload python\n" +\
+        "source %s/bin/activate" % (env.virtual_env_path)
 
 
 @task
@@ -265,7 +266,7 @@ def complete_environment():
     # module_commands = generate_module_commands()
     module_commands = generate_module_commands(script=env.get("script", None))
     run_prefix_commands = env.run_prefix_commands[:]
-    env.run_prefix = " && ".join(
+    env.run_prefix = " \n".join(
         module_commands +
         list(map(template, map(template, run_prefix_commands)))) \
         or '/bin/true || true'
@@ -285,13 +286,13 @@ def complete_environment():
                 for str in env.tasks) and
             hasattr(env, 'venv') and
             str(env.venv).lower() == 'true'):
-        env.run_prefix = env.run_prefix + " && " + \
-            "source %s/bin/activate" % (env.virtual_env_path)
         # since we are going to load python VirtualEnv, so, it would be better
         # to unload any current loaded python modules, in order to avoid
         # conflicts during the execution of python program
-        env.run_prefix = env.run_prefix + " && " + \
-            "module unload python"
+        env.run_prefix = env.run_prefix +\
+            "\n# load python from VirtualEnv" +\
+            "\nmodule unload python\n" +\
+            "source %s/bin/activate" % (env.virtual_env_path)
 
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
