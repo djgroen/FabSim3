@@ -168,6 +168,11 @@ def with_config(name):
     # name of the job sh submission script.
     env.job_name_template_sh = template("%s.sh" % env.job_name_template)
 
+
+def load_plugin_machine_vars(name):
+    path_used = find_config_file_path(name)
+    env.job_config_path_local = os.path.join(path_used)
+
     plugin_local_path = env.job_config_path_local.split("/config_files/")[0]
     plugin_name = plugin_local_path.split("/plugins/")[1]
     add_plugin_environment_variable(plugin_name,
