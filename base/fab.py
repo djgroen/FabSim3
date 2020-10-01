@@ -602,17 +602,38 @@ def job(sweep_length=1, *option_dictionaries):
             put(job_results_dir[threading.get_ident()]['job_script'],
                 job_results_dir[threading.get_ident()]['dest_name'])
 
-            run(
-                template(
-                    "mkdir -p %s && rsync -av --progress \
-                    $job_config_path/* %s/ --exclude SWEEP && \
-                    cp %s %s"
-                    % (job_results_dir[threading.get_ident()]['job_results'],
-                        job_results_dir[threading.get_ident()]['job_results'],
-                        job_results_dir[threading.get_ident()]['dest_name'],
-                        job_results_dir[threading.get_ident()]['job_results'])
+            # in case of PJ=True, we don't need to copy app config files and
+            # folders to PJ and PJ-PY folders
+            if env.label in ['PJ_PYheader', 'PJ_header']:
+                run(
+                    template(
+                        "mkdir -p %s && cp %s %s" % (
+                            job_results_dir[threading.get_ident()][
+                                'job_results'],
+                            job_results_dir[threading.get_ident()][
+                                'dest_name'],
+                            job_results_dir[threading.get_ident()][
+                                'job_results']
+                        )
+                    )
                 )
-            )
+            else:
+                run(
+                    template(
+                        "mkdir -p %s && rsync -av --progress \
+                        $job_config_path/* %s/ --exclude SWEEP && \
+                        cp %s %s" % (
+                            job_results_dir[threading.get_ident()][
+                                'job_results'],
+                            job_results_dir[threading.get_ident()][
+                                'job_results'],
+                            job_results_dir[threading.get_ident()][
+                                'dest_name'],
+                            job_results_dir[threading.get_ident()][
+                                'job_results']
+                        )
+                    )
+                )
 
             # In ensemble mode, also add run-specific file to the results dir.
             if env.ensemble_mode:
