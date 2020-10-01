@@ -198,7 +198,8 @@ def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
         if config[machine_name]["import"] in plugin_config:
             env.update(plugin_config[config[machine_name]["import"]])
 
-    if "default" in plugin_config:
+    if "default" in plugin_config and\
+            plugin_config['default'] is not None:
         env.update(plugin_config['default'])
 
     if machine_name in plugin_config:
@@ -210,7 +211,15 @@ def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
             env.modules.update(
                 plugin_config[config[machine_name]["import"]].modules)
 
-    env.modules.update(plugin_config[machine_name].get("modules", {}))
+    if machine_name in plugin_config and\
+            plugin_config[machine_name] is not None:
+        env.modules.update(plugin_config[machine_name].get("modules", {}))
+    else:
+        error_msg = "%s is not available in %s" % (
+            machine_name, plugin_machines_user)
+        error_msg += "\nor there is no item for that machine name"
+        print_msg_box(error_msg)
+        sys.exit()
 
     complete_environment()
     print_msg_box("\n".join(findDiff(env, old_env, path="env")),
