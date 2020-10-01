@@ -1,5 +1,6 @@
 import os
 import pkg_resources
+import argparse
 
 
 def install(package):
@@ -129,6 +130,12 @@ def config_yml_files():
 
 def main():
 
+    # Instantiate the parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--bashrc_update', action="store",
+                        type=str, default="true")
+    args = parser.parse_args()
+
     config_yml_files()
 
     # run fab localhost setup_fabsim
@@ -143,6 +150,8 @@ def main():
             == 0)
         #assert(subprocess.call(["ssh-add", "~/.ssh/id_rsa"]) == 0)
 
+    if args.bashrc_update.lower() == 'false':
+        exit()
     # setup PATH and PYTHONPATH in bashrc
     if FS3_env.OS_system == 'Linux':
         bash_file_name = os.path.join(os.path.expanduser('~'), '.bashrc')
