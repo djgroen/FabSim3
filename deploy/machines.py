@@ -109,7 +109,6 @@ if (not any("install_app" in str or "install_packages" in str
             for str in env.tasks) and
         hasattr(env, 'venv') and
         str(env.venv).lower() == 'true'):
-
     # since we are going to load python VirtualEnv, so, it would be better
     # to unload any current loaded python modules, in order to avoid
     # conflicts during the execution of python program
@@ -202,7 +201,8 @@ def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
             plugin_config['default'] is not None:
         env.update(plugin_config['default'])
 
-    if machine_name in plugin_config:
+    if machine_name in plugin_config and\
+            plugin_config[machine_name] is not None:
         env.update(plugin_config[machine_name])
 
     env.modules = config["default"]["modules"]
@@ -219,7 +219,6 @@ def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
             machine_name, plugin_machines_user)
         error_msg += "\nor there is no item for that machine name"
         print_msg_box(error_msg)
-        sys.exit()
 
     complete_environment()
     print_msg_box("\n".join(findDiff(env, old_env, path="env")),
@@ -302,7 +301,6 @@ def complete_environment():
             "\n# load python from VirtualEnv" +\
             "\nmodule unload python\n" +\
             "source %s/bin/activate" % (env.virtual_env_path)
-
     # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
     # check_output is 2.7 python and later only. Revert to oldfashioned popen.
     # cmd=os.popen(template("hg id -q -i"))
