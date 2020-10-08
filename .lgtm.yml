@@ -1,3 +1,6 @@
+queries:  
+  - exclude: py/unused-local-variable
+  - exclude: py/polluting-import  
 extraction:
   python:
     python_setup: 

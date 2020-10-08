@@ -11,8 +11,7 @@ print("available resources:\n%s\n" % str(m.resources()))
 
 
 # submit jobs and save their names in 'ids' list
-ids = m.submit(Jobs().$submitted_jobs_list
-               )
+ids = m.submit(Jobs().$submitted_jobs_list)
 
 
 # wait until submited jobs finish

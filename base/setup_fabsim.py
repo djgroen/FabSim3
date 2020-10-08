@@ -3,6 +3,12 @@ from deploy.machines import *
 from fabric.contrib.project import *
 
 
+__all__ = ['install_plugin', 'avail_plugin', 'update_plugin', 'remove_plugin',
+           'add_local_paths', 'get_setup_fabsim_dirs_string',
+           'setup_fabsim_dirs', 'setup_ssh_keys', 'setup_fabsim',
+           'bash_machine_alias']
+
+
 @task
 def install_plugin(name):
     """

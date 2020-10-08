@@ -1,13 +1,13 @@
 import concurrent.futures
 
-import numpy as np
+# import numpy as np
 import os
 import time
 
 from fabric.contrib.project import *
-from fabric.api import settings
+# from fabric.api import settings
 from fabric.operations import *
-from fabric.api import env, run, task
+from fabric.api import env, run
 
 # import asyncio
 from threading import Lock
@@ -171,7 +171,6 @@ if __name__ == '__main__':
     env.host_string = '%s:%s' % (remote_adress, str(remote_port))
 
     # Creation of the SWEEP dir if not exists
-    import os
     if not os.path.exists(os.path.join(current_path, 'SWEEP')):
         os.system('mkdir -p %s' % os.path.join(current_path, 'SWEEP'))
     SWEEP_path = os.path.join(current_path, 'SWEEP')

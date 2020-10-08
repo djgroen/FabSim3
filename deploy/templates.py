@@ -13,6 +13,10 @@
 # launch hemelb jobs on legion, or hector-unittest, for a script used to
 # launch unit-testing jobs on hector.)
 
+__all__ = ['script_templates', 'script_template_content',
+           'script_template_save_temporary', 'script_template',
+           'template']
+
 from fabric.api import *
 from string import Template
 import os

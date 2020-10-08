@@ -2,7 +2,11 @@ from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
 import time
-from pprint import pprint
+
+
+__all__ = ['stat', 'jobs_list', 'cancel_job',
+           'check_jobs_dispatched_on_remote_machine',
+           'check_complete', 'wait_complete']
 
 
 @task

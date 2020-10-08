@@ -8,7 +8,6 @@
 #
 # fab.py contains general-purpose FabSim routines.
 import threading
-from threading import Lock
 import base.AsyncThreadingPool
 from deploy.templates import *
 from deploy.machines import *
@@ -24,11 +23,10 @@ import tempfile
 import os.path
 import math
 from pprint import PrettyPrinter
-from pprint import pprint
 from pathlib import Path
 pp = PrettyPrinter()
-mutex = Lock()
-mutex_template = Lock()
+mutex = threading.Lock()
+mutex_template = threading.Lock()
 
 
 def get_plugin_path(name, quiet=False):

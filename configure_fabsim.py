@@ -57,7 +57,7 @@ def get_platform():
     }
     try:
         return platforms[sys.platform]
-    except:
+    except Exception:
         print("[%s] Unidentified system !!!" % (sys.platform))
         exit()
 
@@ -81,7 +81,7 @@ class AttributeDict(dict):
 def linux_distribution():
     try:
         return platform.linux_distribution()
-    except:
+    except Exception:
         return "N/A"
 
 FS3_env = AttributeDict({

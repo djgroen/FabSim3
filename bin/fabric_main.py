@@ -37,9 +37,9 @@ except NameError:
 # check of a given fabfile callable (in is_classic_task()).
 _modules = [api, project, files, console, colors]
 _internals = reduce(lambda x, y: x + list(filter(callable, vars(y).values())),
-    _modules,
-    []
-)
+                    _modules,
+                    []
+                    )
 
 
 # Module recursion cache
@@ -47,6 +47,7 @@ class _ModuleCache(object):
     """
     Set-like object operating on modules and storing __name__s internally.
     """
+
     def __init__(self):
         self.cache = set()
 
@@ -72,7 +73,7 @@ def load_settings(path):
         comments = lambda s: s and not s.startswith("#")
         settings = filter(comments, open(path, 'r'))
         return dict((k.strip(), v.strip()) for k, _, v in
-            [s.partition('=') for s in settings])
+                    [s.partition('=') for s in settings])
     # Handle nonexistent or empty settings file
     return {}
 
@@ -195,7 +196,7 @@ def load_tasks_from_module(imported):
     # Obey the use of <module>.__all__ if it is present
     imported_vars = vars(imported)
     if "__all__" in imported_vars:
-        imported_vars = [(name, imported_vars[name]) for name in \
+        imported_vars = [(name, imported_vars[name]) for name in
                          imported_vars if name in imported_vars["__all__"]]
     else:
         imported_vars = list(imported_vars.items())
@@ -249,7 +250,7 @@ def is_task_module(a):
     """
     Determine if the provided value is a task module
     """
-    #return (type(a) is types.ModuleType and
+    # return (type(a) is types.ModuleType and
     #        any(map(is_task_object, vars(a).values())))
     if isinstance(a, types.ModuleType) and a not in _seen:
         # Flag module as seen
@@ -290,63 +291,64 @@ def parse_options():
 
     # Display info about a specific command
     parser.add_option('-d', '--display',
-        metavar='NAME',
-        help="print detailed info about command NAME"
-    )
+                      metavar='NAME',
+                      help="print detailed info about command NAME"
+                      )
 
     # Control behavior of --list
     LIST_FORMAT_OPTIONS = ('short', 'normal', 'nested')
     parser.add_option('-F', '--list-format',
-        choices=LIST_FORMAT_OPTIONS,
-        default='normal',
-        metavar='FORMAT',
-        help="formats --list, choices: %s" % ", ".join(LIST_FORMAT_OPTIONS)
-    )
+                      choices=LIST_FORMAT_OPTIONS,
+                      default='normal',
+                      metavar='FORMAT',
+                      help="formats --list, choices: %s" % ", ".join(
+                          LIST_FORMAT_OPTIONS)
+                      )
 
     parser.add_option('-I', '--initial-password-prompt',
-        action='store_true',
-        default=False,
-        help="Force password prompt up-front"
-    )
+                      action='store_true',
+                      default=False,
+                      help="Force password prompt up-front"
+                      )
 
     parser.add_option('--initial-sudo-password-prompt',
-        action='store_true',
-        default=False,
-        help="Force sudo password prompt up-front"
-    )
+                      action='store_true',
+                      default=False,
+                      help="Force sudo password prompt up-front"
+                      )
 
     # List Fab commands found in loaded fabfiles/source files
     parser.add_option('-l', '--list',
-        action='store_true',
-        dest='list_commands',
-        default=False,
-        help="print list of possible commands and exit"
-    )
+                      action='store_true',
+                      dest='list_commands',
+                      default=False,
+                      help="print list of possible commands and exit"
+                      )
 
     # Allow setting of arbitrary env vars at runtime.
     parser.add_option('--set',
-        metavar="KEY=VALUE,...",
-        dest='env_settings',
-        default="",
-        help="comma separated KEY=VALUE pairs to set Fab env vars"
-    )
+                      metavar="KEY=VALUE,...",
+                      dest='env_settings',
+                      default="",
+                      help="comma separated KEY=VALUE pairs to set Fab env vars"
+                      )
 
     # Like --list, but text processing friendly
     parser.add_option('--shortlist',
-        action='store_true',
-        dest='shortlist',
-        default=False,
-        help="alias for -F short --list"
-    )
+                      action='store_true',
+                      dest='shortlist',
+                      default=False,
+                      help="alias for -F short --list"
+                      )
 
     # Version number (optparse gives you --version but we have to do it
     # ourselves to get -V too. sigh)
     parser.add_option('-V', '--version',
-        action='store_true',
-        dest='show_version',
-        default=False,
-        help="show program's version number and exit"
-    )
+                      action='store_true',
+                      dest='show_version',
+                      default=False,
+                      help="show program's version number and exit"
+                      )
 
     #
     # Add in options which are also destined to show up as `env` vars.
@@ -373,7 +375,8 @@ def _is_task(name, value):
 
 def _sift_tasks(mapping):
     tasks, collections, modules = [], [], []
-    for name, value in six.iteritems(mapping): #value is a WrappedCallableTask
+    # value is a WrappedCallableTask
+    for name, value in six.iteritems(mapping):
         if _is_task(name, value):
             #print(name, value.__module__)
             tasks.append(name)
@@ -393,7 +396,7 @@ def _task_names(mapping):
     those two groups, sorting is alphabetical.
     """
     tasks, collections, modules = _sift_tasks(mapping)
-    #for collection in collections:
+    # for collection in collections:
     #    module = mapping[collection]
     #    if hasattr(module, 'default'):
     #        tasks.append(collection)
@@ -419,7 +422,7 @@ def _normal_list(docstrings=True):
     sep = '  '
     trail = '...'
     max_width = _pty_size()[1] - 1 - len(trail)
-    for i in range(0, len(task_names)-1):
+    for i in range(0, len(task_names) - 1):
         output = None
         docstring = _print_docstring(docstrings, task_names[i])
         if docstring:
@@ -429,7 +432,8 @@ def _normal_list(docstrings=True):
             size = max_width - (max_len + max_len2 + len(sep) + len(trail))
             if len(first_line) > size:
                 first_line = first_line[:size] + trail
-            output = task_names[i].ljust(max_len) + sep + modules[i].ljust(max_len2) + sep + first_line
+            output = task_names[i].ljust(
+                max_len) + sep + modules[i].ljust(max_len2) + sep + first_line
         # Or nothing (so just the name)
         else:
             output = task_names[i]
@@ -465,7 +469,7 @@ def list_commands(docstring, format_):
     """
     # Short-circuit with simple short output
     if format_ == "short":
-        n,m = _task_names(state.commands)
+        n, m = _task_names(state.commands)
         return n
     # Otherwise, handle more verbose modes
     result = []
@@ -680,7 +684,7 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
         # Handle case where we were called bare, i.e. just "fab", and print
         # a help message.
         actions = (options.list_commands, options.shortlist, options.display,
-            arguments, remainder_arguments, default)
+                   arguments, remainder_arguments, default)
         if not any(actions):
             parser.print_help()
             sys.exit(1)
@@ -729,8 +733,8 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
 
         # Abort if any unknown commands were specified
         if unknown_commands and not state.env.get('skip_unknown_tasks', False):
-            warn("Command(s) not found:\n%s\n use `fabsim -l` to show all commands." \
-                % indent(unknown_commands))
+            warn("Command(s) not found:\n%s\n use `fabsim -l` to show all commands."
+                 % indent(unknown_commands))
             #show_commands(None, options.list_format, 1)
 
         # Generate remainder command and insert into commands, commands_to_run
@@ -776,7 +780,7 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
         if state.output.status:
             sys.stderr.write("\nStopped.\n")
         sys.exit(1)
-    except:
+    except Exception:
         sys.excepthook(*sys.exc_info())
         # we might leave stale threads if we don't explicitly exit()
         sys.exit(1)
