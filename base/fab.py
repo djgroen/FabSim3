@@ -24,6 +24,7 @@ import os.path
 import math
 from pprint import PrettyPrinter
 from pathlib import Path
+from shutil import copyfile
 pp = PrettyPrinter()
 mutex = threading.Lock()
 mutex_template = threading.Lock()
@@ -1084,11 +1085,16 @@ def install_packages(venv='False'):
     Try to install BLAS and LAPACK first. by
     sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
     """
+    applications_yml_file = os.path.join(env.localroot, 'deploy',
+                                         'applications.yml')
+    user_applications_yml_file = os.path.join(env.localroot, 'deploy',
+                                              'applications_user.yml')
+    if not os.path.exists(user_applications_yml_file):
+        copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'applications.yml')),
-        Loader=yaml.SafeLoader
-    )
+    config = yaml.load(open(user_applications_yml_file),
+                       Loader=yaml.SafeLoader
+                       )
 
     tmp_app_dir = "%s/tmp_app" % (env.localroot)
     local('mkdir -p %s' % (tmp_app_dir))
@@ -1188,11 +1194,16 @@ def install_app(name="", external_connexion='no', venv='False'):
     Install a specific Application through FasbSim3
 
     """
+    applications_yml_file = os.path.join(env.localroot, 'deploy',
+                                         'applications.yml')
+    user_applications_yml_file = os.path.join(env.localroot, 'deploy',
+                                              'applications_user.yml')
+    if not os.path.exists(user_applications_yml_file):
+        copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'applications.yml')),
-        Loader=yaml.SafeLoader
-    )
+    config = yaml.load(open(user_applications_yml_file),
+                       Loader=yaml.SafeLoader
+                       )
     info = config[name]
 
     # Offline cluster installation - --user install
