@@ -405,7 +405,7 @@ def put_profiles(name=''):
     """
     Sets up directories required for the use of FabSim.
     """
-    run(template(get_setup_fabsim_dirs_string()))
+    # run(template(get_setup_fabsim_dirs_string()))
 
 
 def update_environment(*dicts):
