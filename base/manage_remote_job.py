@@ -4,11 +4,6 @@ from fabric.contrib.project import *
 import time
 
 
-__all__ = ['stat', 'jobs_list', 'cancel_job',
-           'check_jobs_dispatched_on_remote_machine',
-           'check_complete', 'wait_complete']
-
-
 @task
 def stat(jobID=None):
     '''

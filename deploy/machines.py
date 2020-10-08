@@ -13,8 +13,7 @@ Environment is loaded from YAML dictionaries machines.yml and machines_user.yml
 """
 # If we're running in an activated virtualenv, use that.
 import site
-from os import environ, path
-from os.path import join
+import os
 from sys import version_info
 import sys
 import fabric.api
@@ -27,26 +26,26 @@ from functools import *
 from pprint import PrettyPrinter
 pp = PrettyPrinter()
 
-if 'VIRTUAL_ENV' in environ:
-    virtual_env = join(environ.get('VIRTUAL_ENV'),
-                       'lib',
-                       'python%d.%d' % version_info[:2],
-                       'site-packages')
+if 'VIRTUAL_ENV' in os.environ:
+    virtual_env = os.path.join(os.environ.get('VIRTUAL_ENV'),
+                               'lib',
+                               'python%d.%d' % version_info[:2],
+                               'site-packages')
     site.addsitedir(virtual_env)
     print('Using Virtualenv =>', virtual_env)
-del site, environ, join, version_info
+del site, version_info
 
 # Root of local FabSim installation
-env.localroot = path.dirname(path.dirname(path.abspath(__file__)))
-env.localhome = path.expanduser("~")
+env.localroot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env.localhome = os.path.expanduser("~")
 env.localplugins = {}  # dict containing local paths to all plugins.
 env.no_ssh = False
 env.no_hg = False
 # Load and invoke the default non-machine specific config JSON dictionaries.
-config = yaml.load(open(path.join(env.localroot, 'deploy',
-                                  'machines.yml')), Loader=yaml.SafeLoader)
+config = yaml.load(open(os.path.join(env.localroot, 'deploy',
+                                     'machines.yml')), Loader=yaml.SafeLoader)
 env.update(config['default'])
-user_config = yaml.load(open(path.join(
+user_config = yaml.load(open(os.path.join(
     env.localroot, 'deploy', 'machines_user.yml')), Loader=yaml.SafeLoader)
 env.update(user_config['default'])
 env.verbose = False
@@ -67,8 +66,8 @@ run_prefix_commands = env.run_prefix_commands[:]
 if env.temp_path_template:
     env.temp_path = template(env.temp_path_template)
 
-env.pythonroot = path.join(env.localroot, 'python')
-env.blackboxroot = path.join(env.localroot, 'blackbox')
+env.pythonroot = os.path.join(env.localroot, 'python')
+env.blackboxroot = os.path.join(env.localroot, 'blackbox')
 
 # job database configuration for remote machines
 # env.local_jobsDB_path = path.join(env.localroot, 'deploy', '.jobsDB')
@@ -257,17 +256,17 @@ def complete_environment():
     env.results_path = env.pather.join(env.work_path, "results")
     env.config_path = env.pather.join(env.work_path, "config_files")
     env.scripts_path = env.pather.join(env.work_path, "scripts")
-    env.local_results = path.expanduser(template(env.local_results))
+    env.local_results = os.path.expanduser(template(env.local_results))
 
     if hasattr(env, 'flee_location'):
         env.flee_location = template(env.flee_location)
 
     for i in range(0, len(env.local_templates_path)):
-        env.local_templates_path[i] = path.expanduser(
+        env.local_templates_path[i] = os.path.expanduser(
             template(env.local_templates_path[i]))
 
     for i in range(0, len(env.local_config_file_path)):
-        env.local_config_file_path[i] = path.expanduser(
+        env.local_config_file_path[i] = os.path.expanduser(
             template(env.local_config_file_path[i]))
 
     # module_commands = generate_module_commands()
