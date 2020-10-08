@@ -430,7 +430,7 @@ def calc_total_mem():
     mem_size = int(re.findall("\d+", str(env.memory))[0])
     try:
         mem_unit_str = re.findall("[a-zA-Z]+", str(env.memory))[0]
-    except:
+    except Exception:
         mem_unit_str = ''
 
     if mem_unit_str.upper() == 'GB' or mem_unit_str.upper() == 'G':
