@@ -1,7 +1,7 @@
 from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
-
+from os import path
 
 __all__ = ['install_plugin', 'avail_plugin', 'update_plugin', 'remove_plugin',
            'add_local_paths', 'get_setup_fabsim_dirs_string',
@@ -15,7 +15,7 @@ def install_plugin(name):
     Install a specific FabSim3 plugin.
     """
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
+        open(path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
     )
     info = config[name]
@@ -31,7 +31,7 @@ def avail_plugin():
     print list of available plugins.
     """
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
+        open(path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
     )
     print("\nList of available plugins\n")
@@ -56,7 +56,7 @@ def remove_plugin(name):
     Remove the specified plug-in.
     """
     config = yaml.load(
-        open(os.path.join(env.localroot, 'deploy', 'plugins.yml')),
+        open(path.join(env.localroot, 'deploy', 'plugins.yml')),
         Loader=yaml.SafeLoader
     )
     plugin_dir = '{}/plugins'.format(env.localroot)
@@ -115,13 +115,12 @@ def setup_ssh_keys(password=""):
           local machine once using SSH. You may be asked to provide
           your password once to facilitate this login.""")
 
-    import os.path
-    if os.path.isfile("%s/.ssh/id_rsa.pub" % (os.path.expanduser("~"))):
+    if path.isfile("%s/.ssh/id_rsa.pub" % (path.expanduser("~"))):
         print("local id_rsa key already exists.")
     else:
         local(
             "ssh-keygen -q -f %s/.ssh/id_rsa -t rsa -b 4096 -N \"%s\"" %
-            (os.path.expanduser("~"), password)
+            (path.expanduser("~"), password)
         )
     local(template("ssh-copy-id -i ~/.ssh/id_rsa.pub %s 2>ssh_copy_id.log"
                    % env.host_string))
@@ -154,7 +153,7 @@ def bash_machine_alias(name=None):
         print("overwrite the main fabsim command.")
         exit()
 
-    destname = os.path.join(env.localroot, 'bin', name)
+    destname = path.join(env.localroot, 'bin', name)
     content = script_template_content('bash_alias')
 
     # save the file
