@@ -140,15 +140,16 @@ def main():
 
     # run fab localhost setup_fabsim
 
-    assert(subprocess.call(["fab", "localhost", "setup_fabsim"],
-                           cwd=FS3_env.FabSim3_PATH) == 0)
+    assert subprocess.call(["fab", "localhost", "setup_fabsim"],
+                           cwd=FS3_env.FabSim3_PATH) == 0
 
     # use ssh-add instead of ssh-copy-id for MacOSX
     if FS3_env.OS_system == 'OSX':
-        assert(subprocess.call(
-            ["ssh-add", "/Users/{}/.ssh/id_rsa".format(FS3_env.user_name)])
-            == 0)
-        #assert(subprocess.call(["ssh-add", "~/.ssh/id_rsa"]) == 0)
+        assert subprocess.call([
+            "ssh-add",
+            "/Users/{}/.ssh/id_rsa".format(FS3_env.user_name)]
+        ) == 0
+        #assert subprocess.call(["ssh-add", "~/.ssh/id_rsa"]) == 0
 
     if args.bashrc_update.lower() == 'false':
         exit()
