@@ -1,6 +1,9 @@
 queries:  
   - exclude: py/unused-local-variable
-  - exclude: py/polluting-import  
+  - exclude: py/polluting-import
+  - exclude: py/side-effect-in-assert
+  - exclude: py/import-and-import-from
+  - exclude: py/unused-import  
 extraction:
   python:
     python_setup: 
