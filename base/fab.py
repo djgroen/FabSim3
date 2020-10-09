@@ -401,11 +401,6 @@ def put_profiles(name=''):
         'mkdir -p $config_path; mkdir -p $results_path; mkdir -p $scripts_path'
     )
 
-    """
-    Sets up directories required for the use of FabSim.
-    """
-    # run(template(get_setup_fabsim_dirs_string()))
-
 
 def update_environment(*dicts):
     for adict in dicts:
