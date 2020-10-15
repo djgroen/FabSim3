@@ -178,11 +178,11 @@ for machine_name in set(config.keys()) - set(['default']):
 def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
     # machines_<plugin>.yml
     # machines_<plugin>_user.yml
-    plugin_machines_user = join(plugin_path,
-                                "machines_%s_user.yml" % (plugin_name)
-                                )
+    plugin_machines_user = os.path.join(plugin_path,
+                                        "machines_%s_user.yml" % (plugin_name)
+                                        )
 
-    if not isfile(plugin_machines_user):
+    if not os.path.exists(plugin_machines_user):
         return
 
     plugin_config = yaml.load(open(plugin_machines_user),
