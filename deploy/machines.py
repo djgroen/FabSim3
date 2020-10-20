@@ -175,6 +175,18 @@ for machine_name in set(config.keys()) - set(['default']):
         partial(machine, machine_name))
 
 
+def load_plugin_env_vars(plugin_name):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            print("calling task %s from plugin %s" %
+                  (func.__name__, plugin_name))
+            add_plugin_environment_variable(plugin_name)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
     # machines_<plugin>.yml
     # machines_<plugin>_user.yml
@@ -182,7 +194,7 @@ def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
                                         "machines_%s_user.yml" % (plugin_name)
                                         )
 
-    if not os.path.exists(plugin_machines_user):
+    if not os.path.isfile(plugin_machines_user):
         return
 
     plugin_config = yaml.load(open(plugin_machines_user),
