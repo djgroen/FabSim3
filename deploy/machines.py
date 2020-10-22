@@ -187,9 +187,11 @@ def load_plugin_env_vars(plugin_name):
     return decorator
 
 
-def add_plugin_environment_variable(plugin_name, plugin_path, machine_name):
+def add_plugin_environment_variable(plugin_name):
     # machines_<plugin>.yml
     # machines_<plugin>_user.yml
+    plugin_path = os.path.join(env.localroot, "plugins", plugin_name)
+    machine_name = env.machine_name
     plugin_machines_user = os.path.join(plugin_path,
                                         "machines_%s_user.yml" % (plugin_name)
                                         )
