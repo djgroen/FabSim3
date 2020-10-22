@@ -161,14 +161,14 @@ def print_machine_config_info(name=""):
     pp.pprint(config[name])
     print_msg_box("User overrides: ", )
     pp.pprint(user_config[name])
-
+    '''
     for plugin_name in plugins_config:
         try:
             print_msg_box("%s plugin overrides: " % (plugin_name))
             pp.pprint(plugins_config[plugin_name][name])
         except KeyError:
             pass
-
+    '''
 # Metaprogram the machine wrappers
 for machine_name in set(config.keys()) - set(['default']):
     globals()[machine_name] = task(alias=machine_name)(
