@@ -25,7 +25,7 @@ class ATP:
             serial  : Serial mode (not implemented yet)
         """
         try:
-            fn = self.job_executor.submit(handler, *args)
+            fn = self.job_executor.submit(handler, args)
         except Exception as e:
             print("Caught excepetion in worker thread X")
             traceback.print_exc()
@@ -48,7 +48,6 @@ class ATP:
                                 )
         print("All threads are over")
 
-        '''
         # add output details for FAILED jobs
         for jobID in range(self.counter):
             if self.remote_jobs[jobID].result() is not None:
@@ -56,7 +55,6 @@ class ATP:
                 print(self.remote_jobs[jobID].result())
                 print("-" * 50)
                 exit()
-        '''
 
     def shutdownThreads(self):
         """
