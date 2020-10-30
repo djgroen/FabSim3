@@ -702,11 +702,14 @@ def job_transmission():
                      job_results, job_results_local, int(env.nb_thread))
                   )
         else:
+            local("rsync -azP  --exclude 'rsync_*.output' %s/ %s:%s "
+                  " 2>&1 | tee %s/rsync_nb_thread[%d].output"
+                  % (job_results_local, env.host_string, job_results,
+                     job_results_local, int(env.nb_thread))
+                  )            
         '''
         local("rsync -azP  --exclude 'rsync_*.output' %s/ %s:%s "
-              " | tee %s/rsync_nb_thread[%d].output"
-              % (job_results_local, env.host_string, job_results,
-                 job_results_local, int(env.nb_thread))
+              % (job_results_local, env.host_string, job_results)
               )
 
 
@@ -780,7 +783,8 @@ def job(*option_dictionaries):
     # ------------------------
     # job preparation phase
     # ------------------------
-    print_msg_box("job preparation phase")
+    # print_msg_box("job preparation phase")
+    print("-" * 15 + "\njob preparation phase\n" + "-" * 15)
     env.jobs_script_path = []
     env.sync_local_path_list = []
     env.sync_host_path_list = []
@@ -809,7 +813,8 @@ def job(*option_dictionaries):
     # ------------------------
     # job transmission phase
     # ------------------------
-    print_msg_box("job transmission phase")
+    # print_msg_box("job transmission phase")
+    print("-" * 15 + "\njob transmission phase\n" + "-" * 15)
     job_transmission()
 
     # ------------------------
@@ -817,7 +822,8 @@ def job(*option_dictionaries):
     # ------------------------
     ThreadPoolJobSubmission = base.AsyncThreadingPool.ATP(
         ncpu=int(env.nb_thread))
-    print_msg_box("job submission phase")
+    #print_msg_box("job submission phase")
+    print("-" * 15 + "\njob submission phase\n" + "-" * 15)
     for idx, job_script in enumerate(env.jobs_script_path):
         ThreadPoolJobSubmission.run_job(
             jobID=idx,
