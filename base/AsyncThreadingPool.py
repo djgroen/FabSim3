@@ -11,11 +11,10 @@ class ATP:
         self.job_executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=self.ncpu)
         self.remote_jobs = {}
-        self.jobs_ID = {}
         self.counter = 0
 
     def run_job(self, jobID, handler, counter=False,
-                serial=False, args=(), **kwargs):
+                serial=False, args=()):
         """
         Put a job on a threading queue.
         Args:
@@ -26,13 +25,12 @@ class ATP:
             serial  : Serial mode (not implemented yet)
         """
         try:
-            fn = self.job_executor.submit(handler, *args, **kwargs)
+            fn = self.job_executor.submit(handler, *args)
         except Exception as e:
             print("Caught excepetion in worker thread X")
             traceback.print_exc()
         # self.remote_jobs[jobID] = fn
         self.remote_jobs[self.counter] = fn
-        self.jobs_ID[self.counter] = jobID
         self.counter += 1
 
     def awaitJobResult(self):
@@ -44,9 +42,19 @@ class ATP:
         Wait for all the jobs to be done.
         """
         # print([self.remote_jobs[jobID] for jobID in range(self.counter)])
-        concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
-            self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
+        concurrent.futures.wait([self.remote_jobs[jobID]
+                                 for jobID in range(self.counter)],
+                                return_when=concurrent.futures.ALL_COMPLETED
+                                )
         print("All threads are over")
+
+        # add output details for FAILED jobs
+        for jobID in range(self.counter):
+            if self.remote_jobs[jobID].result() is not None:
+                print("Output log jobID = %d" % (jobID))
+                print(self.remote_jobs[jobID].result())
+                print("-" * 50)
+                exit()
 
     def shutdownThreads(self):
         """
