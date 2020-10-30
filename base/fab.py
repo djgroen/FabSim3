@@ -480,7 +480,7 @@ def removekey(d, key):
     return r
 
 
-def jobs_preparation(label=''):
+def jobs_preparation(label='', *args):
     """
     This function will prepare all required files/folders/scripts in
     [local FabSim3 dir]/results/job_folder
@@ -681,7 +681,7 @@ def jobs_preparation(label=''):
                        thread_info[threading.get_ident()]['local_job_script']))
 
 
-def job_transmission():
+def job_transmission(*args):
     """
     This function will transfer all prepared job directories to remote host
     to speed up this process, we use multithread rsync
@@ -713,11 +713,10 @@ def job_transmission():
               )
 
 
-def job_submission(job_script_path):
+def job_submission(job_script_path, *args):
     """
     This function will submit all transfered job scripts
     """
-
     # check for PilotJob option is true, DO NOT submit the job directly
     # only submit PJ script
     job_dir = env.pather.dirname(job_script_path)
@@ -783,8 +782,7 @@ def job(*option_dictionaries):
     # ------------------------
     # job preparation phase
     # ------------------------
-    # print_msg_box("job preparation phase")
-    print("-" * 15 + "\njob preparation phase\n" + "-" * 15)
+    print_msg_box("job preparation phase")
     env.jobs_script_path = []
     env.sync_local_path_list = []
     env.sync_host_path_list = []
@@ -813,17 +811,15 @@ def job(*option_dictionaries):
     # ------------------------
     # job transmission phase
     # ------------------------
-    # print_msg_box("job transmission phase")
-    print("-" * 15 + "\njob transmission phase\n" + "-" * 15)
+    print_msg_box("job transmission phase")
     job_transmission()
 
     # ------------------------
     # job submission phase
     # ------------------------
+    print_msg_box("job submission phase")
     ThreadPoolJobSubmission = base.AsyncThreadingPool.ATP(
         ncpu=int(env.nb_thread))
-    #print_msg_box("job submission phase")
-    print("-" * 15 + "\njob submission phase\n" + "-" * 15)
     for idx, job_script in enumerate(env.jobs_script_path):
         ThreadPoolJobSubmission.run_job(
             jobID=idx,
