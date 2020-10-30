@@ -48,6 +48,7 @@ class ATP:
                                 )
         print("All threads are over")
 
+        '''
         # add output details for FAILED jobs
         for jobID in range(self.counter):
             if self.remote_jobs[jobID].result() is not None:
@@ -55,6 +56,7 @@ class ATP:
                 print(self.remote_jobs[jobID].result())
                 print("-" * 50)
                 exit()
+        '''
 
     def shutdownThreads(self):
         """
