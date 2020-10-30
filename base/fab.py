@@ -244,7 +244,7 @@ def put_configs(config='', remote_transfer=False):
 
     with_config(config)
 
-    if (remote_transfer == True):
+    if remote_transfer is True:
         run(
             template(
                 "%s; mkdir -p $job_config_path" % (
@@ -265,7 +265,7 @@ def put_configs(config='', remote_transfer=False):
                 remote_dir=env.job_config_path
             )
 
-    if (remote_transfer == False):
+    if remote_transfer is False:
         local(
             template(
                 "mkdir -p %s" % (env.local_results)
@@ -706,7 +706,7 @@ def job_transmission(*args):
                   " 2>&1 | tee %s/rsync_nb_thread[%d].output"
                   % (job_results_local, env.host_string, job_results,
                      job_results_local, int(env.nb_thread))
-                  )            
+                  )
         '''
         local("rsync -azP  --exclude 'rsync_*.output' %s/ %s:%s "
               % (job_results_local, env.host_string, job_results)
