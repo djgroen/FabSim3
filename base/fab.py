@@ -423,7 +423,8 @@ def calc_total_mem():
         mem_unit = 1
 
     if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
-        env.total_mem = mem_size * int(env.PJ_size) * mem_unit
+        # env.total_mem = mem_size * int(env.PJ_size) * mem_unit
+        env.total_mem = env.memory
     else:
         env.total_mem = mem_size * int(env.nodes) * mem_unit
 
@@ -464,9 +465,6 @@ def job(sweep_length=1, *option_dictionaries):
     Returns the name of the remote results directory.
     """
 
-    # env.fabsim_git_hash = get_fabsim_git_hash()
-
-    env.submit_time = time.strftime('%Y%m%d%H%M%S%f')
     env.ensemble_mode = False  # setting a default before reading in args.
 
     # Crapy, In the case where job() is call outside run_ensemble
@@ -489,248 +487,238 @@ def job(sweep_length=1, *option_dictionaries):
         job_results_dir[threading.get_ident(
         )]['label'] = option_dictionaries[0]['label']
 
-    # Use this to request more cores than we use, to measure performance
-    # without sharing impact
-    if env.get('cores_reserved') == 'WholeNode' and env.get('corespernode'):
-        env.cores_reserved = (
-            (1 + (int(env.cores) - 1) / int(env.corespernode)) *
-            env.corespernode
-        )
-    # If cores_reserved is not specified, temporarily set it based on the
-    # same as the number of cores
-    # Needs to be temporary if there's another job with a different number
-    # of cores which should also be defaulted to.
-    with settings(cores_reserved=env.get('cores_reserved') or env.cores):
-        # Make sure that prefix and module load definitions are properly
-        # updated.
-        for i in range(1, int(env.replicas) + 1):
+    # Make sure that prefix and module load definitions are properly
+    # updated.
+    for i in range(1, int(env.replicas) + 1):
 
-            mutex_template.acquire()
-            try:
-                job_results, job_results_local = with_template_job(
-                    env.ensemble_mode,
-                    job_results_dir[threading.get_ident()]['label'])
-                job_results_dir[threading.get_ident()].update(
-                    {'job_results': job_results})
-                if int(env.replicas) > 1:
-                    if env.ensemble_mode is False:
-                        job_results_dir[threading.get_ident()]['job_results'] \
-                            = job_results_dir[threading.get_ident()][
-                                'job_results'] + '_replica_' + str(i)
+        mutex_template.acquire()
+        try:
+            threadID = threading.get_ident()
+            job_results, job_results_local = with_template_job(
+                env.ensemble_mode,
+                job_results_dir[threadID]['label']
+            )
+            job_results_dir[threadID].update({'job_results': job_results})
+            if int(env.replicas) > 1:
+                if env.ensemble_mode is False:
+                    job_results_dir[threadID]['job_results'] \
+                        = job_results_dir[threadID]['job_results'] \
+                        + '_replica_' + str(i)
 
-                        job_results_local = job_results_local + \
-                            '_replica_' + str(i)
-                    else:
-                        job_results_dir[threading.get_ident()]['job_results'] \
-                            = job_results_dir[threading.get_ident()][
-                            'job_results'] + '_' + str(i)
-                        job_results_local = job_results_local + '_' + str(i)
-
-            finally:
-                mutex_template.release()
-
-            complete_environment()
-
-            calc_nodes()
-
-            if env.node_type:
-                env.node_type_restriction = template(
-                    env.node_type_restriction_template)
-
-            env['job_name'] = env.name[0:env.max_job_name_chars]
-
-            with settings(cores=1):
-                calc_nodes()
-                env.run_command_one_proc = template(env.run_command)
-            calc_nodes()
-
-            calc_total_mem()
-            env.run_command = template(env.run_command)
-
-            # Mutex are used here to temporary set global variable
-            # that will be used to create env.dest_name.
-            # env.dest_name is save as a local variable
-            # The script name is now depending of the job label --> Create N
-            # script for N jobs
-            mutex_template.acquire()
-            try:
-                # env variables have to be set here to set the template
-                env.label = job_results_dir[threading.get_ident()]['label']
-                env.job_results = job_results_dir[threading.get_ident(
-                )]['job_results']
-                env.job_results_local = job_results_local
-                if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
-                    job_results_dir[threading.get_ident()].update(
-                        {'job_script': script_templates(
-                            env.batch_header,
-                            thread_data=job_results_dir[threading.get_ident()])
-                         })
-                    #  Suppose to be in PJM mode --> no multithreading --> env
-                    # = ok
-                    env.job_script = job_results_dir[
-                        threading.get_ident()]['job_script']
+                    job_results_local = job_results_local + \
+                        '_replica_' + str(i)
                 else:
-                    job_results_dir[threading.get_ident()].update({
-                        'job_script': script_templates(
-                            env.batch_header,
-                            env.script,
-                            thread_data=job_results_dir[threading.get_ident()]
-                        )
-                    })
+                    job_results_dir[threadID]['job_results'] \
+                        = job_results_dir[threadID]['job_results'] \
+                        + '_' + str(i)
+                    job_results_local = job_results_local + '_' + str(i)
 
-                job_results_dir[threading.get_ident()].update({
-                    'dest_name':
-                    env.pather.join(env.scripts_path, env.pather.basename(
-                        job_results_dir[threading.get_ident()]['job_script']))}
-                )
-                destname = job_results_dir[threading.get_ident()]['dest_name']
+        finally:
+            mutex_template.release()
 
-            finally:
-                mutex_template.release()
+        complete_environment()
+        env['job_name'] = env.name[0:env.max_job_name_chars]
+        calc_nodes()
+        calc_total_mem()
 
-            put(job_results_dir[threading.get_ident()]['job_script'],
-                job_results_dir[threading.get_ident()]['dest_name'])
+        env.run_command = template(env.run_command)
 
-            # in case of PJ=True, we don't need to copy app config files and
-            # folders to PJ and PJ-PY folders
-            if env.label in ['PJ_PYheader', 'PJ_header']:
-                run(
-                    template(
-                        "mkdir -p %s && cp %s %s" % (
-                            job_results_dir[threading.get_ident()][
-                                'job_results'],
-                            job_results_dir[threading.get_ident()][
-                                'dest_name'],
-                            job_results_dir[threading.get_ident()][
-                                'job_results']
-                        )
-                    )
-                )
+        # Mutex are used here to temporary set global variable
+        # that will be used to create env.dest_name.
+        # env.dest_name is save as a local variable
+        # The script name is now depending of the job label --> Create N
+        # script for N jobs
+        mutex_template.acquire()
+        try:
+            # env variables have to be set here to set the template
+            threadID = threading.get_ident()
+            env.label = job_results_dir[threadID]['label']
+            env.job_results = job_results_dir[threadID]['job_results']
+            env.job_results_local = job_results_local
+
+            if env.label not in ['PJ_PYheader', 'PJ_header']:
+                env.run_prefix += "\n# copy files from config folder"
+                env.run_prefix += template("\nconfig_dir=$job_config_path")
+                rsync_option = "-av --progress --exclude SWEEP"
+                env.run_prefix += "\nrsync %s $config_dir/* ." % (
+                    rsync_option)
+
+            # --ignore-existing
+            if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
+                job_results_dir[threadID].update(
+                    {'job_script': script_templates(
+                        env.batch_header,
+                        thread_data=job_results_dir[threadID])
+                     })
+                env.job_script = job_results_dir[threadID]['job_script']
             else:
-                run(
-                    template(
-                        "mkdir -p %s && rsync -av --progress \
-                        $job_config_path/* %s/ --exclude SWEEP && \
-                        cp %s %s" % (
-                            job_results_dir[threading.get_ident()][
-                                'job_results'],
-                            job_results_dir[threading.get_ident()][
-                                'job_results'],
-                            job_results_dir[threading.get_ident()][
-                                'dest_name'],
-                            job_results_dir[threading.get_ident()][
-                                'job_results']
-                        )
+                job_results_dir[threadID].update({
+                    'job_script': script_templates(
+                        env.batch_header,
+                        env.script,
+                        thread_data=job_results_dir[threadID]
+                    )
+                })
+
+            job_results_dir[threadID].update({
+                'dest_name':
+                env.pather.join(env.scripts_path, env.pather.basename(
+                    job_results_dir[threadID]['job_script']))}
+            )
+            destname = job_results_dir[threadID]['dest_name']
+
+        finally:
+            mutex_template.release()
+        '''
+        # for large number of runs and thread, fabric.api.put  crashed
+        put(job_results_dir[threading.get_ident()]['job_script'],
+            job_results_dir[threading.get_ident()]['dest_name'])
+        '''
+        local(
+            template(
+                "rsync -pthrvz -e 'ssh -p $port' %s "
+                "$username@$remote:%s/" % (
+                    job_results_dir[threading.get_ident()]['job_script'],
+                    env.pather.dirname
+                    (job_results_dir[threading.get_ident()]['dest_name'])
+                )
+            )
+        )
+
+        run(
+            template(
+                "mkdir -p %s && cp %s %s" % (
+                    job_results_dir[threading.get_ident()][
+                        'job_results'],
+                    job_results_dir[threading.get_ident()][
+                        'dest_name'],
+                    job_results_dir[threading.get_ident()][
+                        'job_results']
+                )
+            )
+        )
+
+        # In ensemble mode, also add run-specific file to the results dir.
+        if env.ensemble_mode:
+            run(
+                template(
+                    "rsync -pthrvz \
+                    $job_config_path/SWEEP/%s/ %s/"
+                    % (
+                        job_results_dir[threading.get_ident()]['label'],
+                        job_results_dir[threading.get_ident()][
+                            'job_results']
                     )
                 )
+            )
+        try:
+            del env["passwords"]
+        except KeyError:
+            pass
+        try:
+            del env["password"]
+        except KeyError:
+            pass
 
-            # In ensemble mode, also add run-specific file to the results dir.
-            if env.ensemble_mode:
-                run(
-                    template(
-                        "rsync -pthrvz \
-                        $job_config_path/SWEEP/%s/ %s/"
-                        % (
-                            job_results_dir[threading.get_ident()]['label'],
-                            job_results_dir[threading.get_ident()][
-                                'job_results']
-                        )
+        # For curation purposes, we store env.yml, which
+        # contains the FabSim3 env, for each job.
+        with tempfile.NamedTemporaryFile(prefix="env_", suffix=".yml",
+                                         mode='r+') as tempf:
+            tempf.write(
+                yaml.dump(dict(env))
+            )
+            tempf.flush()  # Flush the file before we copy it.
+            '''
+            # for large number of runs and thread, fabric.api.put crashed
+            put(tempf.name, env.pather.join(job_results_dir[
+                threading.get_ident()]['job_results'], 'env.yml'))
+            '''
+            local(
+                template(
+                    "rsync -pthrvz -e 'ssh -p $port' %s "
+                    "$username@$remote:%s/" % (
+                        tempf.name,
+                        job_results_dir[threading.get_ident()][
+                            'job_results']
                     )
                 )
-            try:
-                del env["passwords"]
-            except KeyError:
-                pass
-            try:
-                del env["password"]
-            except KeyError:
-                pass
+            )
 
-            # For curation purposes, we store env.yml, which
-            # contains the FabSim3 env, for each job.
-            with tempfile.NamedTemporaryFile(mode='r+') as tempf:
-                tempf.write(
-                    yaml.dump(dict(env))
-                )
-                tempf.flush()  # Flush the file before we copy it.
-                put(tempf.name, env.pather.join(job_results_dir[
-                    threading.get_ident()]['job_results'], 'env.yml'))
+        run(template("chmod u+x %s" %
+                     job_results_dir[threading.get_ident()]['dest_name']))
 
-            run(template("chmod u+x %s" %
-                         job_results_dir[threading.get_ident()]['dest_name']))
+        # check for PilotJob option is true, DO NOT submit the job directly
+        # only submit PJ script
+        if (hasattr(env, 'submit_job') and
+                isinstance(env.submit_job, bool) and
+                env.submit_job is False):
 
-            # check for PilotJob option is true, DO NOT submit the job directly
-            # only submit PJ script
-            if (hasattr(env, 'submit_job') and
-                    isinstance(env.submit_job, bool) and
-                    env.submit_job is False):
-
-                if ((hasattr(env, 'NoEnvScript') and
-                     not env.NoEnvScript) or
-                        not hasattr(env, 'NoEnvScript')):
-                    # Protect concurrent writting
-                    mutex.acquire()
-                    try:
-                        env.idsID = len(env.submitted_jobs_list) + 1
-                        env.idsPath = env.pather.join(
+            if ((hasattr(env, 'NoEnvScript') and
+                 not env.NoEnvScript) or
+                    not hasattr(env, 'NoEnvScript')):
+                # Protect concurrent writting
+                mutex.acquire()
+                try:
+                    env.idsID = len(env.submitted_jobs_list) + 1
+                    env.idsPath = env.pather.join(
+                        job_results_dir[threading.get_ident()]
+                        ['job_results'], env.pather.basename(
                             job_results_dir[threading.get_ident()]
-                            ['job_results'], env.pather.basename(
-                                job_results_dir[threading.get_ident()]
-                                ['job_script']))
+                            ['job_script']))
 
-                        if not hasattr(env, 'task_model'):
-                            env.task_model = 'default'
+                    if not hasattr(env, 'task_model'):
+                        env.task_model = 'default'
 
-                        env.submitted_jobs_list.append(
-                            script_template_content('qcg-PJ-task-template'))
-                    finally:
-                        mutex.release()
+                    env.submitted_jobs_list.append(
+                        script_template_content('qcg-PJ-task-template'))
+                finally:
+                    mutex.release()
 
-                if (i > int(env.replicas)):
-                    return
+            if (i > int(env.replicas)):
+                return
 
-            if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
-                # return
-                continue
+        if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
+            # return
+            continue
 
-            # We don't want to go next during replicas and pjm until the final
-            # job
-            if not (hasattr(env, 'submit_job') and
-                    isinstance(env.submit_job, bool) and
-                    env.submit_job is False):
+        # We don't want to go next during replicas and pjm until the final
+        # job
+        if not (hasattr(env, 'submit_job') and
+                isinstance(env.submit_job, bool) and
+                env.submit_job is False):
 
-                # Allow option to submit all preparations,
-                # but not actually submit the job
-                # job_info = ''
+            # Allow option to submit all preparations,
+            # but not actually submit the job
+            # job_info = ''
 
-                if hasattr(env, 'dispatch_jobs_on_localhost') and \
-                        isinstance(env.dispatch_jobs_on_localhost, bool) and \
-                        env.dispatch_jobs_on_localhost:
-                    env.job_script = job_script
-                    local(template("$job_dispatch " + env.job_script))
-                    print("job dispatch is done locally\n")
+            if hasattr(env, 'dispatch_jobs_on_localhost') and \
+                    isinstance(env.dispatch_jobs_on_localhost, bool) and \
+                    env.dispatch_jobs_on_localhost:
+                env.job_script = job_script
+                local(template("$job_dispatch " + env.job_script))
+                print("job dispatch is done locally\n")
 
-                elif not env.get("noexec", False):
-                    if env.remote == 'localhost':
-                        with cd(job_results_dir[threading.get_ident()]
-                                ['job_results']):
-                            with prefix(env.run_prefix):
-                                run(
-                                    template("$job_dispatch %s" %
-                                             job_results_dir[
-                                                 threading.get_ident()]
-                                             ['dest_name'])
-                                )
-                    else:
-                        with cd(job_results_dir[threading.get_ident()]
-                                ['job_results']):
-                            run(template("$job_dispatch %s" % job_results_dir[
-                                threading.get_ident()]['dest_name']))
+            elif not env.get("noexec", False):
+                if env.remote == 'localhost':
+                    with cd(job_results_dir[threading.get_ident()]
+                            ['job_results']):
+                        with prefix(env.run_prefix):
+                            run(
+                                template("$job_dispatch %s" %
+                                         job_results_dir[
+                                             threading.get_ident()]
+                                         ['dest_name'])
+                            )
+                else:
+                    with cd(job_results_dir[threading.get_ident()]
+                            ['job_results']):
+                        run(template("$job_dispatch %s" % job_results_dir[
+                            threading.get_ident()]['dest_name']))
 
-                print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
-                      (env.remote,
-                       job_results_dir[threading.get_ident()]['job_results'])
-                      )
+            print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
+                  (env.remote,
+                   job_results_dir[threading.get_ident()]['job_results'])
+                  )
 
         print("Use `fab %s fetch_results` to copy the results back to %s on\
             localhost." % (env.machine_name, job_results_local)
@@ -928,7 +916,7 @@ def run_ensemble(config, sweep_dir, **args):
 
         else:
             PJ_CMD.append('# Install QCG-PJ in user\'s home space')
-            PJ_CMD.append('pip install --user --upgrade  qcg-pilotjob\n')
+            PJ_CMD.append('pip3 install --user --upgrade  qcg-pilotjob\n')
             PJ_CMD.append('# load QCG-PJ-Python file')
             PJ_CMD.append('python3 %s' % (env.PJ_PATH))
 
