@@ -93,7 +93,6 @@ def generate_module_commands(script=None):
         # (it should always be present).
         module_commands += ["module %s" % module
                             for module in env.modules.get(script, "")]
-        print("SCRIPT: ", script)
     # print("MODULE COMMANDS: ", module_commands)
     return module_commands
 
