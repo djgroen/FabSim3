@@ -47,6 +47,15 @@ class ATP:
         concurrent.futures.wait([self.remote_jobs[jobID] for jobID in range(
             self.counter)], return_when=concurrent.futures.ALL_COMPLETED)
         print("All threads are over")
+        '''
+        # add output details for FAILED jobs
+        for jobID in range(self.counter):
+            if self.remote_jobs[jobID].result() is not None:
+                print("Output log jobID = %d" % (jobID))
+                print(self.remote_jobs[jobID].result())
+                print("-" * 50)
+                exit()
+        '''
 
     def shutdownThreads(self):
         """
