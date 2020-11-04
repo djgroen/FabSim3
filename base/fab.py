@@ -539,7 +539,7 @@ def job(sweep_length=1, *option_dictionaries):
             if env.label not in ['PJ_PYheader', 'PJ_header']:
                 env.run_prefix += "\n# copy files from config folder"
                 env.run_prefix += template("\nconfig_dir=$job_config_path")
-                rsync_option = "-av --progress --exclude SWEEP"
+                rsync_option = "-avp --exclude SWEEP --ignore-existing"
                 env.run_prefix += "\nrsync %s $config_dir/* ." % (
                     rsync_option)
 
