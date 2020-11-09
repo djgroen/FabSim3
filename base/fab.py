@@ -607,6 +607,15 @@ def job(sweep_length=1, *option_dictionaries):
             )
         )
 
+        try:
+            del env["passwords"]
+        except KeyError:
+            pass
+        try:
+            del env["password"]
+        except KeyError:
+            pass
+
         # For curation purposes, we store env.yml, which
         # contains the FabSim3 env, for each job.
         with tempfile.NamedTemporaryFile(prefix="env_", suffix=".yml",
