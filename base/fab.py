@@ -539,9 +539,18 @@ def job(sweep_length=1, *option_dictionaries):
             if env.label not in ['PJ_PYheader', 'PJ_header']:
                 env.run_prefix += "\n# copy files from config folder"
                 env.run_prefix += template("\nconfig_dir=$job_config_path")
-                rsync_option = "-avp --exclude SWEEP --ignore-existing"
+                rsync_option = "-pthrvz --exclude SWEEP "
                 env.run_prefix += "\nrsync %s $config_dir/* ." % (
-                    rsync_option)
+                    rsync_option
+                )
+            # In ensemble mode, also add run-specific file to the results dir.
+            if env.ensemble_mode:
+                env.run_prefix += "\n# copy files from SWEEP folder"
+                rsync_option = "-pthrvz"
+                env.run_prefix += "\nrsync %s $config_dir/SWEEP/%s/ ." % (
+                    rsync_option,
+                    job_results_dir[threading.get_ident()]['label']
+                )
 
             # --ignore-existing
             if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
@@ -597,28 +606,6 @@ def job(sweep_length=1, *option_dictionaries):
                 )
             )
         )
-
-        # In ensemble mode, also add run-specific file to the results dir.
-        if env.ensemble_mode:
-            run(
-                template(
-                    "rsync -pthrvz \
-                    $job_config_path/SWEEP/%s/ %s/"
-                    % (
-                        job_results_dir[threading.get_ident()]['label'],
-                        job_results_dir[threading.get_ident()][
-                            'job_results']
-                    )
-                )
-            )
-        try:
-            del env["passwords"]
-        except KeyError:
-            pass
-        try:
-            del env["password"]
-        except KeyError:
-            pass
 
         # For curation purposes, we store env.yml, which
         # contains the FabSim3 env, for each job.
