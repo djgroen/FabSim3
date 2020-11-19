@@ -248,6 +248,12 @@ def put_configs(config=''):
             "%s; mkdir -p $job_config_path" % (get_setup_fabsim_dirs_string())
         )
     )
+
+    rsync_delete = False
+    if (hasattr(env, 'prevent_results_overwrite') and
+            env.prevent_results_overwrite == 'delete'):
+        rsync_delete = True
+
     if env.manual_gsissh:
         local(
             template(
@@ -259,7 +265,8 @@ def put_configs(config=''):
     else:
         rsync_project(
             local_dir=env.job_config_path_local + '/',
-            remote_dir=env.job_config_path
+            remote_dir=env.job_config_path,
+            delete=rsync_delete
         )
 
 
@@ -594,11 +601,20 @@ def job(sweep_length=1, *option_dictionaries):
             )
         )
 
+        # to clean target folder in results if user set delete parameter
+        clean_dir = ""
+        if (hasattr(env, 'prevent_results_overwrite') and
+                env.prevent_results_overwrite == 'delete'):
+            clean_dir = "&& rm -rf %s/*" % (
+                job_results_dir[threading.get_ident()]['job_results']
+            )
+
         run(
             template(
-                "mkdir -p %s && cp %s %s" % (
+                "mkdir -p %s %s && cp %s %s" % (
                     job_results_dir[threading.get_ident()][
                         'job_results'],
+                    clean_dir,
                     job_results_dir[threading.get_ident()][
                         'dest_name'],
                     job_results_dir[threading.get_ident()][
