@@ -25,6 +25,7 @@ import math
 from pprint import PrettyPrinter
 from pathlib import Path
 from shutil import copyfile
+from fabric.contrib.files import exists
 
 pp = PrettyPrinter()
 mutex = threading.Lock()
@@ -828,7 +829,7 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
         local("rsync -pthrz %s/runs/ %s" % (campaign_dir, sweep_dir))
 
 
-def run_ensemble(config, sweep_dir, **args):
+def run_ensemble(config, sweep_dir, sweep_on_remote=False, ** args):
     """
     Map and execute ensemble jobs.
     The job results will be stored with a name pattern as defined in
@@ -867,6 +868,13 @@ def run_ensemble(config, sweep_dir, **args):
 
     # number of runs performed in this sweep
     sweep_length = 0
+
+    if sweep_on_remote == False:
+        sweepdir_items = os.listdir(sweep_dir)
+    else:
+        # in case of reading SWEEP folder from remote mahcine, we need a
+        # SSH tunnel and then list the directories
+        sweepdir_items = run("ls -1 %s" % (sweep_dir)).splitlines()
 
     sweepdir_items = os.listdir(sweep_dir)
 
