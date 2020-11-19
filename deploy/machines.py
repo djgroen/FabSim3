@@ -369,24 +369,19 @@ def print_msg_box(msg, indent=1, width=None, title=None, border="═"):
         return
 
     if border == "═":
-        t_l = "╔"
-        t_r = "╗"
-        b_l = "╚"
-        b_r = "╝"
+        t_l, t_r, b_l, b_r = "╔", "╗", "╚", "╝"
         l = r = "║"
         t = b = "═"
+
     elif border == "-":
-        t_l = "┌"
-        t_r = "┐"
-        b_l = "└"
-        b_r = "┘"
+        t_l, t_r, b_l, b_r = "┌", "┐", "└", "┘"
         l = r = "|"
         t = b = "─"
     lines = msg.split('\n')
 
     space = " " * indent
     if not width:
-        width = max(map(len, lines))
+        width = max(max(map(len, lines)), len(title))
     box = f'{t_l}{t * (width + indent * 2)}{t_r}\n'  # upper_border
     if title:
         box += f'{l}{space}{title:<{width}}{space}{r}\n'  # title
