@@ -877,8 +877,6 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
         # SSH tunnel and then list the directories
         sweepdir_items = run("ls -1 %s" % (sweep_dir)).splitlines()
 
-    sweepdir_items = os.listdir(sweep_dir)
-
     # reorder an exec_first item for priority execution.
     if(hasattr(env, 'exec_first')):
         sweepdir_items.insert(
