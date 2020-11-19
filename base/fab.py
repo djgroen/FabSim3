@@ -870,7 +870,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
     # number of runs performed in this sweep
     sweep_length = 0
 
-    if sweep_on_remote == False:
+    if sweep_on_remote is False:
         sweepdir_items = os.listdir(sweep_dir)
     else:
         # in case of reading SWEEP folder from remote machine, we need a
