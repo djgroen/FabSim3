@@ -5,19 +5,31 @@ from os import path
 
 
 @task
-def install_plugin(name):
+def install_plugin(name, branch=None):
     """
     Install a specific FabSim3 plugin.
     """
-    config = yaml.load(
-        open(path.join(env.localroot, 'deploy', 'plugins.yml')),
-        Loader=yaml.SafeLoader
-    )
+    config = yaml.load(open(path.join(env.localroot,
+                                      'deploy',
+                                      'plugins.yml')
+                            ),
+                       Loader=yaml.SafeLoader
+                       )
     info = config[name]
     plugin_dir = "%s/plugins" % (env.localroot)
     local("mkdir -p %s" % (plugin_dir))
     local("rm -rf %s/%s" % (plugin_dir, name))
-    local("git clone %s %s/%s" % (info["repository"], plugin_dir, name))
+    if branch is None:
+        local("git clone %s %s/%s" % (info["repository"],
+                                      plugin_dir,
+                                      name)
+              )
+    else:
+        local("git clone --branch %s %s %s/%s" % (branch,
+                                                  info["repository"],
+                                                  plugin_dir,
+                                                  name)
+              )
 
 
 @task
@@ -25,10 +37,12 @@ def avail_plugin():
     """
     print list of available plugins.
     """
-    config = yaml.load(
-        open(path.join(env.localroot, 'deploy', 'plugins.yml')),
-        Loader=yaml.SafeLoader
-    )
+    config = yaml.load(open(path.join(env.localroot,
+                                      'deploy',
+                                      'plugins.yml')
+                            ),
+                       Loader=yaml.SafeLoader
+                       )
     print("\nList of available plugins\n")
     print("%-20s %s" % ('plugin name', 'repository'))
     print("%-20s %s" % ('-----------', '----------'))
