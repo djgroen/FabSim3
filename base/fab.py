@@ -892,7 +892,9 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False, ** args):
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
-        if os.path.isdir(os.path.join(sweep_dir, item)):
+        # os.path.isdir is not working for remote machines, so, instead we can
+        # use exists function from fabric.contrib.files
+        if exists(os.path.join(sweep_dir, item)):
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
