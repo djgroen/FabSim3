@@ -93,6 +93,12 @@ default:
   # Default command for Python3
   python3_command: "python3"
 
+  # possible inputs are: ["delete","ignore","warn_only"]
+  # 1- delete : delte the exist results folder 
+  # 2- ignore : ignore the exist results folder 
+  # 2- warn_only : warn user and keep the exist results folder
+  prevent_results_overwrite: "ignore"
+  
 cartesius:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
