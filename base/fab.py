@@ -873,7 +873,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
     if sweep_on_remote == False:
         sweepdir_items = os.listdir(sweep_dir)
     else:
-        # in case of reading SWEEP folder from remote mahcine, we need a
+        # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
         sweepdir_items = run("ls -1 %s" % (sweep_dir)).splitlines()
 
