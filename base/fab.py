@@ -829,7 +829,8 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
         local("rsync -pthrz %s/runs/ %s" % (campaign_dir, sweep_dir))
 
 
-def run_ensemble(config, sweep_dir, sweep_on_remote=False, ** args):
+def run_ensemble(config, sweep_dir, sweep_on_remote=False,
+                 execute_put_configs=True, **args):
     """
     Map and execute ensemble jobs.
     The job results will be stored with a name pattern as defined in
@@ -885,10 +886,6 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False, ** args):
                 sweepdir_items.index(
                     env.exec_first)))
 
-    # Prevention since some laptop doesn't support more than 4 threads
-    # if int(env.nb_thread) > 4:
-    #     env.nb_thread = 4
-
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
@@ -901,7 +898,10 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False, ** args):
             # The first iteration will create folders to the remote and launch
             # sequentialy the first job
             if sweep_length == 1:
-                execute(put_configs, config)
+                # prevent execute put_config if it is already did before
+                # calling run_ensemble function
+                if execute_put_configs == True:
+                    execute(put_configs, config)
                 job(sweep_length, dict(ensemble_mode=True,
                                        label=item))
 
