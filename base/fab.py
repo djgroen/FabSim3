@@ -255,6 +255,7 @@ def put_configs(config=''):
         rsync_delete = True
 
     if env.manual_gsissh:
+        # TODO: implement prevent_results_overwrite here
         local(
             template(
                 "globus-url-copy -p 10 -cd -r -sync \
@@ -544,7 +545,7 @@ def job(sweep_length=1, *option_dictionaries):
             env.job_results_local = job_results_local
 
             if env.label not in ['PJ_PYheader', 'PJ_header']:
-                env.run_prefix += "\n# copy files from config folder"
+                env.run_prefix += "\n\n# copy files from config folder"
                 env.run_prefix += template("\nconfig_dir=$job_config_path")
                 rsync_option = "-pthrvz --exclude SWEEP "
                 env.run_prefix += "\nrsync %s $config_dir/* ." % (
@@ -552,12 +553,25 @@ def job(sweep_length=1, *option_dictionaries):
                 )
             # In ensemble mode, also add run-specific file to the results dir.
             if env.ensemble_mode:
-                env.run_prefix += "\n# copy files from SWEEP folder"
+                env.run_prefix += "\n\n# copy files from SWEEP folder"
                 rsync_option = "-pthrvz"
                 env.run_prefix += "\nrsync %s $config_dir/SWEEP/%s/ ." % (
                     rsync_option,
                     job_results_dir[threading.get_ident()]['label']
                 )
+
+            # install requested user python packages
+            # you need to specified them in one of these yaml files
+            #           1- machines.yml
+            #           2- machines_user.yml
+            #           3- machines_<plugin name>_user.yml
+            # example : py_pkg: ["numpy", "chaospy"]
+            if not (hasattr(env, 'venv') and env.venv.lower() == 'true'):
+                if hasattr(env, 'py_pkg') and len(env.py_pkg) > 0:
+                    env.run_prefix += "\n\n# Install requested python packages"
+                    env.run_prefix += "\npip install --user %s" % (
+                        ' '.join(pkg for pkg in env.py_pkg)
+                    )
 
             # --ignore-existing
             if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
