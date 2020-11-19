@@ -898,7 +898,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
             if sweep_length == 1:
                 # prevent execute put_config if it is already did before
                 # calling run_ensemble function
-                if execute_put_configs == True:
+                if execute_put_configs is True:
                     execute(put_configs, config)
                 job(sweep_length, dict(ensemble_mode=True,
                                        label=item))
