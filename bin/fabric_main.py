@@ -84,8 +84,8 @@ def _is_package(path):
     """
     _exists = lambda s: os.path.exists(os.path.join(path, s))
     return (
-        os.path.isdir(path)
-        and (_exists('__init__.py') or _exists('__init__.pyc'))
+        os.path.isdir(path) and
+        (_exists('__init__.py') or _exists('__init__.pyc'))
     )
 
 
@@ -131,10 +131,10 @@ def is_classic_task(tup):
     name, func = tup
     try:
         is_classic = (
-            callable(func)
-            and (func not in _internals)
-            and not name.startswith('_')
-            and not (inspect.isclass(func) and issubclass(func, Exception))
+            callable(func)and
+            (func not in _internals) and
+            not name.startswith('_')and
+            not (inspect.isclass(func) and issubclass(func, Exception))
         )
     # Handle poorly behaved __eq__ implementations
     except (ValueError, TypeError):
@@ -290,65 +290,73 @@ def parse_options():
     #
 
     # Display info about a specific command
-    parser.add_option('-d', '--display',
-                      metavar='NAME',
-                      help="print detailed info about command NAME"
-                      )
+    parser.add_option(
+        '-d', '--display',
+        metavar='NAME',
+        help="print detailed info about command NAME"
+    )
 
     # Control behavior of --list
     LIST_FORMAT_OPTIONS = ('short', 'normal', 'nested')
-    parser.add_option('-F', '--list-format',
-                      choices=LIST_FORMAT_OPTIONS,
-                      default='normal',
-                      metavar='FORMAT',
-                      help="formats --list, choices: %s" % ", ".join(
-                          LIST_FORMAT_OPTIONS)
-                      )
+    parser.add_option(
+        '-F', '--list-format',
+        choices=LIST_FORMAT_OPTIONS,
+        default='normal',
+        metavar='FORMAT',
+        help="formats --list, choices: %s" % ", ".join(
+            LIST_FORMAT_OPTIONS)
+    )
 
-    parser.add_option('-I', '--initial-password-prompt',
-                      action='store_true',
-                      default=False,
-                      help="Force password prompt up-front"
-                      )
+    parser.add_option(
+        '-I', '--initial-password-prompt',
+        action='store_true',
+        default=False,
+        help="Force password prompt up-front"
+    )
 
-    parser.add_option('--initial-sudo-password-prompt',
-                      action='store_true',
-                      default=False,
-                      help="Force sudo password prompt up-front"
-                      )
+    parser.add_option(
+        '--initial-sudo-password-prompt',
+        action='store_true',
+        default=False,
+        help="Force sudo password prompt up-front"
+    )
 
     # List Fab commands found in loaded fabfiles/source files
-    parser.add_option('-l', '--list',
-                      action='store_true',
-                      dest='list_commands',
-                      default=False,
-                      help="print list of possible commands and exit"
-                      )
+    parser.add_option(
+        '-l', '--list',
+        action='store_true',
+        dest='list_commands',
+        default=False,
+        help="print list of possible commands and exit"
+    )
 
     # Allow setting of arbitrary env vars at runtime.
-    parser.add_option('--set',
-                      metavar="KEY=VALUE,...",
-                      dest='env_settings',
-                      default="",
-                      help="comma separated KEY=VALUE pairs to set Fab env vars"
-                      )
+    parser.add_option(
+        '--set',
+        metavar="KEY=VALUE,...",
+        dest='env_settings',
+        default="",
+        help="comma separated KEY=VALUE pairs to set Fab env vars"
+    )
 
     # Like --list, but text processing friendly
-    parser.add_option('--shortlist',
-                      action='store_true',
-                      dest='shortlist',
-                      default=False,
-                      help="alias for -F short --list"
-                      )
+    parser.add_option(
+        '--shortlist',
+        action='store_true',
+        dest='shortlist',
+        default=False,
+        help="alias for -F short --list"
+    )
 
     # Version number (optparse gives you --version but we have to do it
     # ourselves to get -V too. sigh)
-    parser.add_option('-V', '--version',
-                      action='store_true',
-                      dest='show_version',
-                      default=False,
-                      help="show program's version number and exit"
-                      )
+    parser.add_option(
+        '-V', '--version',
+        action='store_true',
+        dest='show_version',
+        default=False,
+        help="show program's version number and exit"
+    )
 
     #
     # Add in options which are also destined to show up as `env` vars.
@@ -378,7 +386,7 @@ def _sift_tasks(mapping):
     # value is a WrappedCallableTask
     for name, value in six.iteritems(mapping):
         if _is_task(name, value):
-            #print(name, value.__module__)
+            # print(name, value.__module__)
             tasks.append(name)
             modules.append(value.__module__)
         elif isinstance(value, Mapping):
@@ -559,7 +567,8 @@ def parse_arguments(arguments):
                     k, v = result
                     # Catch, interpret host/hosts/role/roles/exclude_hosts
                     # kwargs
-                    if k in ['host', 'hosts', 'role', 'roles', 'exclude_hosts']:
+                    if k in ['host', 'hosts', 'role',
+                             'roles', 'exclude_hosts']:
                         if k == 'host':
                             hosts = [v.strip()]
                         elif k == 'hosts':
@@ -645,7 +654,8 @@ def main(fabfile_locations=None):
         # Handle --hosts, --roles, --exclude-hosts (comma separated string =>
         # list)
         for key in ['hosts', 'roles', 'exclude_hosts']:
-            if key in state.env and isinstance(state.env[key], six.string_types):
+            if (key in state.env and
+                    isinstance(state.env[key], six.string_types)):
                 state.env[key] = state.env[key].split(',')
 
         # Feed the env.tasks : tasks that are asked to be executed.
@@ -733,9 +743,10 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
 
         # Abort if any unknown commands were specified
         if unknown_commands and not state.env.get('skip_unknown_tasks', False):
-            warn("Command(s) not found:\n%s\n use `fabsim -l` to show all commands."
+            warn("Command(s) not found:\n%s\n "
+                 "use `fabsim -l` to show all commands."
                  % indent(unknown_commands))
-            #show_commands(None, options.list_format, 1)
+            # show_commands(None, options.list_format, 1)
 
         # Generate remainder command and insert into commands, commands_to_run
         if remainder_command:
@@ -762,7 +773,8 @@ Remember that -f can be used to specify fabfile path, and use -h for help.""")
             print("Commands to run: %s" % names)
 
         # At this point all commands must exist, so execute them in order.
-        for name, args, kwargs, arg_hosts, arg_roles, arg_exclude_hosts in commands_to_run:
+        for name, args, kwargs, arg_hosts, arg_roles, \
+                arg_exclude_hosts in commands_to_run:
             execute(
                 name,
                 hosts=arg_hosts,

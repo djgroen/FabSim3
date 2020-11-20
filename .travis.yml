@@ -15,7 +15,8 @@ matrix:
         - fab localhost install_plugin:FabDummy
       script:
         - python -m pytest --log-cli-level=10 tests/
-        - py.test --pep8 base/ --ignore=E501
+        # - py.test --pep8 base/ --ignore=E501
+        - py.test --pep8 base/ deploy/ lib/ UQP/ VVP/
 
     - stage: building docker image
       sudo: required
