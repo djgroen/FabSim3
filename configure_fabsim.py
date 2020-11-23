@@ -5,7 +5,7 @@ import argparse
 
 def install(package):
     print("Trying to Install required module: %s" % (package))
-    os.system('sudo python3 -m pip install %s' % (package))
+    os.system('python3 -m pip --user install %s' % (package))
 
 
 def get_version(package):
