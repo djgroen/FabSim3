@@ -6,6 +6,8 @@ queries:
   - exclude: py/unused-import  
 extraction:
   python:
+    index: # don't scan templates
+      exclude: "**/templates/*"
     python_setup: 
       version: 3
       requirements_files: 
