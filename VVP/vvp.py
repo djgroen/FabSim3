@@ -3,7 +3,8 @@
 # These patterns should be purposed for specific settings.
 # As such, they do not contain a @task descriptor.
 import os
-
+from collections import OrderedDict
+from pprint import pprint
 
 """
 validate_ensemble_output Validation Pattern.
@@ -30,6 +31,82 @@ SPECS of the aggregation_function:
 - Returns a data type that represents the compound validation outcome
   (.e.g, one or more error scores).
 """
+
+
+def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
+                     aggregation_function,
+                     **kwargs):
+    """
+
+    Arguments:
+    ----------
+    - results_dirs_PATH:
+            list of result dirs, one directory for each resolution and
+            each one containing the same QoIs stored to disk
+    - load_QoIs_function:
+            a function which loads the QoIs from each subdirectory of
+            the results_dirs_PATH.
+    - aggregation_function:
+            function to combine all results
+    - **kwargs:
+            custom parameters. The 'items' parameter must be used to give
+            explicit ordering of the various subdirectories, indicating
+            the order of the refinement.
+
+    NOTE:
+        - to see how  input functions should be defined for your app, please
+        look at the implemented examples in FabFlee repo
+
+    Author: Hamid Arabnejad
+    """
+
+    results_dirs = [dirname for dirname in os.listdir(results_dirs_PATH)
+                    if os.path.isdir(os.path.join(results_dirs_PATH, dirname))]
+    if len(results_dirs) == 0:
+        raise ValueError('\nThere is not subdirectories in the passed '
+                         'results_dirs_PATH arguments.'
+                         '\nresults_dirs_PATH = %s' % (results_dirs_PATH))
+
+    #########################################################
+    # the scores dict has this structure:                   #
+    # result_dir_1_name:                                    #
+    #       order: <polynomial_order>                       #
+    #       value:                                          #
+    #             vary_param_1: {<sobol_func_name>:<value>} #
+    #             ...                                       #
+    #             vary_param_X: {<sobol_func_name>:<value>} #
+    # ...                                                   #
+    # result_dir_N_name:                                    #
+    #       order: <polynomial_order>                       #
+    #       value:                                          #
+    #             vary_param_1: {<sobol_func_name>:<value>} #
+    #             ...                                       #
+    #             vary_param_X: {<sobol_func_name>:<value>} #
+    #########################################################
+    scores = {}
+    for result_dir in results_dirs:
+        value, order = load_QoIs_function(
+            os.path.join(results_dirs_PATH, result_dir))
+        scores.update({
+            result_dir: {
+                'value': value,
+                'order': order
+            }
+        })
+
+    #################################################################
+    # sort scores dict based on order value in ascending            #
+    # i.e., the last key in scores will have the higher order value #
+    # to have Descending order, set reverse=True                    #
+    #################################################################
+    scores = dict(OrderedDict(sorted(scores.items(),
+                                     key=lambda x: x[1]['order'],
+                                     reverse=False)
+                              ))
+    ###########################################################
+    # call aggregation_function to compares the sobol indices #
+    ###########################################################
+    aggregation_function(scores, **kwargs)
 
 
 def ensemble_vvp(results_dirs, sample_testing_function,
