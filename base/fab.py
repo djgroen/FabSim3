@@ -803,11 +803,14 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     sweep_dir = config_path + "/SWEEP"
     local("mkdir -p %s" % (sweep_dir))
 
+    local('rm -rf %s/*' % (sweep_dir))
+    '''
     # the previous ensemble in the sweep directory
     prev_runs = os.listdir(sweep_dir)
     # empty sweep directory
     for prev_run in prev_runs:
         local('rm -r %s/%s' % (sweep_dir, prev_run))
+    '''
 
     # if skip > 0: only copy the run directories run_X for X > skip to the
     # FabSim3 sweep directory. This avoids recomputing already computed samples
