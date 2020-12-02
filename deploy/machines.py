@@ -168,6 +168,8 @@ def print_machine_config_info(name=""):
         except KeyError:
             pass
     '''
+
+
 # Metaprogram the machine wrappers
 for machine_name in set(config.keys()) - set(['default']):
     globals()[machine_name] = task(alias=machine_name)(
@@ -360,7 +362,7 @@ def findDiff(d1, d2, path=""):
     return ret_str
 
 
-def print_msg_box(msg, indent=1, width=None, title=None, border="═"):
+def print_msg_box(msg, indent=1, width=None, title="", border="═"):
     """
         Print message-box with optional title.
         source : https://stackoverflow.com/questions/39969064/
@@ -384,7 +386,7 @@ def print_msg_box(msg, indent=1, width=None, title=None, border="═"):
     if not width:
         width = max(max(map(len, lines)), len(title))
     box = f'{t_l}{t * (width + indent * 2)}{t_r}\n'  # upper_border
-    if title:
+    if len(title) > 0:
         box += f'{l}{space}{title:<{width}}{space}{r}\n'  # title
         # underscore
         box += f'{l}{space}{"-" * len(title):<{width}}{space}{r}\n'
