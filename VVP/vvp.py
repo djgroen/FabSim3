@@ -71,6 +71,7 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
     # the scores dict has this structure:                   #
     # result_dir_1_name:                                    #
     #       order: <polynomial_order>                       #
+    #       runs: <num_runs>                                #
     #       value:                                          #
     #             vary_param_1: {<sobol_func_name>:<value>} #
     #             ...                                       #
@@ -78,6 +79,7 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
     # ...                                                   #
     # result_dir_N_name:                                    #
     #       order: <polynomial_order>                       #
+    #       runs: <num_runs>                                #
     #       value:                                          #
     #             vary_param_1: {<sobol_func_name>:<value>} #
     #             ...                                       #
@@ -85,11 +87,12 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
     #########################################################
     scores = {}
     for result_dir in results_dirs:
-        value, order = load_QoIs_function(
+        value, order, num_runs = load_QoIs_function(
             os.path.join(results_dirs_PATH, result_dir))
         scores.update({
             result_dir: {
                 'value': value,
+                'runs': num_runs,
                 'order': order
             }
         })
