@@ -803,11 +803,14 @@ def campaign2ensemble(config, campaign_dir, skip=0, **args):
     sweep_dir = config_path + "/SWEEP"
     local("mkdir -p %s" % (sweep_dir))
 
+    local('rm -rf %s/*' % (sweep_dir))
+    '''
     # the previous ensemble in the sweep directory
     prev_runs = os.listdir(sweep_dir)
     # empty sweep directory
     for prev_run in prev_runs:
         local('rm -r %s/%s' % (sweep_dir, prev_run))
+    '''
 
     # if skip > 0: only copy the run directories run_X for X > skip to the
     # FabSim3 sweep directory. This avoids recomputing already computed samples
@@ -887,9 +890,16 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
     atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
 
     for item in sweepdir_items:
-        # os.path.isdir is not working for remote machines, so, instead we can
-        # use exists function from fabric.contrib.files
-        if exists(os.path.join(sweep_dir, item)):
+
+        item_isdir = False
+        if sweep_on_remote is False:
+            item_isdir = os.path.isdir(os.path.join(sweep_dir, item))
+        else:
+            # os.path.isdir is not working for remote machines,
+            # so, we use exists function from fabric.contrib.files
+            item_isdir = exists(os.path.join(sweep_dir, item))
+
+        if item_isdir:
             sweep_length += 1
 
             # It's only necessary to do that for the first iteration
