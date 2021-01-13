@@ -6,10 +6,18 @@ Installing plugins
 
 By default, FabSim3 comes with the `FabDummy <https://github.com/djgroen/FabDummy>`__ plugin installed. Other plugins can be installed, and are listed in  ``deploy/plugins.yml``.
 
-    * To install a specific plugin, simply type:: 
+	* To install a specific plugin, simply type: 
 
-        fabsim localhost install_plugin:<plug_name>
+	    .. code:: console
 
+		        fabsim localhost install_plugin:<plug_name>
+
+	* To install plugin from a **specific** GitHub branch, you can use ``branch`` keyword
+      
+	    .. code:: console
+
+		        fabsim localhost install_plugin:<plug_name>,branch=<branch_name>
+	
 
 Creating a new plugin
 =====================

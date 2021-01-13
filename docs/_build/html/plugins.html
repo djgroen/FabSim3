@@ -35,33 +35,10 @@
   
   <link rel="stylesheet" href="_static/css/msmb.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="https://assets.readthedocs.org/static/css/badge_only.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Create automation scripts" href="createautomation.html" />
+    <link rel="next" title="APIs for plugin developers" href="fabsim3api.html" />
     <link rel="prev" title="Dependencies" href="installation.html" /> 
-
-<!-- RTD Extra Head -->
-
-<!-- 
-Always link to the latest version, as canonical.
-http://docs.readthedocs.org/en/latest/canonical.html
--->
-<link rel="canonical" href="plugins.html" />
-
-<link rel="stylesheet" href="https://assets.readthedocs.org/static/css/readthedocs-doc-embed.css" type="text/css" />
-
-<script type="text/javascript" src="_static/readthedocs-data.js"></script>
-
-<!-- Add page-specific data, which must exist in the page js, not global -->
-<script type="text/javascript">
-READTHEDOCS_DATA['page'] = "plugins"
-READTHEDOCS_DATA['source_suffix'] = ".rst"
-</script>
-
-<script type="text/javascript" src="https://assets.readthedocs.org/static/javascript/readthedocs-analytics.js" async="async"></script>
-
-<!-- end RTD <extrahead> -->
 </head>
 
 <body class="wy-body-for-nav">
@@ -134,6 +111,10 @@ READTHEDOCS_DATA['source_suffix'] = ".rst"
 <li class="toctree-l2"><a class="reference internal" href="#id2">Testing</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">APIs for Plugin Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fabsim3api.html">APIs for plugin developers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Advanced Topics</span></p>
 <ul>
@@ -223,9 +204,18 @@ READTHEDOCS_DATA['source_suffix'] = ".rst"
 <blockquote>
 <div><ul>
 <li><p class="first">To install a specific plugin, simply type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fabsim</span> <span class="n">localhost</span> <span class="n">install_plugin</span><span class="p">:</span><span class="o">&lt;</span><span class="n">plug_name</span><span class="o">&gt;</span>
+<blockquote>
+<div><div class="code console highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fabsim</span> <span class="n">localhost</span> <span class="n">install_plugin</span><span class="p">:</span><span class="o">&lt;</span><span class="n">plug_name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
+</div></blockquote>
+</li>
+<li><p class="first">To install plugin from a <strong>specific</strong> GitHub branch, you can use <code class="docutils literal notranslate"><span class="pre">branch</span></code> keyword</p>
+<blockquote>
+<div><div class="code console highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fabsim</span> <span class="n">localhost</span> <span class="n">install_plugin</span><span class="p">:</span><span class="o">&lt;</span><span class="n">plug_name</span><span class="o">&gt;</span><span class="p">,</span><span class="n">branch</span><span class="o">=&lt;</span><span class="n">branch_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -380,7 +370,7 @@ READTHEDOCS_DATA['source_suffix'] = ".rst"
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="createautomation.html" class="btn btn-neutral float-right" title="Create automation scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="fabsim3api.html" class="btn btn-neutral float-right" title="APIs for plugin developers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral float-left" title="Dependencies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
