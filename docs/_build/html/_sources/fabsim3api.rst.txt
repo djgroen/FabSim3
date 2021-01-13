@@ -102,7 +102,7 @@ Returns the local base PATH of input plugin name.
 Runs the input `command` on the local system.
 
 
-9- 'run(command)'
+10- 'run(command)'
 ~~~~~~~~~~~~~~~~~~~
 Runs a shell command on a remote host with following conditions:
 
