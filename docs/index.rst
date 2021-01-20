@@ -54,6 +54,11 @@ The main plugins for FabSim3 include:
 
    plugins
 
+.. toctree::
+   :caption: APIs for Plugin Developers
+   :maxdepth: 1
+
+   fabsim3api
 
 .. toctree::
    :caption: Advanced Topics

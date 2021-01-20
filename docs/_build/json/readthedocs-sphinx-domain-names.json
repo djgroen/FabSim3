@@ -44,7 +44,8 @@
         "index.html": "An automation toolkit for complex simulation tasks",
         "installation.html": "Dependencies",
         "plugins.html": "Installing plugins",
-        "remotemachineconfig.html": "Overview"
+        "remotemachineconfig.html": "Overview",
+        "fabsim3api.html": "APIs for plugin developers"
     },
     "paths": {
         "containerizedversion.html": "containerizedversion.rst",
@@ -53,7 +54,8 @@
         "index.html": "index.rst",
         "installation.html": "installation.rst",
         "plugins.html": "plugins.rst",
-        "remotemachineconfig.html": "remotemachineconfig.rst"
+        "remotemachineconfig.html": "remotemachineconfig.rst",
+        "fabsim3api.html": "fabsim3api.rst"
     },
     "pages": {
         "containerizedversion.html": "containerizedversion",
@@ -62,6 +64,7 @@
         "index.html": "index",
         "installation.html": "installation",
         "plugins.html": "plugins",
-        "remotemachineconfig.html": "remotemachineconfig"
+        "remotemachineconfig.html": "remotemachineconfig",
+        "fabsim3api.html": "fabsim3api"
     }
 }
