@@ -158,7 +158,7 @@ def with_config(name):
       for the job may be found
     """
     env.config = name
-    env.job_config_path = env.pather.join(env.config_path, name)
+    env.job_config_path = env.pather.join(env.config_path, name + env.job_desc)
 
     path_used = find_config_file_path(name)
 
@@ -476,6 +476,12 @@ def job(sweep_length=1, *option_dictionaries):
 
     env.ensemble_mode = False  # setting a default before reading in args.
 
+    # check if with_config function is already called or not
+    if not hasattr(env, 'job_config_path'):
+        raise RuntimeError('Function with_config did NOT called, '
+                           'Please call it before calling job()')
+        sys.exit()
+
     # Crapy, In the case where job() is call outside run_ensemble
     # and usually only with option_dictionnaries as arg
     if isinstance(sweep_length, dict) and not isinstance(
@@ -570,7 +576,7 @@ def job(sweep_length=1, *option_dictionaries):
             if not (hasattr(env, 'venv') and env.venv.lower() == 'true'):
                 if hasattr(env, 'py_pkg') and len(env.py_pkg) > 0:
                     env.run_prefix += "\n\n# Install requested python packages"
-                    env.run_prefix += "\npip install --user %s" % (
+                    env.run_prefix += "\npip install --user --upgrade %s" % (
                         ' '.join(pkg for pkg in env.py_pkg)
                     )
 
@@ -861,7 +867,11 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
                but the parameter 'script' was not specified.")
         sys.exit()
 
-    with_config(config)
+    # check if with_config function is already called or not
+    if not hasattr(env, 'job_config_path'):
+        raise RuntimeError('Function with_config did NOT called, '
+                           'Please call it before calling run_ensemble()')
+        sys.exit()
 
     # check for PilotJob option
     if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
