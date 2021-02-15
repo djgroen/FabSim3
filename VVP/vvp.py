@@ -124,7 +124,7 @@ def ensemble_vvp(results_dirs, sample_testing_function,
     - **kwargs: custom parameters. The 'items' parameter can be used to give
     explicit ordering of the various subdirectories.
 
-    return : ensemble_vvp_results (dict)      
+    return : ensemble_vvp_results (dict)
 
     Authors: Derek Groen, Wouter Edeling, and Hamid Arabnejad
     """
