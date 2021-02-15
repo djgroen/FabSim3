@@ -123,8 +123,13 @@ def ensemble_vvp(results_dirs, sample_testing_function,
     - aggregation_function: function to combine all results
     - **kwargs: custom parameters. The 'items' parameter can be used to give
     explicit ordering of the various subdirectories.
-    Authors: Derek Groen and Wouter Edeling
+
+    return : ensemble_vvp_results (dict)      
+
+    Authors: Derek Groen, Wouter Edeling, and Hamid Arabnejad
     """
+
+    ensemble_vvp_results = {}
 
     # if a single result_dir is specified, still add it to a list
     if type(results_dirs) == str:
@@ -149,4 +154,14 @@ def ensemble_vvp(results_dirs, sample_testing_function,
                 scores.append(sample_testing_function(
                     os.path.join(results_dir, item), **kwargs))
 
-        aggregation_function(scores, **kwargs)
+        scores_aggregation = aggregation_function(scores, **kwargs)
+
+        # update return results dict
+        ensemble_vvp_results.update({results_dir: {}})
+
+        ensemble_vvp_results[results_dir].update({
+            'scores': scores,
+            'scores_aggregation': scores_aggregation
+        })
+
+    return ensemble_vvp_results
