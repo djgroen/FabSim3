@@ -29,6 +29,12 @@ def jobs_list(quiet=False):
     ):
 
         output = local(template("$stat "), capture=quiet).splitlines()
+
+    elif env.manual_sshpass:
+        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+        manual_command = template("$stat")
+        output = local(pre_cmd + "'" + manual_command + "'", capture=False)
+
     else:
         with hide('output'):
             output = run(template("$stat"), shell=False).splitlines()

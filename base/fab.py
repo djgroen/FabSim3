@@ -255,7 +255,17 @@ def put_configs(config=''):
             env.prevent_results_overwrite == 'delete'):
         rsync_delete = True
 
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        # TODO: maybe the better option here is to overwrite the rsync_project
+        # function from /fabric/contrib/project.py
+        local(
+            template(
+                "rsync -pthrvz --rsh='sshpass -p $sshpass ssh  -p 22  ' \
+                $job_config_path_local/ \
+                $username@$remote:$job_config_path/ "
+            )
+        )
+    elif env.manual_gsissh:
         # TODO: implement prevent_results_overwrite here
         local(
             template(
@@ -311,7 +321,15 @@ def fetch_results(name='', regex='', debug=False):
     if debug:
         pp.pprint(env)
     env.job_results, env.job_results_local = with_job(name)
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        local(
+            template(
+                "rsync -pthrvz -e 'sshpass -p $sshpass ssh -p $port' \
+                $username@$remote:$job_results/%s \
+                $job_results_local" % regex
+            )
+        )
+    elif env.manual_gsissh:
         local(
             template(
                 "globus-url-copy -cd -r -sync \
@@ -613,8 +631,10 @@ def job(sweep_length=1, *option_dictionaries):
         '''
         local(
             template(
-                "rsync -pthrvz -e 'ssh -p $port' %s "
+                "rsync -pthrvz -e '%s ssh -p $port' %s "
                 "$username@$remote:%s/" % (
+                    "%s" % ("sshpass -p %s" % (env.sshpass)
+                            if env.manual_sshpass else ""),
                     job_results_dir[threading.get_ident()]['job_script'],
                     env.pather.dirname
                     (job_results_dir[threading.get_ident()]['dest_name'])
@@ -658,7 +678,7 @@ def job(sweep_length=1, *option_dictionaries):
         with tempfile.NamedTemporaryFile(prefix="env_", suffix=".yml",
                                          mode='r+') as tempf:
             tempf.write(
-                yaml.dump(dict(env))
+                yaml.dump(dict(env, **{"sshpass": None}))
             )
             tempf.flush()  # Flush the file before we copy it.
             '''
@@ -668,8 +688,10 @@ def job(sweep_length=1, *option_dictionaries):
             '''
             local(
                 template(
-                    "rsync -pthrvz -e 'ssh -p $port' %s "
+                    "rsync -pthrvz -e '%s ssh -p $port' %s "
                     "$username@$remote:%s/" % (
+                        "%s" % ("sshpass -p %s" % (env.sshpass)
+                                if env.manual_sshpass else ""),
                         tempf.name,
                         job_results_dir[threading.get_ident()][
                             'job_results']
@@ -1006,6 +1028,19 @@ def get_running_location(job=None):
     env.running_node = run(template("cat $job_results/env_details.asc"))
 
 
+def manual_sshpass(cmd):
+    commands = env.command_prefixes[:]
+    if env.get('cwd'):
+        commands.append("cd %s" % env.cwd)
+    commands.append(cmd)
+    manual_command = " && ".join(commands)
+    if not hasattr(env, "sshpass"):
+        raise ValueError("sshpass value did not set for this remote machine")
+        sys.exit()
+    pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+    local(pre_cmd + "'" + manual_command + "'", capture=True)
+
+
 def manual(cmd):
     # From the fabric wiki, bypass fabric internal ssh control
     commands = env.command_prefixes[:]
@@ -1029,7 +1064,9 @@ def manual_gsissh(cmd):
 
 
 def run(cmd):
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        manual_sshpass(cmd)
+    elif env.manual_gsissh:
         manual_gsissh(cmd)
     elif env.manual_ssh:
         manual(cmd)
