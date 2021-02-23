@@ -71,6 +71,9 @@ default:
   # Flag to use GSISSH instead of SSH.
   manual_gsissh: false
   
+  # Flag to use sshpass within SSH.
+  manual_sshpass: false
+
   # Default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
 
@@ -425,3 +428,16 @@ training_hidalgo:
     
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]
+
+archer2:
+  <<: *Eagle_Default_Config
+  <<: *QCG_PilotJob  
+  remote: "login.archer2.ac.uk"
+  budget: "d137"
+  qos_name: "standard"
+  # list of available partitions : sinfo --Format=partition
+  partition_name: "standard"
+  batch_header: slurm-archer2
+  # all required files at runtime, must be on the /work filesystem, 
+  # in ARCHER2, there is not access to /home on compute side
+  home_path_template: "/work/$project/$project/$username"    
