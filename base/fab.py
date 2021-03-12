@@ -594,18 +594,18 @@ def job(*job_args):
                           )
 
             for job_script in job_scripts_to_submit:
-                THREAD_POOL.add_task(
-                    func=job_submission,
-                    func_args=dict(job_script=job_script)
-                )
-            job_scripts_to_submit = THREAD_POOL.wait_for_tasks()
+                job_submission(dict(job_script=job_script))
+                # THREAD_POOL.add_task(
+                #     func=job_submission,
+                #     func_args=dict(job_script=job_script)
+                # )
+            # job_scripts_to_submit = THREAD_POOL.wait_for_tasks()
             print("submitted job script = \n{}".format(
                 pformat(job_scripts_to_submit))
             )
 
     THREAD_POOL.shutdown_threads()
 
-    print("\n\nenv.nb_thread = {}".format(env.nb_thread))
     return job_scripts_to_submit
 
 
