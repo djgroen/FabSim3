@@ -20,36 +20,30 @@ import sys
 
 def script_templates(*names, **options):
     commands = options.get('commands', [])
-    thread_env = options.get('thread_env', None)
-    result = "\n".join([script_template_content(name, thread_env)
+    result = "\n".join([script_template_content(name)
                         for name in names] + commands)
-    return script_template_save_temporary(result, thread_env,)
+    return script_template_save_temporary(result,)
 
 
-def script_template_content(template_name, thread_env={}):
+def script_template_content(template_name):
     for p in env.local_templates_path:
         template_file_path = os.path.join(p, template_name)
         if os.path.exists(template_file_path):
             source = open(template_file_path)
 
     try:
-        return template(source.read(), thread_env=thread_env)
+        return template(source.read())
     except UnboundLocalError:
         print("FabSim Error: could not find template file. \
             FabSim looked for it in the following directories: ",
               env.local_templates_path)
 
 
-def script_template_save_temporary(content, thread_env={}):
-    # script name is now depending of the label name to avoid problem
-    # with multithreading
+def script_template_save_temporary(content):
     destname = os.path.join(env.localroot, 'deploy',
                             '.jobscripts', env['name'])
 
-    if 'label' in thread_env:
-        if len(thread_env['label']) > 0:
-            destname += '_' + thread_env['label']
-    elif hasattr(env, 'label') and len(env.label) > 0:
+    if hasattr(env, 'label') and len(env.label) > 0:
         destname += '_' + env.label
 
     destname += '.sh'
@@ -77,7 +71,7 @@ def script_template(template_name):
     return script_template_save_temporary(result)
 
 
-def template(pattern, number_of_iterations=1, thread_env={}):
+def template(pattern, number_of_iterations=1):
     """
     Low-level templating function, insert env variables into any string pattern
         - number_of_iterations can be adjusted to allow recurring
@@ -85,9 +79,7 @@ def template(pattern, number_of_iterations=1, thread_env={}):
     """
     try:
         for i in range(0, number_of_iterations):
-            template = Template(pattern).substitute(
-                dict(env, **thread_env)
-            )
+            template = Template(pattern).substitute(env)
 
             pattern = template
         return template

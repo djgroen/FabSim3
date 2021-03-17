@@ -7,8 +7,8 @@
 # licensing.
 #
 # fab.py contains general-purpose FabSim routines.
-import threading
-from base.MultiThreadingPool import MultiThreadingPool
+# from base.MultiThreadingPool import MultiThreadingPool
+from base.MultiProcessingPool import MultiProcessingPool
 from fabric.state import output
 from deploy.templates import *
 from deploy.machines import *
@@ -29,8 +29,6 @@ from shutil import copyfile, rmtree, copy
 from fabric.contrib.files import exists
 
 pp = PrettyPrinter()
-mutex = threading.Lock()
-mutex_template = threading.Lock()
 
 
 def get_plugin_path(name, quiet=False):
@@ -540,7 +538,7 @@ def job(*job_args):
     os.makedirs(env.tmp_scripts_path)
     os.makedirs(env.tmp_results_path)
 
-    THREAD_POOL = MultiThreadingPool(ncpu=int(env.nb_thread))
+    POOL = MultiProcessingPool(PoolSize=int(env.nb_process))
 
     #####################################
     #       job preparation phase       #
@@ -549,22 +547,22 @@ def job(*job_args):
                   msg='tmp_work_path = %s ' % (env.tmp_work_path)
                   )
 
-    print("Submit tasks to ThreadPoolExecutor : start ...")
+    print("Submit tasks to multiprocessingPool : start ...")
     if env.ensemble_mode is True:
         for task_label in env.sweepdir_items:
-            THREAD_POOL.add_task(
+            POOL.add_task(
                 func=job_preparation,
                 func_args=dict(ensemble_mode=env.ensemble_mode,
                                label=task_label)
             )
     else:
-        THREAD_POOL.add_task(
+        POOL.add_task(
             func=job_preparation,
             func_args=args
         )
 
-    print("Submit tasks to ThreadPoolExecutor : done ...")
-    job_scripts_to_submit = THREAD_POOL.wait_for_tasks()
+    print("Submit tasks to multiprocessingPool : done ...")
+    job_scripts_to_submit = POOL.wait_for_tasks()
 
     #####################################
     #       job transmission phase      #
@@ -595,16 +593,11 @@ def job(*job_args):
 
             for job_script in job_scripts_to_submit:
                 job_submission(dict(job_script=job_script))
-                # THREAD_POOL.add_task(
-                #     func=job_submission,
-                #     func_args=dict(job_script=job_script)
-                # )
-            # job_scripts_to_submit = THREAD_POOL.wait_for_tasks()
             print("submitted job script = \n{}".format(
                 pformat(job_scripts_to_submit))
             )
 
-    THREAD_POOL.shutdown_threads()
+    # POOL.shutdown_threads()
 
     return job_scripts_to_submit
 
@@ -635,11 +628,11 @@ def job_submission(*job_args):
         if env.remote == 'localhost':
             with cd(env.pather.dirname(job_script)):
                 with prefix(env.run_prefix):
-                    print(template("\n\n$job_dispatch %s\n\n" % job_script))
+                    # print(template("\n\n$job_dispatch %s\n\n" % job_script))
                     run(template("$job_dispatch %s" % job_script))
         else:
             with cd(env.pather.dirname(job_script)):
-                print(template("\n\n$job_dispatch %s\n\n" % job_script))
+                # print(template("\n\n$job_dispatch %s\n\n" % job_script))
                 run(template("$job_dispatch %s" % job_script))
 
     print("Use `fab %s fetch_results` to copy the results "
@@ -726,79 +719,68 @@ def job_preparation(*job_args):
         args = dict(args, **adict)
 
     if 'label' in args:
-        thread_label = args['label']
+        env.label = args['label']
     else:
-        thread_label = ''
+        env.label = ''
 
     return_job_scripts = []
     for i in range(1, int(env.replicas) + 1):
 
-        job_results, job_results_local = with_template_job(
+        env.job_results, env.job_results_local = with_template_job(
             ensemble_mode=env.ensemble_mode,
-            label=thread_label
+            label=env.label
         )
 
         if int(env.replicas) > 1:
             if env.ensemble_mode is False:
-                job_results += '_replica_' + str(i)
+                env.job_results += '_replica_' + str(i)
             else:
-                job_results += '_' + str(i)
+                env.job_results += '_' + str(i)
 
-        tmp_job_results = job_results.replace(env.results_path,
-                                              env.tmp_results_path)
+        tmp_job_results = env.job_results.replace(env.results_path,
+                                                  env.tmp_results_path)
 
         env['job_name'] = env.name[0:env.max_job_name_chars]
-        thread_env_var = complete_environment(saveToThreadInfo=['run_prefix'])
-        thread_run_prefix = thread_env_var['run_prefix']
+        complete_environment()
 
         env.run_command = template(env.run_command)
 
-        if thread_label not in ['PJ_PYheader', 'PJ_header']:
-            thread_run_prefix += "\n\n" \
+        if env.label not in ['PJ_PYheader', 'PJ_header']:
+            env.run_prefix += "\n\n" \
                 "# copy files from config folder\n" \
                 "config_dir=%s\n" \
                 "rsync -pthrvz --exclude SWEEP $config_dir/* ." % (
                     env.job_config_path)
 
         if env.ensemble_mode:
-            thread_run_prefix += "\n\n"\
+            env.run_prefix += "\n\n"\
                 "# copy files from SWEEP folder\n"\
                 "rsync -pthrvz $config_dir/SWEEP/%s/ ." % (
-                    thread_label
+                    env.label
                 )
 
         if not (hasattr(env, 'venv') and env.venv.lower() == 'true'):
             if hasattr(env, 'py_pkg') and len(env.py_pkg) > 0:
-                thread_run_prefix += "\n\n"\
+                env.run_prefix += "\n\n"\
                     "# Install requested python packages\n"\
                     "pip install --user --upgrade %s" % (
                         ' '.join(pkg for pkg in env.py_pkg)
                     )
 
-        thread_env = {'run_prefix': thread_run_prefix,
-                      'job_results': job_results
-                      }
         # this is a tricky situation,
         # in case of ensemble runs, or simple job, we need to add env.label
         # to generated job script name,
         # however, for PJ_PYheader and PJ_header header script, nothing should
         # be added at the end of script file name, so, here we pass a empty
         # string as label
-        if thread_label not in ['PJ_PYheader', 'PJ_header']:
-            thread_env.update({'label': thread_label})
-        else:
-            thread_env.update({'label': ''})
-
         if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
             tmp_job_script = script_templates(
-                env.batch_header,
-                thread_env=thread_env
+                env.batch_header
             )
         else:
             tmp_job_script = script_templates(
                 env.batch_header,
-                env.script,
-                thread_env=thread_env
+                env.script
             )
 
         # Separate base from extension
@@ -823,7 +805,7 @@ def job_preparation(*job_args):
         '''
         # here, instead of returning PATH to script folder, it is better to
         # submit script from results_path folder, specially in case of PJ job
-        return_job_scripts.append(env.pather.join(job_results,
+        return_job_scripts.append(env.pather.join(env.job_results,
                                                   dst_script_name)
                                   )
 
@@ -845,10 +827,7 @@ def job_preparation(*job_args):
             yaml.dump(dict(env, **{"sshpass": None,
                                    "passwords": None,
                                    "password": None,
-                                   "sweepdir_items": None,
-                                   "label": thread_label,
-                                   "run_prefix": thread_run_prefix,
-                                   "job_results": job_results}
+                                   "sweepdir_items": None}
                            ),
                       env_yml_file,
                       default_flow_style=False
@@ -999,6 +978,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
         with hide('everything'):
             execute(put_configs, config)
 
+    output['everything'] = False
     job_scripts_to_submit = job(dict(ensemble_mode=True,
                                      sweepdir_items=sweepdir_items,
                                      sweep_dir=sweep_dir)

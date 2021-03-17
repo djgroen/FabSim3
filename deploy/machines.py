@@ -239,7 +239,7 @@ def add_plugin_environment_variable(plugin_name):
                   % (plugin_name))
 
 
-def complete_environment(saveToThreadInfo=[]):
+def complete_environment():
     """Add paths to the environment based on information in the JSON configs.
     Templates are filled in from the dictionary to allow $foo interpolation
     in the JSON file.
@@ -312,16 +312,6 @@ def complete_environment(saveToThreadInfo=[]):
             "\n# load python from VirtualEnv" +\
             "\nmodule unload python\n" +\
             "source %s/bin/activate" % (env.virtual_env_path)
-
-    if len(saveToThreadInfo) == 0:
-        return
-    thread_request_env = {}
-    for req_var in saveToThreadInfo:
-        if hasattr(env, req_var):
-            thread_request_env.update({
-                req_var: env[req_var]
-            })
-    return thread_request_env
 
 # complete_environment()
 
