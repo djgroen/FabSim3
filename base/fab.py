@@ -978,7 +978,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
         with hide('everything'):
             execute(put_configs, config)
 
-    output['everything'] = False
+    # output['everything'] = False
     job_scripts_to_submit = job(dict(ensemble_mode=True,
                                      sweepdir_items=sweepdir_items,
                                      sweep_dir=sweep_dir)
