@@ -2,10 +2,6 @@ from multiprocessing import Pool, cpu_count, current_process, Process, Manager
 import os
 import sys
 import traceback
-import logging
-import psutil
-import signal
-from pprint import pprint, pformat
 import itertools
 parent_id = os.getpid()
 
