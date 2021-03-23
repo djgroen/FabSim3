@@ -508,7 +508,7 @@ def job(*job_args):
     if not hasattr(env, 'job_config_path'):
         raise RuntimeError('Function with_config did NOT called, '
                            'Please call it before calling job()')
-        sys.exit()
+        # sys.exit()
 
     update_environment(args)
     #   Add label, mem, core to env.
@@ -943,7 +943,7 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
     if not hasattr(env, 'job_config_path'):
         raise RuntimeError('Function with_config did NOT called, '
                            'Please call it before calling run_ensemble()')
-        sys.exit()
+        # sys.exit()
 
     # check for PilotJob option
     if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
