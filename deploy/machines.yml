@@ -252,7 +252,7 @@ Eagle : &Eagle_Default_Config
   batch_header_install_app : eagle-app
 
   # PilotJob attributes  
-  PJ_PYheader: eagle-PJ.py
+  PJ_PYheader: eagle-PJ-py
   PJ_header: eagle-PJ-header
   #PJ_header: no_batch
   PJ_size : "3"
@@ -276,7 +276,7 @@ qcg:
   # PilotJob header template
   
   # PilotJob attributes  
-  PJ_PYheader: qcg-PJ.py
+  PJ_PYheader: qcg-PJ-py
   PJ_header: qcg-PJ-header
   #PJ_header: no_batch
   PJ_size : "4"
@@ -400,7 +400,7 @@ genji:
   stat: "squeue"
   job_dispatch: "sbatch"
   PJ_header: slurm-genji-PJ-header
-  PJ_PYheader: slurm-genji-PJ.py
+  PJ_PYheader: slurm-genji-PJ-py
   PJ_size: "3"
 
 training_hidalgo:
