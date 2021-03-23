@@ -1076,7 +1076,7 @@ def manual_sshpass(cmd):
     manual_command = " && ".join(commands)
     if not hasattr(env, "sshpass"):
         raise ValueError("sshpass value did not set for this remote machine")
-        sys.exit()
+        # sys.exit()
     pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
     local(pre_cmd + "'" + manual_command + "'", capture=True)
 
