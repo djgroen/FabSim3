@@ -20,10 +20,9 @@ import sys
 
 def script_templates(*names, **options):
     commands = options.get('commands', [])
-    thread_data = options.get('thread_data', None)
     result = "\n".join([script_template_content(name)
                         for name in names] + commands)
-    return script_template_save_temporary(result, thread_data)
+    return script_template_save_temporary(result,)
 
 
 def script_template_content(template_name):
@@ -40,15 +39,11 @@ def script_template_content(template_name):
               env.local_templates_path)
 
 
-def script_template_save_temporary(content, thread_data=None):
-    # script name is now depending of the label name to avoid problem
-    # with multithreading
+def script_template_save_temporary(content):
     destname = os.path.join(env.localroot, 'deploy',
                             '.jobscripts', env['name'])
 
-    if thread_data is not None and len(thread_data['label']) > 0:
-        destname += '_' + thread_data['label']
-    elif hasattr(env, 'label') and len(env.label) > 0:
+    if hasattr(env, 'label') and len(env.label) > 0:
         destname += '_' + env.label
 
     destname += '.sh'
@@ -85,6 +80,7 @@ def template(pattern, number_of_iterations=1):
     try:
         for i in range(0, number_of_iterations):
             template = Template(pattern).substitute(env)
+
             pattern = template
         return template
     except KeyError as err:
