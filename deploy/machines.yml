@@ -9,9 +9,8 @@ default:
     all: []
     dummy: []
 
-  # Number of threads when launch "run_ensemble"command
-  # High number of thread will make the command faster but could impact the reliability of the ssh connection (limit to 6 threads)
-  nb_thread: 1
+  # Number of process when launch "run_ensemble"command
+  nb_process: 1
 
   # loading virtual environment on the remote machine 
   virtualenv : False
@@ -71,6 +70,9 @@ default:
   # Flag to use GSISSH instead of SSH.
   manual_gsissh: false
   
+  # Flag to use sshpass within SSH.
+  manual_sshpass: false
+
   # Default location for templates.
   local_templates_path: ["$localroot/deploy/templates"]
 
@@ -250,7 +252,7 @@ Eagle : &Eagle_Default_Config
   batch_header_install_app : eagle-app
 
   # PilotJob attributes  
-  PJ_PYheader: eagle-PJ.py
+  PJ_PYheader: eagle-PJ-py
   PJ_header: eagle-PJ-header
   #PJ_header: no_batch
   PJ_size : "3"
@@ -274,7 +276,7 @@ qcg:
   # PilotJob header template
   
   # PilotJob attributes  
-  PJ_PYheader: qcg-PJ.py
+  PJ_PYheader: qcg-PJ-py
   PJ_header: qcg-PJ-header
   #PJ_header: no_batch
   PJ_size : "4"
@@ -332,7 +334,7 @@ eagle_vecma:
   remote: "eagle.man.poznan.pl"
   home_path_template: "/home/plgrid/$username"
   batch_header: slurm-eagle
-  budget: "vecma2020"
+  budget: "plgvecma2021"
   # list of available partitions : sinfo --Format=partition
   partition_name: "altair"
 
@@ -398,7 +400,7 @@ genji:
   stat: "squeue"
   job_dispatch: "sbatch"
   PJ_header: slurm-genji-PJ-header
-  PJ_PYheader: slurm-genji-PJ.py
+  PJ_PYheader: slurm-genji-PJ-py
   PJ_size: "3"
 
 training_hidalgo:
@@ -425,3 +427,19 @@ training_hidalgo:
     
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]
+
+archer2:
+  <<: *Eagle_Default_Config
+  <<: *QCG_PilotJob  
+  remote: "login.archer2.ac.uk"
+  budget: "d137"
+  project: "d137"
+  qos_name: "standard"
+  # list of available partitions : sinfo --Format=partition
+  partition_name: "standard"
+  batch_header: slurm-archer2
+  PJ_header: archer2-PJ-header
+  # all required files at runtime, must be on the /work filesystem, 
+  # in ARCHER2, there is not access to /home on compute side
+  home_path_template: "/work/$project/$project/$username"   
+

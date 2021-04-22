@@ -312,11 +312,6 @@ def complete_environment():
             "\n# load python from VirtualEnv" +\
             "\nmodule unload python\n" +\
             "source %s/bin/activate" % (env.virtual_env_path)
-    # env.build_number=subprocess.check_output(['hg','id','-q'.'-i']).strip()
-    # check_output is 2.7 python and later only. Revert to oldfashioned popen.
-    # cmd=os.popen(template("hg id -q -i"))
-    # cmd.close()
-    # env.build_number=run("hg id -q -i")
 
 # complete_environment()
 

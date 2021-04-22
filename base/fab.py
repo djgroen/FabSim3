@@ -7,8 +7,9 @@
 # licensing.
 #
 # fab.py contains general-purpose FabSim routines.
-import threading
-import base.AsyncThreadingPool
+# from base.MultiThreadingPool import MultiThreadingPool
+from base.MultiProcessingPool import MultiProcessingPool
+from fabric.state import output
 from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
@@ -22,14 +23,12 @@ import yaml
 import tempfile
 import os.path
 import math
-from pprint import PrettyPrinter
+from pprint import PrettyPrinter, pformat
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, rmtree, copy
 from fabric.contrib.files import exists
 
 pp = PrettyPrinter()
-mutex = threading.Lock()
-mutex_template = threading.Lock()
 
 
 def get_plugin_path(name, quiet=False):
@@ -70,7 +69,10 @@ def with_template_job(ensemble_mode=False, label=None):
     if label and not ensemble_mode:
         name = '_'.join((label, name))
 
-    job_results, job_results_local = with_job(name, ensemble_mode, label)
+    job_results, job_results_local = with_job(name=name,
+                                              ensemble_mode=ensemble_mode,
+                                              label=label
+                                              )
 
     return job_results, job_results_local
 
@@ -158,7 +160,7 @@ def with_config(name):
       for the job may be found
     """
     env.config = name
-    env.job_config_path = env.pather.join(env.config_path, name)
+    env.job_config_path = env.pather.join(env.config_path, name + env.job_desc)
 
     path_used = find_config_file_path(name)
 
@@ -255,7 +257,17 @@ def put_configs(config=''):
             env.prevent_results_overwrite == 'delete'):
         rsync_delete = True
 
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        # TODO: maybe the better option here is to overwrite the rsync_project
+        # function from /fabric/contrib/project.py
+        local(
+            template(
+                "rsync -pthrvz --rsh='sshpass -p $sshpass ssh  -p 22  ' \
+                $job_config_path_local/ \
+                $username@$remote:$job_config_path/ "
+            )
+        )
+    elif env.manual_gsissh:
         # TODO: implement prevent_results_overwrite here
         local(
             template(
@@ -311,7 +323,15 @@ def fetch_results(name='', regex='', debug=False):
     if debug:
         pp.pprint(env)
     env.job_results, env.job_results_local = with_job(name)
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        local(
+            template(
+                "rsync -pthrvz -e 'sshpass -p $sshpass ssh -p $port' \
+                $username@$remote:$job_results/%s \
+                $job_results_local" % regex
+            )
+        )
+    elif env.manual_gsissh:
         local(
             template(
                 "globus-url-copy -cd -r -sync \
@@ -464,298 +484,356 @@ def removekey(d, key):
     return r
 
 
-def job(sweep_length=1, *option_dictionaries):
+def job(*job_args):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
-    Execute a generic job on the remote machine. Use hemelb, regress, or test
-    instead.
+    Execute a generic job on the remote machine.
 
-    Returns the name of the remote results directory.
+    To improve the total job submission, and reduce the number of SSH
+    connection for job files/folders transmission, the job submission workflow
+    splitted into 3 individual sub-workflow
+                                1) job_preparation
+                                2) job_transmission
+                                3) job_submission
+
+    Returns the generate jobs scripts for submission on the remote machine.
     """
 
-    env.ensemble_mode = False  # setting a default before reading in args.
+    args = {}
+    for adict in job_args:
+        args = dict(args, **adict)
 
-    # Crapy, In the case where job() is call outside run_ensemble
-    # and usually only with option_dictionnaries as arg
-    if isinstance(sweep_length, dict) and not isinstance(
-            option_dictionaries, dict):
-        option_dictionaries = [sweep_length]
-        sweep_length = 1
+    # check if with_config function is already called or not
+    if not hasattr(env, 'job_config_path'):
+        raise RuntimeError('Function with_config did NOT called, '
+                           'Please call it before calling job()')
+        # sys.exit()
 
+    update_environment(args)
     #   Add label, mem, core to env.
-    update_environment(*option_dictionaries)
-    job_results_dir = {}
+    calc_nodes()
+    calc_total_mem()
 
-    # Save label as local variable since env.label is overwritten by the other
-    # threads !
-    # all these variable are saved in a dict specific to the thread_id
-    job_results_dir[threading.get_ident()] = {}
-    job_results_dir[threading.get_ident()].update({'label': ''})
-    if 'label' in option_dictionaries[0]:
-        job_results_dir[threading.get_ident(
-        )]['label'] = option_dictionaries[0]['label']
+    if 'sweepdir_items' in args:
+        env.ensemble_mode = True
+    else:
+        env.ensemble_mode = False
 
-    # Make sure that prefix and module load definitions are properly
-    # updated.
-    for i in range(1, int(env.replicas) + 1):
+    ########################################################
+    #  temporary folder to save job files/folders/scripts  #
+    ########################################################
+    env.tmp_work_path = env.pather.join(
+        tempfile._get_default_tempdir(),
+        next(tempfile._get_candidate_names()),
+        'FabSim3'
+        # env.fabric_dir
+    )
 
-        mutex_template.acquire()
-        try:
-            threadID = threading.get_ident()
-            job_results, job_results_local = with_template_job(
-                env.ensemble_mode,
-                job_results_dir[threadID]['label']
+    if os.path.exists(env.tmp_work_path):
+        rmtree(env.tmp_work_path)
+    # the config_files folder is already transfered by put_config
+    env.tmp_results_path = env.pather.join(env.tmp_work_path, 'results')
+    env.tmp_scripts_path = env.pather.join(env.tmp_work_path, 'scripts')
+    os.makedirs(env.tmp_scripts_path)
+    os.makedirs(env.tmp_results_path)
+
+    POOL = MultiProcessingPool(PoolSize=int(env.nb_process))
+
+    #####################################
+    #       job preparation phase       #
+    #####################################
+    print_msg_box(title="job preparation phase",
+                  msg='tmp_work_path = %s ' % (env.tmp_work_path)
+                  )
+
+    print("Submit tasks to multiprocessingPool : start ...")
+    if env.ensemble_mode is True:
+        for task_label in env.sweepdir_items:
+            POOL.add_task(
+                func=job_preparation,
+                func_args=dict(ensemble_mode=env.ensemble_mode,
+                               label=task_label)
             )
-            job_results_dir[threadID].update({'job_results': job_results})
-            if int(env.replicas) > 1:
-                if env.ensemble_mode is False:
-                    job_results_dir[threadID]['job_results'] \
-                        = job_results_dir[threadID]['job_results'] \
-                        + '_replica_' + str(i)
-
-                    job_results_local = job_results_local + \
-                        '_replica_' + str(i)
-                else:
-                    job_results_dir[threadID]['job_results'] \
-                        = job_results_dir[threadID]['job_results'] \
-                        + '_' + str(i)
-                    job_results_local = job_results_local + '_' + str(i)
-
-        finally:
-            mutex_template.release()
-
-        complete_environment()
-        env['job_name'] = env.name[0:env.max_job_name_chars]
-        calc_nodes()
-        calc_total_mem()
-
-        env.run_command = template(env.run_command)
-
-        # Mutex are used here to temporary set global variable
-        # that will be used to create env.dest_name.
-        # env.dest_name is save as a local variable
-        # The script name is now depending of the job label --> Create N
-        # script for N jobs
-        mutex_template.acquire()
-        try:
-            # env variables have to be set here to set the template
-            threadID = threading.get_ident()
-            env.label = job_results_dir[threadID]['label']
-            env.job_results = job_results_dir[threadID]['job_results']
-            env.job_results_local = job_results_local
-
-            if env.label not in ['PJ_PYheader', 'PJ_header']:
-                env.run_prefix += "\n\n# copy files from config folder"
-                env.run_prefix += template("\nconfig_dir=$job_config_path")
-                rsync_option = "-pthrvz --exclude SWEEP "
-                env.run_prefix += "\nrsync %s $config_dir/* ." % (
-                    rsync_option
-                )
-            # In ensemble mode, also add run-specific file to the results dir.
-            if env.ensemble_mode:
-                env.run_prefix += "\n\n# copy files from SWEEP folder"
-                rsync_option = "-pthrvz"
-                env.run_prefix += "\nrsync %s $config_dir/SWEEP/%s/ ." % (
-                    rsync_option,
-                    job_results_dir[threading.get_ident()]['label']
-                )
-
-            # install requested user python packages
-            # you need to specified them in one of these yaml files
-            #           1- machines.yml
-            #           2- machines_user.yml
-            #           3- machines_<plugin name>_user.yml
-            # example : py_pkg: ["numpy", "chaospy"]
-            if not (hasattr(env, 'venv') and env.venv.lower() == 'true'):
-                if hasattr(env, 'py_pkg') and len(env.py_pkg) > 0:
-                    env.run_prefix += "\n\n# Install requested python packages"
-                    env.run_prefix += "\npip install --user %s" % (
-                        ' '.join(pkg for pkg in env.py_pkg)
-                    )
-
-            # --ignore-existing
-            if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
-                job_results_dir[threadID].update(
-                    {'job_script': script_templates(
-                        env.batch_header,
-                        thread_data=job_results_dir[threadID])
-                     })
-                env.job_script = job_results_dir[threadID]['job_script']
-            else:
-                job_results_dir[threadID].update({
-                    'job_script': script_templates(
-                        env.batch_header,
-                        env.script,
-                        thread_data=job_results_dir[threadID]
-                    )
-                })
-
-            job_results_dir[threadID].update({
-                'dest_name':
-                env.pather.join(env.scripts_path, env.pather.basename(
-                    job_results_dir[threadID]['job_script']))}
-            )
-            destname = job_results_dir[threadID]['dest_name']
-
-        finally:
-            mutex_template.release()
-        '''
-        # for large number of runs and thread, fabric.api.put  crashed
-        put(job_results_dir[threading.get_ident()]['job_script'],
-            job_results_dir[threading.get_ident()]['dest_name'])
-        '''
-        local(
-            template(
-                "rsync -pthrvz -e 'ssh -p $port' %s "
-                "$username@$remote:%s/" % (
-                    job_results_dir[threading.get_ident()]['job_script'],
-                    env.pather.dirname
-                    (job_results_dir[threading.get_ident()]['dest_name'])
-                )
-            )
+    else:
+        POOL.add_task(
+            func=job_preparation,
+            func_args=args
         )
 
-        # to clean target folder in results if user set delete parameter
-        clean_dir = ""
-        if (hasattr(env, 'prevent_results_overwrite') and
-                env.prevent_results_overwrite == 'delete'):
-            clean_dir = "&& rm -rf %s/*" % (
-                job_results_dir[threading.get_ident()]['job_results']
-            )
+    print("Submit tasks to multiprocessingPool : done ...")
+    job_scripts_to_submit = POOL.wait_for_tasks()
 
-        run(
-            template(
-                "mkdir -p %s %s && cp %s %s" % (
-                    job_results_dir[threading.get_ident()][
-                        'job_results'],
-                    clean_dir,
-                    job_results_dir[threading.get_ident()][
-                        'dest_name'],
-                    job_results_dir[threading.get_ident()][
-                        'job_results']
-                )
-            )
-        )
+    #####################################
+    #       job transmission phase      #
+    #####################################
+    print_msg_box(title="job transmission phase",
+                  msg='Copy all generated files/folder from\n'
+                  'tmp_work_path = %s\n'
+                  'to\n'
+                  'work_path = %s' % (env.tmp_work_path, env.work_path)
+                  )
 
-        try:
-            del env["passwords"]
-        except KeyError:
-            pass
-        try:
-            del env["password"]
-        except KeyError:
-            pass
+    job_transmission()
 
-        # For curation purposes, we store env.yml, which
-        # contains the FabSim3 env, for each job.
-        with tempfile.NamedTemporaryFile(prefix="env_", suffix=".yml",
-                                         mode='r+') as tempf:
-            tempf.write(
-                yaml.dump(dict(env))
-            )
-            tempf.flush()  # Flush the file before we copy it.
-            '''
-            # for large number of runs and thread, fabric.api.put crashed
-            put(tempf.name, env.pather.join(job_results_dir[
-                threading.get_ident()]['job_results'], 'env.yml'))
-            '''
-            local(
-                template(
-                    "rsync -pthrvz -e 'ssh -p $port' %s "
-                    "$username@$remote:%s/" % (
-                        tempf.name,
-                        job_results_dir[threading.get_ident()][
-                            'job_results']
-                    )
-                )
-            )
-
-        run(template("chmod u+x %s" %
-                     job_results_dir[threading.get_ident()]['dest_name']))
-
-        # check for PilotJob option is true, DO NOT submit the job directly
-        # only submit PJ script
-        if (hasattr(env, 'submit_job') and
-                isinstance(env.submit_job, bool) and
-                env.submit_job is False):
-
-            if ((hasattr(env, 'NoEnvScript') and
-                 not env.NoEnvScript) or
-                    not hasattr(env, 'NoEnvScript')):
-                # Protect concurrent writting
-                mutex.acquire()
-                try:
-                    env.idsID = len(env.submitted_jobs_list) + 1
-                    env.idsPath = env.pather.join(
-                        job_results_dir[threading.get_ident()]
-                        ['job_results'], env.pather.basename(
-                            job_results_dir[threading.get_ident()]
-                            ['job_script']))
-
-                    if not hasattr(env, 'task_model'):
-                        env.task_model = 'default'
-
-                    env.submitted_jobs_list.append(
-                        script_template_content('qcg-PJ-task-template'))
-                finally:
-                    mutex.release()
-
-            if (i > int(env.replicas)):
-                return
-
-        if (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
-            # return
-            continue
-
-        # We don't want to go next during replicas and pjm until the final
-        # job
+    if not (hasattr(env, 'TestOnly') and env.TestOnly.lower() == 'true'):
+        # DO NOT submit any job
+        # env.submit_job is False in case of using PilotJob option
+        # therefore, DO NOT submit the job directly, only submit PJ script
         if not (hasattr(env, 'submit_job') and
                 isinstance(env.submit_job, bool) and
                 env.submit_job is False):
+            #####################################
+            #       job submission phase      #
+            #####################################
+            print_msg_box(title="job submission phase",
+                          msg="Submit all generated job scripts to"
+                          " the target remote machine"
+                          )
 
-            # Allow option to submit all preparations,
-            # but not actually submit the job
-            # job_info = ''
+            for job_script in job_scripts_to_submit:
+                job_submission(dict(job_script=job_script))
+            print("submitted job script = \n{}".format(
+                pformat(job_scripts_to_submit))
+            )
 
-            if hasattr(env, 'dispatch_jobs_on_localhost') and \
-                    isinstance(env.dispatch_jobs_on_localhost, bool) and \
-                    env.dispatch_jobs_on_localhost:
-                env.job_script = job_script
-                local(template("$job_dispatch " + env.job_script))
-                print("job dispatch is done locally\n")
+    # POOL.shutdown_threads()
 
-            elif not env.get("noexec", False):
-                if env.remote == 'localhost':
-                    with cd(job_results_dir[threading.get_ident()]
-                            ['job_results']):
-                        with prefix(env.run_prefix):
-                            run(
-                                template("$job_dispatch %s" %
-                                         job_results_dir[
-                                             threading.get_ident()]
-                                         ['dest_name'])
-                            )
-                else:
-                    with cd(job_results_dir[threading.get_ident()]
-                            ['job_results']):
-                        run(template("$job_dispatch %s" % job_results_dir[
-                            threading.get_ident()]['dest_name']))
+    return job_scripts_to_submit
 
-            print("JOB OUTPUT IS STORED REMOTELY IN: %s:%s " %
-                  (env.remote,
-                   job_results_dir[threading.get_ident()]['job_results'])
-                  )
 
-        print("Use `fab %s fetch_results` to copy the results back to %s on\
-            localhost." % (env.machine_name, job_results_local)
-              )
+def job_submission(*job_args):
+    """
+    here, all prepared job scrips will be submitted to the
+    target remote machine
 
-    if env.get("dumpenv", False) == "True":
-        print("DUMPENV mode enabled. Dumping environment:")
-        print(env)
+    Note:
+            - please make sure to pass the list of job scripts be summited as
+              an input to this function
+    """
 
-    return job_results
+    args = {}
+    for adict in job_args:
+        args = dict(args, **adict)
+
+    job_script = args['job_script']
+
+    if hasattr(env, 'dispatch_jobs_on_localhost') and \
+            isinstance(env.dispatch_jobs_on_localhost, bool) and \
+            env.dispatch_jobs_on_localhost:
+        local(template("$job_dispatch " + job_script))
+        print("job dispatch is done locally\n")
+
+    elif not env.get("noexec", False):
+        if env.remote == 'localhost':
+            with cd(env.pather.dirname(job_script)):
+                with prefix(env.run_prefix):
+                    # print(template("\n\n$job_dispatch %s\n\n" % job_script))
+                    run(template("$job_dispatch %s" % job_script))
+        else:
+            with cd(env.pather.dirname(job_script)):
+                # print(template("\n\n$job_dispatch %s\n\n" % job_script))
+                run(template("$job_dispatch %s" % job_script))
+
+    print("Use `fab %s fetch_results` to copy the results "
+          "back to localhost." % (env.machine_name)
+          )
+
+    return [job_script]
+
+
+def job_transmission(*job_args):
+    """
+    here, we only transfer all generated files/folders from
+        <tmp_folder>/{results,scripts}
+    to
+        <target_work_dir>/{results,scripts}
+    """
+    args = {}
+    for adict in job_args:
+        args = dict(args, **adict)
+
+    if (hasattr(env, 'prevent_results_overwrite') and
+            env.prevent_results_overwrite == 'delete'):
+        # if we have a large result directory contains thousands of files and
+        # folders, using rm command will not be efficient,
+        # so, here I am using rsync
+        #
+        # Note: there is another option, using perl which is much faster than
+        #       rsync -a --delete, but I am not sure if we can use it on
+        #       all HPC resources
+        empty_folder = "/tmp/{}".format(next(tempfile._get_candidate_names()))
+        results_dir_items = os.listdir(env.tmp_results_path)
+        for results_dir_item in results_dir_items:
+            run(template("mkdir %s && "
+                         "mkdir -p %s/results &&"
+                         "rsync -a --delete %s/  %s/results/%s/"
+                         % (
+                             empty_folder, env.work_path,
+                             empty_folder, env.work_path, results_dir_item)
+                         ))
+
+    rsyc_src_dst_folders = []
+    rsyc_src_dst_folders.append((env.tmp_scripts_path, env.scripts_path))
+    rsyc_src_dst_folders.append((env.tmp_results_path, env.results_path))
+
+    for sync_src, sync_dst in rsyc_src_dst_folders:
+        if env.manual_sshpass:
+            # TODO: maybe the better option here is to overwrite the
+            #       rsync_project
+            local(
+                template("rsync -pthrvz \
+                    --rsh='sshpass -p $sshpass ssh  -p 22  ' \
+                    %s/ $username@$remote:%s/ " % (sync_src, sync_dst)
+                         )
+            )
+        elif env.manual_gsissh:
+            # TODO: implement prevent_results_overwrite for this option
+            local(
+                template(
+                    "globus-url-copy -p 10 -cd -r -sync \
+                    file://%s/ \
+                    gsiftp://$remote/%s/" % (sync_src, sync_dst)
+                )
+            )
+        else:
+            rsync_project(
+                local_dir=sync_src + '/',
+                remote_dir=sync_dst
+            )
+
+
+def job_preparation(*job_args):
+    """
+    here, all job folders and scripts will be created in the temporary folder
+        <tmp_folder>/{results,scripts}
+    later, in job_transmission, we transfer all these files and folders with
+    a single rsync command.
+    This approach will helps us to reduce the number of SSH connection and
+    improve the stability of job submission workflow which can be compromised
+    by high parallel SSH connection
+    """
+
+    args = {}
+    for adict in job_args:
+        args = dict(args, **adict)
+
+    if 'label' in args:
+        env.label = args['label']
+    else:
+        env.label = ''
+
+    return_job_scripts = []
+    for i in range(1, int(env.replicas) + 1):
+
+        env.job_results, env.job_results_local = with_template_job(
+            ensemble_mode=env.ensemble_mode,
+            label=env.label
+        )
+
+        if int(env.replicas) > 1:
+            if env.ensemble_mode is False:
+                env.job_results += '_replica_' + str(i)
+            else:
+                env.job_results += '_' + str(i)
+
+        tmp_job_results = env.job_results.replace(env.results_path,
+                                                  env.tmp_results_path)
+
+        env['job_name'] = env.name[0:env.max_job_name_chars]
+        complete_environment()
+
+        env.run_command = template(env.run_command)
+
+        if env.label not in ['PJ_PYheader', 'PJ_header']:
+            env.run_prefix += "\n\n" \
+                "# copy files from config folder\n" \
+                "config_dir=%s\n" \
+                "rsync -pthrvz --exclude SWEEP $config_dir/* ." % (
+                    env.job_config_path)
+
+        if env.ensemble_mode:
+            env.run_prefix += "\n\n"\
+                "# copy files from SWEEP folder\n"\
+                "rsync -pthrvz $config_dir/SWEEP/%s/ ." % (
+                    env.label
+                )
+
+        if not (hasattr(env, 'venv') and env.venv.lower() == 'true'):
+            if hasattr(env, 'py_pkg') and len(env.py_pkg) > 0:
+                env.run_prefix += "\n\n"\
+                    "# Install requested python packages\n"\
+                    "pip install --user --upgrade %s" % (
+                        ' '.join(pkg for pkg in env.py_pkg)
+                    )
+
+        # this is a tricky situation,
+        # in case of ensemble runs, or simple job, we need to add env.label
+        # to generated job script name,
+        # however, for PJ_PYheader and PJ_header header script, nothing should
+        # be added at the end of script file name, so, here we pass a empty
+        # string as label
+        if (hasattr(env, 'NoEnvScript') and env.NoEnvScript):
+            tmp_job_script = script_templates(
+                env.batch_header
+            )
+        else:
+            tmp_job_script = script_templates(
+                env.batch_header,
+                env.script
+            )
+
+        # Separate base from extension
+        base, extension = os.path.splitext(env.pather.basename(tmp_job_script))
+        # Initial new name if we have replicas or ensemble
+
+        if int(env.replicas) > 1:
+            if env.ensemble_mode is False:
+                dst_script_name = base + '_replica_' + str(i) + extension
+            else:
+                dst_script_name = base + '_' + str(i) + extension
+        else:
+            dst_script_name = base + extension
+
+        dst_job_script = env.pather.join(env.tmp_scripts_path, dst_script_name)
+
+        # Add target job script to return list
+
+        '''
+        return_job_scripts.append(env.pather.join(env.scripts_path,
+                                               dst_script_name)
+        '''
+        # here, instead of returning PATH to script folder, it is better to
+        # submit script from results_path folder, specially in case of PJ job
+        return_job_scripts.append(env.pather.join(env.job_results,
+                                                  dst_script_name)
+                                  )
+
+        copy(tmp_job_script, dst_job_script)
+        # chmod +x dst_job_script
+        os.chmod(dst_job_script, 0o755)
+
+        os.makedirs(tmp_job_results)
+        copy(dst_job_script, env.pather.join(tmp_job_results,
+                                             dst_script_name))
+
+        # TODO: these env variables are not used anywhere
+        # TODO: maybe it is better to remove them
+        # job_name_template_sh
+        # job_results_contents
+        # job_results_contents_local
+        with open(env.pather.join(tmp_job_results, 'env.yml'), 'w')\
+                as env_yml_file:
+            yaml.dump(dict(env, **{"sshpass": None,
+                                   "passwords": None,
+                                   "password": None,
+                                   "sweepdir_items": None}
+                           ),
+                      env_yml_file,
+                      default_flow_style=False
+                      )
+
+    return return_job_scripts
 
 
 @task
@@ -861,7 +939,11 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
                but the parameter 'script' was not specified.")
         sys.exit()
 
-    with_config(config)
+    # check if with_config function is already called or not
+    if not hasattr(env, 'job_config_path'):
+        raise RuntimeError('Function with_config did NOT called, '
+                           'Please call it before calling run_ensemble()')
+        # sys.exit()
 
     # check for PilotJob option
     if(hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
@@ -870,15 +952,20 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
         env.submit_job = False
         env.batch_header = "bash_header"
 
-    # number of runs performed in this sweep
-    sweep_length = 0
-
     if sweep_on_remote is False:
         sweepdir_items = os.listdir(sweep_dir)
     else:
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
         sweepdir_items = run("ls -1 %s" % (sweep_dir)).splitlines()
+
+    if len(sweepdir_items) == 0:
+        print(
+            "ERROR: no files where found in the sweep_dir of this\
+            run_ensemble command."
+        )
+        print("Sweep dir location: %s" % (sweep_dir))
+        sys.exit()
 
     # reorder an exec_first item for priority execution.
     if(hasattr(env, 'exec_first')):
@@ -887,62 +974,44 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
                 sweepdir_items.index(
                     env.exec_first)))
 
-    atp = base.AsyncThreadingPool.ATP(ncpu=int(env.nb_thread))
+    if execute_put_configs is True:
+        with hide('everything'):
+            execute(put_configs, config)
 
-    for item in sweepdir_items:
+    # output['everything'] = False
+    job_scripts_to_submit = job(dict(ensemble_mode=True,
+                                     sweepdir_items=sweepdir_items,
+                                     sweep_dir=sweep_dir)
+                                )
 
-        item_isdir = False
-        if sweep_on_remote is False:
-            item_isdir = os.path.isdir(os.path.join(sweep_dir, item))
-        else:
-            # os.path.isdir is not working for remote machines,
-            # so, we use exists function from fabric.contrib.files
-            item_isdir = exists(os.path.join(sweep_dir, item))
+    if (hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
+        print_msg_box(msg="NOW, we submit PJ jobs")
 
-        if item_isdir:
-            sweep_length += 1
+        # first, add all generated tasks script to PJ_PY
+        submitted_jobs_list = []
+        if not hasattr(env, 'task_model'):
+            env.task_model = 'default'
+        # Python's indexes start at zero, to start from 1, set start=1
+        for index, job_script in enumerate(job_scripts_to_submit, start=1):
+            # TODO: this loop should be improved
+            env.idsID = index
+            env.idsPath = job_script
+            submitted_jobs_list.append(
+                script_template_content('qcg-PJ-task-template')
+            )
+        env.submitted_jobs_list = "\n".join(submitted_jobs_list)
 
-            # It's only necessary to do that for the first iteration
-            # The first iteration will create folders to the remote and launch
-            # sequentialy the first job
-            if sweep_length == 1:
-                # prevent execute put_config if it is already did before
-                # calling run_ensemble function
-                if execute_put_configs is True:
-                    execute(put_configs, config)
-                job(sweep_length, dict(ensemble_mode=True,
-                                       label=item))
-
-            # All the other iteration will launch parallel jobs
-            else:
-                print(" Start multi threading job")
-                atp.run_job(jobID=sweep_length, handler=job,
-                            args=(sweep_length,
-                                  dict(ensemble_mode=True,
-                                       label=item)))
-
-    # Wait for all jobs to be done
-    atp.awaitJobOver()
-    atp.shutdownThreads()
-
-    if sweep_length == 0:
-        print(
-            "ERROR: no files where found in the sweep_dir of this\
-            run_ensemble command."
-        )
-        print("Sweep dir location: %s" % (sweep_dir))
-
-    elif (hasattr(env, 'PJ') and env.PJ.lower() == 'true'):
         # to avoid apply replicas functionality on PilotJob folders
-        env.replicas = 1
+        env.replicas = '1'
         backup_header = env.batch_header
-        env.submitted_jobs_list = "\n".join(
-            [str(i) for i in env.submitted_jobs_list])
         env.batch_header = env.PJ_PYheader
-        job(dict(label='PJ_PYheader', NoEnvScript=True), args)
-        env.PJ_PATH = env.pather.join(
-            env.job_results, env.pather.basename(env.job_script))
-        env.PJ_FileName = env.pather.basename(env.job_script)
+        job_scripts_to_submit = job(dict(ensemble_mode=False,
+                                         label='PJ_PYheader',
+                                         NoEnvScript=True)
+                                    )
+
+        env.PJ_PATH = job_scripts_to_submit[0]
+        env.PJ_FileName = env.pather.basename(env.PJ_PATH)
         env.batch_header = env.PJ_header
         env.submit_job = True
         # load QCG-PJ-PY file
@@ -965,7 +1034,10 @@ def run_ensemble(config, sweep_dir, sweep_on_remote=False,
             PJ_CMD.append('python3 %s' % (env.PJ_PATH))
 
         env.run_QCG_PilotJob = "\n".join(PJ_CMD)
-        job(dict(label='PJ_header', NoEnvScript=True), args)
+        job(dict(ensemble_mode=False,
+                 label='PJ_header',
+                 NoEnvScript=True)
+            )
         env.batch_header = backup_header
         env.NoEnvScript = False
 
@@ -996,6 +1068,19 @@ def get_running_location(job=None):
     env.running_node = run(template("cat $job_results/env_details.asc"))
 
 
+def manual_sshpass(cmd):
+    commands = env.command_prefixes[:]
+    if env.get('cwd'):
+        commands.append("cd %s" % env.cwd)
+    commands.append(cmd)
+    manual_command = " && ".join(commands)
+    if not hasattr(env, "sshpass"):
+        raise ValueError("sshpass value did not set for this remote machine")
+        # sys.exit()
+    pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+    local(pre_cmd + "'" + manual_command + "'", capture=True)
+
+
 def manual(cmd):
     # From the fabric wiki, bypass fabric internal ssh control
     commands = env.command_prefixes[:]
@@ -1019,7 +1104,9 @@ def manual_gsissh(cmd):
 
 
 def run(cmd):
-    if env.manual_gsissh:
+    if env.manual_sshpass:
+        manual_sshpass(cmd)
+    elif env.manual_gsissh:
         manual_gsissh(cmd)
     elif env.manual_ssh:
         manual(cmd)
