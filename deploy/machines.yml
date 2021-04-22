@@ -334,7 +334,7 @@ eagle_vecma:
   batch_header: slurm-eagle
   budget: "vecma2020"
   # list of available partitions : sinfo --Format=partition
-  partition_name: "standard"
+  partition_name: "altair"
 
   # wall time in format days-hours:minutes:seconds
   job_wall_time : "0-0:30:00"
@@ -354,7 +354,7 @@ eagle_hidalgo:
   batch_header: slurm-eagle
   budget: "394"
   # list of available partitions : sinfo --Format=partition
-  partition_name: "standard"
+  partition_name: "altair"
   # wall time in format days-hours:minutes:seconds
   job_wall_time : "0-0:30:00"
 
