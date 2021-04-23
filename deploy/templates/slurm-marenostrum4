@@ -1,0 +1,24 @@
+#!/bin/bash
+## marenostrum4 - Barcelona Supercomputing Center
+
+## Number of nodes
+#SBATCH --nodes $nodes
+
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --ntasks-per-socket=$taskpersocket
+
+## wall time in format days-hours:minutes:seconds
+#SBATCH --time=$job_wall_time
+
+## stdout file
+#SBATCH --output=$job_results/JobID-%j.output
+
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
+
+## Memory limit per compute node for the job.
+## SBATCH --constraint=$memconfig_name
+
+## To request the queue for the job. If it is not specified, scheduler will use the user’s default queue
+#SBATCH --qos=$queue_name
+

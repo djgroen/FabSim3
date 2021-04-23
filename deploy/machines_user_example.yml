@@ -51,3 +51,14 @@ archer2:
   sshpass: "<ARCHER2-password>"
   manual_sshpass: true
   job_wall_time : "0-00:10:00"
+
+
+marenostrum4:
+  username: "pr1emk01"
+  fabric_dir: "FabSim3"
+  corespernode: 46
+  taskpersocket: 23
+  cores: 1
+  # list of available queue for the job : bsc_queues
+  queue_name: "debug" # or "bsc_case"
+  memconfig_name: "highmem" #"highmem"

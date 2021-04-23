@@ -443,3 +443,18 @@ archer2:
   # in ARCHER2, there is not access to /home on compute side
   home_path_template: "/work/$project/$project/$username"   
 
+marenostrum4:
+  <<: *Eagle_Default_Config
+  <<: *QCG_PilotJob
+
+  remote: "mn1.bsc.es"
+  batch_header: slurm-marenostrum4
+
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python/3.8.2"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]
