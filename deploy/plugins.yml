@@ -32,3 +32,6 @@ FabCovid19:
 
 FabCovidsim:
   repository: https://github.com/arabnejad/FabCovidsim
+
+FabAlya:
+  repository: https://github.com/alfonsostg/FabAlya
