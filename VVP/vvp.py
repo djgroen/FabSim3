@@ -5,7 +5,8 @@
 import os
 from collections import OrderedDict
 from pprint import pprint
-
+import numpy as np
+import scipy
 """
 validate_ensemble_output Validation Pattern.
 
@@ -31,6 +32,98 @@ SPECS of the aggregation_function:
 - Returns a data type that represents the compound validation outcome
   (.e.g, one or more error scores).
 """
+
+
+def ensemble_vvp_QoI(simulation_result_QoI,
+                     uncertainty_result_QoI,
+                     QoI_name
+                     ):
+    """
+    Arguments:
+    ----------
+    - simulation_result_QoI:
+            Experimental QoI data.
+    - load_QoIs_function:
+            QoI data with uncertainty from the validation data.
+    - similarity_measure:
+            Name of similarity measure to be applied
+            supported functions are :
+                    1) Jensen-Shannon divergence
+                    2) Renyi divergence
+                    3) Cosine distance
+                    4) Euclidean distance
+                    5) Kullback-Leibler divergence
+
+    returns: a dictionary with the following structure
+
+    {
+        "similarity measure function name ":
+        {
+            "QoI_name" : [similarity measure function results]
+        }
+    }
+
+
+    Author: Hamid Arabnejad
+    """
+    simulation_result_QoI = np.array(simulation_result_QoI)
+    uncertainty_result_QoI = np.array(uncertainty_result_QoI)
+
+    if simulation_result_QoI.shape != uncertainty_result_QoI.shape:
+        raise RuntimeError("The dimension of two input array are not equal !")
+
+    if simulation_result_QoI.ndim == 1:
+        simulation_result_QoI = np.array([simulation_result_QoI])
+    if uncertainty_result_QoI.ndim == 1:
+        uncertainty_result_QoI = np.array([uncertainty_result_QoI])
+
+    similarity_measure_results = {}
+
+    for simulation_result, uncertainty_result in zip(simulation_result_QoI,
+                                                     uncertainty_result_QoI
+                                                     ):
+        # calculate Jensen-Shannon Divergence
+        measure_name = "Jensen-Shannon Divergence"
+        if measure_name not in similarity_measure_results:
+            similarity_measure_results.update({measure_name: {}})
+            similarity_measure_results[measure_name].update({QoI_name: []})
+
+        res = jensen_shannon_divergence(simulation_result, uncertainty_result)
+        similarity_measure_results[measure_name][QoI_name].append(res)
+
+        # calculate Cosine Similarity
+        measure_name = "Cosine similarity"
+        if measure_name not in similarity_measure_results:
+            similarity_measure_results.update({measure_name: {}})
+            similarity_measure_results[measure_name].update({QoI_name: []})
+        res = cosine_similarity(simulation_result, uncertainty_result)
+        similarity_measure_results[measure_name][QoI_name].append(res)
+
+        # calculate KL divergence
+        measure_name = "KL divergence"
+        if measure_name not in similarity_measure_results:
+            similarity_measure_results.update({measure_name: {}})
+            similarity_measure_results[measure_name].update({QoI_name: []})
+        res = kl_divergence(simulation_result, uncertainty_result)
+        similarity_measure_results[measure_name][QoI_name].append(res)
+
+        # calculate Renyi Divergence
+        measure_name = "Renyi Divergence"
+        if measure_name not in similarity_measure_results:
+            similarity_measure_results.update({measure_name: {}})
+            similarity_measure_results[measure_name].update({QoI_name: []})
+        res = renyi_divergence(simulation_result, uncertainty_result)
+        similarity_measure_results[measure_name][QoI_name].append(res)
+
+        # calculate Euclidean Distance
+        measure_name = "Euclidean Distance"
+        if measure_name not in similarity_measure_results:
+            similarity_measure_results.update({measure_name: {}})
+            similarity_measure_results[measure_name].update({QoI_name: []})
+        res = euclidean_distance(simulation_result, uncertainty_result)
+        similarity_measure_results[measure_name][QoI_name].append(res)
+
+    return similarity_measure_results
 
 
 def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
@@ -165,3 +258,63 @@ def ensemble_vvp(results_dirs, sample_testing_function,
         })
 
     return ensemble_vvp_results
+
+
+def jensen_shannon_divergence(list1, list2):
+    """Calculates Jenson-Shannon Distance """
+
+    # convert the vectors into numpy arrays in case that they aren't
+    list1 = np.array(list1)
+    list2 = np.array(list2)
+    # calculate average
+    avg_lists = (list1 + list2) / 2
+    # compute Jensen Shannon Divergence
+    sim = 1 - 0.5 * (scipy.stats.entropy(list1, avg_lists) +
+                     scipy.stats.entropy(list2, avg_lists)
+                     )
+    if np.isinf(sim):
+        # the similarity is -inf if no term in the document is in the
+        # vocabulary
+        return 0
+    return sim
+
+
+def cosine_similarity(list1, list2):
+    """Calculates cosine similarity."""
+    if list1 is None or list2 is None:
+        return 0
+    assert not (np.isnan(list2).any() or np.isinf(list2).any())
+    assert not (np.isnan(list1).any() or np.isinf(list1).any())
+    sim = 1 - scipy.spatial.distance.cosine(list1, list2)
+    if np.isnan(sim):
+        # the similarity is nan if no term in the document is in the vocabulary
+        return 0
+    return sim
+
+
+def kl_divergence(list1, list2):
+    """Calculates Kullback-Leibler divergence."""
+    sim = scipy.stats.entropy(list1, list2)
+    return sim
+
+
+def renyi_divergence(list1, list2, alpha=0.99):
+    """Calculates Renyi divergence."""
+    log_sum = np.sum(
+        [np.power(p, alpha) / np.power(q, alpha - 1)
+         for (p, q) in zip(list1, list2)]
+    )
+    sim = 1 / (alpha - 1) * np.log(log_sum)
+    if np.isinf(sim):
+        # the similarity is -inf if no term in the document is in the
+        # vocabulary
+        return 0
+    return sim
+
+
+def euclidean_distance(list1, list2):
+    """Calculates Euclidean distance."""
+    sim = np.sqrt(
+        np.sum([np.power(p - q, 2) for (p, q) in zip(list1, list2)])
+    )
+    return sim
