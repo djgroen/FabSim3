@@ -5,13 +5,17 @@ import argparse
 
 def install(package):
     print("Trying to Install required module: %s" % (package))
-    os.system('python3 -m pip install --user %s' % (package))
+    if bool(os.environ.get("VIRTUAL_ENV")) is True:
+        os.system('python3 -m pip install  %s' % (package))
+    else:
+        os.system('python3 -m pip install --user %s' % (package))
 
 
 def get_version(package):
     package = package.lower()
     return next((pkg.version for pkg in pkg_resources.working_set
                  if pkg.project_name.lower() == package), "No match")
+
 
 required = ['ruamel.yaml',
             'numpy',
