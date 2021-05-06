@@ -1,7 +1,11 @@
 FabSim
 ======
 
+<!---
 [![Build Status](https://travis-ci.com/djgroen/FabSim3.svg?branch=master)](https://travis-ci.com/djgroen/FabSim3)
+-->
+
+[![Run Tests](https://github.com/djgroen/FabSim3/actions/workflows/Pytests.yml/badge.svg?branch=master)](https://github.com/djgroen/FabSim3/actions/workflows/Pytests.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vecmafabsim3/fabsimdocker.svg)](https://hub.docker.com/r/vecmafabsim3/fabsimdocker/)
 [![Docker Pulls](https://img.shields.io/docker/automated/vecmafabsim3/fabsimdocker.svg)](https://hub.docker.com/r/vecmafabsim3/fabsimdocker/)
 
