@@ -1,4 +1,5 @@
 from multiprocessing import Pool, cpu_count, current_process, Process, Manager
+from multiprocessing import set_start_method
 import os
 import sys
 import traceback
@@ -35,6 +36,7 @@ class MultiProcessingPool:
     """
 
     def __init__(self, PoolSize=1):
+        set_start_method("fork")
         # to be a little more stable : use one less process maximum
         self.PoolSize = PoolSize if PoolSize < cpu_count() else cpu_count() - 1
         self.Pool = Pool(processes=self.PoolSize,
