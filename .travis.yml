@@ -1,44 +1,49 @@
-matrix:
+language: python
+# ===== Linux ======
+os: linux
+python:
+  - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
+jobs:
   include:
-    - stage: testing
-      language: python
-      python:
-        - "3.6"
-      install:
-        - pip install -r requirements.txt
-        - sed "s/your-username/`whoami`/g" <<< cat deploy/machines_user_example.yml > deploy/machines_user.yml
-        - rm -f ~/.ssh/id_rsa
-        - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-        - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-        - chmod og-wx ~/.ssh/authorized_keys
-        - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-        - fab localhost install_plugin:FabDummy
-      script:
-        - python -m pytest --log-cli-level=10 tests/
-        # - py.test --pep8 base/ --ignore=E501
-        - py.test --pep8 base/ deploy/ lib/ UQP/ VVP/
+    # ======= OSX ========
+    - name: "Python 3.7 on macOS"
+      os: osx
+      osx_image: xcode11.4
+      language: shell
 
-    - stage: building docker image
-      sudo: required
-      services:
-      - docker
-      env:
-        - secure: "ZDc5fEn36vq1iIrzWtWdQf7LcijIkBuuBwIanzuXjVhfV9IGEallKvHoD5y9+p/5Q+qrBLsUKUOjv6KsM6ukhxD7h+YDW0lSbYu88BjmXnCBeuVEDRN9g4sluvC4nEE1pU9Ip+WFM83sXLt+x//ZskhEnWR8rC8IXBdFbF2ADk8uSaj1UruMs5N40pOqMnsRJjvIeczOkn81MpsUjkS1nBSKayhThme1nmW0bIvC4w16dcjy18YuiOEvTj3XAJ9Fm4MKgyuKGyJ8hiy8VVmhJD9n/mQF6oeAswERiiaKQUEOqnPljqDeilEWHxHmYGnocpa70YgcBJhkVxicO2Vv1ab6n0kG4CGfCrNe3YqIssoVTOPiY2rDA0Tl9dPnJTAwQgVDUWe7LrcStb2hKbzynxiFasVPjHkfpSepiTr2DcOpadqyjuHdExwlo7vYjo1p1uVxxKYPa71/3cVeR40nMSN7YLY95IxydgKq+ZTfBkzsJR+FkqZD/fFr9c2EQ9O7RCQIocmiRXZKHjwP5JnNjmdUJkrm5bRzbn2Qeqo1IZzn3wiEPxwoA7EdZqG8qeoCmprwVKj2d/1ojcMxU9fQA4UKZmFoqO7JpruCz0czBAfNGRbvDLfW65lZBfpEYKm1pc+pU4GHIeOrTI+8pphykZWAv1ZiB5cD7AYP95xKQX4="
+    - name: "Python 3.8 on macOS"
+      os: osx
+      osx_image: xcode11.6
+      language: shell
 
-        - secure: "j+XMmpYPpj4ZdQGuVSgDaFFKLVDG2JKYtd6ZI49k7fzO4AcOUhRXJQzsvSOB/SBwJ1Blj0xhHwB2fJTPIrzRxhuS74dKVBBnXV80A1jhf8QtYt4nvD36rM6umVUqeIw7T1sxIpqYUEqFf7yrMiw3xBU66UbjhsZXOFHX536Vgrl2Rkkn0MpJJe4SM0kncOJLkkG/KgoZ/mHjylwmJlCGzFDQjwgHd5DrEIRNEfs47lLyPhsae3jSTJj06nKOEgWH0OxFwbmLSSWS4Sd+pGR0Jusvrfl3nuFOYinTpZYT32fLRtCkKUEumg1TApkndoAvvKNp2sBnA26PyltMBvHBJUjFFtn7N70umNGRrgoAz5hGFoLKlW9mY4ArNfkr4RpajXo2oXtjc6DseX8rdOyDvijh3vexekWj/P4jEQmYO80Fbkl0R0IbWon8BYZDPKeJntOPsrVBWy46UoJcmwt2yVr7M7H81e9VbFUheCA6ZShazCjRx+V9Hev7Dfnh2koN6M3PxBgTgfXgLfZngbodUovCkqRzyPTFGox2RSimvBADZb7eU+uIjmxk+yfQc+bBOkgb4SCacGCFwEO28zMhrHxID9jUFh8sJgXUsBqPzZMVoGd6m8/xVAw/A/Xe3YIdn9ZgFcEcB9BKixNzPNrVS0IHDfLlRV37jbn23NfbSMQ="
+    - name: "Python 3.9 on macOS"
+      os: osx
+      osx_image: xcode12.2
+      language: shell
 
-      before_script:
-      - docker pull vecmafabsim3/fabsimdocker || true
-      script:
-      - docker build --pull --cache-from vecmafabsim3/fabsimdocker --tag vecmafabsim3/fabsimdocker .
-      #- docker build --pull --tag vecmafabsim3/fabsimdocker .
-      - docker run vecmafabsim3/fabsimdocker
-      after_script:
-      - docker images
-      before_deploy:
-      - docker login -u $DOCKER_USER -p $DOCKER_PASS
-      deploy:
-        provider: script
-        script: docker push vecmafabsim3/fabsimdocker
-        on:
-          branch: master
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    export PATH=$PATH:/Users/travis/Library/Python/$PYTHON/bin;
+    fi 
+  - python3 --version
+  - python --version
+  - echo $PATH
+  - alias python='python3'
+  - python3 -m pip install --upgrade pip
+  - python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8
+install:
+  - rm -f ~/.ssh/id_rsa
+  - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  - chmod og-wx ~/.ssh/authorized_keys
+  - ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+  - python3 configure_fabsim.py  --bashrc_update=False 
+  - pip freeze  
+  - fab localhost install_plugin:FabDummy
+
+script:
+  - python3 -m pytest --log-cli-level=10 tests/
+  - pytest --pep8  base/ deploy/ lib/ UQP/ VVP/
