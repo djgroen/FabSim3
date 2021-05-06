@@ -1,0 +1,79 @@
+name: Run Tests
+
+on:
+  push:
+  pull_request:
+    branches: ["master"]   
+
+env:
+  PY_COLORS: 1
+
+  
+jobs:
+  build:
+    name: Python ${{ matrix.python-version }}  ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:        
+        os: [ "ubuntu-latest", "macOS-latest" ]
+        python-version: [ "3.6", "3.7", "3.8", "3.9" ]
+
+    steps:
+      - name: Checkout  🛎️
+        uses: "actions/checkout@v2"    
+
+      - name: Set up Python ${{ matrix.python-version }}  🐍
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+
+
+      - name: Setup SSH  🔧
+        run: |
+          mkdir -p ~/.ssh
+          rm -f ~/.ssh/id_rsa || true
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            chmod g-w ~/.ssh
+            chmod o-w ~/.ssh
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            chmod g-w $HOME
+            chmod o-w $HOME          
+          fi
+
+          ssh-keygen -t rsa -b 4096 -C "$(whoami)@localhost" -f ~/.ssh/id_rsa
+          cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+          chmod og-wx ~/.ssh/authorized_keys
+          ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+          cat ~/.ssh/authorized_keys
+
+      - name: Install Python Dependencies  📥
+        run: |
+          python3 -m pip install --upgrade pip      
+          python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout
+          python3 --version
+          python --version
+
+      - name: Setup FabSim3  🚦🚦🚦
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin;
+              export PATH=$PATH:/Users/runner/.local/bin;
+              sw_vers
+              which ssh-copy-id           
+          fi
+
+          python3 configure_fabsim.py  --bashrc_update=False
+          pip freeze
+          fab localhost install_plugin:FabDummy
+
+      - name: Test with pytest 🚀
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin;
+              export PATH=$PATH:/Users/runner/.local/bin;
+          fi        
+          python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
+          pytest --pep8  base/ deploy/ lib/ UQP/ VVP/
+
