@@ -28,12 +28,29 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: System Info  💻
+        run: |
+          python -c "from multiprocessing import cpu_count ; print('cpu_count={}'.format(cpu_count()))"
 
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              echo "***************************"
+              system_profiler SPHardwareDataType
+              echo "***************************"
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+              echo "***************************"          
+              lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
+              lshw -short -C memory
+              echo "***************************"
+          fi
 
-      - name: Setup SSH  🔧
+          python3 --version
+          python --version
+
+      - name: Setup SSH  🔐
         run: |
           mkdir -p ~/.ssh
           rm -f ~/.ssh/id_rsa || true
+
           if [ "$RUNNER_OS" == "macOS" ]; then
             chmod g-w ~/.ssh
             chmod o-w ~/.ssh
@@ -52,8 +69,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip      
           python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout
-          python3 --version
-          python --version
 
       - name: Setup FabSim3  🚦🚦🚦
         run: |
@@ -65,8 +80,9 @@ jobs:
           fi
 
           python3 configure_fabsim.py  --bashrc_update=False
-          pip freeze
           fab localhost install_plugin:FabDummy
+
+          pip freeze
 
       - name: Test with pytest 🚀
         run: |
