@@ -145,9 +145,7 @@ To fix this issue, you need to add the executable path of ``fab`` to your system
 
 
 
-.. note :: If you are having a problem which is not listed here, please raise a github issue in FabSim3 repository, and provide a full output log, so we can have a look and make a suggestions.
-
-
+.. note :: If you are having a problem which is not listed here, please raise a `github issue <https://github.com/djgroen/FabSim3/issues/new/choose>`_ in FabSim3 repository, and provide a full output log, so we can have a look and make a suggestions.
 
 
 List available commands
