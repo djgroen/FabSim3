@@ -21,3 +21,5 @@ tmp_app/
 localhost_exe/
 
 deploy/applications_user.yml
+
+*_build*/
