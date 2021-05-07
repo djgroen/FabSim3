@@ -111,6 +111,45 @@ The easiest way to test FabSim3 is to simply go to the base directory of your Fa
 Mac users may get a 
 ``ssh: connect to host localhost port 22: Connection refused`` error. This means you must enable remote login. This is done in ``System Preferences > Sharing > Remote Login``.
 
+
+FileNotFoundError: [Errno 2] No such file or directory: 'fab': 'fab'
+--------------------------------------------------------------------
+It is possible that your python bin path directory is not in the system ``PATH``. You may see a ``WARNING`` message during the FabSim3 installation (by executing ``python3 configure_fabsim.py`` command). Here an example :
+
+.. code:: console
+
+      WARNING: The script fab is installed in '<---->/Python/3.<xxx>/bin' which is not on PATH.
+      Consider adding this directory to PATH or, 
+      if you prefer to suppress this warning, use --no-warn-script-location.
+
+      Traceback (most recent call last):
+      File "configure_fabsim.py", line 189, in <module>
+        main()
+      File "configure_fabsim.py", line 148, in main
+        cwd=FS3_env.FabSim3_PATH) == 0
+      File "<---->/python3..<xxx>/subprocess.py", line 339, in call
+        with Popen(*popenargs, **kwargs) as p:
+      File "<---->/python3..<xxx>/subprocess.py", line 800, in __init__
+        restore_signals, start_new_session)
+      File "<---->/python3..<xxx>/subprocess.py", line 1551, in _execute_child
+        raise child_exception_type(errno_num, err_msg, err_filename)
+    FileNotFoundError: [Errno 2] No such file or directory: 'fab': 'fab'
+
+
+To fix this issue, you need to add the executable path of ``fab`` to your system ``PATH`` environment variable. To make this update permanent, please to to you ``bash`` file which could be ``.bash_profile``, ``.bashrc``, or ``.zshrc`` depends on your OS and shell version, and add these line at the end. Please make sure that you used the same executable path for ``fab`` as it mentioned in the warning message
+
+
+.. code:: bash
+
+    export PATH=$PATH:<fab_executable_PATH>
+
+
+
+.. note :: If you are having a problem which is not listed here, please raise a github issue in FabSim3 repository, and provide a full output log, so we can have a look and make a suggestions.
+
+
+
+
 List available commands
 =======================
 
