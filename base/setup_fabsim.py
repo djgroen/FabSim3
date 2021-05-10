@@ -1,7 +1,9 @@
 from deploy.templates import *
 from deploy.machines import *
 from fabric.contrib.project import *
-from os import path
+from os import path, rename
+import random
+import string
 
 
 @task
@@ -17,8 +19,31 @@ def install_plugin(name, branch=None):
                        )
     info = config[name]
     plugin_dir = "%s/plugins" % (env.localroot)
+
+    # check if the requested pluging is already installed or not
+    # if it is already installed, rename the current pluging directory and
+    # warn user
+    print("plugin_dir = {}".format(plugin_dir))
+    print("check dir : {}/{}".format(plugin_dir, name))
+    if path.exists("{}/{}".format(plugin_dir, name)):
+        # generating random strings
+        N = 5
+        res = "".join(random.choices(string.ascii_uppercase +
+                                     string.digits, k=N))
+        rename(
+            "{}/{}".format(plugin_dir, name),
+            "{}/{}_{}".format(plugin_dir, name, res)
+        )
+        print_msg_box(
+            title="WARNNING",
+            msg="The {} plugin directory is already exists\n"
+            "To keep your previous folder, we rename it to : {}_{}".format(
+                name, name, res)
+        )
+
     local("mkdir -p %s" % (plugin_dir))
     local("rm -rf %s/%s" % (plugin_dir, name))
+
     if branch is None:
         local("git clone %s %s/%s" % (info["repository"],
                                       plugin_dir,
