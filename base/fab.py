@@ -310,7 +310,7 @@ def put_results(name=''):
 
 
 @task
-def fetch_results(name='', regex='', debug=False):
+def fetch_results(name='', regex='', files=None, debug=False):
     """
     Fetch results of remote jobs to local result store. Specify a job
     name to transfer just one job. Local path to store results is
@@ -322,30 +322,43 @@ def fetch_results(name='', regex='', debug=False):
 
     if debug:
         pp.pprint(env)
+
+    fetch_files = []
+    if files is not None:
+        fetch_files = files.split(';')
+    includes_files = ""
+    if len(fetch_files) > 0:
+        includes_files = " ".join([
+            *["--include='*/' "],
+            *["--include='{}' ".format(file) for file in fetch_files],
+            *["--exclude='*'  "],
+            *["--prune-empty-dirs "]
+        ])
+
     env.job_results, env.job_results_local = with_job(name)
     if env.manual_sshpass:
         local(
             template(
-                "rsync -pthrvz -e 'sshpass -p $sshpass ssh -p $port' \
-                $username@$remote:$job_results/%s \
-                $job_results_local" % regex
+                "rsync -pthrvz -e 'sshpass -p $sshpass ssh -p $port' {}"
+                "$username@$remote:$job_results/{}  "
+                "$job_results_local".format(includes_files, regex)
             )
         )
     elif env.manual_gsissh:
         local(
             template(
-                "globus-url-copy -cd -r -sync \
-                gsiftp://$remote/$job_results/%s \
-                file://$job_results_local/" % regex
+                "globus-url-copy -cd -r -sync {}"
+                "gsiftp://$remote/$job_results/{} "
+                "file://$job_results_local/".format(includes_files, regex)
             )
         )
     else:
         local(
             template(
                 # "rsync -pthrvz --port=$port \
-                "rsync -pthrvz -e 'ssh -p $port' \
-                $username@$remote:$job_results/%s \
-                $job_results_local" % regex
+                "rsync -pthrvz -e 'ssh -p $port' {}"
+                "$username@$remote:$job_results/{} "
+                "$job_results_local".format(includes_files, regex)
             )
         )
 
