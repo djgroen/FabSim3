@@ -204,6 +204,7 @@ def add_plugin_environment_variable(plugin_name):
                               Loader=yaml.SafeLoader
                               )
 
+    user_config.update(plugin_config)
     # only update environment variable based on plugin_machines_user yaml file
     old_env = my_deepcopy(env)
     if "import" in config[machine_name]:
