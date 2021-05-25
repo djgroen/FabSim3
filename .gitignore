@@ -1,12 +1,12 @@
-deploy/machines_user.yml
+fabsim/deploy/machines_user.yml
 
 base/__pycache__/
 
-deploy/\.jobscripts/
+fabsim/deploy/\.jobscripts/
 
-deploy/\.jobsDB/
+fabsim/deploy/\.jobsDB/
 
-deploy/__pycache__/
+fabsim/deploy/__pycache__/
 
 __pycache__/
 
@@ -20,6 +20,6 @@ tmp_app/
 
 localhost_exe/
 
-deploy/applications_user.yml
+fabsim/deploy/applications_user.yml
 
 *_build*/
