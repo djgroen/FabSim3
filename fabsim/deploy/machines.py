@@ -80,7 +80,8 @@ try:
 except FileNotFoundError:
     print("There is not machines_user.yml under fabsim/deploy folder!!!\n")
     user_config = yaml.load(
-        open(os.path.join(env.fabsim_root, "deploy", "machines_user_example.yml")),
+        open(os.path.join(env.fabsim_root, "deploy",
+                          "machines_user_example.yml")),
         Loader=yaml.SafeLoader,
     )
 
