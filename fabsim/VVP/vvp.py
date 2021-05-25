@@ -172,7 +172,8 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
 
     !!! tip
         - to see how  input functions should be defined for your app, please
-        look at the implemented examples in [FabFlee repo](https://github.com/djgroen/FabFlee/blob/master/VVP/flee_vvp.py#L752)
+        look at the implemented examples in [FabFlee repo]
+        (https://github.com/djgroen/FabFlee/blob/master/VVP/flee_vvp.py#L752)
 
     Author: Hamid Arabnejad
     """
