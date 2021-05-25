@@ -39,29 +39,31 @@ def ensemble_vvp_QoI(simulation_result_QoI,
                      QoI_name
                      ):
     """
-    Arguments:
-    ----------
-    - simulation_result_QoI:
-            Experimental QoI data.
-    - load_QoIs_function:
-            QoI data with uncertainty from the validation data.
-    - similarity_measure:
-            Name of similarity measure to be applied
-            supported functions are :
-                    1) Jensen-Shannon divergence
-                    2) Renyi divergence
-                    3) Cosine distance
-                    4) Euclidean distance
-                    5) Kullback-Leibler divergence
 
-    returns: a dictionary with the following structure
+    The current supported similarity measure are:
+    * Jensen-Shannon divergence
+    * Renyi divergence
+    * Cosine distance
+    * Euclidean distance
+    * Kullback-Leibler divergence
 
-    {
-        "similarity measure function name ":
+    Args:
+        simulation_result_QoI : Experimental QoI data.
+        uncertainty_result_QoI : uncertainty QoI results
+        QoI_name : the name of QoI
+
+
+    Returns:
+        dic : returns a dictionary with the following structure:
+        ```json
         {
-            "QoI_name" : [similarity measure function results]
+            "similarity measure function name":
+            {
+                "QoI_name" : [similarity_measure_function_result]
+            }
         }
-    }
+        ```
+
 
 
     Author: Hamid Arabnejad
@@ -133,22 +135,44 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
 
     Arguments:
     ----------
-    - results_dirs_PATH:
+    - `results_dirs_PATH`:
             list of result dirs, one directory for each resolution and
             each one containing the same QoIs stored to disk
-    - load_QoIs_function:
+    - `load_QoIs_function`:
             a function which loads the QoIs from each subdirectory of
             the results_dirs_PATH.
-    - aggregation_function:
+    - `aggregation_function`:
             function to combine all results
-    - **kwargs:
+    - `**kwargs`:
             custom parameters. The 'items' parameter must be used to give
             explicit ordering of the various subdirectories, indicating
             the order of the refinement.
 
-    NOTE:
+    Returns:
+        dic: returns the results score in `dic` format.
+
+        The scores dict has this structure
+        ```python
+        result_dir_1_name:
+            order: <polynomial_order>
+            runs: <num_runs>
+            value:
+                vary_param_1: {<sobol_func_name>:<value>}
+                ...
+                vary_param_X: {<sobol_func_name>:<value>}
+        ...
+        result_dir_N_name:
+              order: <polynomial_order>
+              runs: <num_runs>
+              value:
+                    vary_param_1: {<sobol_func_name>:<value>}
+                    ...
+                    vary_param_X: {<sobol_func_name>:<value>}
+        ```
+
+    !!! tip
         - to see how  input functions should be defined for your app, please
-        look at the implemented examples in FabFlee repo
+        look at the implemented examples in [FabFlee repo](https://github.com/djgroen/FabFlee/blob/master/VVP/flee_vvp.py#L752)
 
     Author: Hamid Arabnejad
     """
@@ -210,14 +234,15 @@ def ensemble_vvp(results_dirs, sample_testing_function,
     """
     Goes through all the output directories and calculates the scores.
     Arguments:
-    - results_dirs: list of result dirs to analyse.
-    - sample_testing_function: analysis/validation/verification function to be
-    performed on each subdirectory of the results_dirs.
-    - aggregation_function: function to combine all results
-    - **kwargs: custom parameters. The 'items' parameter can be used to give
-    explicit ordering of the various subdirectories.
+    - `results_dirs`: list of result dirs to analyse.
+    - `sample_testing_function`: analysis/validation/verification function to
+        be performed on each subdirectory of the results_dirs.
+    - `aggregation_function`: function to combine all results
+    - `**kwargs` : custom parameters. The `items` parameter can be used to
+        give explicit ordering of the various subdirectories.
 
-    return : ensemble_vvp_results (dict)
+    Returns:
+        dict: ensemble_vvp_results
 
     Authors: Derek Groen, Wouter Edeling, and Hamid Arabnejad
     """

@@ -1,5 +1,5 @@
-from deploy.templates import *
-from deploy.machines import *
+from fabsim.deploy.templates import *
+from fabsim.deploy.machines import *
 from fabric.contrib.project import *
 import time
 

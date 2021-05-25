@@ -74,7 +74,7 @@ default:
   manual_sshpass: false
 
   # Default location for templates.
-  local_templates_path: ["$localroot/deploy/templates"]
+  local_templates_path: ["$fabsim_root/deploy/templates"]
 
   # Default command syntax for getting the job status.
   stat: "qstat -u $username"
@@ -86,12 +86,12 @@ default:
   lammps_args: ""
   
   # Default location for blackbox scripts. - OBSOLETE?
-  local_blackbox_path: ["$localroot/blackbox"]
+  local_blackbox_path: ["$fabsim_root/blackbox"]
   # Default location for Python scripts. - OBSOLETE?
-  local_python_path: ["$localroot/python"]
+  local_python_path: ["$fabsim_root/python"]
   
   # Default location for config_files.
-  local_config_file_path: ["$localroot/config_files"]
+  local_config_file_path: ["$fabsim_root/config_files"]
 
   # Default command for Python3
   python3_command: "python3"

@@ -12,17 +12,21 @@
 # with filenames like legion-hemelb (for a script used to
 # launch hemelb jobs on legion, or hector-unittest, for a script used to
 # launch unit-testing jobs on hector.)
-from fabric.api import *
+# from fabric.api import *
+from fabric.api import env, execute
 from string import Template
 import os
 import sys
 
 
 def script_templates(*names, **options):
-    commands = options.get('commands', [])
-    result = "\n".join([script_template_content(name)
-                        for name in names] + commands)
-    return script_template_save_temporary(result,)
+    commands = options.get("commands", [])
+    result = "\n".join(
+        [script_template_content(name) for name in names] + commands
+    )
+    return script_template_save_temporary(
+        result,
+    )
 
 
 def script_template_content(template_name):
@@ -34,19 +38,22 @@ def script_template_content(template_name):
     try:
         return template(source.read())
     except UnboundLocalError:
-        print("FabSim Error: could not find template file. \
+        raise UnboundLocalError(
+            "FabSim Error: could not find template file. \
             FabSim looked for it in the following directories: ",
-              env.local_templates_path)
+            env.local_templates_path,
+        )
 
 
 def script_template_save_temporary(content):
-    destname = os.path.join(env.localroot, 'deploy',
-                            '.jobscripts', env['name'])
+    destname = os.path.join(
+        env.fabsim_root, "deploy", ".jobscripts", env["name"]
+    )
 
-    if hasattr(env, 'label') and len(env.label) > 0:
-        destname += '_' + env.label
+    if hasattr(env, "label") and len(env.label) > 0:
+        destname += "_" + env.label
 
-    destname += '.sh'
+    destname += ".sh"
 
     # Support for multi-level directories in the configuration files.
     if not os.path.exists(os.path.dirname(destname)):
@@ -55,7 +62,7 @@ def script_template_save_temporary(content):
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-    target = open(destname, 'w')
+    target = open(destname, "w")
     target.write(content)
     return destname
 
@@ -84,16 +91,23 @@ def template(pattern, number_of_iterations=1):
             pattern = template
         return template
     except KeyError as err:
-        print("ORIGINAL PATTERN:\n\n%s" % (pattern))
-        print("SAFELY SUBSTITUTED PATTERN:\n\n%s" %
-              (Template(pattern).safe_substitute(env)))
+        print("ORIGINAL PATTERN:\n\n{}".format(pattern))
+        print(
+            "SAFELY SUBSTITUTED PATTERN:\n\n{}".format(
+                Template(pattern).safe_substitute(env)
+            )
+        )
         print("ERROR: FABSIM_TEMPLATE_KEYERROR")
-        print("Template variables were not found in FabSim env dictionary: \
-            These variables need to be added, with a default value set.")
-        print("FabSim performed a 'safe_substite' and print the original \
+        print(
+            "Template variables were not found in FabSim env dictionary: \
+            These variables need to be added, with a default value set."
+        )
+        print(
+            "FabSim performed a 'safe_substite' and print the original \
             template and the partially substituted one (both are given above \
             this message). Variables that are missing in the env dictionary \
             will be displayed unsubstituted in the output text. FabSim will \
             now terminate as these errors would result in unpredictable \
-            behavior otherwise.")
+            behavior otherwise."
+        )
         sys.exit()

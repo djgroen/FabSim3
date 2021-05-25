@@ -4,35 +4,50 @@ import os
 import sys
 import traceback
 import itertools
+
 parent_id = os.getpid()
 
 
 def start_process(PoolSize):
-    print('[MultiProcessingPool] Starting Process child '
-          ': Name = {} {} , PID = {},  parentPID = {} '
-          'Max PoolSize = {} requested PoolSize = {}'.format(
-              current_process().name, Process().name, os.getpid(),
-              parent_id, cpu_count() - 1, PoolSize)
-          )
+    """
+    the initializer function for multiprocessing Pool
+    """
+    print(
+        "[MultiProcessingPool] Starting Process child "
+        ": Name = {} {} , PID = {},  parentPID = {} "
+        "Max PoolSize = {} requested PoolSize = {}".format(
+            current_process().name,
+            Process().name,
+            os.getpid(),
+            parent_id,
+            cpu_count() - 1,
+            PoolSize,
+        )
+    )
 
 
 def error_callback(e):
+    """
+    the error callback function attached to each process to check show the
+    error message in case if the process call failed.
+    """
     print(
-        '{} error_callback from process {}:{} {}'
-        '\nEXCEPTION TRACE:{}\n{}\n'.format(
-            '=' * 10, current_process().name, Process().name, '=' * 10,
+        "{} error_callback from process {}:{} {}"
+        "\nEXCEPTION TRACE:{}\n{}\n".format(
+            "=" * 10,
+            current_process().name,
+            Process().name,
+            "=" * 10,
             type(e),
-            "".join(traceback.format_tb(
-                e.__traceback__
-            )
-            )
+            "".join(traceback.format_tb(e.__traceback__)),
         )
     )
 
 
 class MultiProcessingPool:
     """
-    Multi Processing Pool Class
+    the based Multi Processing Pool Class to be used for lunching FabSim3
+    tasks.
     """
 
     def __init__(self, PoolSize=1):
@@ -42,23 +57,28 @@ class MultiProcessingPool:
             pass
         # to be a little more stable : use one less process maximum
         self.PoolSize = PoolSize if PoolSize < cpu_count() else cpu_count() - 1
-        self.Pool = Pool(processes=self.PoolSize,
-                         initializer=start_process,
-                         initargs=(self.PoolSize,)
-                         )
+        self.Pool = Pool(
+            processes=self.PoolSize,
+            initializer=start_process,
+            initargs=(self.PoolSize,),
+        )
         self.Pool_tasks = []
 
     def add_task(self, func, func_args=dict(), callback_func=None):
+        """
+        adds the task to create Pool process for execution
+        """
         # TODO: it would be better to collect the output results of
-        # 		each task within a callback function, instead of
-        # 		iterating over the Pool_tasks
+        #     each task within a callback function, instead of
+        #     iterating over the Pool_tasks
         try:
             self.Pool_tasks.append(
-                self.Pool.apply_async(func=func,
-                                      args=(func_args,),
-                                      callback=callback_func,
-                                      error_callback=error_callback
-                                      )
+                self.Pool.apply_async(
+                    func=func,
+                    args=(func_args,),
+                    callback=callback_func,
+                    error_callback=error_callback,
+                )
             )
         except Exception as e:
             self.Pool.close()
@@ -68,7 +88,10 @@ class MultiProcessingPool:
             sys.exit(1)
 
     def wait_for_tasks(self):
-
+        """
+        wait until all tasks in the Pool are finished, then collect the output
+        tasks and return the outputs
+        """
         results = []
         print("Waiting for tasks to be completed ...")
         # tells the pool not to accept any new job
