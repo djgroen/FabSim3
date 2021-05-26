@@ -1436,7 +1436,7 @@ def install_packages(venv="False"):
         open(user_applications_yml_file), Loader=yaml.SafeLoader
     )
 
-    tmp_app_dir = "{}/tmp_app".format(env.fabsim_root)
+    tmp_app_dir = "{}/tmp_app".format(env.localroot)
     local("mkdir -p {}".format(tmp_app_dir))
 
     for dep in config["packages"]:
@@ -1566,7 +1566,7 @@ def install_app(name="", external_connexion="no", venv="False"):
 
     # Offline cluster installation - --user install
     # Temporary folder
-    tmp_app_dir = "{}/tmp_app".format(env.fabsim_root)
+    tmp_app_dir = "{}/tmp_app".format(env.localroot)
     local("mkdir -p {}".format(tmp_app_dir))
 
     # First download all the Miniconda3 installation script

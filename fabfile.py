@@ -10,17 +10,7 @@
 import yaml
 import importlib
 import os
-from pprint import pprint
-try:
-    from fabsim.base.fab import *
-except ImportError:
-    # update system PATH if FabSim3 directory did not added
-    # to system PYTHONPATH
-    import sys
-    FabSim3_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    sys.path.insert(0, FabSim3_PATH)
-    # Now, we can import fabsim APIs
-    from fabsim.base.fab import *
+from fabsim.base.fab import *
 
 
 config = yaml.load(
@@ -40,7 +30,7 @@ for key in config.keys():
                          if not name.startswith("_")]
         globals().update({name: plugin_dict[name] for name in to_import})
         env.localplugins[key] = os.path.join(
-            os.path.dirname(env.fabsim_root), "plugins", key
+            env.localroot, "plugins", key
         )
     except ImportError as e:
         pass

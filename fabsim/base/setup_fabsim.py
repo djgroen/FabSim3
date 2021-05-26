@@ -27,7 +27,7 @@ def install_plugin(plugin_name, branch=None):
     )
     info = config[plugin_name]
 
-    plugin_dir = path.join(path.dirname(env.fabsim_root), "plugins")
+    plugin_dir = path.join(env.localroot, "plugins")
 
     # check if the requested pluging is already installed or not
     # if it is already installed, rename the current pluging directory and
@@ -130,34 +130,19 @@ def add_local_paths(plugin_name):
     """
     # This variable encodes the default location for templates.
     env.local_templates_path.insert(
-        0,
-        path.join(
-            path.dirname(env.fabsim_root), "plugins", plugin_name, "templates"
-        ),
+        0, path.join(env.localroot, "plugins", plugin_name, "templates")
     )
     # This variable encodes the default location for blackbox scripts.
     env.local_blackbox_path.insert(
-        0,
-        path.join(
-            path.dirname(env.fabsim_root), "plugins", plugin_name, "blackbox"
-        ),
+        0, path.join(env.localroot, "plugins", plugin_name, "blackbox")
     )
     # This variable encodes the default location for Python scripts.
     env.local_python_path.insert(
-        0,
-        path.join(
-            path.dirname(env.fabsim_root), "plugins", plugin_name, "python"
-        ),
+        0, path.join(env.localroot, "plugins", plugin_name, "python")
     )
     # This variable encodes the default location for config files.
     env.local_config_file_path.insert(
-        0,
-        path.join(
-            path.dirname(env.fabsim_root),
-            "plugins",
-            plugin_name,
-            "config_files",
-        ),
+        0, path.join(env.localroot, "plugins", plugin_name, "config_files")
     )
 
 
