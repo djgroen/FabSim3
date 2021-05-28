@@ -14,24 +14,93 @@ By default, FabSim3 comes with the [FabDummy](https://github.com/djgroen/FabDumm
 	fabsim localhost install_plugin:<plug_name>,branch=<branch_name>
 	```
 
-### Creating a new plugin
 
-To create a new plugin for FabSim3:
+### List of available FabSim3 plugins
 
-1. Fork the [FabDummy](https://github.com/djgroen/FabDummy) repository.
-2. Rename the repository, and modify it to suit your own needs as you see fit.
-3. Rename **`FabDummy.py`** to the **`<name of your plugin>.py`**.
-4. In your new plugin repository, at the top of the **`<name of your plugin>.py`**, change `#!python add_local_paths("FabDummy")`  `#!python add_local_paths("name of your plugin")`.
-5. In the main FabSim3 repository, add an entry for your new plugin in `fabsim/deploy/plugins.yml` file.
-6. Set up your plugin using
-```sh
-fab localhost install_plugin:<name of your plugin>
-```
-7. You’re good to go, although you’ll inevitably will have to debug some of your modifications made in the second step of course.
+#### FabFlee
 
-### Plugins Examples
+FabFlee is a plugin for automated [Flee](https://github.com/djgroen/flee)-based simulations. It provides an environment to construct, modify and execute simulations as a single run or ensemble runs. FabFlee aims to predict the distribution of incoming refugees across destination camps under a range of different policy situations.
 
-For examples, see the plugins available in `fabsim/deploy/plugins.yml` file. [FabDummy](https://github.com/djgroen/FabDummy), [FabFlee](https://github.com/djgroen/FabFlee), and [FabMD](https://github.com/UCL-CCS/FabMD) are particularly good examples to investigate.
+* FabFlee github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabFlee)
+* FabFlee documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabFlee/blob/master/doc/FabFlee.md)
+
+
+#### FabMD
+
+FabMD is a FabSim3 plugin for automated [LAMMPS](https://lammps.sandia.gov/)-based simulations.
+
+This plugin provides functionality to extend FabSim3's workflow and remote submission capabilities to LAMMPS specific tasks.
+
+* FabMD github repository : [:octicons-mark-github-16:](https://github.com/UCL-CCS/FabMD)
+* FabMD documentation : [:fontawesome-solid-book:](https://fabmd.readthedocs.io)
+
+
+#### FabDummy
+
+FabDummy is a dummy example plugin for FabSim3. It is meant to showcase a minimal implementation for a FabSim3 plugin.
+
+* FabDummy github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabDummy)
+* FabDummy documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabDummy/blob/master/README.md)
+
+
+#### FabUQCampaign
+
+FabUQCampaign is a FabSim3 plugin for a climate modelling. It used to run an ensemble of [EasyVVUQ](https://github.com/UCL-CCS/EasyVVUQ/) samples on HPC resources.
+
+
+* FabUQCampaign github repository : [:octicons-mark-github-16:](https://github.com/wedeling/FabUQCampaign)
+* FabUQCampaign documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/README.md)
+	* FabUQCampaign 2D ocean model documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/Tutorial_ocean.md)
+
+
+
+#### FabMUSCLE
+
+FabMUSCLE is a preliminary launcher for the MUSCLE3 toolkit. It serves to automatically set up [MUSCLE3](https://muscle3.readthedocs.io) simulations, launch the manager and its submodels, and keep all the associated data organized.
+
+* FabMUSCLE github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabMUSCLE)
+* FabMUSCLE documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabMUSCLE/blob/master/README.md)
+
+
+#### FabCovid19
+
+FabCovid19 is a FabSim3 plugin for Flu And Coronavirus Simulator ([FACS](https://facs.readthedocs.io/en/latest/)).
+
+* FabCovid19 github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabCovid19)
+* FabCovid19 documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabCovid19/blob/master/README.md)
+
+
+#### FabCovidsim
+
+FabCovidsim is a FabSim3/EasyVVUQ plugin for [COVID-19 CovidSim microsimulation model](https://github.com/mrc-ide/covid-sim) developed Imperial College, London.
+
+
+
+* FabCovidsim github repository : [:octicons-mark-github-16:](https://github.com/arabnejad/FabCovidsim)
+* FabCovidsim documentation : [:fontawesome-solid-book:](https://github.com/arabnejad/FabCovidsim/blob/dev/README.md)
+
+
+
+#### FabSMD
+
+FabSMD is a SMD (Steered Molecular Dynamics) plugin for FabSim3
+
+* FabSMD github repository : [:octicons-mark-github-16:](https://github.com/potterton48/FabSMD)
+* FabSMD documentation : [:fontawesome-solid-book:](https://github.com/potterton48/FabSMD/blob/master/README.md)
+
+
+#### FabChemShell
+
+FabChemShell is a ChemShell plugin for FabSim3.
+
+* FabChemShell github repository : [:octicons-mark-github-16:](https://github.com/gh3orghiu/FabChemShell)
+* FabChemShell documentation : [:fontawesome-solid-book:](https://github.com/gh3orghiu/FabChemShell/blob/master/README.md)
+
+
+
+
+
+
 
 ### FabDummy testing on the local host
 
@@ -59,47 +128,3 @@ fabsim localhost fetch_results
 
 For more advanced testing features, please refer to the FabDummy tutorial at <https://github.com/djgroen/FabDummy/blob/master/README.md>.
 
-### LAMMPS testing on the local host
-
-#### Dependencies and Pre-Configurations
-1. Install LAMMPS (see <http://lammps.sandia.gov>). We suggest to install it from source files.
-	* Download the latest stable version from <https://lammps.sandia.gov/tars/lammps-stable.tar.gz>
-	* Extract tar file by `tar xvf lammps-stable.tar.gz`. This will create a folder named: *lammps-3Mar20* (The date may change depending of the updates in the website).
-	* Before keep going it is necessary to solve some dependencies: build-essential (to compile in C), MPIch (to work in parallel) , FFTW ( to compute long-range interactions), libxaw7 (to compute the movies). In one line code you choose
-	```sh
-	sudo apt-get install build-essential libxaw7-dev
-	```
-	* Then, go to the extract folder, and execute following commands
-	```sh
-	~$ cd lammps-3Mar20
-	~/lammps-3Mar20$ cd src/STUBS
-	~/lammps-3Mar20/src/STUBS$ make clean
-	~/lammps-3Mar20/src/STUBS$ make
-	~/lammps-3Mar20/src/STUBS$ cd ..
-	~/lammps-3Mar20/src$ make clean-all
-	~/lammps-3Mar20/src$ make serial
-	```
-	* If the installation part worked correctly, you should be able to find `lmp_serial` executable file inside `lammps-3Mar20/src` folder
-
-2. Modify `fabsim/deploy/machines_user.yml` file to make the `lammps_exec` variable point to the location of the LAMMPS executable. e.g.
-```yaml
-localhost:
-        lammps_exec: "/home/james/bin/lmp_serial"
-```
-3. FabSim3 contains sample LAMMPS input files, so there’s no need to download that.
-
-#### FabMD Plugin Installation
-Before run LAMMPS test data set, you should install FabMD which provides functionality to extend FabSim3’s workflow and remote submission capabilities to LAMMPS specific tasks. Please install it by typing:
-```sh
-fabsim localhost install_plugin:FabMD
-```
-
-#### Testing
-1. Run the LAMMPS test data set using:
-```sh
-fabsim localhost lammps_dummy:lammps_dummy,cores=1,wall_time=1:00:0
-```
-2. Run the following command to copy the output of your job in the results directory. By default this will be a subdirectory in `FabSim3/results`:
-```sh
-fabsim localhost fetch_results
-```
