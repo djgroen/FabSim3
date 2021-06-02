@@ -16,6 +16,7 @@ Installations under CentOS Linux:
 ```sh
 sudo yum install -y openssh-server
 ```
+
 #### FabSim3 Singularity Installation
 Download the singularity image from [Singularity Hub](https://singularity-hub.org/):
 ```sh
@@ -56,7 +57,7 @@ source ~/.bashrc
 ```
 	`fabsim_INSTALL_DIR` will be replaced by your local machine path.
 
-After, loading the environment variable from `fabsim_env.conf` into your into the current shell script, `fab` command will be available as a alias name to run for singularity image and accept all FabSim3 command.	
+After loading the environment variable from `fabsim_env.conf` into your into the current shell script, `fab` command will be available as a alias name to run for singularity image and accept all FabSim3 command.	
 
 ##### For QCG users
 
@@ -83,7 +84,7 @@ First, you need to add your username for remote machine in `FabSim3/fabsim/deplo
 ```yaml
 qcg: # machine name
      username: "plg..."
-```     
+```
 Then, set up configuration for remote machine in `FabSim3/fabsim/deploy/machines.yml` file. Here is a simple example:
 ```yaml
 qcg: # machine name

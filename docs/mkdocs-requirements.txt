@@ -1,6 +1,5 @@
 mkdocs
 mkdocs-autorefs
-mkdocs-click
 mkdocs-macros-plugin
 mkdocs-markdownextradata-plugin
 mkdocs-material

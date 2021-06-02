@@ -1,10 +1,10 @@
-This document briefly details how user/developers can set up a remote machine on FabSim3 for job submission.
+This document briefly details how user/developer can set up a remote machine on FabSim3 for job submission.
 
 ### Overview
 
-The aim of FabSim3 is to automate and simplify the creation, management, execution and modification of complex application workflows, using functionalities such as ensemble runs, remote executions and code couplings. This helps researchers to become more productive in general, and more effective with handling complex applications in particular. For instance, researchers may want to run and rerun static configurations, run a range of slightly different workflows, or to define new types of complex applications altogether.
+The aim of FabSim3 is to automate and simplify the creation, management, execution and modification of complex application workflows using functionalities, such as ensemble runs, remote executions and code couplings. This helps researchers to become more productive in general, and more effective with handling complex applications in particular. For instance, researchers may want to run and rerun static configurations, run a range of slightly different workflows, or to define new types of complex applications altogether.
 
-FabSim3 is built on top of the [Python Fabric library](http://www.fabfile.org/), and therefore shares automation and remote access features with Fabric (<http://www.fabfile.org>) and other system-level automation tools such as Ansible (<http://www.ansible.com>) and Homebrew (<http://brew.sh>).
+FabSim3 is built on top of the [Python Fabric library](http://www.fabfile.org/), and therefore shares automation and remote access features with Fabric (<http://www.fabfile.org>) and other system-level automation tools, such as Ansible (<http://www.ansible.com>) and Homebrew (<http://brew.sh>).
 
 ### FabSim3 Remote Job Management Command
 
@@ -22,11 +22,11 @@ This does the following:
 
 #### Job Monitoring
 
-* `stat` : returns a report for all submitted jobs or a one in Particular. By default
+* `stat`: returns a report for all submitted job(s).
 ```sh
 fab <remote machine name> job_stat
 ```
-reports the status of jobs. You can also ask for reporting on specific job by
+By default it reports the status of jobs. You can also request a report status of specific job by
 ```sh
 fab <remote machine name> job_stat:<jobID>
 ```
@@ -65,7 +65,7 @@ prometheus:
 ```
 When defining a new machine in this way, all variables will by default have a value that is specified under the `#!yaml "default:"` heading of `machines.yml`.  
 
-We recommend commiting these typo of definitions to the GitHub repository of FabSim3, unless the machine is non-public.
+We recommend commiting these type of definitions to the GitHub repository of FabSim3, unless the machine is non-public.
 
 #### Adding user information for an existing machine
 
@@ -84,7 +84,7 @@ A full list of fabric `env` variables can be found on <www.fabfile.org>, e.g. he
 
 #### Adding shortened commands for specific machines
 
-In FabSim3 it is possible to introduce a shortened alias. For instance, you can define a `fab` command to use in place of `fab eagle_vecma`. Such aliases can help speed up the typing of interactive commands.
+In FabSim3, it is possible to introduce a shortened alias. For instance, you can define a `fab` command to use in place of `fab eagle_vecma`. Such aliases can help speed up the typing of interactive commands.
 
 To define an alias, simply type
 ```sh
@@ -97,15 +97,15 @@ fabsim eagle_vecma bash_machine_alias:name=feh
 Aliases are stored in `FabSim3/fabsim/bin` and cannot be named `fabsim`, as that would break the main `fabsim` command.
 
 !!! note
-	this has to be done for every user, as different people have different existing shell commands, and we want to avoid accidental conflicts.
+	This has to be done for every user, as different people have different existing shell commands, and we want to avoid accidental conflicts.
 
 ### QCG Pilot Job Manager
 
-A Pilot Job, is a container for many subjobs that can be started and managed without having to wait individually for resources to become available.
+A Pilot Job is a container for many subjobs that can be started and managed without having to wait individually for resources to become available.
 
 The [QCG PilotJob](https://github.com/vecma-project/QCG-PilotJob) mechanism provides two interfaces that may be used interchangeably. The first one allows to specify a file with the description of sub-jobs and execute the scenario in a batch-like mode, conveniently supporting static scenarios. The second interface is offered with the REST API and it can be accessed remotely in a more dynamic way. It will be used to support scenarios where a number of replicas and their complexity dynamically changes at application runtime.
 
-Within FabSim3, you can install this python library or any other python library required for you application as a python virtual environment in your account.
+Within FabSim3, you can install this python library or any other python library required for your application as a python virtual environment in your account.
 
 #### QCG-PJ installation on your remote machine
 
@@ -118,7 +118,7 @@ fabsim <remote machine name> install_app:QCG-PilotJob,venv=True
 
 #### Python packages installation on your remote machine
 
-If you application requires a python package which is not available on pre-installed packages on your remote machine, you can install it as your local virtual environment. To do that, pleas specify the package name in `FabSim3/fabsim/deploy/applications.yml`under `packages` entry
+If you application requires a python package, which is not available on pre-installed packages on your remote machine, you can install it as your local virtual environment. To do that, please specify the package name in `FabSim3/fabsim/deploy/applications.yml`under `packages` entry
 ```yaml
 packages:
     - matplotlib

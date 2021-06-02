@@ -9,8 +9,8 @@
 	* rich
 
 	!!! note
-		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) package, others will be installed by FabSim3.
-		To install that python package, simply type
+		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) package, other packages are installed by FabSim3.
+		To install ruamel.yaml package, simply type
 		```sh
 		pip3 install ruamel.yaml
 		```
@@ -22,11 +22,11 @@
 
 ## Installing FabSim3
 
-1. Clone the code from the GitHub repository
+1. Clone FabSim3 from the GitHub repository:
 	```sh
 	git clone https://github.com/djgroen/FabSim3.git
 	```
-2. To install **all** packages automatically and configure yml files, please go to your FabSim3 directory, and type
+2. To install **all** packages automatically and configure yml files, please go to your `FabSim3` directory, and type
 	```sh
 	python3 configure_fabsim.py
 	```
@@ -57,15 +57,15 @@
 	script, e.g., source ~/.bashrc, or lunch a new terminal.
 	```
 
-4. To make the fabsim command available in you system, please restart the shell by opening a new terminal or just re-load your bash profile by `source` command.
+4. To make the fabsim command available in your system, please restart the shell by opening a new terminal or just re-load your bash profile by `source` command.
 
 
 ## Updating FabSim3
 
-If you have already installed FabSim3 and want to update to the latest version, in your local FabSim3 directory simply type `git pull`
+If you have already installed FabSim3 and want to update to the latest version, simply type `git pull` in your local FabSim3 directory.
 
 !!! attention
-		Your personal settings like the `machines_user.yml` will be unchanged by `git pull`, **unless** you run `python3 configure_fabsim.py` again which overwrite the current `machines_user.yml` file.
+		Your personal settings like the `machines_user.yml` will be unchanged by `git pull`, **unless** you run `python3 configure_fabsim.py` again, which overwrites the current `machines_user.yml` file.
 
 ## Known Issues
 
@@ -74,7 +74,7 @@ Here is the list of known issue that reported by our users so far:
 ### ssh: connect to host localhost port 22: Connection refused
 
 #### Linux
-This is a common issue on linux system, and it will be solved by re-installing openssh server, to do that
+This is a common issue on Linux system, and it will be solved by re-installing openssh server, to do that
 
 1. Remove SSH with the following command
 	```sh
@@ -92,7 +92,7 @@ on Mac OSX, make sure turn on **Remote Login** under **System Preferences** then
   <img src="../images/ssh_macos_error.png" width="400" />
 </figure>
 
-The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the examples below.
+The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the command demonstrated below in the **List of available commands**.
 
 Mac users may get a `ssh: connect to host localhost port 22: Connection refused` error. This means you must enable remote login. This is done in *System Preferences > Sharing > Remote Login*.
 
@@ -119,18 +119,20 @@ It is possible that your python bin path directory is not in the system `PATH`. 
 FileNotFoundError: [Errno 2] No such file or directory: 'fab': 'fab'	
 ```
 
-To fix this issue, you need to add the executable path of `fab` to your system `PATH` environment variable. To make this update permanent, please to to you bash file which could be `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` depends on your OS and shell version, and add these line at the end. Please make sure that you used the same executable path for `fab` as it mentioned in the warning message
-```bash
-export PATH=$PATH:<fab_executable_PATH>
-```
+To fix this issue, you need to add the executable path of `fab` to your system `PATH` environment variable. To make this update permanent, please go to your bash file, which could be `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` depends on your OS and shell version, and add the following line at the end:
+	```bash
+	export PATH=$PATH:<fab_executable_PATH>
+	```
+
+Please make sure that you used the same executable path for `fab` as it mentioned in the warning message.
 
 !!! note
-	If you are having a problem which is not listed here, please raise a [github issue](https://github.com/djgroen/FabSim3/issues/new/choose) in FabSim3 repository, and provide a full output log, so we can have a look and make a suggestions.
+	If you are having a problem which is not listed here, please raise a [github issue](https://github.com/djgroen/FabSim3/issues/new/choose) in FabSim3 repository, and provide a full output log, so we can have a look and provide a solution or address your issue.
 
 
-### List available commands
+### List of available commands
 
-You can see the list of available FabSim3 commands, by simply type:
-```sh
-fabsim -l
-``
+You can see the list of available FabSim3 commands, by simply typing:
+	```sh
+	fabsim -l
+	```

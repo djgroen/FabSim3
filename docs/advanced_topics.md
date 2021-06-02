@@ -1,12 +1,11 @@
-### Create automation scripts
+### Creating automation scripts
 This document briefly details how user/developers can create their own FabSim3 automations.
 
 #### Overview
 
-
 * Automation scripts allow user/developers to create their own FabSim3 functionalities. They are usually created and modified within individual plugins.
 * Base automation scripts reside within the `FabSim3/fabsim/base` subdirectory. These should normally not be modified, but they can serve as examples to create your own functionalities, or as building blocks to create complex functions.
-Plugin-specific automation scripts reside within the base directory of the respective plugin. The script that will be invoked by default is `<plugin_name>.py`. For larger plugins, various other Python scripts can of course be imported in this main script.
+* Plugin-specific automation scripts reside within the base directory of the respective plugin. The script that will be invoked by default is `<plugin_name>.py`. For larger plugins, various other Python scripts can surely be imported in this main script.
 
 #### How to write automation functions
 
@@ -210,5 +209,5 @@ $run_command $lammps_exec $lammps_args < $lammps_input > log.lammps # Genericall
 The last command will likely depend on how parameters are passed to the target code.
 
 * `$run_command` will be substituted by a job execution command such as `mpirun` or `aprun`.
-* other variables contain code/domain-specific information such as input and output destinations, relevant flags or the location of the executable.
+* Other variables contain code/domain-specific information such as input and output destinations, relevant flags or the location of the executable.
 
