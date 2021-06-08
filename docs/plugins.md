@@ -2,7 +2,9 @@
 
 ### Installing plugins
 
-By default, FabSim3 comes with the [FabDummy](https://github.com/djgroen/FabDummy) plugin installed. Other plugins can be installed, and are listed in `fabsim/deploy/plugins.yml` file.
+By default, FabSim3 comes with the [FabDummy](https://github.com/djgroen/FabDummy) plugin, which is available in `~/FabSim3/plugins`. 
+
+Other plugins can be installed in FabSim3, and are listed in `fabsim/deploy/plugins.yml` file.
 
 * To install a specific plugin, simply type:
 	```sh
@@ -19,7 +21,7 @@ By default, FabSim3 comes with the [FabDummy](https://github.com/djgroen/FabDumm
 
 #### FabFlee
 
-FabFlee is a plugin for automated [Flee](https://github.com/djgroen/flee)-based simulations. It provides an environment to construct, modify and execute simulations as a single run or ensemble runs. FabFlee aims to predict the distribution of incoming refugees across destination camps under a range of different policy situations.
+FabFlee is a plugin for automated [Flee](https://github.com/djgroen/flee) agent-based simulations. It provides an environment to construct, modify and execute simulations as a single run or ensemble runs. FabFlee aims to predict the distribution of incoming refugees across destination camps under a range of different policy situations.
 
 * FabFlee github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabFlee)
 * FabFlee documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabFlee/blob/master/doc/FabFlee.md)
@@ -74,8 +76,6 @@ FabCovid19 is a FabSim3 plugin for Flu And Coronavirus Simulator ([FACS](https:/
 
 FabCovidsim is a FabSim3/EasyVVUQ plugin for [COVID-19 CovidSim microsimulation model](https://github.com/mrc-ide/covid-sim) developed Imperial College, London.
 
-
-
 * FabCovidsim github repository : [:octicons-mark-github-16:](https://github.com/arabnejad/FabCovidsim)
 * FabCovidsim documentation : [:fontawesome-solid-book:](https://github.com/arabnejad/FabCovidsim/blob/dev/README.md)
 
@@ -83,7 +83,7 @@ FabCovidsim is a FabSim3/EasyVVUQ plugin for [COVID-19 CovidSim microsimulation 
 
 #### FabSMD
 
-FabSMD is a SMD (Steered Molecular Dynamics) plugin for FabSim3
+FabSMD is a Steered Molecular Dynamics (SMD) plugin for FabSim3.
 
 * FabSMD github repository : [:octicons-mark-github-16:](https://github.com/potterton48/FabSMD)
 * FabSMD documentation : [:fontawesome-solid-book:](https://github.com/potterton48/FabSMD/blob/master/README.md)
@@ -98,11 +98,7 @@ FabChemShell is a ChemShell plugin for FabSim3.
 
 
 
-
-
-
-
-### FabDummy testing on the local host
+### FabDummy testing on localhost
 
 #### FabDummy Plugin Installation
 Open a terminal, and simply type:
@@ -121,7 +117,7 @@ fabsim localhost dummy:dummy_test
 ```sh
 fabsim localhost dummy_ensemble:dummy_test
 ```
-3. for both cases, i.e., a single dummy job or an ensemble of dummy jobs, you can fetch the results by using:
+3. For both cases, i.e. a single dummy job or an ensemble of dummy jobs, you can fetch the results by using:
 ```sh
 fabsim localhost fetch_results
 ```

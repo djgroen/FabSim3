@@ -1,21 +1,24 @@
 
-The scope of this document is to provide useful description of commonly used APIs to develop a FabSim3 pluing.
+The scope of this document is to provide useful description of commonly used APIs to develop a FabSim3 plugin.
 
 All our APIs, are available on the [FabSim3](https://github.com/djgroen/FabSim3) GitHub repository, and regularly updated. For any further assistance or inquiries, email us at <djgroennl@gmail.com> or <hamid.arabnejad@gmail.com>.
 
 ### machine-specific configuration for plugin
 
-Simulations can be run locally, or remotely on HPC resources. The submission and execution process of a workflow requires some information of the target host machine, such as username and host ip address. We encapsulate all these information in form of a human readable structure,YAML language, in two main files:
+Simulations can be run locally, or remotely on HPC resources. The submission and execution processes of a workflow requires some information about the target host machine, such as `username` and `host ip address`. We encapsulate all these information in two main files and in a human readable format structure, specificall using YAML language:
 
-* `FabSim3/fabsim/deploy/machines.yml` file where general machine-specific configurations are stored, and
+* `FabSim3/fabsim/deploy/machines.yml` file where general machine-specific configurations are stored and
 * `FabSim3/fabsim/deploy/machines_user.yml` file which contains user-specific information for each remote machine.
 
-In addition to these two files, you can also define machine configuration, for each remote machine, specified for your plugin. This give you better *flexibility* to share your FabSim3 plugin with other research groups. The structure is similar to `machines.yml` and `machines_user.yml` files. But, the file name **should** follow the following pattern :
+In addition to these two files, you can also define machine configuration, for each remote machine, specified for your plugin. This give you better *flexibility* to share your FabSim3 plugin with other research groups. The structure is similar to `machines.yml` and `machines_user.yml` files. But, the file name **should** follow the following pattern:
 ```sh
 machines_<plugin_name>_user.yml
 ```
 
-Here are two examples of machine-specific configuration : [Example1](https://github.com/djgroen/FabFlee/blob/master/machines_FabFlee_user.yml) , [Example2](https://github.com/djgroen/FabCovid19/blob/master/machines_FabCovid19_user.yml)
+Here are two examples of machine-specific configuration: 
+
+* [Example1](https://github.com/djgroen/FabFlee/blob/master/machines_FabFlee_user.yml) 
+* [Example2](https://github.com/djgroen/FabCovid19/blob/master/machines_FabCovid19_user.yml)
 
 #### Usage:
 To load machine-specific configuration specified by the user for the input `plugin_name`, you need to wrap the task functions with `#!python @load_plugin_env_vars(plugin_name`)
@@ -46,7 +49,7 @@ This function updates the environmental variables that are loaded from machine-s
 1. `FabSim3/fabsim/deploy/machines.yml`
 2. `FabSim3/fabsim/deploy/machines_user.yml`
 3. `FabSim3/plugin/<plugin_name>/machines_<plugin_name>_user.yml` *(if exists)*
-4. user input arguments via command line (Modified/Added by `update_environment` function or manual coding)
+4. User input arguments via command line (Modified/Added by `update_environment` function or manual coding)
 
 #### **`with_config(config_name)`**	
 This function augments environment variable, such as the remote location variables where the config files for the job should be found or stored, with information regarding a particular configuration name.
@@ -60,13 +63,12 @@ This function transfers config files to the target machine (local and remote res
 This is an internal low level job launcher. It will submit a single job to the target machine (local and remote resource). All required parameters for the job are determined from the prepared fabric environment.
 
 #### **`run_ensemble(config, sweep_dir,sweep_on_remote=False, execute_put_configs=True, **args)`**
-This function maps and submit an ensemble job to the target machine. For each listed directory from sweep folder, an individual job will be submitted. The input arguments are:
+This function maps and submits an ensemble job to the target machine. For each listed directory from sweep folder, an individual job will be submitted. The input arguments are:
 
-
-* `config` : the input config folder name
-* `sweep_dir` : the PATH to the sweep directory
-* `sweep_on_remote` (optional) : this flag indicates if you sweep directory located on your local machine or is saved on remote machine. By default is `#!python False`.
-* `execute_put_configs` (optional) : this flag transfers all config files to the remote machine. In case of having config files on the remote machine, this arguments should be set to `#!python False`, to avoid overwriting config files.
+* `config`: the input config folder name;
+* `sweep_dir`: the PATH to the sweep directory;
+* `sweep_on_remote` (optional): this flag indicates if you sweep directory located on your local machine or is saved on remote machine. By default is `#!python False`;
+* `execute_put_configs` (optional): this flag transfers all config files to the remote machine. In case of having config files on the remote machine, this arguments should be set to `#!python False`, to avoid overwriting config files.
 
 #### **`find_config_file_path(config_name)`**
 Returns the PATH of input config_name in your plugin.
@@ -80,7 +82,7 @@ Runs the input command on the local system.
 #### **`run(command)`**
 Runs a shell command on a remote host with following conditions:
 
-* if `#!yaml manual_gsissh` env variable is set to `#!python True` in `fabsim/deploy/machines.yml` file, then the [`gsissh`](https://linux.die.net/man/1/gsissh) command will invoke for execution. The `gsissh` command provides a secure remote login service with forwarding of X.509 proxy credentials.
-* if `#!yaml manual_ssh` env variable is set to `#!python True` in `fabsim/deploy/machines.yml` file, the port number from `machines.yml` will be used to establish the ssh connection.
+* If `#!yaml manual_gsissh` env variable is set to `#!python True` in `fabsim/deploy/machines.yml` file, then the [`gsissh`](https://linux.die.net/man/1/gsissh) command will invoke for execution. The `gsissh` command provides a secure remote login service with forwarding of X.509 proxy credentials.
+* If `#!yaml manual_ssh` env variable is set to `#!python True` in `fabsim/deploy/machines.yml` file, the port number from `machines.yml` will be used to establish the ssh connection.
 * otherwise, the shell command on a remote system via SSH with default port number `22` will executed.
 

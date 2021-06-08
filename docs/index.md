@@ -15,7 +15,7 @@
 [![GitHub last-commit](https://img.shields.io/github/last-commit/djgroen/FabSim3.svg)](https://github.com/djgroen/FabSim3/commits/master)
 
 
-FabSim3 is a Python-based automation toolkit for scientific simulation and data processing workflows, licensed under the BSD 3-clause license. It is developed as part of VECMA <http://www.vecma.eu>, and is part of the VECMA Toolkit <http://www.vecma-toolkit.eu>.
+FabSim3 is a Python-based automation toolkit for scientific simulation and data processing workflows, licensed under the BSD 3-clause license. It is developed as part of the VECMA project <http://www.vecma.eu>, and is part of the VECMA Toolkit <http://www.vecma-toolkit.eu>.
 
 Among other things, FabSim3 supports the use of simple one-liner commands to:
 
@@ -30,7 +30,9 @@ Users can perform complex remote tasks from a local command-line, and run single
 FabSim3 relies strongly on Fabric (<http://www.fabfile.org>, shown to work with versions 1.5.3 and 1.10.0) and PyYAML. It has been used to run simulation workflows on supercomputers such as ARCHER, SuperMUC, Carthesius, Eagle, as well as local clusters and desktops.
 
 
-FabSim3 is publicly available at: <http://www.github.com/djgroen/FabSim3>/ The accompanying software paper can be found here: <https://doi.org/10.1016/j.cpc.2016.05.020>
+FabSim3 is publicly available at: <http://www.github.com/djgroen/FabSim3>. 
+
+The accompanying software paper can be found here: <https://doi.org/10.1016/j.cpc.2016.05.020>.
 
 The main plugins for FabSim3 include:
 
