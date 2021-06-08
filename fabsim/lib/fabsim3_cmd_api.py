@@ -8,6 +8,12 @@
 # It has no dependencies, but does require a working FabSim3 installation.
 
 import os
+import time
+import subprocess
+try:
+    from fabsim.base.fab import *
+except ImportError:
+    from base.fab import *
 
 
 def fabsim(command, arguments, machine='localhost'):
