@@ -113,12 +113,12 @@ def wait(machine='localhost', sleep=1):
             time.sleep(sleep * 60)
 
 
-def run_uq_ensemble(campaign_dir, script_name, machine='localhost', **kwargs):
+def run_uq_ensemble(campaign_dir, script_name, machine="localhost", **kwargs):
     """
     Launches a UQ ensemble.
     """
 
-    sim_ID = campaign_dir.split('/')[-1]
+    sim_ID = campaign_dir.split("/")[-1]
     arguments = "{},campaign_dir={},script_name={}".format(sim_ID,
                                                            campaign_dir,
                                                            script_name
@@ -126,18 +126,19 @@ def run_uq_ensemble(campaign_dir, script_name, machine='localhost', **kwargs):
     # add additional named arguments list
     if len(kwargs) > 0:
         arguments += ",{}".format(
-            (','.join("%s=%s" % (arg_name, kwargs[arg_name])
-                      for arg_name in kwargs))
+            (",".join("%s=%s" % (arg_name, kwargs[arg_name])
+                      for arg_name in kwargs)
+             )
         )
 
     fabsim("run_uq_ensemble", arguments, machine=machine)
 
 
-def get_uq_samples(campaign_dir, machine='localhost', **kwargs):
+def get_uq_samples(campaign_dir, machine="localhost", **kwargs):
     """
     Retrieves results from UQ ensemble
     """
-    sim_ID = campaign_dir.split('/')[-1]
+    sim_ID = campaign_dir.split("/")[-1]
     arguments = "{},campaign_dir={}".format(sim_ID,
                                             campaign_dir
                                             )
@@ -145,7 +146,7 @@ def get_uq_samples(campaign_dir, machine='localhost', **kwargs):
     # add additional named arguments list
     if len(kwargs) > 0:
         arguments += ",{}".format(
-            (','.join("%s=%s" % (arg_name, kwargs[arg_name])
+            (",".join("%s=%s" % (arg_name, kwargs[arg_name])
                       for arg_name in kwargs))
         )
 
