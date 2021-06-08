@@ -1,0 +1,203 @@
+###########################
+#   Project information   #
+###########################
+site_name: FabSim3
+# site_url: https://fabsim3.readthedocs.io
+site_description: An automation toolkit for complex simulation tasks
+
+##################
+#   Repository   #
+##################
+repo_name: djgroen/FabSim3
+repo_url: https://github.com/djgroen/FabSim3
+
+site_author: Hamid Arabnejad
+docs_dir: docs/
+
+# Copyright
+copyright: Derek Groen, Hamid Arabnejad, Robin Richardson, Robert Sinclair, Vytautas Jancauskas, Nicolas Monnier, Paul Karlshoefer, Maxime Vassaux
+
+####################
+#   Social Media   #
+####################
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/djgroen/FabSim3
+    - icon: fontawesome/solid/envelope
+      link: mailto:djgroen@gmail.com 
+
+#####################
+#   Configuration   #
+#####################
+theme:
+  name: material
+  custom_dir: docs/static/theme/overrides
+  static_templates:
+    - 404.html  
+  include_search_page: false
+  search_index_only: true
+  # Default values, taken from mkdocs_theme.yml
+  language: en  
+  font:    
+    text: Roboto
+    code: Roboto Mono
+  palette:
+    primary: black    
+  features:
+    - search.suggest
+    - search.highlight    
+    - navigation.tabs
+    - navigation.expand  
+  favicon: images/logo/logo.png # browser tab icon
+  logo: images/empty.png
+  icon:
+    repo: fontawesome/brands/github
+
+###############
+#   Plugins   #
+###############
+plugins:
+  - search
+  # - enumerate-headings:
+  - autolinks
+  - awesome-pages:
+      collapse_single_pages: true
+      strict: true  
+  - macros
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+          python:
+            rendering:
+              show_root_toc_entry: false
+              show_root_heading: false
+              show_root_full_path: true
+              show_object_full_path: false
+              show_source: true
+              show_category_heading: true
+              show_if_no_docstring: false
+              group_by_category: true
+              heading_level: 2
+            selection:
+              # new_path_syntax: True
+              filters:
+                - "!^_"  # exlude all members starting with _
+              members: true
+              inherited_members: True                
+              docstring_style: google
+              docstring_options:
+                replace_admonitions: false
+        
+  - mermaid2:
+      arguments:
+        securityLevel: 'loose'
+        theme: 'forest'
+
+#################
+#   Extra CSS   #
+#################
+extra_css:
+  - static/css/custom.css
+  
+################
+#   Extra JS   #
+################
+# source https://gokumohandas.github.io/MLOps/tagifai/data/#tagifai.data
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
+  - static/js/extra.js
+
+##################
+#   Extensions   #
+##################
+markdown_extensions:
+  # - admonition
+  - markdown.extensions.admonition # alerts  
+  # - attr_list
+  - markdown.extensions.attr_list # add HTML and CSS to Markdown elements
+  # - def_list  
+  - markdown.extensions.def_list
+  # - footnotes
+  - markdown.extensions.footnotes
+  # - meta  
+  - markdown.extensions.meta
+  - markdown.extensions.toc:
+      baselevel: 1
+      permalink: true
+      toc_depth: 4
+  - pymdownx.arithmatex: # mathjax
+      generic: true      
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details #  collapsible alerts
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.escapeall:
+      nbsp: true      
+  - pymdownx.inlinehilite # inline code highlights
+  - pymdownx.keys # show keystroke symbols
+  # - pymdownx.magiclink:
+  #     repo_url_shorthand: true
+  #     user: arabnejad
+  #     repo: pyDAGSim
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets: # insert content from other files
+      check_paths: true
+  - pymdownx.superfences: # nest code and content inside alerts
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          # format: !!python/name:pymdownx.superfences.fence_code_format
+          # format: !!python/name:pymdownx.superfences.fence_div_format
+          format: !!python/name:mermaid2.fence_mermaid
+
+  - pymdownx.tabbed # content tabs
+  - pymdownx.tasklist:
+      custom_checkbox: true
+      clickable_checkbox: true      
+  - pymdownx.tilde
+  - pymdownx.tabbed
+  # - codehilite:
+  #     guess_lang: false
+  - codehilite:
+      guess_lang: False
+      use_pygments: True
+      noclasses: True
+      pygments_style: monokai      
+  - toc:
+      permalink: true
+#################
+#   Page tree   #
+#################
+nav:
+    - Home:
+      - Introduction: index.md
+      - Installation: installation.md
+      - Plugins: plugins.md
+      - APIs for Plugin Developers : APIs_for_plugin_developers.md
+      - Patterns : patterns.md
+      - Advanced Topics : advanced_topics.md
+      - Remote Machine Configuration : remote_machine_configuration.md
+      - Containerized versions : containerized_versions.md      
+      - Tutorials : tutorials.md
+
+    - Code Reference:
+       - Base APIs:
+          - base : code_reference/base/fab.md
+          - manage remote job: code_reference/base/manage_remote_job.md
+          - MultiProcessingPool: code_reference/base/MultiProcessingPool.md
+          - Setup Fabsim : code_reference/base/setup_fabsim.md
+          - Machines : code_reference/deploy/machines.md
+          - Templates : code_reference/deploy/templates.md
+          - VVP : code_reference/VVP/vvp.md
+          

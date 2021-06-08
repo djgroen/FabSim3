@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+# -*- coding: utf-8 -*-
+import re
+import sys
+import os
+
+import fabric_main
+
+if __name__ == '__main__':
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    fabfile_path = os.path.join(
+        os.path.dirname(os.path.dirname(cur_dir)),
+        "fabfile.py"
+    )
+
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(fabric_main.main([fabfile_path]))

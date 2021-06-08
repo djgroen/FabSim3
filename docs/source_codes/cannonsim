@@ -1,0 +1,29 @@
+# change directory to where application is stored
+cd $job_results
+$run_prefix
+
+OUTPUT_DIR="output_files"
+INPUT_DIR="input_files"
+
+# run c program
+$c_app_run_prefix
+$c_app_run_command
+
+# run python program
+$py_app_run_command
+
+# run java program
+$java_app_run_prefix
+$java_app_compile_command
+$java_app_run_command
+
+# show output results
+echo -e "\n\nOutput results for python program :"
+cat $$OUTPUT_DIR/py_output.txt
+
+echo -e "\n\nOutput results for C program :"
+cat $$OUTPUT_DIR/c_output.txt
+
+echo -e "\n\nOutput results for Java program :"
+cat $$OUTPUT_DIR/java_output.txt
+

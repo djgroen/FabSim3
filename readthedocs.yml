@@ -1,0 +1,24 @@
+version: 2
+
+# https://github.com/readthedocs/readthedocs.org/pull/8065
+# build:
+#   apt_packages:
+#     - openmpi-bin
+#     - libopenmpi-dev
+
+# Optionally set the version of Python and requirements required to build your docs
+python:
+  version: 3.7
+  install:
+    - requirements: docs/mkdocs-requirements.txt
+    - requirements: requirements.txt
+  system_packages: true
+
+# Build documentation with MkDocs
+mkdocs:
+ configuration: mkdocs.yml
+ fail_on_warning: false
+
+
+# Optionally build your docs in additional formats such as PDF and ePub
+formats: all

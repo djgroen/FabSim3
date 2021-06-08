@@ -1,0 +1,10 @@
+default:
+  # require command for compile and execute C code version
+  c_app_run_prefix: "gcc cannonsim.cpp -o cannonsim -lm"
+  c_app_run_command: "./cannonsim"
+  # require command for compile and execute python code version
+  py_app_run_command: "python cannonsim.py"
+  # require command for compile and execute JAVA code version
+  java_app_run_prefix: "export CLASSPATH='java_libs/commons-cli-1.3.1.jar:.'"
+  java_app_compile_command: "javac cannonsim.java"
+  java_app_run_command: "java cannonsim"

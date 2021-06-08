@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: System Info  💻
+      - name: Setup System & Info  💻
         run: |
           python -c "from multiprocessing import cpu_count ; print('cpu_count={}'.format(cpu_count()))"
 
@@ -43,8 +43,18 @@ jobs:
               echo "***************************"
           fi
 
+          if [ "$RUNNER_OS" == "macOS" ]; then
+              echo "export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin" >> ~/.bash_profile
+              echo "export PATH=$PATH:/Users/runner/.local/bin >>" ~/.bash_profile
+              echo "sw_vers" >> ~/.bash_profile
+              source ~/.bash_profile
+              which ssh-copy-id
+          fi
+          echo "export PATH=$PATH:~/.local/bin/" >> ~/.bash_profile
+          source ~/.bash_profile
           python3 --version
           python --version
+          ls -la ~/
 
       - name: Setup SSH  🔐
         run: |
@@ -59,37 +69,31 @@ jobs:
             chmod o-w $HOME          
           fi
 
-          ssh-keygen -t rsa -b 4096 -C "$(whoami)@localhost" -f ~/.ssh/id_rsa
-          cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-          chmod og-wx ~/.ssh/authorized_keys
-          ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-          cat ~/.ssh/authorized_keys
+          # ssh-keygen -t rsa -b 4096 -C "$(whoami)@localhost" -f ~/.ssh/id_rsa
+          # cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+          # chmod og-wx ~/.ssh/authorized_keys
+          # ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+          # cat ~/.ssh/authorized_keys
 
       - name: Install Python Dependencies  📥
         run: |
           python3 -m pip install --upgrade pip      
-          python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout
+          python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout rich
 
       - name: Setup FabSim3  🚦🚦🚦
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-              export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin;
-              export PATH=$PATH:/Users/runner/.local/bin;
-              sw_vers
-              which ssh-copy-id           
-          fi
+          python3 configure_fabsim.py
 
-          python3 configure_fabsim.py  --bashrc_update=False
-          fab localhost install_plugin:FabDummy
-
+          echo "export PATH=$(pwd)/fabsim/bin:$PATH" >> ~/.bash_profile
+          echo "export PYTHONPATH=$(pwd):$PYTHONPATH" >> ~/.bash_profile
+          source ~/.bash_profile
+          fabsim localhost install_plugin:FabDummy
+          fabsim localhost install_plugin:FabDummy
           pip freeze
 
       - name: Test with pytest 🚀
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-              export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin;
-              export PATH=$PATH:/Users/runner/.local/bin;
-          fi        
+          source ~/.bash_profile
           python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
-          pytest --pep8  base/ deploy/ lib/ UQP/ VVP/
+          pytest --pep8  fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
 

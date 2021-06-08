@@ -1,0 +1,4 @@
+
+::: fabsim.deploy.machines
+    :docstring:
+

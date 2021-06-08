@@ -1,0 +1,64 @@
+# Copy this file as machines_user.yml, and fill in your details.
+# Details given in the default dictionary will override default settings in machines.yml
+# Details given in per-machine dictionaries will override machine settings in machines.yml
+
+default:
+  local_results: "/home/hamid/Downloads/FabSim3_refactor/results"
+  local_configs: "/home/hamid/Downloads/FabSim3_refactor/config_files"
+  username: "hamid"
+  # home_path_template: "/home/$username"
+  # home_path_template: "/Users/$username"  # for OSX users
+  # Allows to switch between SSH (default) and GSISSH login.
+  manual_gsissh: false
+  port: 22
+  home_path_template: "/home/hamid/Downloads/FabSim3_refactor/localhost_exe"
+archer:
+  username: "user"
+  project: "e123"
+  budget: "e123-user"
+# SuperMUC phase2 connecting using GSISSH
+localhost:
+  username: "hamid"
+  home_path_template: "/home/hamid/Downloads/FabSim3_refactor/localhost_exe"
+supermuc2:
+  username: "ab12cde"
+  project: "fg34hi"
+  namd_exec: "/lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2"
+  # Password set in the redisexec directory.
+  redispwd: "multiple"
+  # Switches to GSISSH login from SSH.
+  manual_gsissh: true
+  port: 2222
+bluejoule:
+  username: "abc12-def01"
+  groupname: "abc01"
+  project: "ABC012" #"HCP056"
+  namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
+  ensemble_dir: "rep0/replicas"
+qcg:
+  username: "<your-username>"
+  flee_location: "$home_path/flee-release"
+
+eagle_vecma:
+  username: "<your-username>"
+  flee_location: "$home_path/flee-release"
+
+eagle_hidalgo:
+  username: "<your-username>"
+  flee_location: "$home_path/flee-release"
+archer2:
+  username: "<your-username>"
+  sshpass: "<ARCHER2-password>"
+  manual_sshpass: true
+  job_wall_time: "0-00:10:00"
+
+
+marenostrum4:
+  username: "pr1emk01"
+  fabric_dir: "FabSim3"
+  corespernode: 46
+  taskpersocket: 23
+  cores: 1
+  # list of available queue for the job : bsc_queues
+  queue_name: "debug" # or "bsc_case"
+  memconfig_name: "highmem" #"highmem"

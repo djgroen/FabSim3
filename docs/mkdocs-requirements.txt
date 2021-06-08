@@ -1,0 +1,11 @@
+mkdocs
+mkdocs-autorefs
+mkdocs-macros-plugin
+mkdocs-markdownextradata-plugin
+mkdocs-material
+mkdocs-material-extensions
+mkdocs-mermaid2-plugin
+mkdocs-minify-plugin
+mkdocstrings
+mkdocs-awesome-pages-plugin
+mkdocs-autolinks-plugin
