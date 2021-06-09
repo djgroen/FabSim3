@@ -23,3 +23,5 @@ localhost_exe/
 fabsim/deploy/applications_user.yml
 
 *_build*/
+
+**/.DS_Store
