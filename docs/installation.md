@@ -89,7 +89,7 @@ This is a common issue on Linux system, and it will be solved by re-installing o
 on Mac OSX, make sure turn on **Remote Login** under **System Preferences** then **File Sharing**.
 
 <figure>
-  <img src="../images/ssh_macos_error.png" width="400" />
+  <img src="images/ssh_macos_error.png" width="400" />
 </figure>
 
 The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the command demonstrated below in the **List of available commands**.

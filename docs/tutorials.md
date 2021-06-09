@@ -24,7 +24,7 @@ In this tutorial, we explain how to write a FabSim3 plugin from scratch. To keep
 For this tutorial, a simple application, namely *cannon_app*, which calculates the range of a projectile fired at an angle is selected. By using simple physics rules, you can find how far a fired projectile will travel. The source code for this application, written in three of the most widely used languages: C,Java, and Python, is available here : <https://github.com/arabnejad/cannon_app>. The *cannon_app* reads the input parameters from a simple txt file and calculate the distance until ball hits the round. How far the ball travels will depend on the input parameters such as : speed, angle, gravity, and air resistance. Figure below shows the sample input setting file and the generate output plot.
 
 <figure>
-   <img src="../images/canonsim_example.png" width="600"> 
+   <img src="images/canonsim_example.png" width="600"> 
 </figure>
 
 
@@ -85,7 +85,7 @@ To create a new plugin for *cannon_app* application, you need to follow a files 
 To summarize this part, by following above steps, the file and directory should be as shown as in figure below:
 
 <figure>
-   <img src="../images/canonsim_structure.png" width="700"> 
+   <img src="images/canonsim_structure.png" width="700"> 
 </figure>
 
 
