@@ -41,6 +41,7 @@ def ensemble_vvp_QoI(simulation_result_QoI,
     """
 
     The current supported similarity measure are:
+
     * Jensen-Shannon divergence
     * Renyi divergence
     * Cosine distance
