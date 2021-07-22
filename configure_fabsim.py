@@ -230,7 +230,7 @@ def main():
     print(Panel.fit(msg, title=title, border_style="sea_green2"))
 
     # check if fabsim command is already available or not
-    if which("ls") is not None:
+    if which("fabsim") is not None:
         print("\n")
         print(
             Panel.fit(
