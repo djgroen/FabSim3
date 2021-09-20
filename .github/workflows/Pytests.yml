@@ -80,7 +80,7 @@ jobs:
           python3 -m pip install --upgrade pip      
           python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout rich
 
-      - name: Setup FabSim3  🚦🚦🚦
+      - name: Setup FabSim  🚦🚦🚦
         run: |
           python3 configure_fabsim.py
 

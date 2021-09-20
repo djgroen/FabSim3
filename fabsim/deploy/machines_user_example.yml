@@ -3,8 +3,8 @@
 # Details given in per-machine dictionaries will override machine settings in machines.yml
 
 default:
-  local_results: "~/Codes/FabSim/results"
-  local_configs: "~/Codes/FabSim/config_files"
+  local_results: "~/FabSim3/results"
+  local_configs: "~/FabSim3/config_files"
   username: "your-username"
   # home_path_template: "/home/$username"
   # home_path_template: "/Users/$username"  # for OSX users
@@ -62,3 +62,9 @@ marenostrum4:
   # list of available queue for the job : bsc_queues
   queue_name: "debug" # or "bsc_case"
   memconfig_name: "highmem" #"highmem"
+
+
+training_hidalgo:
+  username: "<your-username>"
+  home_path_template: "/work/<your-username>"
+  partition_name: "hidalgo"

@@ -1,4 +1,4 @@
-from base.fab import *
+from fabsim.base.fab import *
 # Add local script and template path for FabSim3
 add_local_paths("FabCannonsim")
 
@@ -20,6 +20,7 @@ def Cannonsim_ensemble(app, **args):
         >_ fabsim localhost Cannonsim_ensemble:cannon_app
     """
     update_environment(args)
+    with_config(app)
     sweep_dir = find_config_file_path(app) + "/SWEEP"
     env.script = "cannonsim"
     run_ensemble(app, sweep_dir, **args)

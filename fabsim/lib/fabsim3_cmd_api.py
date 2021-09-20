@@ -16,22 +16,22 @@ except ImportError:
     from base.fab import *
 
 
-def fabsim(command, arguments, machine='localhost'):
+def fabsim(task, arguments, machine="localhost"):
     """
-    Generic function for running any FabSim3 command.
+    Generic function for running any FabSim3 task.
 
     Args:
-        command (str): the FanSim3 command to execute
+        task (str): the FanSim3 task to execute
         arguments (str): a list of arguments, starting with the config ID,
           followed by keyword arguments "config,arg1=....,arg2=...."
         machine (str, optional): the name of the remote machine as indicated in
           machines_user.yml
     """
     print("Executing\n\n", "\tfabsim {} {}:{}".format(
-        machine, command, arguments)
+        machine, task, arguments)
     )
 
-    os.system("fabsim {} {}:{}".format(machine, command, arguments))
+    os.system("fabsim {} {}:{}".format(machine, task, arguments))
 
 
 def fetch_results(machine="localhost"):

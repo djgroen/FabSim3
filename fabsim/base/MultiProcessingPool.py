@@ -4,7 +4,7 @@ import os
 import sys
 import traceback
 import itertools
-
+import signal
 parent_id = os.getpid()
 
 
@@ -24,6 +24,7 @@ def start_process(PoolSize):
             PoolSize,
         )
     )
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
 def error_callback(e):

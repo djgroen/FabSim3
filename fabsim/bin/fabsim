@@ -1,18 +1,45 @@
 #!/usr/bin/env python3
 
-# -*- coding: utf-8 -*-
 import re
 import sys
 import os
 
-import fabric_main
+
+def find_fabsim_main():
+    """
+    Attempt to locate the fabsim_main.py file
+    Hamid: this would be helpful if you want to have multiple FabSim3 installed
+    in your PC at different PATHs
+
+    credit to :
+    https://github.com/fabric/fabric/blob/1.13/fabric/main.py#L85
+    """
+    file_name = "fabsim_main.py"
+    path = "."
+    # Stop before falling off root of filesystem (should be platform
+    # agnostic)
+    while os.path.split(os.path.abspath(path))[1]:
+        fabsim_main_py = os.path.join(path, "fabsim", "base", file_name)
+        if os.path.exists(fabsim_main_py):
+            fabsim_rootdir = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(fabsim_main_py),
+                    "../.."
+                )
+            )
+            return fabsim_rootdir
+        path = os.path.join("..", path)
+
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    fabsim_rootdir = os.path.dirname(os.path.dirname(cur_dir))
+    return os.path.abspath(fabsim_rootdir)
+
 
 if __name__ == '__main__':
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    fabfile_path = os.path.join(
-        os.path.dirname(os.path.dirname(cur_dir)),
-        "fabfile.py"
-    )
-
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
-    sys.exit(fabric_main.main([fabfile_path]))
+
+    fabsim_rootdir = find_fabsim_main()
+    sys.path.insert(0, fabsim_rootdir)
+    from fabsim.base import fabsim_main
+
+    sys.exit(fabsim_main.main())

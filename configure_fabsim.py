@@ -55,8 +55,8 @@ required = {
     "ruamel.yaml": None,
     "numpy": None,
     "yaml": "pyyaml",
-    "fabric": "fabric3==1.13.1.post1",
-    "cryptography": None
+    "fabric2": "fabric2",
+    "beartype": "beartype",
 }
 
 for pkg_name, pip_pkg_name in required.items():
@@ -214,7 +214,7 @@ def main():
 
     print(Panel.fit(msg, title=title, border_style="orange_red1"))
 
-    title = "[sea_green2]Tip[/sea_green2]"
+    title = "[dark_green]Tip[/dark_green]"
     msg = "\nTo make these updates permanent, you can add the following command "
     msg += "at the end of your bash shell script which could be one of "
     msg += "[{}] files, depends on your OS System.\n\n".format(
@@ -227,7 +227,7 @@ def main():
     msg += "[red1]source[/red1] [light_sea_green]~/.bashrc[/light_sea_green], or "
     msg += "lunch a new terminal."
 
-    print(Panel.fit(msg, title=title, border_style="sea_green2"))
+    print(Panel.fit(msg, title=title, border_style="dark_green"))
 
     # check if fabsim command is already available or not
     if which("fabsim") is not None:

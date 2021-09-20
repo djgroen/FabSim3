@@ -24,7 +24,7 @@ In this tutorial, we explain how to write a FabSim3 plugin from scratch. To keep
 For this tutorial, a simple application, namely *cannon_app*, which calculates the range of a projectile fired at an angle is selected. By using simple physics rules, you can find how far a fired projectile will travel. The source code for this application, written in three of the most widely used languages: C,Java, and Python, is available here : <https://github.com/arabnejad/cannon_app>. The *cannon_app* reads the input parameters from a simple txt file and calculate the distance until ball hits the round. How far the ball travels will depend on the input parameters such as : speed, angle, gravity, and air resistance. Figure below shows the sample input setting file and the generate output plot.
 
 <figure>
-   <img src="images/canonsim_example.png" width="600"> 
+   <img src="../images/canonsim_example.png" width="600"> 
 </figure>
 
 
@@ -70,7 +70,7 @@ To create a new plugin for *cannon_app* application, you need to follow a files 
 	* `FabCannonsim.py`, which contains the plugin source code.
 	* `machines_FabCannonsim_user.yml`, which contains the plugin environmental variables.
 
-5. Add a new plugin entry in `plugins.yml` file located in `FabSim3/deploy` folder.
+5. Add a new plugin entry in `plugins.yml` file located in `FabSim3/fabsim/deploy` folder.
 	```yaml
 	...
 	FabCannonsim:
@@ -85,12 +85,12 @@ To create a new plugin for *cannon_app* application, you need to follow a files 
 To summarize this part, by following above steps, the file and directory should be as shown as in figure below:
 
 <figure>
-   <img src="images/canonsim_structure.png" width="700"> 
+   <img src="../images/canonsim_structure.png" width="700"> 
 </figure>
 
 
 - (a) demonstrates the directory tree structures
-- (b) show the updated `plugins.yml` file located in `FabSim3/deploy` folder
+- (b) show the updated `plugins.yml` file located in `FabSim3/fabsim/deploy` folder
 
 !!! attention
 	Please note that, the folders name highlighted with **red** color in (a) will be used by FabSim3 for job configuration and execution and should not be changed. Also, all three (1) the plugin name, here `FabCannonsim`, (2) the plugin fabric python file, here `FabCannonsim.py`, and (3) the plugin entry in `plugins.yml` file , should be **identical**.
@@ -140,7 +140,7 @@ To call and execute a function from command line, it should be tagged as a Fabri
 
 	* `#!python update_environment(args)`
 
-		is predefined FabSim3 function which updated the environmental variables that are used as a combination settings registry and shared inter-task data namespace. The complete list of FabSim3 environmental variables can be found in `machines.yml` and `machines_user.yml` located in `FabSim3/deploy` folder.
+		is predefined FabSim3 function which updated the environmental variables that are used as a combination settings registry and shared inter-task data namespace. The complete list of FabSim3 environmental variables can be found in `machines.yml` and `machines_user.yml` located in `FabSim3/fabsim/deploy` folder.
 
 	* `#!python with config(args)`
 
@@ -180,16 +180,70 @@ To call and execute a function from command line, it should be tagged as a Fabri
 
 	To submit and execute a single *cannon_app* job,
 	```sh
+	# to execute on localhost
 	fabsim localhost Cannonsim:cannon_app
+	# to execute on remote machine
+	fabsim eagle_vecma Cannonsim:cannon_app
 	```
+
+	!!! note
+		Please note that, the target machine, e.g., `localhost` or `eagle_vecma`, should be defined and available in both in both `machines.yml` and `machines_user.yml` files. To see the machine configuration attribute, you can run : 
+		```sh
+		fabsim <target_host> machine_config_info
+		```
+
+		Additionally, you can overwrite or add new attributes to the target machine, tailored to your plugin, in `machines_<plugin_name>_user.yml` file.
+
+
 
 2. **Ensemble job execution**
 
-	Code below shows a sample function for an ensemble job execution in `FabCannonsim.py`.
+	An ensemble-based simulation uses variation in input or output data, model parameters, or available version of models to improve the simulation performance. 
+	For the `cannon_app` application, the input `simsetting.txt` file can be varied for different ensemble runs. 
+	To setup an ensemble simulation, first we need to create a `SWEEP` folder in the root directory of application. Inside the `SWEEP` folder, each ensemble runs should represented by different folder name. To vary the input `simsetting.txt` file, we should follow the same relative path of that file inside each run directory in `SWEEP` folder.
+
+	!!! note
+		Please note that, by default, FabSim3 builds and constructs the required number of ensembles runs based on a default folder, namely `SWEEP`, located inside the application config directory
+
+	Figure bellow illustrates a sample files and folders structures with 3 ensemble runs.
+
+	<figure>
+	   <img src="../images/canonsim_ensemble_structure.png" width="700"> 
+	</figure>
+
+	- (a) A sample files and folders structure for cannon app application with 3 ensemble runs. Please not that, the target file, here is `simsetting.txt`, should follow the same path as the original version. 
+	- (b) the generated files and folder structure for execution side of the ensemble execution.
+
+
+
+	Code below shows the sample function for an ensemble execution in `FabCannonsim.py` file.
+
+
 	```python
 	--8<-- "docs/source_codes/cannonsim_ensemble_job.py"
 	```
 
+	Most part of this code is already explained in the previous section, i.e., single job submission. The following paragraphs will explain the required lines for an ensemble functionality:
+
+	* `#!python sweep_dir = find_config_file_path(app) + "/SWEEP"`
+
+		set the `SWEEP` directory `PATH`. As it mentioned earlier, the `SWEEP` directory should be located in the root of the application. The API `find_config_file_path(app)` will return the `PATH` to the application, here, the return value will be : `FabSim3/plugins/FabCannonsim/config_files/cannon_app`.
+
+	* `#!python run_ensemble(app, sweep_dir, **args)`
+
+		is an internal low level function to map and execute ensemble jobs. Two mandatory input arguments are : (1) the config/application directory name, and (2) the `PATH` to `SWEEP` directory which contains inputs that will vary per ensemble simulation instance.
+
+
+	As you can see in code above, unlike the single job execution, there is no need to call `execute(put_configs, app)`; The `execute` function will be called automatically by the `run_ensemble` API.
+
+
+	To submit and execute an ensemble *cannon_app* job,
+	```sh
+	# to execute on localhost
+	fabsim localhost Cannonsim_ensemble:cannon_app
+	# to execute on remote machine
+	fabsim eagle_vecma Cannonsim_ensemble:cannon_app
+	```
 
 ## How to use `fabsim` API commands form python code
 
