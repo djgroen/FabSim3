@@ -1,30 +1,30 @@
-import os
 import math
+import os
 import re
 import tempfile
-from shutil import copyfile, rmtree, copy
-from typing import Callable
-from typing import Tuple
-from typing import Optional
-from pprint import pprint, pformat
-# from rich import print
+from pprint import pformat, pprint
+from shutil import copy, copyfile, rmtree
+from typing import Callable, Optional, Tuple
+
+from beartype import beartype
+from rich import print as rich_print
+from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table, box
-from rich.console import Console
+
 # from fabsim.base.utils import add_prefix, print_prefix
-
-from fabsim.base.MultiProcessingPool import MultiProcessingPool
-
-from rich import print as rich_print
-from fabsim.deploy.machines import *
+from fabsim.base.decorators import load_plugin_env_vars, task
 from fabsim.base.env import env
-from fabsim.deploy.templates import template, script_templates,\
-    script_template_content
-from fabsim.base.decorators import task, load_plugin_env_vars
-from fabsim.base.setup_fabsim import *
-from fabsim.base.networks import run, rsync_project, local, put
 from fabsim.base.manage_remote_job import *
-from beartype import beartype
+from fabsim.base.MultiProcessingPool import MultiProcessingPool
+from fabsim.base.networks import local, put, rsync_project, run
+from fabsim.base.setup_fabsim import *
+from fabsim.deploy.machines import *
+from fabsim.deploy.templates import (
+    script_template_content,
+    script_templates,
+    template,
+)
 
 
 @beartype

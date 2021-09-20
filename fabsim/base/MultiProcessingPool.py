@@ -1,10 +1,17 @@
-from multiprocessing import Pool, cpu_count, current_process, Process, Manager
-from multiprocessing import set_start_method
+import itertools
 import os
+import signal
 import sys
 import traceback
-import itertools
-import signal
+from multiprocessing import (
+    Manager,
+    Pool,
+    Process,
+    cpu_count,
+    current_process,
+    set_start_method,
+)
+
 parent_id = os.getpid()
 
 

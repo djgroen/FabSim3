@@ -1,14 +1,14 @@
 import inspect
 import sys
-from pprint import pprint
 from contextlib import contextmanager
-# from rich import print
+from pprint import pprint
 from typing import Dict
+
+from rich.console import Console
 from rich.table import Table, box
 from rich.text import Text
-from rich.console import Console
+
 from fabsim.base.env import env
-# from fabsim.base.decorators import add_prefix_to_print
 
 
 def find_all_avail_tasks() -> Dict:

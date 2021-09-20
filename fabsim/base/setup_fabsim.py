@@ -1,14 +1,16 @@
-import yaml
-from os import path, rename
 import random
 import string
+from os import path, rename
+
+import yaml
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+from fabsim.base.decorators import task
 from fabsim.base.env import env
 from fabsim.base.networks import local, run
-from fabsim.base.decorators import task
 from fabsim.deploy.templates import template
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
 
 
 @task

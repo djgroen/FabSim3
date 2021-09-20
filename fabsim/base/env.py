@@ -1,14 +1,12 @@
 import getpass
-
-import os
-from rich import traceback
-from rich import pretty
-from rich.table import Table, box
-from io import StringIO
-from rich.console import Console
-import posixpath
 import io
+import os
+import posixpath
+from io import StringIO
 
+from rich import pretty, traceback
+from rich.console import Console
+from rich.table import Table, box
 
 # Better Logging and Tracebacks with Rich :)
 # traceback.install()

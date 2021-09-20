@@ -1,10 +1,12 @@
-from fabsim.base.networks import run, local
-from fabsim.deploy.templates import template
+import time
+from typing import Optional
+
+from beartype import beartype
+
 from fabsim.base.decorators import task
 from fabsim.base.env import env
-from beartype import beartype
-from typing import Optional
-import time
+from fabsim.base.networks import local, run
+from fabsim.deploy.templates import template
 
 
 @task

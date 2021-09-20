@@ -1,19 +1,19 @@
 from __future__ import print_function
-from pprint import pprint, pformat
-import os
+
 import io
-import sys
-from beartype import beartype
-from contextlib import contextmanager
-from fabric2 import Config, Connection
-from fabsim.base.env import env
-from rich.table import Table, box
-from fabsim.base.utils import add_print_perfix
+import os
 import subprocess
+import sys
+from contextlib import contextmanager
+from pprint import pformat, pprint
+from typing import List, Optional, Tuple
+
 from beartype import beartype
-from typing import Tuple
-from typing import List
-from typing import Optional
+from fabric2 import Config, Connection
+from rich.table import Table, box
+
+from fabsim.base.env import env
+from fabsim.base.utils import add_print_perfix
 
 
 @beartype

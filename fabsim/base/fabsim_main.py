@@ -1,21 +1,27 @@
 from __future__ import absolute_import
-import sys
-import inspect
-from optparse import OptionParser, make_option
 
-from pprint import pprint, pformat
-# from rich import print
 import builtins
-from rich import print as rich_print, get_console
+import inspect
+import sys
+from optparse import OptionParser, make_option
+from pprint import pformat, pprint
+
+from rich import get_console
+from rich import print as rich_print
 from rich.panel import Panel
 
-
-from fabsim.base.fab import *
 from fabsim.base.env import env
-from fabsim.base.utils import find_all_avail_tasks, show_avail_tasks, \
-    show_avail_machines
-from fabsim.deploy.machines import available_remote_machines, load_plugins, \
-    load_machine
+from fabsim.base.fab import *
+from fabsim.base.utils import (
+    find_all_avail_tasks,
+    show_avail_machines,
+    show_avail_tasks,
+)
+from fabsim.deploy.machines import (
+    available_remote_machines,
+    load_machine,
+    load_plugins,
+)
 
 # from fabsim.base.decorators import add_prefix_to_print
 

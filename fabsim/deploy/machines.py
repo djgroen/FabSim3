@@ -1,18 +1,18 @@
-import yaml
-import sys
 import importlib
-from pprint import pprint, pformat
-import os
 import inspect
-from beartype import beartype
+import os
+import sys
+from pprint import pformat, pprint
 from typing import Dict, List, Optional
-# from rich import print
+
+import yaml
+from beartype import beartype
 from rich.console import Console
 from rich.panel import Panel
-from fabsim.base.decorators import task
-from fabsim.base.utils import add_print_perfix
 
+from fabsim.base.decorators import task
 from fabsim.base.env import env
+from fabsim.base.utils import add_print_perfix
 from fabsim.deploy.templates import template
 
 config = yaml.safe_load(

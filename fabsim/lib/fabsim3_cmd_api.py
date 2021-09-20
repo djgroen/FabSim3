@@ -8,8 +8,9 @@
 # It has no dependencies, but does require a working FabSim3 installation.
 
 import os
-import time
 import subprocess
+import time
+
 try:
     from fabsim.base.fab import *
 except ImportError:

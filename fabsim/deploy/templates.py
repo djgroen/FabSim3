@@ -1,9 +1,11 @@
-from string import Template
 import os
 import sys
-from beartype import beartype
-from fabsim.base.env import env
+from string import Template
 from typing import Optional
+
+from beartype import beartype
+
+from fabsim.base.env import env
 
 
 def script_templates(*names, **options):

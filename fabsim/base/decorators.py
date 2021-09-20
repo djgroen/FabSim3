@@ -1,12 +1,12 @@
-import os
 import inspect
+import os
 from functools import wraps
-from beartype import beartype
-from fabsim.base.env import env
-from fabsim.base.utils import add_print_perfix, colored
-
 from pprint import pprint
 
+from beartype import beartype
+
+from fabsim.base.env import env
+from fabsim.base.utils import add_print_perfix, colored
 
 """
 def colored(r, g, b, text):

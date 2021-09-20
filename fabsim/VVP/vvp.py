@@ -5,6 +5,7 @@
 import os
 from collections import OrderedDict
 from pprint import pprint
+
 import numpy as np
 
 """
@@ -290,6 +291,7 @@ def ensemble_vvp(results_dirs, sample_testing_function,
 def jensen_shannon_divergence(list1, list2):
     """Calculates Jenson-Shannon Distance """
     import scipy
+
     # convert the vectors into numpy arrays in case that they aren't
     list1 = np.array(list1)
     list2 = np.array(list2)
