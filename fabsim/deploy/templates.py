@@ -3,6 +3,7 @@ import os
 import sys
 from beartype import beartype
 from fabsim.base.env import env
+from typing import Optional
 
 
 def script_templates(*names, **options):
@@ -68,7 +69,7 @@ def script_template(template_name: str) -> str:
 
 
 @beartype
-def template(pattern: str, number_of_iterations: int = 1) -> str:
+def template(pattern: str, number_of_iterations: Optional[int] = 1) -> str:
     """
     Low-level templating function, insert env variables into any string pattern
         - number_of_iterations can be adjusted to allow recurring

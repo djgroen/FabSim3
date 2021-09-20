@@ -13,10 +13,14 @@ import subprocess
 from beartype import beartype
 from typing import Tuple
 from typing import List
+from typing import Optional
 
 
 @beartype
-def local(command: str, capture: bool = False) -> Tuple[str, str]:
+def local(
+    command: str,
+    capture: Optional[bool] = False
+) -> Tuple[str, str]:
     """
     Run a command on the local system.
 
@@ -127,7 +131,11 @@ class HostConnection():
 
 
 @beartype
-def run(cmd: str, cd: str = None, capture: bool = False):
+def run(
+    cmd: str,
+    cd: Optional[str] = None,
+    capture: Optional[bool] = False
+):
     if env.manual_sshpass:
         return manual_sshpass(cmd, cd=cd, capture=capture)
     elif env.manual_gsissh:
@@ -139,7 +147,11 @@ def run(cmd: str, cd: str = None, capture: bool = False):
 
 
 @beartype
-def manual_sshpass(cmd: str, cd: str = None, capture: bool = False):
+def manual_sshpass(
+    cmd: str,
+    cd: Optional[str] = None,
+    capture: Optional[bool] = False
+):
     if env.get("command_prefixes"):
         commands = env.command_prefixes[:]
     else:
@@ -158,7 +170,11 @@ def manual_sshpass(cmd: str, cd: str = None, capture: bool = False):
 
 
 @beartype
-def manual_gsissh(cmd: str, cd: str = None, capture: bool = False):
+def manual_gsissh(
+    cmd: str,
+    cd: Optional[str] = None,
+    capture: Optional[bool] = False
+):
     # From the fabric wiki, bypass fabric internal ssh control
     if env.get("command_prefixes"):
         commands = env.command_prefixes[:]
@@ -175,7 +191,11 @@ def manual_gsissh(cmd: str, cd: str = None, capture: bool = False):
 
 
 @beartype
-def manual(cmd: str, cd: str = None, capture: bool = False):
+def manual(
+    cmd: str,
+    cd: Optional[str] = None,
+    capture: Optional[bool] = False
+):
     # From the fabric wiki, bypass fabric internal ssh control
     if env.get("command_prefixes"):
         commands = env.command_prefixes[:]
@@ -205,10 +225,10 @@ def rsync_project(
     remote_dir: str,
     local_dir: str,
     exclude: List[str] = [],
-    delete: bool = False,
-    ssh_opts: str = "",
-    default_opts: str = "-pthrvz",
-    capture: bool = False
+    delete: Optional[bool] = False,
+    ssh_opts: Optional[str] = "",
+    default_opts: Optional[str] = "-pthrvz",
+    capture: Optional[bool] = False
 ) -> Tuple[str, str]:
     """
     Synchronize a remote directory with the current project directory via
@@ -275,7 +295,7 @@ def rsync_project(
 def put(
     src: str,
     dst: str,
-    capture: bool = False
+    capture: Optional[bool] = False
 ) -> Tuple[str, str]:
     """
     Upload a file or directory to a remote host.

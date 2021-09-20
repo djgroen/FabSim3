@@ -5,6 +5,7 @@ import tempfile
 from shutil import copyfile, rmtree, copy
 from typing import Callable
 from typing import Tuple
+from typing import Optional
 from pprint import pprint, pformat
 # from rich import print
 from rich.panel import Panel
@@ -87,10 +88,10 @@ def put_results(name: str) -> None:
 @task
 @beartype
 def fetch_results(
-        name: str = "",
-        regex: str = "",
-        files: str = None,
-        debug: bool = False) -> None:
+        name: Optional[str] = "",
+        regex: Optional[str] = "",
+        files: Optional[str] = None,
+        debug: Optional[bool] = False) -> None:
     """
     Fetch results of remote jobs to local result store. Specify a job
     name to transfer just one job. Local path to store results is
@@ -335,7 +336,10 @@ def calc_total_mem() -> None:
 
 
 @beartype
-def find_config_file_path(name: str, ExceptWhenNotFound: bool = True) -> str:
+def find_config_file_path(
+    name: str,
+    ExceptWhenNotFound: Optional[bool] = True
+) -> str:
     """
     Find the config file path
 
@@ -441,8 +445,8 @@ def add_local_paths(plugin_name: str) -> None:
 
 @beartype
 def with_template_job(
-        ensemble_mode: bool = False,
-        label: str = None
+    ensemble_mode: Optional[bool] = False,
+    label: Optional[str] = None
 ) -> Tuple[str, str]:
     """
     Determine a generated job name from environment parameters,
@@ -473,8 +477,8 @@ def with_template_job(
 @beartype
 def with_job(
     name: str,
-    ensemble_mode: bool = False,
-    label: str = None
+    ensemble_mode: Optional[bool] = False,
+    label: Optional[str] = None
 ) -> Tuple[str, str]:
     """
     Augment the fabric environment with information regarding a particular
@@ -937,7 +941,7 @@ def job_submission(*job_args):
 def ensemble2campaign(
     results_dir: str,
     campaign_dir: str,
-    skip: int = 0
+    skip: Optional[int] = 0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -973,7 +977,7 @@ def ensemble2campaign(
 def campaign2ensemble(
     config: str,
     campaign_dir: str,
-    skip: int = 0
+    skip: Optional[int] = 0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
@@ -1023,8 +1027,8 @@ def campaign2ensemble(
 def run_ensemble(
     config: str,
     sweep_dir: str,
-    sweep_on_remote: bool = False,
-    execute_put_configs: bool = True,
+    sweep_on_remote: Optional[bool] = False,
+    execute_put_configs: Optional[bool] = True,
     **args
 ) -> None:
     """

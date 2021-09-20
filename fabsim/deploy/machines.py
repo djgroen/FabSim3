@@ -5,7 +5,7 @@ from pprint import pprint, pformat
 import os
 import inspect
 from beartype import beartype
-from typing import Dict, List
+from typing import Dict, List, Optional
 # from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -397,7 +397,7 @@ def my_deepcopy(obj):
 
 
 @beartype
-def findDiff(d1: Dict, d2: Dict, path: str = "") -> List[str]:
+def findDiff(d1: Dict, d2: Dict, path: Optional[str] = "") -> List[str]:
     ret_str = []
     for key in d1:
         if key not in d2:

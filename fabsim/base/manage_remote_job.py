@@ -3,7 +3,7 @@ from fabsim.deploy.templates import template
 from fabsim.base.decorators import task
 from fabsim.base.env import env
 from beartype import beartype
-
+from typing import Optional
 import time
 
 
@@ -21,7 +21,7 @@ def stat() -> None:
 
 
 @beartype
-def jobs_list(quiet: bool = False) -> str:
+def jobs_list(quiet: Optional[bool] = False) -> str:
     """
         options:
                 quiet = True : hide the command output
@@ -48,7 +48,7 @@ def jobs_list(quiet: bool = False) -> str:
 
 @task
 @beartype
-def cancel_job(jobID: str = None) -> None:
+def cancel_job(jobID: Optional[str] = None) -> None:
     """
         Cancel a remote job.
         Syntax: fab <machine> cancel_job:jobID
@@ -89,7 +89,7 @@ def check_jobs_dispatched_on_remote_machine() -> None:
 
 
 @beartype
-def check_complete(jobname_syntax: str = "") -> bool:
+def check_complete(jobname_syntax: Optional[str] = "") -> bool:
     """
     Return true if the user has no job running containing
     jobname_syntax in their name
@@ -110,7 +110,7 @@ def check_complete(jobname_syntax: str = "") -> bool:
 
 
 @task
-def wait_complete(jobname_syntax: str = "") ->None:
+def wait_complete(jobname_syntax: str = "") -> None:
     """
     Wait until jobs currently running containing jobname_syntax in
     their name are complete, then return
