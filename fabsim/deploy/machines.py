@@ -22,11 +22,19 @@ env.update(config["default"])
 
 try:
     user_config = yaml.safe_load(
-        open(os.path.join(env.fabsim_root, "deploy", "machines_user.yml"))
+        open(os.path.join(env.fabsim_root, "deploy",
+                          "machines_user.yml")
+             )
     )
 except FileNotFoundError:
-    raise FileNotFoundError(
-        "There is NO machines_user.yml under fabsim/deploy directory!!!\n"
+    # raise FileNotFoundError(
+    #     "There is NO machines_user.yml under fabsim/deploy directory!!!\n"
+    # )
+    print("There is not machines_user.yml under fabsim/deploy folder!!!\n")
+    user_config = yaml.safe_load(
+        open(os.path.join(env.fabsim_root, "deploy",
+                          "machines_user_example.yml")
+             )
     )
 env.update(user_config["default"])
 
