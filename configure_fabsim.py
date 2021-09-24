@@ -165,12 +165,23 @@ def config_yml_files():
     FS3_env.machines_user_yml["default"]["username"] = FS3_env.user_name
     FS3_env.machines_user_yml["localhost"]["username"] = FS3_env.user_name
 
+    machines_user_PATH = os.path.join(FS3_env.FabSim3_PATH,
+                                      "fabsim",
+                                      "deploy",
+                                      "machines_user.yml")
+
+    # backup the machines_user.yml if it exits
+    if os.path.isfile(machines_user_PATH):
+        os.rename(
+            machines_user_PATH,
+            os.path.join(FS3_env.FabSim3_PATH,
+                         "fabsim",
+                         "deploy",
+                         "machines_user_backup.yml")
+        )
+
     # save machines_user.yml
-    with open(os.path.join(FS3_env.FabSim3_PATH,
-                           "fabsim",
-                           "deploy",
-                           "machines_user.yml"),
-              "w") as yaml_file:
+    with open(machines_user_PATH, "w") as yaml_file:
         yaml.dump(FS3_env.machines_user_yml, yaml_file)
 
     # create localhost execution folder if it is not exists
