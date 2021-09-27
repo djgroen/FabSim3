@@ -1,0 +1,25 @@
+#!/bin/bash -l
+
+# Batch script to run a job under UCL Young SGE Cluster.
+# Young is the UK National Tier 2 High Performance Computing Hub in 
+# Materials and Molecular Modelling, and replacement for Thomas. 
+# Young went into pilot on 3 Aug 2020.
+# https://www.rc.ucl.ac.uk/docs/Clusters/Young/
+
+# Set the name of the job.
+#$dollar -N $job_name
+
+# job wall time in format hours:minutes:second
+#$dollar -l h_rt=$job_wall_time
+
+# Request memory per core/thread (must be an integer followed by M, G, or T)
+#$dollar -l mem=$memory
+
+# Set the working directory
+#$dollar -wd $job_results
+
+# enable/disable Hyperthreading
+# this is only available if you submit you job on kathleen.rc.ucl.ac.uk
+#$dollar -l threads=$hyperthreading
+
+

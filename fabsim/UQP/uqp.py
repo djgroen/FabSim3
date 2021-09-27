@@ -2,7 +2,6 @@
 #
 # These patterns should be purposed for specific settings.
 # As such, they do not contain a @task descriptor.
-import os
 
 
 """

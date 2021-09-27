@@ -1,12 +1,16 @@
-from fabsim.deploy.templates import *
-from fabsim.deploy.machines import *
-from fabric.contrib.project import *
-from fabric.api import hide, local, run
 import time
+from typing import Optional
+
+from beartype import beartype
+
+from fabsim.base.decorators import task
+from fabsim.base.env import env
+from fabsim.base.networks import local, run
+from fabsim.deploy.templates import template
 
 
 @task
-def stat(jobID=None):
+def stat() -> None:
     '''
     Check the remote message queue status for individual machines.
     Syntax: fab <machine> stat.
@@ -15,10 +19,11 @@ def stat(jobID=None):
     '''
     check_jobs_dispatched_on_remote_machine()
     jobsInfo = jobs_list(quiet=True)
-    print('\n'.join(jobsInfo))
+    print(jobsInfo)
 
 
-def jobs_list(quiet=False):
+@beartype
+def jobs_list(quiet: Optional[bool] = False) -> str:
     """
         options:
                 quiet = True : hide the command output
@@ -37,14 +42,15 @@ def jobs_list(quiet=False):
         output = local(pre_cmd + "'" + manual_command + "'", capture=False)
 
     else:
-        with hide("output"):
-            output = run(template("$stat"), shell=False).splitlines()
+
+        output = run(template("$stat"), capture=quiet)
 
     return output
 
 
 @task
-def cancel_job(jobID=None):
+@beartype
+def cancel_job(jobID: Optional[str] = None) -> None:
     """
         Cancel a remote job.
         Syntax: fab <machine> cancel_job:jobID
@@ -67,24 +73,25 @@ def cancel_job(jobID=None):
             isinstance(env.dispatch_jobs_on_localhost, bool) and
             env.dispatch_jobs_on_localhost
     ):
-        return local(template("$cancel_job_command $jobID"))
+        local(template(templatetemplate("$cancel_job_command")))
     elif env.manual_sshpass:
         pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
         manual_command = template("$cancel_job_command $jobID")
-        return local(pre_cmd + "'" + manual_command + "'", capture=False)
+        local(pre_cmd + "'" + manual_command + "'", capture=False)
 
     else:
-        return run(template("$cancel_job_command $jobID"))
+        run(template(template("$cancel_job_command")))
 
 
-def check_jobs_dispatched_on_remote_machine():
+def check_jobs_dispatched_on_remote_machine() -> None:
     if env.remote == "localhost":
         print("ERROR: This functionality can be used only when"
               "jobs are submitted on the remote machine")
         sys.exit()
 
 
-def check_complete(jobname_syntax=""):
+@beartype
+def check_complete(jobname_syntax: Optional[str] = "") -> bool:
     """
     Return true if the user has no job running containing
     jobname_syntax in their name
@@ -105,7 +112,7 @@ def check_complete(jobname_syntax=""):
 
 
 @task
-def wait_complete(jobname_syntax=""):
+def wait_complete(jobname_syntax: str = "") -> None:
     """
     Wait until jobs currently running containing jobname_syntax in
     their name are complete, then return

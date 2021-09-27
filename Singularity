@@ -181,7 +181,7 @@ EOF_fabsim_env_warning
 		#-- generate machines_user.yml file
 		if [ ! -f ${fabsim_INSTALL_DIR}/deploy/machines_user.yml ]; then
 			cp ${fabsim_INSTALL_DIR}/deploy/machines_user_example.yml ${fabsim_INSTALL_DIR}/deploy/machines_user.yml
-			sed -i "s/your-username/`whoami`/g;s#~/Codes/FabSim#${fabsim_INSTALL_DIR}#g"  ${fabsim_INSTALL_DIR}/deploy/machines_user.yml
+			sed -i "s/your-username/`whoami`/g;s#~/FabSim3#${fabsim_INSTALL_DIR}#g"  ${fabsim_INSTALL_DIR}/deploy/machines_user.yml
 		fi
 
 		id

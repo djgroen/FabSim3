@@ -5,8 +5,9 @@
 import os
 from collections import OrderedDict
 from pprint import pprint
+
 import numpy as np
-import scipy
+
 """
 validate_ensemble_output Validation Pattern.
 
@@ -289,6 +290,7 @@ def ensemble_vvp(results_dirs, sample_testing_function,
 
 def jensen_shannon_divergence(list1, list2):
     """Calculates Jenson-Shannon Distance """
+    import scipy
 
     # convert the vectors into numpy arrays in case that they aren't
     list1 = np.array(list1)
@@ -308,6 +310,7 @@ def jensen_shannon_divergence(list1, list2):
 
 def cosine_similarity(list1, list2):
     """Calculates cosine similarity."""
+    import scipy
     if list1 is None or list2 is None:
         return 0
     assert not (np.isnan(list2).any() or np.isinf(list2).any())
@@ -321,6 +324,7 @@ def cosine_similarity(list1, list2):
 
 def kl_divergence(list1, list2):
     """Calculates Kullback-Leibler divergence."""
+    import scipy
     sim = scipy.stats.entropy(list1, list2)
     return sim
 

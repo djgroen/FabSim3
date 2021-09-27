@@ -79,8 +79,9 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip      
           python3 -m pip install --upgrade ruamel.yaml pytest==5.4.3 pytest-pep8 pep8 pytest-timeout rich
+          python3 -m pip install isort
 
-      - name: Setup FabSim3  🚦🚦🚦
+      - name: Setup FabSim  🚦🚦🚦
         run: |
           python3 configure_fabsim.py
 
@@ -97,3 +98,6 @@ jobs:
           python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
           pytest --pep8  fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
 
+      - name: Run isort 🚀
+        run: |
+          isort --profile hug --check --diff -l 80 fabsim/

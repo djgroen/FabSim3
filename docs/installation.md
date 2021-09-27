@@ -9,10 +9,10 @@
 	* rich
 
 	!!! note
-		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) package, other packages are installed by FabSim3.
-		To install ruamel.yaml package, simply type
+		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) and  [rich](https://pypi.org/project/rich/)  packages, other packages are installed by FabSim3.
+		To install both `ruamel.yaml` and `rich` packages, simply type
 		```sh
-		pip3 install ruamel.yaml
+		pip3 install ruamel.yaml rich
 		```
 
 2. To perform the `Pytest` tests (not required for using FabSim3, but essential for running the tests), you will need [`pytest`](https://docs.pytest.org/en/latest/getting-started.html) and [`pytest-pep8`](https://pypi.org/project/pytest-pep8).
@@ -89,7 +89,7 @@ This is a common issue on Linux system, and it will be solved by re-installing o
 on Mac OSX, make sure turn on **Remote Login** under **System Preferences** then **File Sharing**.
 
 <figure>
-  <img src="images/ssh_macos_error.png" width="400" />
+  <img src="../images/ssh_macos_error.png" width="400" />
 </figure>
 
 The easiest way to test FabSim3 is to simply go to the base directory of your FabSim3 installation and try the command demonstrated below in the **List of available commands**.

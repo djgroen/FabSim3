@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 # -*- coding: utf-8 -*-
+import os
 import re
 import sys
-import os
 
 import fabric_main
 
@@ -16,5 +16,3 @@ if __name__ == '__main__':
     sys.argv.insert(1, '$machine_name')
 
     sys.exit(fabric_main.main([fabfile_path]))
-
-    

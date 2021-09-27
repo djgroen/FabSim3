@@ -6,7 +6,7 @@ Uncertainty quantification (UQ) is an increasingly important field in the simula
 
 
 <figure>
-   <img src="images/UQ_pattern_system.png" width="500"> 
+   <img src="../images/UQ_pattern_system.png" width="500"> 
    Software architecture of the UQ system
 </figure>
 

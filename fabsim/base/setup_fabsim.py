@@ -1,15 +1,16 @@
-from fabsim.deploy.templates import *
-from fabsim.deploy.machines import *
-from fabric.contrib.project import *
-from fabric.api import local, run
-from os import path, rename
 import random
 import string
-from pprint import pprint
+from os import path, rename
+
+import yaml
 from rich.console import Console
-from rich.table import Column, Table
-from rich import print
 from rich.panel import Panel
+from rich.table import Table
+
+from fabsim.base.decorators import task
+from fabsim.base.env import env
+from fabsim.base.networks import local, run
+from fabsim.deploy.templates import template
 
 
 @task
@@ -42,15 +43,19 @@ def install_plugin(plugin_name, branch=None):
             "{}/{}".format(plugin_dir, plugin_name),
             "{}/{}_{}".format(plugin_dir, plugin_name, res),
         )
-        print(
+        print("\n")
+        console = Console()
+        console.print(
             Panel(
-                "[red1]The {} plugin directory is already exists.\n"
-                "To keep your previous folder, we rename it to[/red1] : "
-                "[green1]{}_{}[/green1]".format(plugin_name, plugin_name, res),
-                title="[yellow1]WARNING[/yellow1]",
+                "[orange_red1]The {} plugin directory is already exists.\n"
+                "To keep your previous folder, we rename it to[/orange_red1]: "
+                "[dark_cyan]{}_{}[/dark_cyan]".format(
+                    plugin_name, plugin_name, res),
+                title="[dark_cyan]WARNING[/dark_cyan]",
                 expand=False,
             )
         )
+        print("\n")
 
     local("mkdir -p {}".format(plugin_dir))
     local("rm -rf {}/{}".format(plugin_dir, plugin_name))
@@ -67,6 +72,8 @@ def install_plugin(plugin_name, branch=None):
                 branch, info["repository"], plugin_dir, plugin_name
             )
         )
+
+    print("{} plugin installed...".format(plugin_name))
 
 
 @task
@@ -85,12 +92,19 @@ def avail_plugin():
     )
     table.add_column("plugin name")
     table.add_column("repository")
+    table.add_column("installed")
     for plugin_name, repo in config.items():
+        if path.exists(path.join(env.localroot, "plugins", plugin_name)):
+            installed = "\u2714"  # ✔
+        else:
+            installed = "\u2718"  # ✘
         table.add_row(
             "[blue]{}[/blue]".format(plugin_name),
             "{}".format(repo["repository"]),
+            "{}".format(installed)
         )
-    print(table)
+    console = Console()
+    console.print(table)
 
 
 @task
@@ -101,7 +115,7 @@ def update_plugin(plugin_name):
     Args:
         plugin_name (str): plugin name
     """
-    plugin_dir = "{}/plugins".format(env.fabsim_root)
+    plugin_dir = "{}/plugins".format(env.localroot)
     local("cd {}/{} && git pull".format(plugin_dir, plugin_name))
 
 
@@ -117,33 +131,8 @@ def remove_plugin(name):
         open(path.join(env.fabsim_root, "deploy", "plugins.yml")),
         Loader=yaml.SafeLoader,
     )
-    plugin_dir = "{}/plugins".format(env.fabsim_root)
+    plugin_dir = "{}/plugins".format(env.localroot)
     local("rm -rf {}/{}".format(plugin_dir, name))
-
-
-def add_local_paths(plugin_name):
-    """
-    Updates `env` variables for the input plugin name
-
-    Args:
-        plugin_name (str): plugin name
-    """
-    # This variable encodes the default location for templates.
-    env.local_templates_path.insert(
-        0, path.join(env.localroot, "plugins", plugin_name, "templates")
-    )
-    # This variable encodes the default location for blackbox scripts.
-    env.local_blackbox_path.insert(
-        0, path.join(env.localroot, "plugins", plugin_name, "blackbox")
-    )
-    # This variable encodes the default location for Python scripts.
-    env.local_python_path.insert(
-        0, path.join(env.localroot, "plugins", plugin_name, "python")
-    )
-    # This variable encodes the default location for config files.
-    env.local_config_file_path.insert(
-        0, path.join(env.localroot, "plugins", plugin_name, "config_files")
-    )
 
 
 def get_setup_fabsim_dirs_string():
@@ -174,12 +163,13 @@ def setup_ssh_keys(password=""):
     """
     Sets up SSH key pairs for FabSim access.
     """
-    print(
+    console = Console()
+    console.print(
         Panel(
             "[magenta]To set up your SSH keys, you will be logged in to your\n"
             "local machine once using SSH. You may be asked to provide\n"
             "your password once to facilitate this login.[/magenta]",
-            title="hamid",
+            title="[dark_cyan]Setup SSH keys[/dark_cyan]",
             expand=False,
         )
     )
@@ -199,48 +189,3 @@ def setup_ssh_keys(password=""):
             )
         )
     )
-
-
-@task
-def setup_fabsim(password=""):
-    """
-    Combined command which sets up both the SSH keys and creates the
-    FabSim directories.
-    """
-    setup_ssh_keys(password)
-    setup_fabsim_dirs()
-    # FabSim3 ships with FabDummy by default,
-    # to provide a placeholder example for a plugin.
-    install_plugin("FabDummy")
-
-
-# @task
-# def bash_machine_alias(name=None):
-#     if name is None:
-#         print("Error: the bash alias name (argument 'name') is not set.")
-#         print("the correct format is :")
-#         print("\t\t\t fab %s bash_alias:<prefered_ash_alias_name>\n" %
-#               (env.machine_name))
-#         exit()
-
-#     if name == 'fabsim':
-#         print("Error: cannot set a machine alias to 'fabsim', as this will")
-#         print("overwrite the main fabsim command.")
-#         exit()
-
-#     destname = path.join(env.fabsim_root, 'bin', name)
-#     content = script_template_content('bash_alias')
-
-#     # save the file
-#     target = open(destname, 'w')
-#     target.write(content)
-#     target.close()
-#     # change file permission to be executable
-#     local("chmod u+x %s" % (destname))
-
-#     print("the alias name is set. so, you can use :\n")
-#     print("\t\t\t %s ..." % (name))
-#     print("\tinstead of :")
-#     print("\t\t\t fab %s ..." % (env.machine_name))
-#     print("\n\nNote: you need to reload your bashrc file or restart " +
-#           "the shell to use the new alias name")

@@ -13,7 +13,7 @@ default:
   nb_process: 1
 
   # loading virtual environment on the remote machine 
-  virtualenv : False
+  venv : False
   # Allows to load or unload default modules on remote via interactive connection
   module_load_at_connect: true
   
@@ -28,7 +28,7 @@ default:
   home_path_template: "/home/$username"
   
   # Name for the Project FabSim3 folder
-  fabric_dir: "FabSim3"
+  fabric_dir: "FabSim"
   
   # Path to runtime accessible filesystem (default is same as build time) - OBSOLETE?
   runtime_path_template: "$home_path"
@@ -101,7 +101,10 @@ default:
   # 2- ignore : ignore the exist results folder 
   # 2- warn_only : warn user and keep the exist results folder
   prevent_results_overwrite: "ignore"
-  
+
+  # enable rich Console for colorful outputs
+  rich_console: True
+
 cartesius:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
