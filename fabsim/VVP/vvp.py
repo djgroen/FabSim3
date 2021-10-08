@@ -402,11 +402,16 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
                 if os.path.isdir(os.path.join(sif_dir, item)):
                     print(os.path.join(results_dir, item))
                     print(os.path.join(sif_dir, item))
-                    scores.append(sample_testing_function(
-                        os.path.join(results_dir, item), os.path.join(sif_dir, item) ** kwargs))
+                    scores.append(
+                        sample_testing_function(
+                            os.path.join(results_dir, item),
+                            os.path.join(sif_dir, item),
+                            ** kwargs
+                        )
+                    )
                 else:
-                    print(
-                        "ERROR: SIF dir structure doesn't match results dir structure.")
+                    print("ERROR: SIF dir structure doesn't match "
+                          "results dir structure.")
 
         scores_aggregation = aggregation_function(scores, **kwargs)
 
