@@ -349,3 +349,72 @@ def euclidean_distance(list1, list2):
         np.sum([np.power(p - q, 2) for (p, q) in zip(list1, list2)])
     )
     return sim
+
+# VVP 1
+def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
+                 aggregation_function, **kwargs):
+    """
+    Goes through all the output directories and calculates the scores.
+    Arguments:
+    - results_dirs: list of result dirs to analyse.
+    - sample_testing_function: analysis/validation/verification function to be
+    performed on each subdirectory of the results_dirs.
+    - aggregation_function: function to combine all results
+    - **kwargs: custom parameters. The 'items' parameter can be used to give
+    explicit ordering of the various subdirectories.
+
+    return : sif_vvp_results (dict)
+
+    Authors: Derek Groen, Wouter Edeling, and Hamid Arabnejad
+    """
+
+    sif_vvp_results = {}
+
+    # if a single result_dir is specified, still add it to a list
+    if type(results_dirs) == str:
+        tmp = []
+        tmp.append(results_dirs)
+        results_dirs = tmp
+
+    # if a single sif_dir is specified, still add it to a list
+    if type(sif_dirs) == str:
+        tmp = []
+        tmp.append(sif_dirs)
+        sif_dirs = tmp
+
+
+    for i in range(0, results_dirs):
+        results_dir = results_dirs[i]
+        sif_dir = sif_dirs[i]
+
+        scores = []
+
+        # use user-specified sample directories if specified,
+        # otherwise look for uq results in all directories in results_dir
+        if 'items' in kwargs:
+            items = kwargs['items']
+        else:
+            items = os.listdir("{}".format(results_dir))
+
+        for item in items:
+            if os.path.isdir(os.path.join(results_dir, item)):
+                if os.path.isdir(os.path.join(sif_dir, item)):
+                    print(os.path.join(results_dir, item))
+                    print(os.path.join(sif_dir, item))
+                    scores.append(sample_testing_function(
+                        os.path.join(results_dir, item), os.path.join(sif_dir, item) **kwargs))
+                else:
+                    print("ERROR: SIF dir structure doesn't match results dir structure.")
+
+        scores_aggregation = aggregation_function(scores, **kwargs)
+
+        # update return results dict
+        sif_vvp_results.update({results_dir: {}})
+
+        sif_vvp_results[results_dir].update({
+            'scores': scores,
+            'scores_aggregation': scores_aggregation
+        })
+
+    return sif_vvp_results
+
