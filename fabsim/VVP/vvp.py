@@ -351,8 +351,10 @@ def euclidean_distance(list1, list2):
     return sim
 
 # VVP 1
+
+
 def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
-                 aggregation_function, **kwargs):
+            aggregation_function, **kwargs):
     """
     Goes through all the output directories and calculates the scores.
     Arguments:
@@ -382,7 +384,6 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         tmp.append(sif_dirs)
         sif_dirs = tmp
 
-
     for i in range(0, results_dirs):
         results_dir = results_dirs[i]
         sif_dir = sif_dirs[i]
@@ -402,9 +403,10 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
                     print(os.path.join(results_dir, item))
                     print(os.path.join(sif_dir, item))
                     scores.append(sample_testing_function(
-                        os.path.join(results_dir, item), os.path.join(sif_dir, item) **kwargs))
+                        os.path.join(results_dir, item), os.path.join(sif_dir, item) ** kwargs))
                 else:
-                    print("ERROR: SIF dir structure doesn't match results dir structure.")
+                    print(
+                        "ERROR: SIF dir structure doesn't match results dir structure.")
 
         scores_aggregation = aggregation_function(scores, **kwargs)
 
@@ -417,4 +419,3 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         })
 
     return sif_vvp_results
-
