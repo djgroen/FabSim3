@@ -4,7 +4,7 @@ import re
 import tempfile
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 from beartype import beartype
 from rich import print as rich_print
@@ -941,7 +941,7 @@ def job_submission(*job_args):
 def ensemble2campaign(
     results_dir: str,
     campaign_dir: str,
-    skip: Optional[int] = 0
+    skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -977,7 +977,7 @@ def ensemble2campaign(
 def campaign2ensemble(
     config: str,
     campaign_dir: str,
-    skip: Optional[int] = 0
+    skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
@@ -986,7 +986,7 @@ def campaign2ensemble(
         config (str): FabSim3 configuration name (will create in top level if
             non-existent, and overwrite existing content).
         campaign_dir (str): EasyVVUQ root campaign directory
-        skip (str, optional): The number of runs (run_1 to run_skip)
+        skip (Union[int, str], optional): The number of runs(run_1 to run_skip)
             not to copy to the FabSim3 sweep directory. The first skip number
             of samples will then not be computed.
     """
