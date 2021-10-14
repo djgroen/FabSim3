@@ -461,3 +461,9 @@ marenostrum4:
     loaded: ["python/3.8.2"]
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]
+
+
+piz_daint:
+  <<: *Eagle_Default_Config
+  <<: *QCG_PilotJob
+  remote: "daint.cscs.ch"
