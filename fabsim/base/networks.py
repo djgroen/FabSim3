@@ -107,6 +107,10 @@ class HostConnection():
         """
         # TODO: implement the hide options here
 
+        # this will load the login shell. this required to make sure
+        # the module command can be found during job execution
+        command = "bash -l -c \"{}\"".format(command)
+
         # env.remote : localhost
         # env.host_string : user@localhost
         with add_print_perfix(prefix="run on {}".format(env.host_string),
