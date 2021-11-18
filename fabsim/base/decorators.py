@@ -77,7 +77,9 @@ def task(func):
     if not hasattr(func, "__wrapped__"):
         func_dir = os.path.dirname(os.path.abspath(inspect.getfile(func)))
     else:
-        func_dir = os.path.dirname(os.path.abspath(inspect.getfile(func.__wrapped__)))
+        func_dir = os.path.dirname(
+            os.path.abspath(inspect.getfile(func.__wrapped__))
+        )
 
     # find the type of task, is FabSim3 API or plugin task
     if env.plugins_root in func_dir:
