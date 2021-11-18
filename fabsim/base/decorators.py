@@ -76,6 +76,8 @@ def task(func):
     wrapper.has_been_called = False
     if not hasattr(func, "__wrapped__"):
         func_dir = os.path.dirname(os.path.abspath(inspect.getfile(func)))
+    elif hasattr(func, "__wrapped__") and hasattr(func, "plugin_name"):
+        func_dir = os.path.join(env.plugins_root, func.plugin_name)
     else:
         func_dir = os.path.dirname(
             os.path.abspath(inspect.getfile(func.__wrapped__))
@@ -124,6 +126,7 @@ def load_plugin_env_vars(plugin_name: str):
             add_plugin_environment_variable(plugin_name)
             return func(*args, **kwargs)
 
+        wrapper.plugin_name = plugin_name
         return wrapper
 
     return decorator
