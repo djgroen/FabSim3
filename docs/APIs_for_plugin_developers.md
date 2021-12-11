@@ -17,8 +17,8 @@ machines_<plugin_name>_user.yml
 
 Here are two examples of machine-specific configuration: 
 
-* [Example1](https://github.com/djgroen/FabFlee/blob/master/machines_FabFlee_user.yml) 
-* [Example2](https://github.com/djgroen/FabCovid19/blob/master/machines_FabCovid19_user.yml)
+* [Example1](https://github.com/djgroen/FabFlee/blob/master/machines_FabFlee_user_example.yml) 
+* [Example2](https://github.com/djgroen/FabCovid19/blob/master/machines_FabCovid19_user_example.yml)
 
 #### Usage:
 To load machine-specific configuration specified by the user for the input `plugin_name`, you need to wrap the task functions with `#!python @load_plugin_env_vars(plugin_name`)
