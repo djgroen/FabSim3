@@ -35,6 +35,12 @@ default:
   
   # Default number of cores per (supercomputer) node.
   corespernode: 1
+
+  # Default number of cpus per task
+  cpuspertask: 1
+
+  # Default number of nodes
+  nodes: 1
   
   # Default number of cores per replica in an ensemble. - OBSOLETE?
   cores_per_replica: "${cores}"
@@ -83,7 +89,7 @@ default:
   cancel_job_command: "qdel"
   
   # Default arguments to LAMMPS - OBSOLETE?
-  lammps_args: ""
+  lammps_args: "-log log.lammps -screen [lammps_scr_output.txt"
   
   # Default location for blackbox scripts. - OBSOLETE?
   local_blackbox_path: ["$fabsim_root/blackbox"]
@@ -137,6 +143,32 @@ prometheus:
   queue: "plgrid"
   python_build: "python2.7"
   corespernode: 24
+  nodes: 4
+
+cirrus:
+  max_job_name_chars: 15
+  job_dispatch: "sbatch"
+  budget: "Your Budget"
+  sshpass: 'Your Password'
+  manual_sshpass: true
+  stat: "squeue -u $username"
+  run_command: "srun -n $cores --kill-on-bad-exit"
+  batch_header: slurm-cirrus
+  remote: "login.cirrus.ac.uk"
+  home_path_template: "/lustre/home/ec190/kbronik"
+  runtime_path_template: "/lustre/home/ec190/kbronik"
+  modules:
+    all: ["load lammps"]
+  temp_path_template: "$work_path/tmp"
+  corespernode: 36
+  cpuspertask: 1
+  job_name: "lammps_Example"
+  job_wall_time : "00:20:00"
+  partition_name: "standard"
+  qos_name: "standard"
+#  password: 'NP1085B?(")")($&2021pass'
+
+
 
 supermuc2:
   max_job_name_chars: 15
@@ -154,6 +186,24 @@ supermuc2:
   queue: "standard"
   python_build: "lib64/python2.6"
   corespernode: 28
+
+
+
+ohm:
+  home_path_template: "/home/$username"
+  remote: "ohm.chem.ucl.ac.uk"
+  run_command: "mpirun -np 1"
+
+
+Kathleen:
+  home_path_template: "/home/$username"
+  remote: "kathleen-hpc-prod-10-313.gtm.ucl.ac.uk"
+  modules:
+    # list of modules to be loaded on remote machine
+    all: ["load python/3.7.4", "load lammps/16Mar18/userintel/intel-2018"]
+
+
+
 archer:
   max_job_name_chars: 15
   job_dispatch: "qsub"
@@ -467,3 +517,4 @@ piz_daint:
   <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
   remote: "daint.cscs.ch"
+

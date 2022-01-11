@@ -259,7 +259,7 @@ def put_configs(config: str) -> None:
         and env.prevent_results_overwrite == "delete"
     ):
         rsync_delete = True
-
+    
     if env.manual_sshpass:
         # TODO: maybe the better option here is to overwrite the rsync_project
         # function from /fabric/contrib/project.py
@@ -897,7 +897,8 @@ def job_submission(*job_args):
         please make sure to pass the list of job scripts be summited as
         an input to this function
     """
-
+    CRED = '\33[31m'
+    CEND = '\33[0m'
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
@@ -928,10 +929,13 @@ def job_submission(*job_args):
                 cd=env.pather.dirname(job_script)
             )
 
+    # print(
+    #     "Use `fab {} fetch_results` to copy the results "
+    #     "back to localhost.".format(env.machine_name)
+    # )
     print(
-        "Use `fab {} fetch_results` to copy the results "
-        "back to localhost.".format(env.machine_name)
-    )
+        "Use " + CRED + "fabsim {} fetch_results".format(env.machine_name) + CEND + " to copy the results "
+        "back to local machine!")
 
     return [job_script]
 
@@ -1086,7 +1090,7 @@ def run_ensemble(
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
         sweepdir_items = run("ls -1 {}".format(sweep_dir)).splitlines()
-
+    print('reading SWEEP folder from remote machine')
     if len(sweepdir_items) == 0:
         raise RuntimeError(
             "ERROR: no files where found in the sweep_dir : {}".format(
