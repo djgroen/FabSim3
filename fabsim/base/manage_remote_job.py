@@ -62,7 +62,6 @@ def jobs_list(quiet: Optional[bool] = False) -> str:
     else:
 
         output = run(template("$stat"), capture=quiet)
-        # string = CRED + 'The stat of your submitted job is shown in the table above!' + CEND
         return output
 
     # return output
