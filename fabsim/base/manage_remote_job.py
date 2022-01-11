@@ -1,6 +1,6 @@
 import time
 from typing import Optional
-import  sys
+import sys
 from beartype import beartype
 
 from fabsim.base.decorators import task
@@ -47,7 +47,8 @@ def jobs_list(quiet: Optional[bool] = False) -> str:
         # manual_command = '"' + manual_command + '"'
         print('manual_command', manual_command)
         output = local(pre_cmd + "'" + manual_command + "'", capture=False)
-        string = CRED + 'The stat of your submitted job is shown in the table above!' + CEND
+        string = CRED + 'The stat of your submitted job is shown' \
+                        ' in the table above!' + CEND
         return string
         # print('output', output)
         # output = local(

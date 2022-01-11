@@ -48,11 +48,6 @@ def local(
 
     # execute the command on the local system
     try:
-        # p = subprocess.Popen(command, shell=True,
-        #                      stdout=stdout, stderr=stderr)
-        # (stdout, stderr) = p.communicate()
-        # cmd = f"rsync --delete --exclude={'file1.txt','dir1 / * ','dir2'} -pthrvz --rsh='ssh -p 22 ' /Users/kevinbronik/FabSim3/plugins/FabMD/config_files/lammps_ensemble_example2/ skgtoni@kathleen-hpc-prod-10-313.gtm.ucl.ac.uk:/home/skgtoni/FabSim/config_files/lammps_ensemble_example2/"
-        #
         p = subprocess.Popen(command, shell=True,
                              stdout=stdout, stderr=stderr)
         # p.wait()
@@ -85,10 +80,7 @@ class HostConnection():
         self.port = env.port
         # self.password = env.password
         self.use_sudo = env.use_sudo
-
         self.pty = True
-
-    # ssh-copy-id "user@hostname.example.com
 
     @contextmanager
     def ssh_connection(self):
@@ -104,9 +96,6 @@ class HostConnection():
             gateway=None,
             forward_agent=False,
             connect_timeout=None,
-            # connect_kwargs={
-            #     "password": self.password,
-            # },
             connect_kwargs=None,
             inline_ssh_env=False
         )
@@ -119,16 +108,10 @@ class HostConnection():
             print('\x1b[6;30;42m' + 'Opening a connection!' + '\x1b[0m')
             conn.open()
             yield conn
-        # except:
-        #     print('error!!!')
         finally:
             print('\x1b[6;30;45m' + 'Closing a connection!' + '\x1b[0m')
             conn.close()
 
-
-    # def close_conn(self):
-    #     with self.ssh_connection() as conn:
-    #         conn.close()
     def run_command(self, command, cd=None, capture=False):
         """
         exec a command on the target remote machine
@@ -159,9 +142,6 @@ class HostConnection():
                 else:
                     with conn.cd(cd):
                         result = run(command, pty=self.pty, hide=hide)
-
-
-
         return result.stdout
 
 
@@ -172,16 +152,16 @@ def run(
     capture: Optional[bool] = False
 ):
     if env.manual_sshpass:
-        print('\x1b[6;30;42m' + 'manual_sshpass is set to be true!' + '\x1b[0m')
+        # print('\x1b[6;30;42m' + 'manual_sshpass is set to be true!' + '\x1b[0m')
         return manual_sshpass(cmd, cd=cd, capture=capture)
     elif env.manual_gsissh:
-        print('\x1b[6;30;42m' + 'manual_gsissh is set to be true!' + '\x1b[0m')
+        # print('\x1b[6;30;42m' + 'manual_gsissh is set to be true!' + '\x1b[0m')
         return manual_gsissh(cmd, cd=cd, capture=capture)
     elif env.manual_ssh:
-        print('\x1b[6;30;42m' + 'manual_ssh is set to be true!' + '\x1b[0m')
+        # print('\x1b[6;30;42m' + 'manual_ssh is set to be true!' + '\x1b[0m')
         return manual(cmd, cd=cd, capture=capture)
     else:
-        print('\x1b[6;30;44m' + 'manual_ssh,sshpass,gsissh  is set to be false!' + '\x1b[0m')
+        # print('\x1b[6;30;44m' + 'manual_ssh,sshpass,gsissh  is set to be false!' + '\x1b[0m')
         return _run(cmd, cd=cd, capture=capture)
 
 
