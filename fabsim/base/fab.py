@@ -259,7 +259,7 @@ def put_configs(config: str) -> None:
         and env.prevent_results_overwrite == "delete"
     ):
         rsync_delete = True
-    
+
     if env.manual_sshpass:
         # TODO: maybe the better option here is to overwrite the rsync_project
         # function from /fabric/contrib/project.py

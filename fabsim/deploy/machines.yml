@@ -148,8 +148,8 @@ prometheus:
 cirrus:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
-  budget: "Your Budget"
-  sshpass: 'Your Password'
+  budget: "ec190-kbronik"
+  sshpass: 'Y!KJ8f!qX4cTKpz'
   manual_sshpass: true
   stat: "squeue -u $username"
   run_command: "srun -n $cores --kill-on-bad-exit"
@@ -272,6 +272,7 @@ localhost:
   remote: "localhost"
   python_build: "lib/python2.7"
   home_path_template: "/home/$username"
+  manual_ssh: true
   # The setting below can be useful for debugging if you run into problems.
   # manual_ssh: true
 

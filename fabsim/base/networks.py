@@ -172,12 +172,16 @@ def run(
     capture: Optional[bool] = False
 ):
     if env.manual_sshpass:
+        print('\x1b[6;30;42m' + 'manual_sshpass is set to be true!' + '\x1b[0m')
         return manual_sshpass(cmd, cd=cd, capture=capture)
     elif env.manual_gsissh:
+        print('\x1b[6;30;42m' + 'manual_gsissh is set to be true!' + '\x1b[0m')
         return manual_gsissh(cmd, cd=cd, capture=capture)
     elif env.manual_ssh:
+        print('\x1b[6;30;42m' + 'manual_ssh is set to be true!' + '\x1b[0m')
         return manual(cmd, cd=cd, capture=capture)
     else:
+        print('\x1b[6;30;44m' + 'manual_ssh,sshpass,gsissh  is set to be false!' + '\x1b[0m')
         return _run(cmd, cd=cd, capture=capture)
 
 
@@ -243,8 +247,10 @@ def manual(
     commands.append(cmd)
     manual_command = " && ".join(commands)
     pre_cmd = "ssh -Y -p %(port)s %(username)s@%(remote)s " % env
+
+    return local(pre_cmd + "'" + manual_command + "'", capture=capture)
     # return local(pre_cmd + "'" + manual_command + "'", capture=capture)
-    return local(pre_cmd, capture=capture)
+    # return local(pre_cmd, capture=capture)
 
 
 def _run(cmd: str, cd: str = None, capture: bool = False):
