@@ -149,7 +149,7 @@ cirrus:
   max_job_name_chars: 15
   job_dispatch: "sbatch"
   budget: "ec190-kbronik"
-  sshpass: 'Y!KJ8f!qX4cTKpz'
+  sshpass: ''
   manual_sshpass: true
   stat: "squeue -u $username"
   run_command: "srun -n $cores --kill-on-bad-exit"
