@@ -70,6 +70,7 @@ def local(
 
     return (stdout, stderr)
 
+
 class HostConnection():
     def __init__(self):
         self.host_address = env.remote
