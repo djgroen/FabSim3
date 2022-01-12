@@ -14,6 +14,7 @@ from fabsim.base.env import env
 from fabsim.base.utils import add_print_perfix
 from fabsim.deploy.templates import template
 
+
 @beartype
 def local(
     command: str,
