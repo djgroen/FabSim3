@@ -2,13 +2,15 @@ from __future__ import print_function
 
 import os
 import subprocess
-from beartype import beartype
 from contextlib import contextmanager
+from typing import List, Optional, Tuple
+
+from beartype import beartype
 from fabric2 import Config, Connection
+
 from fabsim.base.env import env
 from fabsim.base.utils import add_print_perfix
 from fabsim.deploy.templates import template
-from typing import List, Optional, Tuple
 
 
 @beartype
