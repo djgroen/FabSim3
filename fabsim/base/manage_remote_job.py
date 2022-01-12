@@ -1,8 +1,7 @@
 import time
-from typing import Optional
 import sys
+from typing import Optional
 from beartype import beartype
-
 from fabsim.base.decorators import task
 from fabsim.base.env import env
 from fabsim.base.networks import local, run
