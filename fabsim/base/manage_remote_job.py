@@ -1,5 +1,5 @@
-import time
 import sys
+import time
 from typing import Optional
 from beartype import beartype
 from fabsim.base.decorators import task

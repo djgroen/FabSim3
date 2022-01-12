@@ -7,14 +7,12 @@ import sys
 from contextlib import contextmanager
 from pprint import pformat, pprint
 from typing import List, Optional, Tuple
-from fabsim.deploy.templates import template
 from beartype import beartype
 from fabric2 import Config, Connection
 from rich.table import Table, box
-
 from fabsim.base.env import env
 from fabsim.base.utils import add_print_perfix
-
+from fabsim.deploy.templates import template
 
 @beartype
 def local(
