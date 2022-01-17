@@ -1,3 +1,5 @@
+
+import sys
 import time
 from typing import Optional
 
@@ -19,6 +21,7 @@ def stat() -> None:
     '''
     check_jobs_dispatched_on_remote_machine()
     jobsInfo = jobs_list(quiet=True)
+    # jobs_list(quiet=True)
     print(jobsInfo)
 
 
@@ -28,24 +31,42 @@ def jobs_list(quiet: Optional[bool] = False) -> str:
         options:
                 quiet = True : hide the command output
     """
+    CRED = '\33[31m'
+    CEND = '\33[0m'
     if (
             hasattr(env, 'dispatch_jobs_on_localhost') and
             isinstance(env.dispatch_jobs_on_localhost, bool) and
             env.dispatch_jobs_on_localhost
     ):
 
-        output = local(template("$stat "), capture=quiet).splitlines()
+        # output = local(template("$stat "), capture=quiet).splitlines()
+        output = run(template("$stat "), capture=quiet)
+        return output
 
     elif env.manual_sshpass:
-        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
         manual_command = template("$stat")
+        # manual_command = '"' + manual_command + '"'
+        print('manual_command', manual_command)
         output = local(pre_cmd + "'" + manual_command + "'", capture=False)
+        string = CRED + 'The stat of your submitted job is shown' \
+                        ' in the table above!' + CEND
+        return string
+        # print('output', output)
+        # output = local(
+        #     template(
+        #         pre_cmd +
+        #         manual_command
+        #     )
+        # )
+        # output = local(pre_cmd + str(manual_command) , capture=False)
 
     else:
 
         output = run(template("$stat"), capture=quiet)
+        return output
 
-    return output
+    # return output
 
 
 @task
@@ -73,9 +94,9 @@ def cancel_job(jobID: Optional[str] = None) -> None:
             isinstance(env.dispatch_jobs_on_localhost, bool) and
             env.dispatch_jobs_on_localhost
     ):
-        local(template(templatetemplate("$cancel_job_command")))
+        local(template(template.template("$cancel_job_command")))
     elif env.manual_sshpass:
-        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
         manual_command = template("$cancel_job_command $jobID")
         local(pre_cmd + "'" + manual_command + "'", capture=False)
 

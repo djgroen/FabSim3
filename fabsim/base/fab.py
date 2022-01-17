@@ -255,8 +255,8 @@ def put_configs(config: str) -> None:
 
     rsync_delete = False
     if (
-        hasattr(env, "prevent_results_overwrite")
-        and env.prevent_results_overwrite == "delete"
+            hasattr(env, "prevent_results_overwrite")
+            and env.prevent_results_overwrite == "delete"
     ):
         rsync_delete = True
 
@@ -337,8 +337,8 @@ def calc_total_mem() -> None:
 
 @beartype
 def find_config_file_path(
-    name: str,
-    ExceptWhenNotFound: Optional[bool] = True
+        name: str,
+        ExceptWhenNotFound: Optional[bool] = True
 ) -> str:
     """
     Find the config file path
@@ -445,8 +445,8 @@ def add_local_paths(plugin_name: str) -> None:
 
 @beartype
 def with_template_job(
-    ensemble_mode: Optional[bool] = False,
-    label: Optional[str] = None
+        ensemble_mode: Optional[bool] = False,
+        label: Optional[str] = None
 ) -> Tuple[str, str]:
     """
     Determine a generated job name from environment parameters,
@@ -476,9 +476,9 @@ def with_template_job(
 
 @beartype
 def with_job(
-    name: str,
-    ensemble_mode: Optional[bool] = False,
-    label: Optional[str] = None
+        name: str,
+        ensemble_mode: Optional[bool] = False,
+        label: Optional[str] = None
 ) -> Tuple[str, str]:
     """
     Augment the fabric environment with information regarding a particular
@@ -645,9 +645,9 @@ def job(*job_args):
         # env.submit_job is False in case of using PilotJob option
         # therefore, DO NOT submit the job directly, only submit PJ script
         if not (
-            hasattr(env, "submit_job")
-            and isinstance(env.submit_job, bool)
-            and env.submit_job is False
+                hasattr(env, "submit_job")
+                and isinstance(env.submit_job, bool)
+                and env.submit_job is False
         ):
             #####################################
             #       job submission phase      #
@@ -799,7 +799,7 @@ def job_preparation(*job_args):
         # job_results_contents
         # job_results_contents_local
         with open(
-            env.pather.join(tmp_job_results, "env.yml"), "w"
+                env.pather.join(tmp_job_results, "env.yml"), "w"
         ) as env_yml_file:
             yaml.dump(
                 dict(
@@ -833,8 +833,8 @@ def job_transmission(*job_args):
         args = dict(args, **adict)
 
     if (
-        hasattr(env, "prevent_results_overwrite")
-        and env.prevent_results_overwrite == "delete"
+            hasattr(env, "prevent_results_overwrite")
+            and env.prevent_results_overwrite == "delete"
     ):
         # if we have a large result directory contains thousands of files and
         # folders, using rm command will not be efficient,
@@ -897,7 +897,8 @@ def job_submission(*job_args):
         please make sure to pass the list of job scripts be summited as
         an input to this function
     """
-
+    CRED = '\33[31m'
+    CEND = '\33[0m'
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
@@ -905,9 +906,9 @@ def job_submission(*job_args):
     job_script = args["job_script"]
 
     if (
-        hasattr(env, "dispatch_jobs_on_localhost")
-        and isinstance(env.dispatch_jobs_on_localhost, bool)
-        and env.dispatch_jobs_on_localhost
+            hasattr(env, "dispatch_jobs_on_localhost")
+            and isinstance(env.dispatch_jobs_on_localhost, bool)
+            and env.dispatch_jobs_on_localhost
     ):
         local(template("$job_dispatch " + job_script))
         print("job dispatch is done locally\n")
@@ -928,10 +929,14 @@ def job_submission(*job_args):
                 cd=env.pather.dirname(job_script)
             )
 
+    # print(
+    #     "Use `fab {} fetch_results` to copy the results "
+    #     "back to localhost.".format(env.machine_name)
+    # )
     print(
-        "Use `fab {} fetch_results` to copy the results "
-        "back to localhost.".format(env.machine_name)
-    )
+        "Use " + CRED + "fabsim {} fetch_results"
+        .format(env.machine_name) + CEND + " to copy the results "
+                                           "back to local machine!")
 
     return [job_script]
 
@@ -939,9 +944,9 @@ def job_submission(*job_args):
 @task
 @beartype
 def ensemble2campaign(
-    results_dir: str,
-    campaign_dir: str,
-    skip: Optional[Union[int, str]]=0
+        results_dir: str,
+        campaign_dir: str,
+        skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -975,9 +980,9 @@ def ensemble2campaign(
 @task
 @beartype
 def campaign2ensemble(
-    config: str,
-    campaign_dir: str,
-    skip: Optional[Union[int, str]]=0
+        config: str,
+        campaign_dir: str,
+        skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
@@ -1025,11 +1030,11 @@ def campaign2ensemble(
 
 @beartype
 def run_ensemble(
-    config: str,
-    sweep_dir: str,
-    sweep_on_remote: Optional[bool] = False,
-    execute_put_configs: Optional[bool] = True,
-    **args
+        config: str,
+        sweep_dir: str,
+        sweep_on_remote: Optional[bool] = False,
+        execute_put_configs: Optional[bool] = True,
+        **args
 ) -> None:
     """
     Map and execute ensemble jobs.
@@ -1086,7 +1091,7 @@ def run_ensemble(
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
         sweepdir_items = run("ls -1 {}".format(sweep_dir)).splitlines()
-
+    print('reading SWEEP folder from remote machine')
     if len(sweepdir_items) == 0:
         raise RuntimeError(
             "ERROR: no files where found in the sweep_dir : {}".format(

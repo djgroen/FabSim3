@@ -1,19 +1,16 @@
 from __future__ import print_function
 
-import io
 import os
 import subprocess
-import sys
 from contextlib import contextmanager
-from pprint import pformat, pprint
 from typing import List, Optional, Tuple
 
 from beartype import beartype
 from fabric2 import Config, Connection
-from rich.table import Table, box
 
 from fabsim.base.env import env
 from fabsim.base.utils import add_print_perfix
+from fabsim.deploy.templates import template
 
 
 @beartype
@@ -50,31 +47,33 @@ def local(
     try:
         p = subprocess.Popen(command, shell=True,
                              stdout=stdout, stderr=stderr)
+        # p.wait()
+        # yield f"{command} Rsync process completed."
         (stdout, stderr) = p.communicate()
+
     except Exception as e:
         raise RuntimeError("Unexpected error: {}".format(e))
-        sys.exit()
+        # sys.exit()
 
     if p.returncode not in env.acceptable_err_subprocesse_ret_codes:
         raise RuntimeError(
             "\nlocal() encountered an error (return code {})"
             "while executing '{}'".format(p.returncode, command)
         )
-        sys.exit(0)
+        # sys.exit(0)
 
     stdout = stdout.decode("utf-8").strip() if stdout else ""
     stderr = stderr.decode("utf-8").strip() if stderr else ""
+
     return (stdout, stderr)
 
 
 class HostConnection():
-
     def __init__(self):
         self.host_address = env.remote
         self.user = env.username
         self.port = env.port
         self.use_sudo = env.use_sudo
-
         self.pty = True
 
     @contextmanager
@@ -89,16 +88,22 @@ class HostConnection():
             port=self.port,
             config=None,
             gateway=None,
-            forward_agent=None,
+            forward_agent=False,
             connect_timeout=None,
             connect_kwargs=None,
-            inline_ssh_env=None
+            inline_ssh_env=False
         )
 
         try:
+            print('host_address:', self.host_address)
+            print('user:', self.user)
+            print('port:', self.port)
+            # print('password:', self.password)
+            print('\x1b[6;30;42m' + 'Opening a connection!' + '\x1b[0m')
             conn.open()
             yield conn
         finally:
+            print('\x1b[6;30;45m' + 'Closing a connection!' + '\x1b[0m')
             conn.close()
 
     def run_command(self, command, cd=None, capture=False):
@@ -127,10 +132,10 @@ class HostConnection():
                 run = conn.sudo if self.use_sudo else conn.run
                 if cd is None:
                     result = run(command, pty=self.pty, hide=hide)
+
                 else:
                     with conn.cd(cd):
                         result = run(command, pty=self.pty, hide=hide)
-
         return result.stdout
 
 
@@ -169,7 +174,7 @@ def manual_sshpass(
     if not hasattr(env, "sshpass"):
         raise ValueError("sshpass value did not set for this remote machine")
 
-    pre_cmd = "sshpass -p '%(sshpass)s' ssh %(user)s@%(host)s " % env
+    pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
     return local(pre_cmd + "'" + manual_command + "'", capture=capture)
 
 
@@ -190,7 +195,7 @@ def manual_gsissh(
 
     commands.append(cmd)
     manual_command = " && ".join(commands)
-    pre_cmd = "gsissh -t -p %(port)s %(host)s " % env
+    pre_cmd = "gsissh -t -p %(port)s %(remote)s " % env
     return local(pre_cmd + "'" + manual_command + "'", capture=capture)
 
 
@@ -211,8 +216,11 @@ def manual(
 
     commands.append(cmd)
     manual_command = " && ".join(commands)
-    pre_cmd = "ssh -Y -p %(port)s %(username)s@%(host)s " % env
+    pre_cmd = "ssh -Y -p %(port)s %(username)s@%(remote)s " % env
+
     return local(pre_cmd + "'" + manual_command + "'", capture=capture)
+    # return local(pre_cmd + "'" + manual_command + "'", capture=capture)
+    # return local(pre_cmd, capture=capture)
 
 
 def _run(cmd: str, cd: str = None, capture: bool = False):
@@ -221,6 +229,7 @@ def _run(cmd: str, cd: str = None, capture: bool = False):
 
     """
     conn = HostConnection()
+
     return conn.run_command(command=cmd, cd=cd, capture=capture)
 
 
@@ -288,11 +297,19 @@ def rsync_project(
         delete_opt, exclude_opts, default_opts, rsh_opts,
         local_dir, env.host_string, remote_dir
     )
+    # rync_cmd = "rsync --delete -pthrvz {} {} {}:{}".format(
+    #      exclude_opts,
+    #     local_dir, env.host_string, remote_dir
+    # )
 
     with add_print_perfix(prefix="rsync_project", color=196):
         print("{}".format(rync_cmd))
+    # conn = HostConnection()
+    # return conn.run_command(command=rync_cmd, capture=capture)
 
     return local(command=rync_cmd, capture=capture)
+    # return rync_cmd, capture
+    # return _run(cmd=rync_cmd, capture=capture)
 
 
 @beartype
@@ -322,7 +339,7 @@ def put(
         raise RuntimeError(
             "\nThe input path {} is no file neither folder !!! ".format(src)
         )
-        sys.exit()
+        # sys.exit()
 
     # if src points to a directory, then remove '/' from end of src if exists
     if os.path.isdir(src):

@@ -1,0 +1,20 @@
+#!/bin/bash --login
+
+# Slurm job options (name, compute nodes, job time)
+#SBATCH --job-name=$job_name
+#SBATCH --time=$job_wall_time
+#SBATCH --exclusive
+#SBATCH --nodes=$nodes
+#SBATCH --tasks-per-node=$corespernode
+#SBATCH --cpus-per-task=$cpuspertask
+
+# Replace [budget code] below with your project code (e.g. t01)
+#SBATCH --account=$budget
+# Replace [partition name] below with your partition name (e.g. standard,gpu-skylake)
+#SBATCH --partition=$partition_name
+# Replace [qos name] below with your qos name (e.g. standard,long,gpu)
+#SBATCH --qos=$qos_name
+#SBATCH --output="job.out"
+#SBATCH --error="job.err"
+
+

@@ -80,7 +80,8 @@ def template(pattern: str, number_of_iterations: Optional[int] = 1) -> str:
     # print(env.flee_location)
     try:
         for i in range(0, number_of_iterations):
-            template = Template(pattern).substitute(env)
+            # template = Template(pattern).substitute(env)
+            template = Template(pattern).safe_substitute(env)
             pattern = template
 
         return template
