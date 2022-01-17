@@ -384,9 +384,15 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         tmp.append(sif_dirs)
         sif_dirs = tmp
 
-    for i in range(0, results_dirs):
-        results_dir = results_dirs[i]
-        sif_dir = sif_dirs[i]
+
+    print("SIF_VVP results dirs:", results_dirs, sif_dirs)
+    if(len(results_dirs)) == 0:
+        print("ERROR: SIF_VVP applied, but no results directories of test_subject runs provided.")
+        sys.exit()
+
+    for i in range(0, len(results_dirs)):
+        ri = results_dirs[i]
+        si = sif_dirs[0]
 
         scores = []
 
@@ -395,17 +401,19 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         if 'items' in kwargs:
             items = kwargs['items']
         else:
-            items = os.listdir("{}".format(results_dir))
+            items = os.listdir("{}".format(ri))
+
+        scores.append(sample_testing_function(ri, si, **kwargs))
 
         for item in items:
-            if os.path.isdir(os.path.join(results_dir, item)):
+            if os.path.isdir(os.path.join(ri, item)):
                 if os.path.isdir(os.path.join(sif_dir, item)):
-                    print(os.path.join(results_dir, item))
-                    print(os.path.join(sif_dir, item))
+                    print(os.path.join(ri, item))
+                    print(os.path.join(si, item))
                     scores.append(
                         sample_testing_function(
-                            os.path.join(results_dir, item),
-                            os.path.join(sif_dir, item),
+                            os.path.join(ri, item),
+                            os.path.join(si, item),
                             ** kwargs
                         )
                     )
@@ -416,9 +424,9 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         scores_aggregation = aggregation_function(scores, **kwargs)
 
         # update return results dict
-        sif_vvp_results.update({results_dir: {}})
+        sif_vvp_results.update({ri: {}})
 
-        sif_vvp_results[results_dir].update({
+        sif_vvp_results[ri].update({
             'scores': scores,
             'scores_aggregation': scores_aggregation
         })
