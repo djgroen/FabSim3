@@ -253,7 +253,7 @@ def ensemble_vvp(results_dirs, sample_testing_function,
     ensemble_vvp_results = {}
 
     # if a single result_dir is specified, still add it to a list
-    if type(results_dirs) == str:
+    if isinstance(results_dirs, str):
         tmp = []
         tmp.append(results_dirs)
         results_dirs = tmp
@@ -373,13 +373,13 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
     sif_vvp_results = {}
 
     # if a single result_dir is specified, still add it to a list
-    if type(results_dirs) == str:
+    if isinstance(results_dirs, str):
         tmp = []
         tmp.append(results_dirs)
         results_dirs = tmp
 
     # if a single sif_dir is specified, still add it to a list
-    if type(sif_dirs) == str:
+    if isinstance(sif_dirs, str):
         tmp = []
         tmp.append(sif_dirs)
         sif_dirs = tmp
