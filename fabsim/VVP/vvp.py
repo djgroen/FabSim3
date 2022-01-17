@@ -384,7 +384,6 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         tmp.append(sif_dirs)
         sif_dirs = tmp
 
-
     print("SIF_VVP results dirs:", results_dirs, sif_dirs)
     if(len(results_dirs)) == 0:
         print("ERROR: SIF_VVP applied, but no results directories of test_subject runs provided.")

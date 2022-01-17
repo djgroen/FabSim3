@@ -1,11 +1,10 @@
+import matplotlib.pyplot as plt
+import argparse
+import csv
+from os import path, makedirs
+from math import sin, cos
 import matplotlib
 matplotlib.use('Agg')
-
-from math import sin, cos
-from os import path, makedirs
-import csv
-import argparse
-import matplotlib.pyplot as plt
 
 
 def launch(gravity, mass, velocity, angle, height,
