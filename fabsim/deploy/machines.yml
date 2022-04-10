@@ -273,6 +273,7 @@ localhost:
   python_build: "lib/python2.7"
   home_path_template: "/home/$username"
   manual_ssh: true
+  batch_header: bash_header
   # The setting below can be useful for debugging if you run into problems.
   # manual_ssh: true
 
