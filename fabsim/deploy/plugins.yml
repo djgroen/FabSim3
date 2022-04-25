@@ -38,3 +38,10 @@ FabAlya:
 
 FabMPS:
   repository: https://github.com/goghino/FabMPS.git
+  
+FabNEPTUNE:
+  repository: https://github.com/UCL-CCS/FabNEPTUNE
+  
+FabSCEMa:
+  repository: https://github.com/UCL-CCS/FabSCEMa
+  
