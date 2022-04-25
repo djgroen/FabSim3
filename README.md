@@ -50,7 +50,7 @@ the source code of that).
 
 ## Installation and usage 
 
-For instructions on how to install and test FabSim, please refer to `INSTALL.md`.
+For instructions on how to install and test FabSim, please refer to `docs/installation.md`.
 
 ## Known issues
 
