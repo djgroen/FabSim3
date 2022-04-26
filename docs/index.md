@@ -2,7 +2,7 @@
 # *An automation toolkit for complex simulation tasks*
 
 <figure>
-   <img src="../images/logo.jpg" width="200"> 
+   <img src="images/logo.jpg" width="200"> 
 </figure>
 
 
