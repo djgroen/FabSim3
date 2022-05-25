@@ -15,7 +15,7 @@
 [![GitHub last-commit](https://img.shields.io/github/last-commit/djgroen/FabSim3.svg)](https://github.com/djgroen/FabSim3/commits/master)
 
 
-FabSim3 is a Python-based automation toolkit for scientific simulation and data processing workflows, licensed under the BSD 3-clause license. It is developed as part of the VECMA project <http://www.vecma.eu>, and is part of the VECMA Toolkit <http://www.vecma-toolkit.eu>.
+FabSim3 is a Python-based automation toolkit for scientific simulation and data processing workflows, licensed under the BSD 3-clause license. It is developed as part of the SEAVEA project <http://www.seavea-project.org>, and is part of the VECMA Toolkit <http://www.vecma-toolkit.eu>.
 
 Among other things, FabSim3 supports the use of simple one-liner commands to:
 
