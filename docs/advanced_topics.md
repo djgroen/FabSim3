@@ -213,7 +213,10 @@ The last command will likely depend on how parameters are passed to the target c
 
 
 ## Setting up multiplexing
-This document briefly details how user/developers can set up multiplexing
+This document briefly details how user/developers can set up multiplexing configuration, and reduce the number of times they have to retype passwords.
+
+!!! note
+	The example below is given for a specific HPC resource, but one can reuse this approach for other machines by changing the `User`, `Host` and `Hostname` variables in step 1, and the name and `remote:` field of the YML entries in step 3.
 
 #### Step 1
 
