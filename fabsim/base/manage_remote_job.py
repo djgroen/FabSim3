@@ -44,7 +44,7 @@ def jobs_list(quiet: Optional[bool] = False) -> str:
         return output
 
     elif env.manual_sshpass:
-        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
+        pre_cmd = "sshpass -f '%(sshpass)s' ssh %(username)s@%(remote)s " % env
         manual_command = template("$stat")
         # manual_command = '"' + manual_command + '"'
         print('manual_command', manual_command)
@@ -96,7 +96,7 @@ def cancel_job(jobID: Optional[str] = None) -> None:
     ):
         local(template(template.template("$cancel_job_command")))
     elif env.manual_sshpass:
-        pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
+        pre_cmd = "sshpass -f '%(sshpass)s' ssh %(username)s@%(remote)s " % env
         manual_command = template("$cancel_job_command $jobID")
         local(pre_cmd + "'" + manual_command + "'", capture=False)
 
