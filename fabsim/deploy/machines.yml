@@ -461,6 +461,7 @@ archer2:
   project: "d137"
   qos_name: "standard"
   # list of available partitions : sinfo --Format=partition
+  job_dispatch: "cd /work/$project/$project/$username ; sbatch"
   partition_name: "standard"
   batch_header: slurm-archer2
   PJ_header: archer2-PJ-header
