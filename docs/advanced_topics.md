@@ -1,4 +1,4 @@
-### Creating automation scripts
+## Creating automation scripts
 This document briefly details how user/developers can create their own FabSim3 automations.
 
 #### Overview
@@ -76,7 +76,7 @@ To launch FabSim3 commands from Python scripts, we have established a basic Pyth
 
 We recommend using this API rather than `#!python os.system()` or `#!python subprocess()` directly, as it will allow us to fix any emerging bugs in future versions for you.
 
-### Create Config Directories
+## Create Config Directories
 
 
 * Configuration information is stored in subdirectories of either `config` or `FabSim3/plugins/<module_name>/configs` (to be implemented).
@@ -135,7 +135,7 @@ def test_sim(config,**args):
     # start a fictitious job, with the variable present in your FabSim environment.
 ```
 
-### Creating Job Submission Templates
+## Creating Job Submission Templates
 
 
 * Job submission templates are used to convert FabSim environmental information to batch job scripts which can be submitted to remote resource schedulers.
@@ -210,4 +210,47 @@ The last command will likely depend on how parameters are passed to the target c
 
 * `$run_command` will be substituted by a job execution command such as `mpirun` or `aprun`.
 * Other variables contain code/domain-specific information such as input and output destinations, relevant flags or the location of the executable.
+
+
+## Setting up multiplexing
+This document briefly details how user/developers can set up multiplexing for a specific remote, and reduce the number of times they have to retype passwords.
+
+!!! note
+	The example below is given for a specific HPC resource, but one can reuse this approach for other machines by changing the `User`, `Host` and `Hostname` variables in step 1, and the name and `remote:` field of the YML entries in step 3.
+
+#### Step 1
+
+Create a local file named `~/.ssh/config`, or append to it.
+
+In this file, you need the following block
+```sh
+Host archer2
+   User <archer2-username>
+   HostName login.archer2.ac.uk
+   ControlPath ~/.ssh/controlmasters/%r@%h:%p
+   ControlMaster auto
+   ControlPersist 30m
+```
+
+!!! note
+        The duration of ControlPersist can be modified to suit your needs. Note however that shorter durations are more secure.
+
+#### Step 2
+
+Create a directory using `mkdir ~/.ssh/controlmasters`
+
+#### Step 3
+
+Modify your existing `machines_user.yml` file such that it contains the following:
+
+```yml
+archer2:
+  username: <username>
+  remote: archer2
+  manual_ssh: true
+  project: <project>
+  budget: <budget>
+```
+
+
 

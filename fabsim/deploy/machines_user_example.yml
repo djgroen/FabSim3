@@ -11,10 +11,6 @@ default:
   # Allows to switch between SSH (default) and GSISSH login.
   manual_gsissh: false
   port: 22
-archer:
-  username: "user"
-  project: "e123"
-  budget: "e123-user"
 # SuperMUC phase2 connecting using GSISSH
 localhost:
   username: "your-username"

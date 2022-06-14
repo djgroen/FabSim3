@@ -133,7 +133,7 @@ def fetch_results(
     if env.manual_sshpass:
         local(
             template(
-                "rsync -pthrvz -e 'sshpass -p $sshpass ssh -p $port' {}"
+                "rsync -pthrvz -e 'sshpass -f $sshpass ssh -p $port' {}"
                 "$username@$remote:$job_results/{}  "
                 "$job_results_local".format(includes_files, regex)
             )
@@ -265,7 +265,7 @@ def put_configs(config: str) -> None:
         # function from /fabric/contrib/project.py
         local(
             template(
-                "rsync -pthrvz --rsh='sshpass -p $sshpass ssh  -p 22  ' "
+                "rsync -pthrvz --rsh='sshpass -f $sshpass ssh  -p 22  ' "
                 "$job_config_path_local/ "
                 "$username@$remote:$job_config_path/"
             )
@@ -871,7 +871,7 @@ def job_transmission(*job_args):
             local(
                 template(
                     "rsync -pthrvz "
-                    "--rsh='sshpass -p $sshpass ssh  -p 22  ' "
+                    "--rsh='sshpass -f $sshpass ssh  -p 22  ' "
                     "{}/ $username@$remote:{}/ ".format(sync_src, sync_dst)
                 )
             )

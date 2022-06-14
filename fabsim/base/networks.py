@@ -174,7 +174,7 @@ def manual_sshpass(
     if not hasattr(env, "sshpass"):
         raise ValueError("sshpass value did not set for this remote machine")
 
-    pre_cmd = "sshpass -p '%(sshpass)s' ssh %(username)s@%(remote)s " % env
+    pre_cmd = "sshpass -f '%(sshpass)s' ssh %(username)s@%(remote)s " % env
     return local(pre_cmd + "'" + manual_command + "'", capture=capture)
 
 

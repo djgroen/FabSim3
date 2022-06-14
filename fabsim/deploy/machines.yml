@@ -202,36 +202,6 @@ Kathleen:
     # list of modules to be loaded on remote machine
     all: ["load python/3.7.4", "load lammps/16Mar18/userintel/intel-2018"]
 
-
-
-archer:
-  max_job_name_chars: 15
-  job_dispatch: "qsub"
-  run_command: "aprun -n $cores"
-  run_ensemble_command: "aprun -n $cores_per_replica" # Required for ESMACS runs!
-  run_ensemble_command_ties: "aprun -n $cores_per_replica_per_lambda" # Required for TIES runs!
-  batch_header: pbs-archer
-  bac_ensemble_namd_script: bac-archer
-  bac_ensemble_nmode_script: bac-archer-nmode
-  bac_ensemble_nm_remote_script: bac-archer-nm-remote
-  bac_ties_script: bac-ties-archer-v2
-  no_ssh: true # Hector doesn't allow outgoing ssh sessions.
-  remote: "login.archer.ac.uk"
-  # On hector, *all files* which are needed at runtime, must be on the /work filesystem, so we must make the install location be on the /work filesystem
-  home_path_template: "/home/$project/$project/$username"
-  runtime_path_template: "/work/$project/$project/$username"
-  stat: "qstat -u $username"
-  modules: 
-    all: []
-    lammps: ["load lammps/lammps-28Jun14"]
-    dummy_lammps: ["load lammps/lammps-28Jun14"]
-    namd: ["load namd"]
-    gromacs: ["load gromacs"]
-  temp_path_template: "$work_path/tmp"
-  queue: "standard"
-  python_build: "lib64/python2.6"
-  pwd: "export PBS_O_WORKDIR=$(readlink -f $$PBS_O_WORKDIR)"
-  corespernode: 24
 bluejoule:
   job_dispatch: "llsubmit"
   run_command: "runjob --env-all -p $corespernode -n $cores :"
@@ -491,6 +461,7 @@ archer2:
   project: "d137"
   qos_name: "standard"
   # list of available partitions : sinfo --Format=partition
+  job_dispatch: "cd /work/$project/$project/$username ; sbatch"
   partition_name: "standard"
   batch_header: slurm-archer2
   PJ_header: archer2-PJ-header
