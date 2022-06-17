@@ -1,7 +1,13 @@
 
-## Creating a new plugin
+# Tutorials
 
-### Using Dummy Example
+For FabSim3, we provide several interactive tutorials, as well as static tutorials.
+
+The interactive tutorials use Jupyter notebooks, and they can be found here: https://github.com/vecma-project/VECMA-tutorials/tree/master/FabSim3
+
+As for the static tutorials, please find them below.
+
+## Creating a new plugin
 
 To create a new plugin for FabSim3:
 
@@ -245,11 +251,11 @@ To call and execute a function from command line, it should be tagged as a Fabri
 	fabsim eagle_vecma Cannonsim_ensemble:cannon_app
 	```
 
-## How to use `fabsim` API commands form python code
+## How to use `fabsim` API commands from python code
 
-Within FabSim3, in addition to `fabsim` command APIs, we also provide this functionality to call `fabsim` command from a python code.
+Within FabSim3, in addition to `fabsim` command APIs, we also provide this functionality to call `fabsim` commands from a python code. The best example that showcases how to do this is FabUQCampaign. The repository for that can be found here: https://github.com/wedeling/FabUQCampaign
 
 
 ## Advanced Plugins Examples
 
-For advanced examples, see the plugins available in `fabsim/deploy/plugins.yml` file. Both [FabFlee](https://github.com/djgroen/FabFlee), and [FabMD](https://github.com/UCL-CCS/FabMD) are particularly good examples to investigate.
+For more advanced examples, please see the plugins available in the `fabsim/deploy/plugins.yml` file. Both [FabFlee](https://github.com/djgroen/FabFlee), and [FabMD](https://github.com/UCL-CCS/FabMD) are good examples that showcase the possibilities of FabSim3.
