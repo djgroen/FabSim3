@@ -468,6 +468,9 @@ archer2:
   # all required files at runtime, must be on the /work filesystem, 
   # in ARCHER2, there is not access to /home on compute side
   home_path_template: "/work/$project/$project/$username"   
+  run_command: "srun -n $cores"
+  modules:
+          loaded: ["cray-python"]
 
 marenostrum4:
   <<: *Eagle_Default_Config
