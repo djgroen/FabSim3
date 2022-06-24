@@ -456,7 +456,7 @@ training_hidalgo:
 archer2:
   <<: *Eagle_Default_Config
   <<: *QCG_PilotJob  
-  remote: "login.archer2.ac.uk"
+  remote: "archer2" #ARCHER2 always requires multiplexing, so here we need an alias.
   budget: "d137"
   project: "d137"
   qos_name: "standard"
