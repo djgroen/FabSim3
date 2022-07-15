@@ -187,7 +187,7 @@ nav:
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
       - Patterns : patterns.md
       - Advanced Topics : advanced_topics.md
-          - Multiplex Setup : multiplex_setup.md
+      - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
       - Containerized versions : containerized_versions.md      
       - Tutorials : tutorials.md
