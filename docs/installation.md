@@ -2,11 +2,14 @@
 
 1. FabSim3 requires the following Python modules
 
-	* fabric3==1.13.1.post1
-	* PyYAML
-	* numpy
-	* ruamel.yaml
 	* rich
+	* fabric2
+	* pyyaml
+	* pytest
+	* pytest-pep8
+	* ruamel.yaml
+	* numpy
+	* beartype
 
 	!!! note
 		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) and  [rich](https://pypi.org/project/rich/)  packages, other packages are installed by FabSim3.
