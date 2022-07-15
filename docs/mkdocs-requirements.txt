@@ -8,4 +8,5 @@ mkdocs-mermaid2-plugin
 mkdocs-minify-plugin
 mkdocs-awesome-pages-plugin
 mkdocs-autolinks-plugin
-mkdocstrings[python]>=0.18
+mkdocstrings
+mkdocstrings-python
