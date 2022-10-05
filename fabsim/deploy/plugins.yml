@@ -44,4 +44,6 @@ FabNEPTUNE:
   
 FabSCEMa:
   repository: https://github.com/UCL-CCS/FabSCEMa
-  
+
+FabDynamics:
+  repository: https://github.com/arindamsaha1507/FabDynamics
