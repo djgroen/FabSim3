@@ -333,6 +333,10 @@ def add_plugin_environment_variable(plugin_name: str) -> None:
         open(plugin_machines_user), Loader=yaml.SafeLoader
     )
 
+    if plugin_config is None:
+        print("\nmachines_{}_user.yml is empty\n".format(plugin_name))
+        return
+
     user_config.update(plugin_config)
     # only update environment variable based on plugin_machines_user yaml file
     old_env = my_deepcopy(env)

@@ -387,7 +387,7 @@ def find_config_file_path(
     if path_used is None:
         if ExceptWhenNotFound:
             raise Exception(
-                "Error: config file directory not found in: ",
+                "Error: config file directory '{}' not found in: ".format(name),
                 env.local_config_file_path,
             )
         else:
