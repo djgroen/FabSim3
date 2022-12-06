@@ -1,7 +1,7 @@
 import os
 import sys
 from string import Template
-from typing import Optional
+from beartype.typing import Optional
 
 from beartype import beartype
 

@@ -3,7 +3,7 @@ import inspect
 import os
 import sys
 from pprint import pformat, pprint
-from typing import Dict, List, Optional
+from beartype.typing import Dict, List, Optional
 
 import yaml
 from beartype import beartype

@@ -3,7 +3,7 @@ from __future__ import print_function
 import os
 import subprocess
 from contextlib import contextmanager
-from typing import List, Optional, Tuple
+from beartype.typing import List, Optional, Tuple
 
 from beartype import beartype
 from fabric2 import Config, Connection

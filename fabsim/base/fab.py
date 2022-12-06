@@ -4,7 +4,7 @@ import re
 import tempfile
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
-from typing import Callable, Optional, Tuple, Union
+from beartype.typing import Callable, Optional, Tuple, Union
 
 from beartype import beartype
 from rich import print as rich_print
