@@ -260,12 +260,21 @@ def put_configs(config: str) -> None:
     ):
         rsync_delete = True
 
-    if env.manual_sshpass:
-        # TODO: maybe the better option here is to overwrite the rsync_project
-        # function from /fabric/contrib/project.py
+    if env.monsoon_mode:
+        # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
         local(
             template(
-                "rsync -pthrvz --rsh='sshpass -f $sshpass ssh  -p 22  ' "
+                "scp $job_config_path_local/ "
+                "$remote_head:$job_config_path/ ; "
+                "ssh $remote_head -C "
+                "'scp $remote_head:$job_config_path "
+                "$remote_compute:$job_config_path/'"
+            )
+        )
+    elif env.manual_ssh:
+        local(
+            template(
+                "rsync -pthrvz "
                 "$job_config_path_local/ "
                 "$username@$remote:$job_config_path/"
             )
