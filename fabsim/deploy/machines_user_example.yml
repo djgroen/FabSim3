@@ -44,10 +44,11 @@ eagle_hidalgo:
   
 archer2:
   username: "<your-username>"
-  sshpass: "<ARCHER2-password>"
-  manual_sshpass: true
+  manual_ssh: true
+  remote: archer2
+  budget: "<your-budget>"
+  project: "<your-project>"
   job_wall_time : "0-00:10:00"
-
 
 marenostrum4:
   username: "pr1emk01"
