@@ -265,9 +265,9 @@ def put_configs(config: str) -> None:
         local(
             template(
                 "scp $job_config_path_local/ "
-                "$remote_head:$job_config_path/ ; "
-                "ssh $remote_head -C "
-                "'scp $remote_head:$job_config_path "
+                "$remote:$job_config_path/ ; "
+                "ssh $remote -C "
+                "'scp $remote:$job_config_path "
                 "$remote_compute:$job_config_path/'"
             )
         )
