@@ -260,14 +260,15 @@ def put_configs(config: str) -> None:
     ):
         rsync_delete = True
 
+
     if env.ssh_monsoon_mode:
         # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
         local(
             template(
-                "scp $job_config_path_local/ "
+                "scp -r $job_config_path_local/* "
                 "$remote:$job_config_path/ ; "
                 "ssh $remote -C "
-                "'scp $remote:$job_config_path "
+                "'scp -r $remote:$job_config_path/* "
                 "$remote_compute:$job_config_path/'"
             )
         )

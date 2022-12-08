@@ -523,3 +523,5 @@ piz_daint:
   <<: *QCG_PilotJob
   remote: "daint.cscs.ch"
 
+monsoonfab:
+  remote: “monsoonfab” #Monsoon always requires multiplexing due to the RSA fob, so here we need an alias.
