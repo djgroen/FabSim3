@@ -3,9 +3,9 @@ from __future__ import print_function
 import os
 import subprocess
 from contextlib import contextmanager
-from beartype.typing import List, Optional, Tuple
 
 from beartype import beartype
+from beartype.typing import List, Optional, Tuple
 from fabric2 import Config, Connection
 
 from fabsim.base.env import env

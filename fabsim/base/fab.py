@@ -4,9 +4,9 @@ import re
 import tempfile
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
-from beartype.typing import Callable, Optional, Tuple, Union
 
 from beartype import beartype
+from beartype.typing import Callable, Optional, Tuple, Union
 from rich import print as rich_print
 from rich.console import Console
 from rich.panel import Panel

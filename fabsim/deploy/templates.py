@@ -1,9 +1,9 @@
 import os
 import sys
 from string import Template
-from beartype.typing import Optional
 
 from beartype import beartype
+from beartype.typing import Optional
 
 from fabsim.base.env import env
 

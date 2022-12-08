@@ -1,9 +1,9 @@
 
 import sys
 import time
-from beartype.typing import Optional
 
 from beartype import beartype
+from beartype.typing import Optional
 
 from fabsim.base.decorators import task
 from fabsim.base.env import env

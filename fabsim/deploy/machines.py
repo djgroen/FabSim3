@@ -3,10 +3,10 @@ import inspect
 import os
 import sys
 from pprint import pformat, pprint
-from beartype.typing import Dict, List, Optional
 
 import yaml
 from beartype import beartype
+from beartype.typing import Dict, List, Optional
 from rich.console import Console
 from rich.panel import Panel
 
