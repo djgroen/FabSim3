@@ -266,12 +266,13 @@ def put_configs(config: str) -> None:
         local(
             template(
                 "scp -r $job_config_path_local/* "
-                "$remote:$job_config_path/ ; "
-                "ssh $remote -C "
-                "'scp -r $remote:$job_config_path/* "
-                "$remote_compute:$job_config_path/'"
+                "$remote:$job_config_path/"
             )
         )
+        #"; "
+        #"ssh $remote -C "
+        #"'scp -r $remote:$job_config_path/* "
+        #"$remote_compute:$job_config_path/'"
     elif env.manual_sshpass:
         local(
             template(
