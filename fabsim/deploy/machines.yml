@@ -81,7 +81,7 @@ default:
 
   # Flag to use 'monsoon mode', which avoids rsync altogether and copies 
   # using recursive scp commands.
-  manual_ssh_monsoon_mode: false
+  ssh_monsoon_mode: false
 
   # Default location for templates.
   local_templates_path: ["$fabsim_root/deploy/templates"]
