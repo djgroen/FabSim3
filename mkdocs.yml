@@ -25,7 +25,7 @@ extra:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/djgroen/FabSim3
     - icon: fontawesome/solid/envelope
-      link: mailto:djgroen@gmail.com 
+      link: mailto:djgroen@gmail.com
 
 #####################
 #   Configuration   #
@@ -34,21 +34,21 @@ theme:
   name: material
   custom_dir: docs/static/theme/overrides
   static_templates:
-    - 404.html  
+    - 404.html
   include_search_page: false
   search_index_only: true
   # Default values, taken from mkdocs_theme.yml
-  language: en  
-  font:    
+  language: en
+  font:
     text: Roboto
     code: Roboto Mono
   palette:
-    primary: black    
+    primary: black
   features:
     - search.suggest
-    - search.highlight    
+    - search.highlight
     - navigation.tabs
-    - navigation.expand  
+    - navigation.expand
   favicon: images/logo/logo.png # browser tab icon
   logo: images/empty.png
   icon:
@@ -63,7 +63,7 @@ plugins:
   - autolinks
   - awesome-pages:
       collapse_single_pages: true
-      strict: true  
+      strict: true
   - macros
   - mkdocstrings:
       default_handler: python
@@ -84,11 +84,11 @@ plugins:
               filters:
                 - "!^_"  # exlude all members starting with _
               members: true
-              inherited_members: True                
+              inherited_members: True
               docstring_style: google
               docstring_options:
                 replace_admonitions: false
-        
+
   - mermaid2:
       arguments:
         securityLevel: 'loose'
@@ -99,7 +99,7 @@ plugins:
 #################
 extra_css:
   - static/css/custom.css
-  
+
 ################
 #   Extra JS   #
 ################
@@ -116,21 +116,21 @@ extra_javascript:
 ##################
 markdown_extensions:
   # - admonition
-  - markdown.extensions.admonition # alerts  
+  - markdown.extensions.admonition # alerts
   # - attr_list
   - markdown.extensions.attr_list # add HTML and CSS to Markdown elements
-  # - def_list  
+  # - def_list
   - markdown.extensions.def_list
   # - footnotes
   - markdown.extensions.footnotes
-  # - meta  
+  # - meta
   - markdown.extensions.meta
   - markdown.extensions.toc:
       baselevel: 1
       permalink: true
       toc_depth: 4
   - pymdownx.arithmatex: # mathjax
-      generic: true      
+      generic: true
   - pymdownx.betterem:
       smart_enable: all
   - pymdownx.caret
@@ -142,7 +142,7 @@ markdown_extensions:
   - pymdownx.highlight:
       use_pygments: true
   - pymdownx.escapeall:
-      nbsp: true      
+      nbsp: true
   - pymdownx.inlinehilite # inline code highlights
   - pymdownx.keys # show keystroke symbols
   # - pymdownx.magiclink:
@@ -164,7 +164,7 @@ markdown_extensions:
   - pymdownx.tabbed # content tabs
   - pymdownx.tasklist:
       custom_checkbox: true
-      clickable_checkbox: true      
+      clickable_checkbox: true
   - pymdownx.tilde
   - pymdownx.tabbed
   # - codehilite:
@@ -173,7 +173,7 @@ markdown_extensions:
       guess_lang: False
       use_pygments: True
       noclasses: True
-      pygments_style: monokai      
+      pygments_style: monokai
   - toc:
       permalink: true
 #################
@@ -187,9 +187,11 @@ nav:
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
       - Patterns : patterns.md
       - Advanced Topics : advanced_topics.md
+      - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
-      - Containerized versions : containerized_versions.md      
+      - Containerized versions : containerized_versions.md
       - Tutorials : tutorials.md
+      - Papers : papers.md
 
     - Code Reference:
        - Base APIs:
@@ -200,4 +202,4 @@ nav:
           - Machines : code_reference/deploy/machines.md
           - Templates : code_reference/deploy/templates.md
           - VVP : code_reference/VVP/vvp.md
-          
+

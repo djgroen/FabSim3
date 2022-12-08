@@ -3,7 +3,7 @@ import inspect
 import os
 import sys
 from pprint import pformat, pprint
-from typing import Dict, List, Optional
+from beartype.typing import Dict, List, Optional
 
 import yaml
 from beartype import beartype
@@ -332,6 +332,10 @@ def add_plugin_environment_variable(plugin_name: str) -> None:
     plugin_config = yaml.load(
         open(plugin_machines_user), Loader=yaml.SafeLoader
     )
+
+    if plugin_config is None:
+        print("\nmachines_{}_user.yml is empty\n".format(plugin_name))
+        return
 
     user_config.update(plugin_config)
     # only update environment variable based on plugin_machines_user yaml file

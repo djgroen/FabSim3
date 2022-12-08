@@ -1,7 +1,7 @@
 
 import sys
 import time
-from typing import Optional
+from beartype.typing import Optional
 
 from beartype import beartype
 

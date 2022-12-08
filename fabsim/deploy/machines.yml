@@ -395,6 +395,29 @@ eagle_hidalgo:
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]
 
+eagle_seavea:
+  <<: *Eagle_Default_Config
+  <<: *QCG_PilotJob
+  run_command: "mpirun -n $cores"
+  remote: "eagle.man.poznan.pl"
+  home_path_template: "/home/users/$username"
+  batch_header: slurm-eagle
+  budget: "574"
+  # list of available partitions : sinfo --Format=partition
+  partition_name: "standard"
+  # wall time in format days-hours:minutes:seconds
+  job_wall_time : "0-0:30:00"
+
+  PJ_size : "4"
+  PJ_wall_time : "0-3:00:00"
+
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]
+
 supermuc_vecma:
   <<: *Eagle_Default_Config
   <<: *QCG_PilotJob
@@ -444,6 +467,7 @@ training_hidalgo:
   PJ_size : "4"
   PJ_wall_time : "0-3:00:00"
 
+  run_prefix_commands: ["export PYTHONPATH=/home/users/$username/.local/lib/python3.7/site-packages"]
 
   modules:
     # list of modules to be loaded on remote machine

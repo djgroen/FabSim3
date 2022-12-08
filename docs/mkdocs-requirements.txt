@@ -8,5 +8,8 @@ mkdocs-mermaid2-plugin
 mkdocs-minify-plugin
 mkdocs-awesome-pages-plugin
 mkdocs-autolinks-plugin
-mkdocstrings
-mkdocstrings-python
+mkdocstrings==0.18.1
+mkdocstrings-python-legacy
+# mkdocs-enumerate-headings-plugin
+# mkdocs-print-site-plugin
+# pytkdocs==0.12

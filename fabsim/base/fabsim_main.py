@@ -93,6 +93,13 @@ def main():
     # by default, our assumption is the first arguments after fabsim command #
     # should be the name of target remote machine                            #
     ##########################################################################
+
+    if len(arguments) == 0:
+        raise ValueError(
+            "First argument expected to be target remote machine."
+            "Try `-h` for usage information."
+        )
+
     env.host = arguments[0]
     if env.host not in env.avail_machines:
         raise ValueError(

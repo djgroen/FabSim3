@@ -2,7 +2,7 @@ import inspect
 import sys
 from contextlib import contextmanager
 from pprint import pprint
-from typing import Dict
+from beartype.typing import Dict
 
 from rich.console import Console
 from rich.table import Table, box
