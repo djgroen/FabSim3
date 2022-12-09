@@ -879,7 +879,7 @@ def job_transmission(*job_args):
                         results_dir_item,
                     )
                 )
-           
+
                 run(
                     template(
                         "{} ; ssh $remote_compute -C"
@@ -926,10 +926,10 @@ def job_transmission(*job_args):
                     "ssh $remote -C "
                     "'scp -r {}/* "
                     "$remote_compute:{}/'".format(
-                        sync_src, 
-                        sync_dst, 
-                        sync_dst, 
-                        sync_dst
+                        sync_src,
+                        sync_dst,
+                        sync_dst,
+                        sync_dst,
                     )
                 )
             )
