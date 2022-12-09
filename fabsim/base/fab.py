@@ -866,19 +866,36 @@ def job_transmission(*job_args):
         empty_folder = "/tmp/{}".format(next(tempfile._get_candidate_names()))
         results_dir_items = os.listdir(env.tmp_results_path)
         for results_dir_item in results_dir_items:
-            run(
-                template(
-                    "mkdir {} && "
-                    "mkdir -p {}/results &&"
-                    "rsync -a --delete --inplace {}/  {}/results/{}/".format(
-                        empty_folder,
-                        env.work_path,
-                        empty_folder,
-                        env.work_path,
-                        results_dir_item,
+            print("empty folder: ", empty_folder, ", results_dir_item: ", results_dir_item)
+            if env.ssh_monsoon_mode:
+                run(
+                    template(
+                        "mkdir {} && "
+                        "mkdir -p {}/results/{} && "
+                        "rm -rf {}/results/{}/*".format(
+                            empty_folder,
+                            env.work_path,
+                            results_dir_item,
+                            env.work_path,
+                            results_dir_item,
+                        )
                     )
                 )
-            )
+
+            else:
+                run(
+                    template(
+                        "mkdir {} && "
+                        "mkdir -p {}/results &&"
+                        "rsync -a --delete --inplace {}/  {}/results/{}/".format(
+                            empty_folder,
+                            env.work_path,
+                            empty_folder,
+                            env.work_path,
+                            results_dir_item,
+                        )
+                    )
+                )
 
     rsyc_src_dst_folders = []
     rsyc_src_dst_folders.append((env.tmp_scripts_path, env.scripts_path))
