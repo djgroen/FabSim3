@@ -885,7 +885,14 @@ def job_transmission(*job_args):
     rsyc_src_dst_folders.append((env.tmp_results_path, env.results_path))
 
     for sync_src, sync_dst in rsyc_src_dst_folders:
-        if env.manual_sshpass:
+        if env.ssh_monsoon_mode:
+            local(
+                template(
+                    "scp -r "
+                    "{}/* $username@$remote:{}/ ".format(sync_src, sync_dst)
+                )
+            )
+        elif env.manual_sshpass:
             # TODO: maybe the better option here is to overwrite the
             #       rsync_project
             local(
