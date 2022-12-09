@@ -269,8 +269,8 @@ def put_configs(config: str) -> None:
                 "ssh $remote -C "
                 "'scp -r $remote:$job_config_path/* "
                 "$remote_compute:$job_config_path/'"
-                )
             )
+        )
 
     elif env.manual_sshpass:
         local(
@@ -879,16 +879,16 @@ def job_transmission(*job_args):
                         results_dir_item,
                     )
                 )
-                
+           
                 run(
                     template(
                         "{} ; ssh $remote_compute -C"
                         "'{}'".format(
                             task_string,
                             task_string,
-                            )
                         )
                     )
+                )
 
             else:
                 run(
@@ -926,9 +926,13 @@ def job_transmission(*job_args):
                     "ssh $remote -C "
                     "'scp -r $remote:{}/* "
                     "$remote_compute:{}/'".format(
-                    sync_src, sync_dst, sync_dst, sync_dst)
+                        sync_src, 
+                        sync_dst, 
+                        sync_dst, 
+                        sync_dst
                     )
                 )
+            )
         elif env.manual_sshpass:
             # TODO: maybe the better option here is to overwrite the
             #       rsync_project
