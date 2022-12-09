@@ -260,7 +260,6 @@ def put_configs(config: str) -> None:
     ):
         rsync_delete = True
 
-
     if env.ssh_monsoon_mode:
         # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
         local(
@@ -269,10 +268,10 @@ def put_configs(config: str) -> None:
                 "$remote:$job_config_path/"
             )
         )
-        #"; "
-        #"ssh $remote -C "
-        #"'scp -r $remote:$job_config_path/* "
-        #"$remote_compute:$job_config_path/'"
+        # "; "
+        # "ssh $remote -C "
+        # "'scp -r $remote:$job_config_path/* "
+        # "$remote_compute:$job_config_path/'"
     elif env.manual_sshpass:
         local(
             template(
@@ -866,7 +865,8 @@ def job_transmission(*job_args):
         empty_folder = "/tmp/{}".format(next(tempfile._get_candidate_names()))
         results_dir_items = os.listdir(env.tmp_results_path)
         for results_dir_item in results_dir_items:
-            print("empty folder: ", empty_folder, ", results_dir_item: ", results_dir_item)
+            print("empty folder: ", empty_folder)
+            print("results_dir_item: ", results_dir_item)
             if env.ssh_monsoon_mode:
                 run(
                     template(
@@ -887,7 +887,8 @@ def job_transmission(*job_args):
                     template(
                         "mkdir {} && "
                         "mkdir -p {}/results &&"
-                        "rsync -a --delete --inplace {}/  {}/results/{}/".format(
+                        "rsync -a --delete --inplace {}/ "
+                        "{}/results/{}/".format(
                             empty_folder,
                             env.work_path,
                             empty_folder,
