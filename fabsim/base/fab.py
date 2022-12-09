@@ -265,13 +265,13 @@ def put_configs(config: str) -> None:
         local(
             template(
                 "scp -r $job_config_path_local/* "
-                "$remote:$job_config_path/"
+                "$remote:$job_config_path/ ; "
+                "ssh $remote -C "
+                "'scp -r $remote:$job_config_path/* "
+                "$remote_compute:$job_config_path/'"
+                )
             )
-        )
-        # "; "
-        # "ssh $remote -C "
-        # "'scp -r $remote:$job_config_path/* "
-        # "$remote_compute:$job_config_path/'"
+
     elif env.manual_sshpass:
         local(
             template(
@@ -868,19 +868,27 @@ def job_transmission(*job_args):
             print("empty folder: ", empty_folder)
             print("results_dir_item: ", results_dir_item)
             if env.ssh_monsoon_mode:
-                run(
-                    template(
-                        "mkdir {} && "
-                        "mkdir -p {}/results/{} && "
-                        "rm -rf {}/results/{}/*".format(
-                            empty_folder,
-                            env.work_path,
-                            results_dir_item,
-                            env.work_path,
-                            results_dir_item,
-                        )
+                task_string = template(
+                    "mkdir {} && "
+                    "mkdir -p {}/results/{} && "
+                    "rm -rf {}/results/{}/*".format(
+                        empty_folder,
+                        env.work_path,
+                        results_dir_item,
+                        env.work_path,
+                        results_dir_item,
                     )
                 )
+                
+                run(
+                    template(
+                        "{} ; ssh $remote_compute -C"
+                        "'{}'".format(
+                            task_string,
+                            task_string,
+                            )
+                        )
+                    )
 
             else:
                 run(
@@ -904,12 +912,23 @@ def job_transmission(*job_args):
 
     for sync_src, sync_dst in rsyc_src_dst_folders:
         if env.ssh_monsoon_mode:
+            # local(
+            #    template(
+            #        "scp -r "
+            #        "{}/* $username@$remote:{}/ ".format(sync_src, sync_dst)
+            #    )
+            # )
+            # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
             local(
                 template(
-                    "scp -r "
-                    "{}/* $username@$remote:{}/ ".format(sync_src, sync_dst)
+                    "scp -r {}/* "
+                    "$username@$remote:{}/ ; "
+                    "ssh $remote -C "
+                    "'scp -r $remote:{}/* "
+                    "$remote_compute:{}/'".format(
+                    sync_src, sync_dst, sync_dst, sync_dst)
+                    )
                 )
-            )
         elif env.manual_sshpass:
             # TODO: maybe the better option here is to overwrite the
             #       rsync_project
