@@ -921,6 +921,8 @@ def job_transmission(*job_args):
             # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
             local(
                 template(
+                    "ssh $remote -C "
+                    "'mkdir -p sync_dst' && "
                     "scp -r {}/* "
                     "$username@$remote:{}/ && "
                     "ssh $remote -C "
