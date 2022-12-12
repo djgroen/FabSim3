@@ -922,7 +922,7 @@ def job_transmission(*job_args):
             local(
                 template(
                     "ssh $remote -C "
-                    "'mkdir -p sync_dst' && "
+                    "'mkdir -p $sync_dst' && "
                     "scp -r {}/* "
                     "$username@$remote:{}/ && "
                     "ssh $remote -C "
