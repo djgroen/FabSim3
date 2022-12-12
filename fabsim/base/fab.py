@@ -923,11 +923,11 @@ def job_transmission(*job_args):
                 template(
                     "ssh $remote -C "
                     "'mkdir -p {}' && "
-                    "scp -r {}/* "
-                    "$username@$remote:{}/ && "
+                    "scp -r {} "
+                    "$username@$remote:{}/../ && "
                     "ssh $remote -C "
-                    "'scp -r {}/* "
-                    "$remote_compute:{}/'".format(
+                    "'scp -r {} "
+                    "$remote_compute:{}/../'".format(
                         sync_dst,
                         sync_src,
                         sync_dst,
