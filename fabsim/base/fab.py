@@ -264,11 +264,11 @@ def put_configs(config: str) -> None:
         # scp a monsoonfab:~/ ; ssh monsoonfab -C “scp ~/a xcscfab:~/”
         local(
             template(
-                "scp -r $job_config_path_local/* "
-                "$remote:$job_config_path/ ; "
+                "scp -r $job_config_path_local "
+                "$remote:$config_path/ ; "
                 "ssh $remote -C "
-                "'scp -r $job_config_path/* "
-                "$remote_compute:$job_config_path/'"
+                "'scp -r $job_config_path "
+                "$remote_compute:$config_path/'"
             )
         )
 
