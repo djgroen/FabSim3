@@ -999,7 +999,7 @@ def job_submission(*job_args):
                 "-C '$job_dispatch {}'".format(job_script)
             )
             run(
-                cmd, 
+                cmd,
                 cd=env.pather.dirname(job_script)
             )
         else:
