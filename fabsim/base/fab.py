@@ -993,7 +993,15 @@ def job_submission(*job_args):
                 ),
                 cd=env.pather.dirname(job_script)
             )
-
+        elif env.ssh_monsoon_mode:
+            cmd = template(
+                "ssh $remote_compute "
+                "-C '$job_dispatch {}'".format(job_script)
+            )
+            run(
+                cmd, 
+                cd=env.pather.dirname(job_script)
+            )
         else:
             run(
                 cmd=template("$job_dispatch {}".format(job_script)),
