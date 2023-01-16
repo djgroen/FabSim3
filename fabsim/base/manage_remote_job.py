@@ -64,6 +64,12 @@ def jobs_list(quiet: Optional[bool] = False) -> str:
     else:
 
         output = run(template("$stat"), capture=quiet)
+        
+        # One some machines (e.g. ARCHER2) output returns a tuple.
+        # This branch isolates the string part of it.
+        if isinstance(output, tuple):
+            output = output[0]
+
         return output
 
     # return output
