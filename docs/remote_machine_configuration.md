@@ -113,6 +113,7 @@ To install QCG-PJ on your remote machine, simply type:
 ```sh
 fabsim <remote machine name> install_app:QCG-PilotJob,venv=True
 ```
+Here, the `venv=True` ensures that you are using the VirtualEnv virtual environment. If you choose to omit the flag, you may have to face various errors and complications that accompany direct deployment in the default remote machine environment.
 !!! info
 	All required packages are downloaded and transferred to the remote machine. Therefore, even if the compute nodes do not have an access to Internet, the installation part will be done in off-line mode
 
