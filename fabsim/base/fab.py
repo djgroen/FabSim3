@@ -4,6 +4,7 @@ import re
 import tempfile
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
+from pathlib import Path
 
 from beartype import beartype
 from beartype.typing import Callable, Optional, Tuple, Union
