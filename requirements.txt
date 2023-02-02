@@ -5,5 +5,5 @@ pytest
 pytest-pep8
 ruamel.yaml
 numpy
-beartype
+beartype>=0.11
 
