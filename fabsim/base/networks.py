@@ -345,7 +345,7 @@ def put(
     if os.path.isdir(src):
         src = src.rstrip("/")
 
-    if os.path.isfile(src) and not dst.endswith("/"):
+    if os.path.isfile(src) and os.path.isdir(dst) and not dst.endswith("/"):
         dst = dst + "/"
 
     if os.path.isdir(src) and os.path.isdir(dst) and dst.endswith("/"):
