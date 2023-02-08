@@ -1619,7 +1619,11 @@ def install_app(name="", external_connexion="no", venv="False"):
     #
     run(template("mkdir -p $job_results"))
 
-    with cd(env.pather.dirname(env.job_results)):
-        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    env.job_dispatch += " -q standard"
+
+    print(env.job_dispatch)
+    print(env.dest_name)
+
+    run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
     local("rm -rf {}".format(tmp_app_dir))
