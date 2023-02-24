@@ -1453,6 +1453,8 @@ def install_app(name="", external_connexion="no", venv="False"):
         )
     )
 
+    local("pip3 install -r "+env.localroot+'/qcg_requirements.txt')
+
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
         local(
