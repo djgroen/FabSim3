@@ -2,9 +2,9 @@ import math
 import os
 import re
 import tempfile
+from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
-from pathlib import Path
 
 from beartype import beartype
 from beartype.typing import Callable, Optional, Tuple, Union
@@ -1453,6 +1453,11 @@ def install_app(name="", external_connexion="no", venv="False"):
         )
     )
 
+    # Install app-specific requirements
+
+    if name == "QCG-PilotJob":
+        local("pip3 install -r " + env.localroot + "/qcg_requirements.txt")
+
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
         local(
@@ -1619,7 +1624,11 @@ def install_app(name="", external_connexion="no", venv="False"):
     #
     run(template("mkdir -p $job_results"))
 
-    with cd(env.pather.dirname(env.job_results)):
-        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    env.job_dispatch += " -q standard"
+
+    print(env.job_dispatch)
+    print(env.dest_name)
+
+    run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
     local("rm -rf {}".format(tmp_app_dir))

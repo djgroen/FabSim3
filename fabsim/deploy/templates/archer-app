@@ -1,7 +1,7 @@
 #!/bin/bash
-## slurm-archer2
+## archer-app
 ## number of nodes
-#SBATCH --nodes $PJ_size
+#SBATCH --nodes $nodes
 
 ## task per node
 #SBATCH --tasks-per-node=$corespernode
@@ -18,21 +18,12 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Request a specific partition ("queue") for the resource allocation
 #SBATCH --partition=$partition_name
-#SBATCH --qos=$qos_name
 
-## create sub-directory to save output job log
-
-cd /work/$project/$project/$username/
-logJob_dir="tasks-log"
-if [ -d "$$logJob_dir" ]; then
-  rm -rf $$logJob_dir
-fi  
-mkdir $$logJob_dir
 
 $run_prefix
 
-## load QCG-PilotJob
 
-$run_QCG_PilotJob
+
 
