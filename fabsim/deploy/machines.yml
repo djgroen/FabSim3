@@ -500,7 +500,7 @@ archer2:
   home_path_template: "/work/$project/$project/$username"   
   modules:
     all: ["load cray-python"]
-  run_prefix_commands: ["export PYTHONUSERBASE=/work/$project/$project/$username/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH"]
+  run_prefix_commands: ["export PYTHONUSERBASE=/work/$project/$project/$username/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH", "export SLURM_CPU_FREQ_REQ=2250000"]
 
 marenostrum4:
   <<: *Eagle_Default_Config
