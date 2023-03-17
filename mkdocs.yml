@@ -189,6 +189,7 @@ nav:
       - Advanced Topics : advanced_topics.md
       - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
+      - Remote QCG PilotJob Installation: qcg-pilotjob_installation.md
       - Containerized versions : containerized_versions.md
       - Tutorials : tutorials.md
       - Papers : papers.md
