@@ -724,6 +724,8 @@ def job_preparation(*job_args):
     return_job_scripts = []
     for i in range(env.replica_start_number, int(env.replicas) + env.replica_start_number):
 
+        env.replica_number = i
+
         env.job_results, env.job_results_local = with_template_job(
             ensemble_mode=env.ensemble_mode, label=env.label
         )
