@@ -722,7 +722,9 @@ def job_preparation(*job_args):
         env.replica_start_number = 1
 
     return_job_scripts = []
-    for i in range(env.replica_start_number, int(env.replicas) + env.replica_start_number):
+
+    for i in range(env.replica_start_number, int(env.replicas) +
+            env.replica_start_number):
 
         env.replica_number = i
 
