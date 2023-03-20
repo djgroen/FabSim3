@@ -336,7 +336,7 @@ def calc_total_mem() -> None:
     if not hasattr(env, "memory"):
         env.memory = "2GB"
 
-    mem_size = int(re.findall("\d+", str(env.memory))[0])
+    mem_size = int(re.findall("\\d+", str(env.memory))[0])
     try:
         mem_unit_str = re.findall("[a-zA-Z]+", str(env.memory))[0]
     except Exception:
@@ -724,7 +724,7 @@ def job_preparation(*job_args):
     return_job_scripts = []
 
     for i in range(env.replica_start_number, int(env.replicas) +
-            env.replica_start_number):
+                   env.replica_start_number):
 
         env.replica_number = i
 
@@ -1035,7 +1035,7 @@ def job_submission(*job_args):
 def ensemble2campaign(
         results_dir: str,
         campaign_dir: str,
-        skip: Optional[Union[int, str]]=0
+        skip: Optional[Union[int, str]] = 0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -1071,7 +1071,7 @@ def ensemble2campaign(
 def campaign2ensemble(
         config: str,
         campaign_dir: str,
-        skip: Optional[Union[int, str]]=0
+        skip: Optional[Union[int, str]] = 0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
