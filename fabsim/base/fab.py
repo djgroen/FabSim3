@@ -716,8 +716,13 @@ def job_preparation(*job_args):
     else:
         env.label = ""
 
+    if "replica_start_number" in args:
+        env.replica_start_number = int(args["replica_start_number"])
+    else:
+        env.replica_start_number = 1
+
     return_job_scripts = []
-    for i in range(1, int(env.replicas) + 1):
+    for i in range(env.replica_start_number, int(env.replicas) + env.replica_start_number):
 
         env.job_results, env.job_results_local = with_template_job(
             ensemble_mode=env.ensemble_mode, label=env.label
