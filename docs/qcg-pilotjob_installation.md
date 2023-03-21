@@ -25,6 +25,7 @@ fabsim <remote machine name> install_app:QCG-PilotJob,venv=True
 ```
 
 Once the command is issued, the following steps will occur in sequence:
+
 1. Miniconda will be installed locally.
 
 2. All the dependencies required for installation of QCG Pilot Job will be installed locally
