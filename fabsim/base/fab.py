@@ -1035,7 +1035,7 @@ def job_submission(*job_args):
 def ensemble2campaign(
         results_dir: str,
         campaign_dir: str,
-        skip: Optional[Union[int, str]] = 0
+        skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
