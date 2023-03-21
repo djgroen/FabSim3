@@ -5,6 +5,9 @@ FabMD:
 FabFlee:
   repository: https://github.com/djgroen/FabFlee.git
 
+FabParticleDA:
+  repository: https://github.com/djgroen/FabParticleDA.git
+
 FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
 

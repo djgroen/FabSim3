@@ -1,6 +1,14 @@
 # QCG Pilot Job installation on remote machines
 
-QCG Pilot Job is a lightweight implementation of the Pilot Job mechanism which can be used to run a very large number of jobs efficiently on remote machines. We present the instructions to install QCG Pilot Job on remote machines.
+QCG Pilot Job is a lightweight implementation of the Pilot Job mechanism which
+can be used to run a very large number of jobs efficiently on remote clusters and supercomputers.
+
+More information on QCG-PilotJob can be found on their [ReadTheDocs site](https://qcg-pilotjob.readthedocs.io/en/develop/).
+
+![images/qcg-pj.webp!](Image of a QCG Pilot Job container)
+*Example of a QCG-Pilotjob container, which dynamically facilitates a diverse set of code executions within a single queuing system job. [Source](https://link.springer.com/chapter/10.1007/978-3-030-77977-1_39)*
+
+Here we present how you can install QCG Pilot Job on remote machines, so that you can use it with FabSim3. Note that FabSim3 can also work with a pre-installed version of QCG-PilotJob; but for those who need to set it up manually this document is meant to provide some help.
 
 ## Prerequisites
 
