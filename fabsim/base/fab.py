@@ -1071,7 +1071,7 @@ def ensemble2campaign(
 def campaign2ensemble(
         config: str,
         campaign_dir: str,
-        skip: Optional[Union[int, str]] = 0
+        skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
