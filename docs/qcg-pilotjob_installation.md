@@ -26,9 +26,13 @@ fabsim <remote machine name> install_app:QCG-PilotJob,venv=True
 
 Once the command is issued, the following steps will occur in sequence:
 1. Miniconda will be installed locally.
+
 2. All the dependencies required for installation of QCG Pilot Job will be installed locally
+
 3. Prepares the script that when run on the remote machine will install QCG Pilot Job
+
 4. Transfers all the dependencies to the remote machine
+
 5. Submits the installation job script to the remote machine
 
 Since, the number of dependencies for QCG Pilot Job is quite large, therefore, the command may take upto 45 minutes to run.
