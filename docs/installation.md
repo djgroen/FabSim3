@@ -70,6 +70,35 @@ If you have already installed FabSim3 and want to update to the latest version, 
 !!! attention
 		Your personal settings like the `machines_user.yml` will be unchanged by `git pull`, **unless** you run `python3 configure_fabsim.py` again, which overwrites the current `machines_user.yml` file.
 
+## List of available machines and tasks
+
+The basic syntax of any FabSim3 command is the following:
+```sh
+fabsim <machine_name> <task_name>:<task_argument_list>
+```
+
+where 
+
+- `task_name` is the name of the task to be executed.
+
+- `task_argument_list` is a comma seperated list of arguments specific to the task.
+
+- `machine_name` is the name of the machine on which the task is to be executed.
+
+You can see the list of available FabSim3 machines by typing:
+```sh
+fabsim -l machines
+```
+
+which gives a table with the `machine_names` and their addresses,
+
+You can see the list of available FabSim3 machines by typing:
+```sh
+fabsim -l tasks
+```
+
+which gives a table with the plugin names and their associated `task_names`.
+
 ## Known Issues
 
 Here is the list of known issue that reported by our users so far:
@@ -131,11 +160,3 @@ Please make sure that you used the same executable path for `fab` as it mentione
 
 !!! note
 	If you are having a problem which is not listed here, please raise a [github issue](https://github.com/djgroen/FabSim3/issues/new/choose) in FabSim3 repository, and provide a full output log, so we can have a look and provide a solution or address your issue.
-
-
-### List of available commands
-
-You can see the list of available FabSim3 commands, by simply typing:
-	```sh
-	fabsim -l
-	```
