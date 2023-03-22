@@ -54,7 +54,6 @@ For instructions on how to install and test FabSim, please refer to `docs/instal
 
 ## Known issues
 
-* `fabsim3 -l` sorts commands but not the module list correctly.
 * The FabMUSCLE plugin does not yet work correctly with the Eagle Supercomputer.
 
 ### Citing FabSim
