@@ -11,7 +11,7 @@ More information on QCG-PilotJob can be found on their [ReadTheDocs site](https:
 Here we present how you can install QCG Pilot Job on remote machines, so that you can use it with FabSim3.
 
 !!! note
-Note that FabSim3 can also work with a pre-installed version of QCG-PilotJob; but for those who need to set it up manually this document is meant to provide some help.
+    Note that FabSim3 can also work with a pre-installed version of QCG-PilotJob; but for those who need to set it up manually this document is meant to provide some help.
 
 ## Prerequisites
 
