@@ -37,7 +37,9 @@ The accompanying software paper can be found here: <https://doi.org/10.1016/j.cp
 The main plugins for FabSim3 include:
 
 * FabMD, focused on molecular dynamics.
-* FabFlee, focused on agent-based modelling.
+* FabFlee, focused on agent-based modelling of human migration.
+* FabCovid19: focused on agent-based modelling of infectious disease spread.
 * FabUQCampaign, focused on UQ ensemble sampling.
 * FabDummy, a dummy plugin used for testing the toolkit.
 * FabMUSCLE, a preliminary integration with the MUSCLE3 coupling toolkit.
+* FabParticleDA: a preliminary plugin for ParticleDA.jl
