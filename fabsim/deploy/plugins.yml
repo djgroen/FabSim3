@@ -50,3 +50,6 @@ FabSCEMa:
 
 FabDynamics:
   repository: https://github.com/arindamsaha1507/FabDynamics
+
+FabABMCPP:
+  repository: https://github.com/shakir507/FabABMCPP

@@ -19,49 +19,12 @@ Other plugins can be installed in FabSim3, and are listed in `fabsim/deploy/plug
 
 ### List of available FabSim3 plugins
 
-#### FabFlee
+#### FabChemShell
 
-FabFlee is a plugin for automated [Flee](https://github.com/djgroen/flee) agent-based simulations. It provides an environment to construct, modify and execute simulations as a single run or ensemble runs. FabFlee aims to predict the distribution of incoming refugees across destination camps under a range of different policy situations.
+FabChemShell is a ChemShell plugin for FabSim3.
 
-* FabFlee github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabFlee)
-* FabFlee documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabFlee/blob/master/doc/FabFlee.md)
-
-
-#### FabMD
-
-FabMD is a FabSim3 plugin for automated [LAMMPS](https://lammps.sandia.gov/)-based simulations.
-
-This plugin provides functionality to extend FabSim3's workflow and remote submission capabilities to LAMMPS specific tasks.
-
-* FabMD github repository : [:octicons-mark-github-16:](https://github.com/UCL-CCS/FabMD)
-* FabMD documentation : [:fontawesome-solid-book:](https://fabmd.readthedocs.io)
-
-
-#### FabDummy
-
-FabDummy is a dummy example plugin for FabSim3. It is meant to showcase a minimal implementation for a FabSim3 plugin.
-
-* FabDummy github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabDummy)
-* FabDummy documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabDummy/blob/master/README.md)
-
-
-#### FabUQCampaign
-
-FabUQCampaign is a FabSim3 plugin for a climate modelling. It used to run an ensemble of [EasyVVUQ](https://github.com/UCL-CCS/EasyVVUQ/) samples on HPC resources.
-
-
-* FabUQCampaign github repository : [:octicons-mark-github-16:](https://github.com/wedeling/FabUQCampaign)
-* FabUQCampaign documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/README.md)
-	* FabUQCampaign 2D ocean model documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/Tutorial_ocean.md)
-
-
-
-#### FabMUSCLE
-
-FabMUSCLE is a preliminary launcher for the MUSCLE3 toolkit. It serves to automatically set up [MUSCLE3](https://muscle3.readthedocs.io) simulations, launch the manager and its submodels, and keep all the associated data organized.
-
-* FabMUSCLE github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabMUSCLE)
-* FabMUSCLE documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabMUSCLE/blob/master/README.md)
+* FabChemShell github repository : [:octicons-mark-github-16:](https://github.com/gh3orghiu/FabChemShell)
+* FabChemShell documentation : [:fontawesome-solid-book:](https://github.com/gh3orghiu/FabChemShell/blob/master/README.md)
 
 
 #### FabCovid19
@@ -80,6 +43,38 @@ FabCovidsim is a FabSim3/EasyVVUQ plugin for [COVID-19 CovidSim microsimulation 
 * FabCovidsim documentation : [:fontawesome-solid-book:](https://github.com/arabnejad/FabCovidsim/blob/dev/README.md)
 
 
+#### FabDummy
+
+FabDummy is a dummy example plugin for FabSim3. It is meant to showcase a minimal implementation for a FabSim3 plugin.
+
+* FabDummy github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabDummy)
+* FabDummy documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabDummy/blob/master/README.md)
+
+
+#### FabFlee
+
+FabFlee is a plugin for automated [Flee](https://github.com/djgroen/flee) agent-based simulations. It provides an environment to construct, modify and execute simulations as a single run or ensemble runs. FabFlee aims to predict the distribution of incoming refugees across destination camps under a range of different policy situations.
+
+* FabFlee github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabFlee)
+* FabFlee documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabFlee/blob/master/doc/FabFlee.md)
+
+
+#### FabMD
+
+FabMD is a FabSim3 plugin for automated [LAMMPS](https://lammps.sandia.gov/)-based simulations.
+
+This plugin provides functionality to extend FabSim3's workflow and remote submission capabilities to LAMMPS specific tasks.
+
+* FabMD github repository : [:octicons-mark-github-16:](https://github.com/UCL-CCS/FabMD)
+* FabMD documentation : [:fontawesome-solid-book:](https://fabmd.readthedocs.io)
+
+
+#### FabMUSCLE
+
+FabMUSCLE is a preliminary launcher for the MUSCLE3 toolkit. It serves to automatically set up [MUSCLE3](https://muscle3.readthedocs.io) simulations, launch the manager and its submodels, and keep all the associated data organized.
+
+* FabMUSCLE github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabMUSCLE)
+* FabMUSCLE documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabMUSCLE/blob/master/README.md)
 
 #### FabSMD
 
@@ -89,13 +84,14 @@ FabSMD is a Steered Molecular Dynamics (SMD) plugin for FabSim3.
 * FabSMD documentation : [:fontawesome-solid-book:](https://github.com/potterton48/FabSMD/blob/master/README.md)
 
 
-#### FabChemShell
+#### FabUQCampaign
 
-FabChemShell is a ChemShell plugin for FabSim3.
+FabUQCampaign is a FabSim3 plugin for a climate modelling. It used to run an ensemble of [EasyVVUQ](https://github.com/UCL-CCS/EasyVVUQ/) samples on HPC resources.
 
-* FabChemShell github repository : [:octicons-mark-github-16:](https://github.com/gh3orghiu/FabChemShell)
-* FabChemShell documentation : [:fontawesome-solid-book:](https://github.com/gh3orghiu/FabChemShell/blob/master/README.md)
 
+* FabUQCampaign github repository : [:octicons-mark-github-16:](https://github.com/wedeling/FabUQCampaign)
+* FabUQCampaign documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/README.md)
+	* FabUQCampaign 2D ocean model documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/Tutorial_ocean.md)
 
 
 ### FabDummy testing on localhost
