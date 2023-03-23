@@ -5,7 +5,9 @@ can be used to run a very large number of jobs efficiently on remote clusters an
 
 More information on QCG-PilotJob can be found on their [ReadTheDocs site](https://qcg-pilotjob.readthedocs.io/en/develop/).
 
-![images/qcg-pj.webp!](Image of a QCG Pilot Job container)
+<p align="center">
+    <img src="../images/qcg-pj.webp" alt="Image of a QCG Pilot Job container" width="800" />
+</p>
 *Example of a QCG-Pilotjob container, which dynamically facilitates a diverse set of code executions within a single queuing system job. [Source](https://link.springer.com/chapter/10.1007/978-3-030-77977-1_39)*
 
 Here we present how you can install QCG Pilot Job on remote machines, so that you can use it with FabSim3.
