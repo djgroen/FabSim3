@@ -32,7 +32,8 @@ FabSim3 relies strongly on Fabric (<http://www.fabfile.org>, shown to work with 
 
 FabSim3 is publicly available at: <http://www.github.com/djgroen/FabSim3>. 
 
-The accompanying software paper can be found here: <https://doi.org/10.1016/j.cpc.2016.05.020>.
+The accompanying software paper can be found here: <https://doi.org/10.1016/j.cpc.2022.108596>
+There is also a paper about the original version of FabSim here: <https://doi.org/10.1016/j.cpc.2016.05.020>.
 
 The main plugins for FabSim3 include:
 
@@ -42,4 +43,5 @@ The main plugins for FabSim3 include:
 * FabUQCampaign, focused on UQ ensemble sampling.
 * FabDummy, a dummy plugin used for testing the toolkit.
 * FabMUSCLE, a preliminary integration with the MUSCLE3 coupling toolkit.
+* FabNEPTUNE, a plugin specific for project NEPTUNE (on fusion research).
 * FabParticleDA: a preliminary plugin for ParticleDA.jl
