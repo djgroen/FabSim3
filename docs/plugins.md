@@ -76,6 +76,15 @@ FabMUSCLE is a preliminary launcher for the MUSCLE3 toolkit. It serves to automa
 * FabMUSCLE github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabMUSCLE)
 * FabMUSCLE documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabMUSCLE/blob/master/README.md)
 
+
+#### FabParticleDA
+
+FabParticleDA is a FabSim3 plugin for [ParticleDA.jl](https://github.com/Team-RADDISH/ParticleDA.jl)).
+
+* FabParticleDA github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabParticleDA)
+* FabParticleDA documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabParticleDA/blob/master/README.md)
+
+
 #### FabSMD
 
 FabSMD is a Steered Molecular Dynamics (SMD) plugin for FabSim3.
