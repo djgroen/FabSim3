@@ -1,11 +1,11 @@
 ## Creating automation scripts
-This document briefly details how user/developers can create their own FabSim3 automations.
+This document briefly details how user/developers can create their own FabSim3 automation.
 
 #### Overview
 
 * Automation scripts allow user/developers to create their own FabSim3 functionalities. They are usually created and modified within individual plugins.
 * Base automation scripts reside within the `FabSim3/fabsim/base` subdirectory. These should normally not be modified, but they can serve as examples to create your own functionalities, or as building blocks to create complex functions.
-* Plugin-specific automation scripts reside within the base directory of the respective plugin. The script that will be invoked by default is `<plugin_name>.py`. For larger plugins, various other Python scripts can surely be imported in this main script.
+* Plugin-specific automation scripts reside within the base directory of the respective plugin. The script that will be invoked by default is `<plugin_name>.py`. For larger plugins, various other Python scripts can surely be imported into this main script.
 
 #### How to write automation functions
 
@@ -43,7 +43,7 @@ return
 ```
 
 !!! note
-	This function first navigates to the `blackbox` subdirectory in the local Fabsim3 installation, and subsequently executes the `$script` in that directory. Also, the freehand use of `args` give a sequence of parameters etc.
+	This function first navigates to the `blackbox` subdirectory in the local Fabsim3 installation, and subsequently executes the `$script` in that directory. Also, the freehand use of `args` gives a sequence of parameters etc.
 
 To run LAMMPS on a remote host (part of FabMD) one could write:
 ```python
@@ -65,7 +65,7 @@ def lammps(config,**args):
 ```
 
 
-* The combination of `#!python **args` in the declaration with `#!python update_environment(args)` at the start of the function allows users to specify arbitrary arguments on the command line, and to have those automatically loaded in to the FabSim3 environment.
+* The combination of `#!python **args` in the declaration with `#!python update_environment(args)` at the start of the function allows users to specify arbitrary arguments on the command line, and to have those automatically loaded into the FabSim3 environment.
 * `#!python with_config()` loads in input files into FabSim3.
 * `#!python execute(put_configs,config)` copies the configuration information to the right directory at the remote resource.
 On the last line, LAMMPS is run remotely (shown by `#!python script="lammps"`), and the values of args are passed on to that function as well, overriding the default `wall_time` and `memory` specification on that line if the user has specified those variables explicitly already.
@@ -82,7 +82,7 @@ We recommend using this API rather than `#!python os.system()` or `#!python subp
 * Configuration information is stored in subdirectories of either `config` or `FabSim3/plugins/<module_name>/configs` (to be implemented).
 * One directory should be created for each individual simulation problem type.
 * Typically, input file names are standardized using default names, to reduce the number of user-specified arguments on the command line (e.g., `config.xml` for `HemeLB`).
-* Examples for LAMMPS are provided in the base installation of FabSim3.
+* Examples of LAMMPS are provided in the base installation of FabSim3.
 
 ### FabSim variables
 FabSim variables are represented in three different ways:
@@ -101,7 +101,7 @@ update_environment({"number_of_cores":16})
 * within templates as a `$` denominated variable, which is to be substituted.
 
 #### How variables are obtained or introduced:
-Variable are obtained from the following sources:
+Variables are obtained from the following sources:
 
 * Parsed from `.yml` files such as `machines.yml` and `machines_user.yml`, which are loaded on startup.
 * Explicitly written/created in the Python code environment. This should be implemented such that the third method will still override this method.
@@ -128,7 +128,7 @@ def test_sim(config,**args):
     # then the default set above will be overridden.
 
     env.sim_args = "-test-var=%s" % (env.test_var)
-    # Optional example how to use your created variable
+    # Optional example of how to use your created variable
     # to create some parameter syntax for your job.
 
     test_sim(config, **args)
@@ -142,7 +142,7 @@ def test_sim(config,**args):
 * Domain-independent templates are stored in `FabSim3/fabsim/deploy/templates`, while domain-specific templates should be stored in `FabSim3/fabsim/deploy/<module_name>/templates`.
 * Templates consist of two parts, *Header templates* which are scheduler-specific, and *job execution* templates which are code-specific.
 * Normally, one new template needs to be added when adding a new machine definition to FabSim3, regardless of the number of codes used on that machine.
-* Also one new template needs to be added for each new code definition to FabSim3, regardless of the number of machines supported.
+* Also, one new template needs to be added for each new code definition to FabSim3, regardless of the number of machines supported.
 
 #### Header templates
 
@@ -199,7 +199,7 @@ Job execution templates are typically straightforward in their structure, and us
 
 Here is an example job execution template for the LAMMPS code:
 ```bash
-cd $job_results # change directory to the FabSim results dir. Featured in almost all templates.
+cd $job_results # change directory to the FabSim result dir. Featured in almost all templates.
 $run_prefix     # run preparatory commands, as specified within FabSim.
 
 cp -r $job_config_path/* . # Copy over initial conditions to results directory. Featured in almost all templates.

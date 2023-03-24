@@ -10,7 +10,7 @@ More information on QCG-PilotJob can be found on their [ReadTheDocs site](https:
 </p>
 *Example of a QCG-Pilotjob container, which dynamically facilitates a diverse set of code executions within a single queuing system job. [Source](https://link.springer.com/chapter/10.1007/978-3-030-77977-1_39)*
 
-Here we present how you can install QCG Pilot Job on remote machines, so that you can use it with FabSim3.
+Here we present how you can install QCG Pilot Job on remote machines so that you can use it with FabSim3.
 
 !!! note
     Note that FabSim3 can also work with a pre-installed version of QCG-PilotJob; but for those who need to set it up manually this document is meant to provide some help.
@@ -43,7 +43,7 @@ Once the command is issued, the following steps will occur in sequence:
 
 5. Submits the installation job script to the remote machine
 
-Since, the number of dependencies for QCG Pilot Job is quite large, therefore, the command may take upto 45 minutes to run.
+Since the number of dependencies for QCG Pilot Job is quite large, therefore, the command may take up to 45 minutes to run.
 
 After all the above-mentioned processes are done, the status of the submitted job on the remote machine can be checked using
 
