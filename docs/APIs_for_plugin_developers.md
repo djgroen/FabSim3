@@ -1,7 +1,7 @@
 
-The scope of this document is to provide useful description of commonly used APIs to develop a FabSim3 plugin.
+The scope of this document is to provide a useful description of commonly used APIs to develop a FabSim3 plugin.
 
-All our APIs, are available on the [FabSim3](https://github.com/djgroen/FabSim3) GitHub repository, and regularly updated. For any further assistance or inquiries, email us at <djgroennl@gmail.com> or <hamid.arabnejad@gmail.com>.
+All our APIs are available on the [FabSim3](https://github.com/djgroen/FabSim3) GitHub repository, and are regularly updated. For any further assistance or inquiries, email us at <djgroennl@gmail.com> or <hamid.arabnejad@gmail.com>.
 
 ### machine-specific configuration for plugin
 
@@ -31,14 +31,14 @@ def <function_name>(input_args):
 ...
 ```
 !!! hint
-	The `#!python @task` is pre-defined decorator by fabric library which makes your function callable from command line. For more details, please look at [task definition](https://docs.fabfile.org/en/1.12.1/usage/tasks.html#the-task-decorator) in fabric library.
+	The `#!python @task` is a pre-defined decorator by fabric library which makes your function callable from command line. For more details, please look at [task definition](https://docs.fabfile.org/en/1.12.1/usage/tasks.html#the-task-decorator) in fabric library.
 !!! note
 	This only works if the machine-specific configuration file (i.e., `machines_<plugin_name>_user.yml`) exists in your plugin directory (i.e., `FabSim3/plugins/<plugin_name>`).
 
 ### Common APIs:
 
 #### **`add_local_paths(plugin_name)`**
-This function adds your plugin directory to FabSim3 (a) templates and (b) config_files PATH system. FabSim3 uses the template PATH to find the target script and generates the required script for job execution. The config_path will be use to find your application and transfer the required files/folder to remote machine.
+This function adds your plugin directory to FabSim3 (a) templates and (b) config_files PATH system. FabSim3 uses the template PATH to find the target script and generates the required script for job execution. The config_path will be used to find your application and transfer the required files/folder to remote machine.
 
 !!! attention
 	You should add `add_local_paths` function at top of the main fabric file for your plugin. Otherwise, the target script and application config files for job submission and execution can not be found by FabSim3.
