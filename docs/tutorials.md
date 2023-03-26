@@ -3,7 +3,7 @@
 
 For FabSim3, we provide several interactive tutorials, as well as static tutorials.
 
-The interactive tutorials use Jupyter notebooks, and they can be found here: https://github.com/vecma-project/VECMA-tutorials/tree/master/FabSim3
+The interactive tutorials use Jupyter notebooks, and they can be found here: <https://github.com/vecma-project/VECMA-tutorials/tree/master/FabSim3>
 
 As for the static tutorials, please find them below.
 
@@ -130,7 +130,7 @@ To call and execute a function from command line, it should be tagged as a Fabri
 
 		Loads all machine-specific configuration information that is specified by the user for the input plugin name.
 
-		The below code shows the sample machine-specific configuration yaml file for the *cannon_app* application.
+		The code below shows the sample machine-specific configuration yaml file or *machines_FabCannonsim_user.yml* for the *cannon_app* application. The *default* corresponds to a machine's name, in this case, *localhost*.
 
 		```yaml
 		--8<-- "docs/source_codes/machines_FabCannonsim_user.yml"
@@ -160,7 +160,7 @@ To call and execute a function from command line, it should be tagged as a Fabri
 
 		the `env.script` variable contains the name of template script file to be used for execution of a job on the target machine, which can be local host or HPC resources. This script will be called when the job execution starts, and contains all steps, such as set environment variable, or commands line to call/execute the application. 
 
-		The below code shows the script file, namely `cannonsim`, for the *cannon_app` application.
+		The code below shows the script file, namely `cannonsim`, for the *cannon_app` application.
 
 		```bash
 		--8<-- "docs/source_codes/cannonsim"
