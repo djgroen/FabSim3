@@ -50,6 +50,13 @@ FabDummy is a dummy example plugin for FabSim3. It is meant to showcase a minima
 * FabDummy github repository : [:octicons-mark-github-16:](https://github.com/djgroen/FabDummy)
 * FabDummy documentation : [:fontawesome-solid-book:](https://github.com/djgroen/FabDummy/blob/master/README.md)
 
+#### FabDynamics
+
+FabDynamics is a plugin for [Dynamics](https://dynamics.readthedocs.io/en/latest/index.html) which is used for analysis of ODE systems.
+
+* FabDynamics github repository : [:octicons-mark-github-16:](https://github.com/arindamsaha1507/dynamics)
+* FabDynamics documentation : [:fontawesome-solid-book:](https://github.com/arindamsaha1507/FabDynamics/blob/main/README.md)
+
 
 #### FabFlee
 
