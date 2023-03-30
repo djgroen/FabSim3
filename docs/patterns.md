@@ -1,8 +1,8 @@
 
-The computing pattern, also called Multiscale Computing Patterns (MCP), are aimed to simplify the implementation of the multiscale application by enhancing the execution of scenarios. From the application’s point of view, a pattern can determine the ordering and composition of single scale models that are coupled within a multiscale application.
+The computing pattern, also called Multiscale Computing Patterns (MCP), is aimed to simplify the implementation of the multiscale application by enhancing the execution of scenarios. From the application’s point of view, a pattern can determine the ordering and composition of single-scale models that are coupled within a multiscale application.
 
 ## UQP
-Uncertainty quantification (UQ) is an increasingly important field in the simulation-based modelling of scientific applications. It can be defined as a bridge between the statistical and probability theory, computer simulation-based techniques with 'the real world'. In other words, by identifying the source of uncertainty in each component of the model, UQ aims to make the results more reliable and have close predictions of the complex physical systems. A typical UQ problem involves one or more mathematical model subjects to some uncertainty of model parameter value.
+Uncertainty quantification (UQ) is an increasingly important field in the simulation-based modelling of scientific applications. It can be defined as a bridge between the statistical and probability theory, and computer simulation-based techniques with 'the real world'. In other words, by identifying the source of uncertainty in each component of the model, UQ aims to make the results more reliable and have close predictions of the complex physical systems. A typical UQ problem involves one or more mathematical model subjects to some uncertainty of model parameter value.
 
 
 <figure>
@@ -20,7 +20,7 @@ Uncertainty Quantification Pattern (UQP) is the term for workflows and algorithm
 
 ## VVP
 
-Verification and validation (V&V) provide a framework for building confidence in computational simulation predictions. The Verification process addresses the quality of the numerical treatment of the model that is used in the predication, and the validation process addresses the quality of the model. The inclusion of V&V is the key to obtain credibility of a proposed model. Given the diversity of applications, there is no doubt that having a V&V pattern increases trustworthiness of the simulation model. 
+Verification and validation (V&V) provide a framework for building confidence in computational simulation predictions. The Verification process addresses the quality of the numerical treatment of the model that is used in the prediction, and the validation process addresses the quality of the model. The inclusion of V&V is the key to obtaining credibility of a proposed model. Given the diversity of applications, there is no doubt that having a V&V pattern increases trustworthiness of the simulation model. 
 
 Within [VECMA](https://www.vecma.eu/) project,  we identified *four* prominent V&V patterns which are most suitable for multiscale computing applications:
 
@@ -49,7 +49,7 @@ where
 * `**kwargs`: The optional input parameter items that will be passed to `aggregation_function` function.
 
 
-* The return score is in `dictionary` format and has the following structure:
+* The returned score is in `dictionary` format and has the following structure:
 	```yaml
 	result_dir_1_name:
 	    order: <polynomial_order>
@@ -303,14 +303,14 @@ where
 * `uncertainty_result_QoI` : the uncertainty QoI results
 * `QoI_name` : the name of QoI
 
-In the current implementation, the current supported similarity measure are:
+In the current implementation, the supported similarity measures are:
 * Jensen-Shannon divergence
 * Renyi divergence
 * Cosine distance
 * Euclidean distance
 * Kullback-Leibler divergence
 
-And `ensemble_vvp_QoI` function returns a dictionary contains the  calculated similarity measure with the following structure: 
+And `ensemble_vvp_QoI` function returns a dictionary containing calculated similarity measure with the following structure: 
     ``` json
 	{
 	    "similarity measure function name":

@@ -221,7 +221,7 @@ def main():
 
     msg += "\nThe last list is added because the required packages are "
     msg += "installed with flag \"--user\" which makes pip install packages "
-    msg += "in your your home directory instead instead of system directory."
+    msg += "in your home directory instead of system directory."
 
     print(Panel.fit(msg, title=title, border_style="orange_red1"))
 

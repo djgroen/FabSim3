@@ -184,14 +184,16 @@ nav:
       - Introduction: index.md
       - Installation: installation.md
       - Plugins: plugins.md
+      - Create new plugin: create_new_plugin.md
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
-      - Patterns : patterns.md
+      - VVUQ Patterns : patterns.md
+      - VVP tutorials: eov_migration_tutorial.md
       - Advanced Topics : advanced_topics.md
       - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
       - Remote QCG PilotJob Installation: qcg-pilotjob_installation.md
       - Containerized versions : containerized_versions.md
-      - Tutorials : tutorials.md
+      - Additional links : additional_links.md
       - Papers : papers.md
 
     - Code Reference:

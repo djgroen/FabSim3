@@ -1,13 +1,4 @@
-
-# Tutorials
-
-For FabSim3, we provide several interactive tutorials, as well as static tutorials.
-
-The interactive tutorials use Jupyter notebooks, and they can be found here: <https://github.com/vecma-project/VECMA-tutorials/tree/master/FabSim3>
-
-As for the static tutorials, please find them below.
-
-## Creating a new plugin
+# Creating a new plugin
 
 To create a new plugin for FabSim3:
 
@@ -22,7 +13,7 @@ fab localhost install_plugin:<name of your plugin>
 ```
 7. You’re good to go, although you’ll inevitably have to debug some of your modifications made in the second step of course.
 
-### Writing a Plugin From scratch
+## Writing a Plugin From scratch
 
 In this tutorial, we explain how to write a FabSim3 plugin from scratch. To keep simplicity, the basic functionalities are presented here, for more advanced and complicated functionalities, we suggest the reader to have a look at the current plugins presented in "plugins" section of this work.
 
@@ -58,7 +49,7 @@ For this tutorial, a simple application, namely *cannon_app*, which calculates t
         ```
 
 
-#### New plugin preparation
+### New plugin preparation
 
 To create a new plugin for *cannon_app* application, you need to follow a files and folders structure to be used by FabSim3. To do that, follow these steps:
 
@@ -101,7 +92,7 @@ To summarize this part, by following above steps, the file and directory should 
 !!! attention
 	Please note that the folders name highlighted with **red** color in (a) will be used by FabSim3 for job configuration and execution and should not be changed. Also, all three (1) the plugin name, here `FabCannonsim`, (2) the plugin fabric python file, here `FabCannonsim.py`, and (3) the plugin entry in `plugins.yml` file, should be **identical**.
 
-#### Write application-specific functionalities
+### Write application-specific functionalities
 To call and execute a function from command line, it should be tagged as a Fabric task class. This part of tutorial explains how to write a function/task to execute a single or ensemble jobs of your application.
 
 1. **Single single job execution**
@@ -250,12 +241,3 @@ To call and execute a function from command line, it should be tagged as a Fabri
 	# to execute on remote machine
 	fabsim eagle_vecma Cannonsim_ensemble:cannon_app
 	```
-
-## How to use `fabsim` API commands from python code
-
-Within FabSim3, in addition to `fabsim` command APIs, we also provide this functionality to call `fabsim` commands from a python code. The best example that showcases how to do this is FabUQCampaign. The repository for that can be found here: https://github.com/wedeling/FabUQCampaign
-
-
-## Advanced Plugins Examples
-
-For more advanced examples, please see the plugins available in the `fabsim/deploy/plugins.yml` file. Both [FabFlee](https://github.com/djgroen/FabFlee), and [FabMD](https://github.com/UCL-CCS/FabMD) are good examples that showcase the possibilities of FabSim3.
