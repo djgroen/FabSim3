@@ -2,6 +2,7 @@ import importlib
 import inspect
 import os
 import sys
+import time
 from pprint import pformat, pprint
 
 import yaml
@@ -153,6 +154,7 @@ def complete_environment() -> None:
     env.config_path = os.path.join(env.work_path, "config_files")
     env.scripts_path = os.path.join(env.work_path, "scripts")
     env.local_results = os.path.expanduser(template(env.local_results))
+    env.local_system_time = int(time.time())
 
     if hasattr(env, "flee_location"):
         env.flee_location = template(env.flee_location)
