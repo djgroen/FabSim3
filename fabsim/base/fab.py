@@ -879,7 +879,7 @@ def job_transmission(*job_args):
             print("results_dir_item: ", results_dir_item)
             if env.ssh_monsoon_mode:
                 task_string = template(
-                    "mkdir {} && "
+                    "mkdir -p {} && "
                     "mkdir -p {}/results/{} && "
                     "rm -rf {}/results/{}/*".format(
                         empty_folder,
@@ -903,7 +903,7 @@ def job_transmission(*job_args):
             else:
                 run(
                     template(
-                        "mkdir {} && "
+                        "mkdir -p {} && "
                         "mkdir -p {}/results &&"
                         "rsync -a --delete --inplace {}/ "
                         "{}/results/{}/".format(
