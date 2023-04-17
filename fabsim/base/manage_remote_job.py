@@ -146,4 +146,4 @@ def wait_complete(jobname_syntax: str = "") -> None:
     """
     # time.sleep(120)
     while not check_complete(jobname_syntax):
-        time.sleep(110)
+        time.sleep(600)
