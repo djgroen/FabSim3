@@ -226,8 +226,8 @@ def main():
     print(Panel.fit(msg, title=title, border_style="orange_red1"))
 
     title = "[dark_green]Tip[/dark_green]"
-    msg = "\nTo make these updates permanent, you can add the following command "
-    msg += "at the end of your bash shell script which could be one of "
+    msg = "\nTo make these updates permanent, you can add the export commands "
+    msg += "above at the end of your bash shell script which could be one of "
     msg += "[{}] files, depends on your OS System.\n\n".format(
         ", ".join(["[light_sea_green]{}[/light_sea_green]".format(name)
                    for name in bash_scripts])
