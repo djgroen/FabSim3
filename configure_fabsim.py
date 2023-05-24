@@ -27,10 +27,16 @@ def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
         print("Installing {} package ...".format(pkg_name))
         if bool(os.environ.get("VIRTUAL_ENV")) is True:
             print("Executing : python3 -m pip install {}".format(pip_pkg_name))
-            subprocess.check_call(
-                ["python3", "-m", "pip", "install", pip_pkg_name],
-                # stdout=subprocess.DEVNULL
-            )
+
+            if pip_pkg_name == "fabric2":
+                subprocess.check_call(
+                    ["python3", "-m", "pip", "install", pip_pkg_name, "invoke==2.0.0"],
+                )
+            else:
+                subprocess.check_call(
+                    ["python3", "-m", "pip", "install", pip_pkg_name],
+                    # stdout=subprocess.DEVNULL
+                )
         else:
             print("Executing : python3 -m pip install --user {}".format(
                 pip_pkg_name)
@@ -55,7 +61,7 @@ required = {
     "ruamel.yaml": None,
     "numpy": None,
     "yaml": "pyyaml",
-    "fabric2": "fabric2 invoke==2.0.0",
+    "fabric2": "fabric2",
     "beartype": "beartype",
 }
 
