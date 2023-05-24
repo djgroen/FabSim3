@@ -55,7 +55,7 @@ required = {
     "ruamel.yaml": None,
     "numpy": None,
     "yaml": "pyyaml",
-    "fabric2": "fabric2",
+    "fabric2": "fabric2 invoke==2.0.0",
     "beartype": "beartype",
 }
 
