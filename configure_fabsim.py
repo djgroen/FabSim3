@@ -41,10 +41,15 @@ def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
             print("Executing : python3 -m pip install --user {}".format(
                 pip_pkg_name)
             )
-            subprocess.check_call(
-                ["python3", "-m", "pip", "install", "--user", pip_pkg_name],
-                # stdout=subprocess.DEVNULL
-            )
+            if pip_pkg_name == "fabric2":
+                subprocess.check_call(
+                    ["python3", "-m", "pip", "install", pip_pkg_name, "invoke==2.0.0"],
+                )
+            else:
+                subprocess.check_call(
+                    ["python3", "-m", "pip", "install", pip_pkg_name],
+                    # stdout=subprocess.DEVNULL
+                )
 
     return already_installed
 
