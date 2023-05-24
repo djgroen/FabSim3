@@ -1,3 +1,4 @@
+invoke==2.0.0
 rich
 fabric2
 pyyaml
