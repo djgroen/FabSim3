@@ -14,10 +14,7 @@ from fabsim.deploy.templates import template
 
 
 @beartype
-def local(
-    command: str,
-    capture: Optional[bool] = False
-) -> Tuple[str, str]:
+def local(command: str, capture: Optional[bool] = False) -> Tuple[str, str]:
     """
     Run a command on the local system.
 
@@ -45,8 +42,7 @@ def local(
 
     # execute the command on the local system
     try:
-        p = subprocess.Popen(command, shell=True,
-                             stdout=stdout, stderr=stderr)
+        p = subprocess.Popen(command, shell=True, stdout=stdout, stderr=stderr)
         # p.wait()
         # yield f"{command} Rsync process completed."
         (stdout, stderr) = p.communicate()
@@ -68,7 +64,7 @@ def local(
     return (stdout, stderr)
 
 
-class HostConnection():
+class HostConnection:
     def __init__(self):
         self.host_address = env.remote
         self.user = env.username
@@ -91,19 +87,19 @@ class HostConnection():
             forward_agent=False,
             connect_timeout=None,
             connect_kwargs=None,
-            inline_ssh_env=False
+            inline_ssh_env=False,
         )
 
         try:
-            print('host_address:', self.host_address)
-            print('user:', self.user)
-            print('port:', self.port)
+            print("host_address:", self.host_address)
+            print("user:", self.user)
+            print("port:", self.port)
             # print('password:', self.password)
-            print('\x1b[6;30;42m' + 'Opening a connection!' + '\x1b[0m')
+            print("\x1b[6;30;42m" + "Opening a connection!" + "\x1b[0m")
             conn.open()
             yield conn
         finally:
-            print('\x1b[6;30;45m' + 'Closing a connection!' + '\x1b[0m')
+            print("\x1b[6;30;45m" + "Closing a connection!" + "\x1b[0m")
             conn.close()
 
     def run_command(self, command, cd=None, capture=False):
@@ -114,12 +110,13 @@ class HostConnection():
 
         # this will load the login shell. this required to make sure
         # the module command can be found during job execution
-        command = "bash -l -c \"{}\"".format(command)
+        command = 'bash -l -c "{}"'.format(command)
 
         # env.remote : localhost
         # env.host_string : user@localhost
-        with add_print_perfix(prefix="run on {}".format(env.host_string),
-                              color=196):
+        with add_print_perfix(
+            prefix="run on {}".format(env.host_string), color=196
+        ):
             print("{}".format(command))
 
         # (None, False, 'out', 'stdout', 'err', 'stderr', 'both', True)
@@ -140,11 +137,7 @@ class HostConnection():
 
 
 @beartype
-def run(
-    cmd: str,
-    cd: Optional[str] = None,
-    capture: Optional[bool] = False
-):
+def run(cmd: str, cd: Optional[str] = None, capture: Optional[bool] = False):
     if env.manual_sshpass:
         return manual_sshpass(cmd, cd=cd, capture=capture)
     elif env.manual_gsissh:
@@ -157,9 +150,7 @@ def run(
 
 @beartype
 def manual_sshpass(
-    cmd: str,
-    cd: Optional[str] = None,
-    capture: Optional[bool] = False
+    cmd: str, cd: Optional[str] = None, capture: Optional[bool] = False
 ):
     if env.get("command_prefixes"):
         commands = env.command_prefixes[:]
@@ -180,9 +171,7 @@ def manual_sshpass(
 
 @beartype
 def manual_gsissh(
-    cmd: str,
-    cd: Optional[str] = None,
-    capture: Optional[bool] = False
+    cmd: str, cd: Optional[str] = None, capture: Optional[bool] = False
 ):
     # From the fabric wiki, bypass fabric internal ssh control
     if env.get("command_prefixes"):
@@ -201,9 +190,7 @@ def manual_gsissh(
 
 @beartype
 def manual(
-    cmd: str,
-    cd: Optional[str] = None,
-    capture: Optional[bool] = False
+    cmd: str, cd: Optional[str] = None, capture: Optional[bool] = False
 ):
     # From the fabric wiki, bypass fabric internal ssh control
     if env.get("command_prefixes"):
@@ -241,7 +228,7 @@ def rsync_project(
     delete: Optional[bool] = False,
     ssh_opts: Optional[str] = "",
     default_opts: Optional[str] = "-pthrvz",
-    capture: Optional[bool] = False
+    capture: Optional[bool] = False,
 ) -> Tuple[str, str]:
     """
     Synchronize a remote directory with the current project directory via
@@ -294,8 +281,13 @@ def rsync_project(
     rsh_opts = "--rsh='ssh {}'".format(" ".join([port_opt, ssh_opts]))
 
     rync_cmd = "rsync {} {} {} {} {} {}:{}".format(
-        delete_opt, exclude_opts, default_opts, rsh_opts,
-        local_dir, env.host_string, remote_dir
+        delete_opt,
+        exclude_opts,
+        default_opts,
+        rsh_opts,
+        local_dir,
+        env.host_string,
+        remote_dir,
     )
     # rync_cmd = "rsync --delete -pthrvz {} {} {}:{}".format(
     #      exclude_opts,
@@ -314,9 +306,7 @@ def rsync_project(
 
 @beartype
 def put(
-    src: str,
-    dst: str,
-    capture: Optional[bool] = False
+    src: str, dst: str, capture: Optional[bool] = False
 ) -> Tuple[str, str]:
     """
     Upload a file or directory to a remote host.

@@ -50,7 +50,8 @@ def install_plugin(plugin_name, branch=None):
                 "[orange_red1]The {} plugin directory is already exists.\n"
                 "To keep your previous folder, we rename it to[/orange_red1]: "
                 "[dark_cyan]{}_{}[/dark_cyan]".format(
-                    plugin_name, plugin_name, res),
+                    plugin_name, plugin_name, res
+                ),
                 title="[dark_cyan]WARNING[/dark_cyan]",
                 expand=False,
             )
@@ -75,13 +76,18 @@ def install_plugin(plugin_name, branch=None):
 
     print("{} plugin installed...".format(plugin_name))
 
-
     if path.exists("{}/{}/requirements.txt".format(plugin_dir, plugin_name)):
         print("Installing plugin requirements...")
-        local("pip install -r {}/{}/requirements.txt".format(plugin_dir, plugin_name))
+        local(
+            "pip install -r {}/{}/requirements.txt".format(
+                plugin_dir, plugin_name
+            )
+        )
         print("Plugin requirements installed successfully.")
     else:
-        print("No requirements.txt file found for {} plugin".format(plugin_name))
+        print(
+            "No requirements.txt file found for {} plugin".format(plugin_name)
+        )
 
     print("Plugin {} installed successfully.".format(plugin_name))
 
@@ -111,7 +117,7 @@ def avail_plugin():
         table.add_row(
             "[blue]{}[/blue]".format(plugin_name),
             "{}".format(repo["repository"]),
-            "{}".format(installed)
+            "{}".format(installed),
         )
     console = Console()
     console.print(table)

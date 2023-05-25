@@ -42,20 +42,23 @@ def main():
     """
 
     # Parse command-line options
-    parser = OptionParser(usage="fabsim [remote_machine] "
-                          "<task>[:arg1=val1,arg2=val2,...] "
-                          "[fabsim optional args]"
-                          )
+    parser = OptionParser(
+        usage="fabsim [remote_machine] "
+        "<task>[:arg1=val1,arg2=val2,...] "
+        "[fabsim optional args]"
+    )
 
     optional_input_args = [
-        make_option("-l", "--list",
-                    action="store",
-                    type='choice',
-                    choices=("tasks", "machines"),
-                    dest="list",
-                    # default=None,
-                    help="list available tasks or machines"
-                    ),
+        make_option(
+            "-l",
+            "--list",
+            action="store",
+            type="choice",
+            choices=("tasks", "machines"),
+            dest="list",
+            # default=None,
+            help="list available tasks or machines",
+        ),
     ]
 
     # Add in fabsim input optional arguments
@@ -103,7 +106,7 @@ def main():
     env.host = arguments[0]
     if env.host not in env.avail_machines:
         raise ValueError(
-            "The requested remote machine \"{}\" did not listed in the "
+            'The requested remote machine "{}" did not listed in the '
             "machines.yml file, so it can not be used as a target remote host."
             "\n\nThe available remote machines are : \n{}".format(
                 env.host, env.avail_machines.keys()
@@ -157,5 +160,5 @@ def main():
     env.exec_func(*env.task_args, **env.task_kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

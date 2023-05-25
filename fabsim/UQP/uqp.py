@@ -26,8 +26,9 @@ def uqp1_aleatoric(model_exec, collation_function, **kwargs):
 """
 
 
-def uqp1_epistemic(input_space, sampling_function, model_exec,
-                   collation_function, **kwargs):
+def uqp1_epistemic(
+    input_space, sampling_function, model_exec, collation_function, **kwargs
+):
     pass
 
 
@@ -46,8 +47,13 @@ def uqp1_epistemic(input_space, sampling_function, model_exec,
 """
 
 
-def uqp2_aleatoric(model1_exec, translation_function, model2_exec,
-                   collation_function, **kwargs):
+def uqp2_aleatoric(
+    model1_exec,
+    translation_function,
+    model2_exec,
+    collation_function,
+    **kwargs
+):
     pass
 
 
@@ -66,7 +72,13 @@ def uqp2_aleatoric(model1_exec, translation_function, model2_exec,
 """
 
 
-def uqp2_epistemic(input_space, sampling_function, model1_exec,
-                   translation_function, model2_exec,
-                   collation_function, **kwargs):
+def uqp2_epistemic(
+    input_space,
+    sampling_function,
+    model1_exec,
+    translation_function,
+    model2_exec,
+    collation_function,
+    **kwargs
+):
     pass

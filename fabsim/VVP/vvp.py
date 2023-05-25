@@ -35,10 +35,7 @@ SPECS of the aggregation_function:
 """
 
 
-def ensemble_vvp_QoI(simulation_result_QoI,
-                     uncertainty_result_QoI,
-                     QoI_name
-                     ):
+def ensemble_vvp_QoI(simulation_result_QoI, uncertainty_result_QoI, QoI_name):
     """
 
     The current supported similarity measure are:
@@ -83,9 +80,9 @@ def ensemble_vvp_QoI(simulation_result_QoI,
 
     similarity_measure_results = {}
 
-    for simulation_result, uncertainty_result in zip(simulation_result_QoI,
-                                                     uncertainty_result_QoI
-                                                     ):
+    for simulation_result, uncertainty_result in zip(
+        simulation_result_QoI, uncertainty_result_QoI
+    ):
         # calculate Jensen-Shannon Divergence
         measure_name = "Jensen-Shannon Divergence"
         if measure_name not in similarity_measure_results:
@@ -130,9 +127,9 @@ def ensemble_vvp_QoI(simulation_result_QoI,
     return similarity_measure_results
 
 
-def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
-                     aggregation_function,
-                     **kwargs):
+def ensemble_vvp_LoR(
+    results_dirs_PATH, load_QoIs_function, aggregation_function, **kwargs
+):
     """
 
     Arguments:
@@ -180,12 +177,17 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
     Author: Hamid Arabnejad
     """
 
-    results_dirs = [dirname for dirname in os.listdir(results_dirs_PATH)
-                    if os.path.isdir(os.path.join(results_dirs_PATH, dirname))]
+    results_dirs = [
+        dirname
+        for dirname in os.listdir(results_dirs_PATH)
+        if os.path.isdir(os.path.join(results_dirs_PATH, dirname))
+    ]
     if len(results_dirs) == 0:
-        raise ValueError('\nThere is not subdirectories in the passed '
-                         'results_dirs_PATH arguments.'
-                         '\nresults_dirs_PATH = %s' % (results_dirs_PATH))
+        raise ValueError(
+            "\nThere is not subdirectories in the passed "
+            "results_dirs_PATH arguments."
+            "\nresults_dirs_PATH = %s" % (results_dirs_PATH)
+        )
 
     #########################################################
     # the scores dict has this structure:                   #
@@ -208,32 +210,31 @@ def ensemble_vvp_LoR(results_dirs_PATH, load_QoIs_function,
     scores = {}
     for result_dir in results_dirs:
         value, order, num_runs = load_QoIs_function(
-            os.path.join(results_dirs_PATH, result_dir))
-        scores.update({
-            result_dir: {
-                'value': value,
-                'runs': num_runs,
-                'order': order
-            }
-        })
+            os.path.join(results_dirs_PATH, result_dir)
+        )
+        scores.update(
+            {result_dir: {"value": value, "runs": num_runs, "order": order}}
+        )
 
     #################################################################
     # sort scores dict based on order value in ascending            #
     # i.e., the last key in scores will have the higher order value #
     # to have Descending order, set reverse=True                    #
     #################################################################
-    scores = dict(OrderedDict(sorted(scores.items(),
-                                     key=lambda x: x[1]['order'],
-                                     reverse=False)
-                              ))
+    scores = dict(
+        OrderedDict(
+            sorted(scores.items(), key=lambda x: x[1]["order"], reverse=False)
+        )
+    )
     ###########################################################
     # call aggregation_function to compares the sobol indices #
     ###########################################################
     aggregation_function(scores, **kwargs)
 
 
-def ensemble_vvp(results_dirs, sample_testing_function,
-                 aggregation_function, **kwargs):
+def ensemble_vvp(
+    results_dirs, sample_testing_function, aggregation_function, **kwargs
+):
     """
     Goes through all the output directories and calculates the scores.
     Arguments:
@@ -259,37 +260,38 @@ def ensemble_vvp(results_dirs, sample_testing_function,
         results_dirs = tmp
 
     for results_dir in results_dirs:
-
         scores = []
 
         # use user-specified sample directories if specified,
         # otherwise look for uq results in all directories in results_dir
-        if 'items' in kwargs:
-            items = kwargs['items']
+        if "items" in kwargs:
+            items = kwargs["items"]
         else:
             items = os.listdir("{}".format(results_dir))
 
         for item in items:
             if os.path.isdir(os.path.join(results_dir, item)):
                 print(os.path.join(results_dir, item))
-                scores.append(sample_testing_function(
-                    os.path.join(results_dir, item), **kwargs))
+                scores.append(
+                    sample_testing_function(
+                        os.path.join(results_dir, item), **kwargs
+                    )
+                )
 
         scores_aggregation = aggregation_function(scores, **kwargs)
 
         # update return results dict
         ensemble_vvp_results.update({results_dir: {}})
 
-        ensemble_vvp_results[results_dir].update({
-            'scores': scores,
-            'scores_aggregation': scores_aggregation
-        })
+        ensemble_vvp_results[results_dir].update(
+            {"scores": scores, "scores_aggregation": scores_aggregation}
+        )
 
     return ensemble_vvp_results
 
 
 def jensen_shannon_divergence(list1, list2):
-    """Calculates Jenson-Shannon Distance """
+    """Calculates Jenson-Shannon Distance"""
     import scipy
 
     # convert the vectors into numpy arrays in case that they aren't
@@ -298,9 +300,10 @@ def jensen_shannon_divergence(list1, list2):
     # calculate average
     avg_lists = (list1 + list2) / 2
     # compute Jensen Shannon Divergence
-    sim = 1 - 0.5 * (scipy.stats.entropy(list1, avg_lists) +
-                     scipy.stats.entropy(list2, avg_lists)
-                     )
+    sim = 1 - 0.5 * (
+        scipy.stats.entropy(list1, avg_lists)
+        + scipy.stats.entropy(list2, avg_lists)
+    )
     if np.isinf(sim):
         # the similarity is -inf if no term in the document is in the
         # vocabulary
@@ -311,6 +314,7 @@ def jensen_shannon_divergence(list1, list2):
 def cosine_similarity(list1, list2):
     """Calculates cosine similarity."""
     import scipy
+
     if list1 is None or list2 is None:
         return 0
     assert not (np.isnan(list2).any() or np.isinf(list2).any())
@@ -325,6 +329,7 @@ def cosine_similarity(list1, list2):
 def kl_divergence(list1, list2):
     """Calculates Kullback-Leibler divergence."""
     import scipy
+
     sim = scipy.stats.entropy(list1, list2)
     return sim
 
@@ -332,8 +337,10 @@ def kl_divergence(list1, list2):
 def renyi_divergence(list1, list2, alpha=0.99):
     """Calculates Renyi divergence."""
     log_sum = np.sum(
-        [np.power(p, alpha) / np.power(q, alpha - 1)
-         for (p, q) in zip(list1, list2)]
+        [
+            np.power(p, alpha) / np.power(q, alpha - 1)
+            for (p, q) in zip(list1, list2)
+        ]
     )
     sim = 1 / (alpha - 1) * np.log(log_sum)
     if np.isinf(sim):
@@ -345,16 +352,20 @@ def renyi_divergence(list1, list2, alpha=0.99):
 
 def euclidean_distance(list1, list2):
     """Calculates Euclidean distance."""
-    sim = np.sqrt(
-        np.sum([np.power(p - q, 2) for (p, q) in zip(list1, list2)])
-    )
+    sim = np.sqrt(np.sum([np.power(p - q, 2) for (p, q) in zip(list1, list2)]))
     return sim
+
 
 # VVP 1
 
 
-def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
-            aggregation_function, **kwargs):
+def sif_vvp(
+    results_dirs,
+    sif_dirs,
+    sample_testing_function,
+    aggregation_function,
+    **kwargs
+):
     """
     Goes through all the output directories and calculates the scores.
     Arguments:
@@ -385,7 +396,7 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
         sif_dirs = tmp
 
     print("SIF_VVP results dirs:", results_dirs, sif_dirs)
-    if(len(results_dirs)) == 0:
+    if (len(results_dirs)) == 0:
         print("ERROR: SIF_VVP applied,")
         print("but no results directories of test_subject runs provided.")
         sys.exit()
@@ -398,8 +409,8 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
 
         # use user-specified sample directories if specified,
         # otherwise look for uq results in all directories in results_dir
-        if 'items' in kwargs:
-            items = kwargs['items']
+        if "items" in kwargs:
+            items = kwargs["items"]
         else:
             items = os.listdir("{}".format(ri))
 
@@ -414,21 +425,22 @@ def sif_vvp(results_dirs, sif_dirs, sample_testing_function,
                         sample_testing_function(
                             os.path.join(ri, item),
                             os.path.join(si, item),
-                            ** kwargs
+                            **kwargs
                         )
                     )
                 else:
-                    print("ERROR: SIF dir structure doesn't match "
-                          "results dir structure.")
+                    print(
+                        "ERROR: SIF dir structure doesn't match "
+                        "results dir structure."
+                    )
 
         scores_aggregation = aggregation_function(scores, **kwargs)
 
         # update return results dict
         sif_vvp_results.update({ri: {}})
 
-        sif_vvp_results[ri].update({
-            'scores': scores,
-            'scores_aggregation': scores_aggregation
-        })
+        sif_vvp_results[ri].update(
+            {"scores": scores, "scores_aggregation": scores_aggregation}
+        )
 
     return sif_vvp_results
