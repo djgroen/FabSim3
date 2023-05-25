@@ -740,7 +740,7 @@ def job_preparation(*job_args):
             env.results_path, env.tmp_results_path
         )
 
-        env["job_name"] = env.name[0 : env.max_job_name_chars]
+        env["job_name"] = env.name[0: env.max_job_name_chars]
         complete_environment()
 
         env.run_command = template(env.run_command)
@@ -1031,7 +1031,7 @@ def job_submission(*job_args):
 @task
 @beartype
 def ensemble2campaign(
-    results_dir: str, campaign_dir: str, skip: Optional[Union[int, str]] = 0
+    results_dir: str, campaign_dir: str, skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -1065,7 +1065,7 @@ def ensemble2campaign(
 @task
 @beartype
 def campaign2ensemble(
-    config: str, campaign_dir: str, skip: Optional[Union[int, str]] = 0
+    config: str, campaign_dir: str, skip: Optional[Union[int, str]]=0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
