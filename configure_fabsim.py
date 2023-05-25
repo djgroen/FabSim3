@@ -24,48 +24,24 @@ def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
         already_installed = True
     except ImportError:
         # Error if Module is not installed Yet, then install it
+
+        check_call_list = ["python3", "-m", "pip", "install", pip_pkg_name]
+        if pip_pkg_name == "fabric2":
+            check_call_list.append("invoke==2.0.0")
+
         print("Installing {} package ...".format(pkg_name))
         if bool(os.environ.get("VIRTUAL_ENV")) is True:
             print("Executing : python3 -m pip install {}".format(pip_pkg_name))
 
-            if pip_pkg_name == "fabric2":
-                subprocess.check_call(
-                    [
-                        "python3",
-                        "-m",
-                        "pip",
-                        "install",
-                        pip_pkg_name,
-                        "invoke==2.0.0",
-                    ],
-                )
-            else:
-                subprocess.check_call(
-                    ["python3", "-m", "pip", "install", pip_pkg_name],
-                    # stdout=subprocess.DEVNULL
-                )
+            subprocess.check_call(check_call_list)
+
         else:
             print(
                 "Executing : python3 -m pip install --user {}".format(
                     pip_pkg_name
                 )
             )
-            if pip_pkg_name == "fabric2":
-                subprocess.check_call(
-                    [
-                        "python3",
-                        "-m",
-                        "pip",
-                        "install",
-                        pip_pkg_name,
-                        "invoke==2.0.0",
-                    ],
-                )
-            else:
-                subprocess.check_call(
-                    ["python3", "-m", "pip", "install", pip_pkg_name],
-                    # stdout=subprocess.DEVNULL
-                )
+            subprocess.check_call(check_call_list)
 
     return already_installed
 
