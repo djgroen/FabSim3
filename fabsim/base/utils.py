@@ -21,7 +21,8 @@ def find_all_avail_tasks() -> Dict:
     """
     f_globals = inspect.stack()[1][0].f_globals
     avail_tasks = {
-        k: v for k, v in f_globals.items()
+        k: v
+        for k, v in f_globals.items()
         if callable(v) and hasattr(v, "__wrapped__")
     }
 
@@ -87,7 +88,6 @@ def show_avail_tasks() -> None:
 
 
 class Prefixer(object):
-
     def __init__(self, prefix, orig):
         self.prefix = prefix
         self.orig = orig
@@ -111,8 +111,7 @@ def add_print_perfix(prefix, color=24):
     current_out = sys.stdout
     try:
         sys.stdout = Prefixer(
-            prefix=colored(color, "[{}]".format(prefix)),
-            orig=current_out
+            prefix=colored(color, "[{}]".format(prefix)), orig=current_out
         )
         yield
     finally:

@@ -37,6 +37,7 @@ class _lookupDict(dict):
     def __str__(self):
         if not env.rich_console:
             from pprint import pformat
+
             return pformat(self)
         table = Table(
             title="\n\nFabSim3 Environment variables",
@@ -55,7 +56,7 @@ class _lookupDict(dict):
         f = io.StringIO()
         console = Console(file=f, force_terminal=True)
         console.print(table)
-        return(f.getvalue())
+        return f.getvalue()
 
 
 work_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,28 +64,33 @@ localroot = os.path.dirname(os.path.dirname(work_dir))
 fabsim_root = os.path.dirname(work_dir)
 plugins_root = os.path.join(localroot, "plugins")
 ssh_default_port = "22"
-env = _lookupDict({
-    "host": None,
-    "username": None,
-    "default_port": ssh_default_port,
-    "port": ssh_default_port,
-    "avail_hosts": [],
-    "local_user": getpass.getuser(),
-    "use_sudo": False,
-    "task": None,
-    "task_args": [],
-    "task_kwargs": {},
-    "localroot": localroot,
-    "fabsim_root": fabsim_root,
-    "plugins_root": plugins_root,
-    "localplugins": {},
-    "acceptable_err_subprocesse_ret_codes": [0],
-    "command_prefixes": [],
-    "pather": posixpath,
-    "replicas": 1,
-    "max_job_name_chars": 15,
-    "local_templates_path": [os.path.join(fabsim_root, "deploy", "templates")],
-    "local_config_file_path": [os.path.join(fabsim_root, "config_files")],
-    "default_ssh_config_path": os.path.join(
-        os.path.expanduser("~"), ".ssh", "config")
-})
+env = _lookupDict(
+    {
+        "host": None,
+        "username": None,
+        "default_port": ssh_default_port,
+        "port": ssh_default_port,
+        "avail_hosts": [],
+        "local_user": getpass.getuser(),
+        "use_sudo": False,
+        "task": None,
+        "task_args": [],
+        "task_kwargs": {},
+        "localroot": localroot,
+        "fabsim_root": fabsim_root,
+        "plugins_root": plugins_root,
+        "localplugins": {},
+        "acceptable_err_subprocesse_ret_codes": [0],
+        "command_prefixes": [],
+        "pather": posixpath,
+        "replicas": 1,
+        "max_job_name_chars": 15,
+        "local_templates_path": [
+            os.path.join(fabsim_root, "deploy", "templates")
+        ],
+        "local_config_file_path": [os.path.join(fabsim_root, "config_files")],
+        "default_ssh_config_path": os.path.join(
+            os.path.expanduser("~"), ".ssh", "config"
+        ),
+    }
+)

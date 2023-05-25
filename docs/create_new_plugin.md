@@ -5,13 +5,23 @@ To create a new plugin for FabSim3:
 1. Fork the [FabDummy](https://github.com/djgroen/FabDummy) repository.
 2. Rename the repository, and modify it to suit your own needs as you see fit.
 3. Rename **`FabDummy.py`** to the **`<name of your plugin>.py`**.
-4. In your new plugin repository, at the top of **`<name of your plugin>.py`**, change `#!python add_local_paths("FabDummy")`  `#!python add_local_paths("name of your plugin")`.
-5. In the main FabSim3 repository, add an entry for your new plugin in `fabsim/deploy/plugins.yml` file.
-6. Set up your plugin using
+4. In your new plugin repository, at the top of **`<name of your plugin>.py`**, change 
+   ```python
+   add_local_paths("FabDummy")
+   ``` 
+   to
+   
+   ```python
+   add_local_paths("name of your plugin")
+   ```
+5. Make the required changes specific to your plugin. Refer to the [API documentation](APIs_for_plugin_developers.md)
+6. In case, your plugin requires additional python packages to be installed as dependencies, list them in a new file called `requirements.txt` in the same directory as `<name of your plugin>.py`.
+6. In the main FabSim3 repository, add an entry for your new plugin in `fabsim/deploy/plugins.yml` file.
+7. Set up your plugin using
 ```sh
-fab localhost install_plugin:<name of your plugin>
+fabsim localhost install_plugin:<name of your plugin>
 ```
-7. You’re good to go, although you’ll inevitably have to debug some of your modifications made in the second step of course.
+8. You’re good to go, although you’ll inevitably have to debug some of your modifications made in the second step of course.
 
 ## Writing a Plugin From scratch
 

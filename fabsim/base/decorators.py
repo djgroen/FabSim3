@@ -65,6 +65,7 @@ def task(func):
     wrapped or not :) It can also be used to check if the wrapped function is
     already called or not
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         wrapper.has_been_called = True

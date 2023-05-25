@@ -4,11 +4,11 @@ import csv
 from os import path, makedirs
 from math import sin, cos
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 
-def launch(gravity, mass, velocity, angle, height,
-           air_resistance, time_step):
+def launch(gravity, mass, velocity, angle, height, air_resistance, time_step):
     x = 0.0
     y = height
     vx = velocity * sin(angle)
@@ -33,16 +33,13 @@ def launch(gravity, mass, velocity, angle, height,
 
 
 if __name__ == "__main__":
-
     # python cannonsim.py
     # python cannonsim.py --input_dir=<xxx> --output_dir=<xx>
 
     # Instantiate the parser
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_dir',
-                        action="store", default='input_files')
-    parser.add_argument('--output_dir',
-                        action="store", default='output_files')
+    parser.add_argument("--input_dir", action="store", default="input_files")
+    parser.add_argument("--output_dir", action="store", default="output_files")
 
     args = parser.parse_args()
     input_dir = args.input_dir
@@ -51,7 +48,7 @@ if __name__ == "__main__":
     # read input parameters from simsetting.csv
     input_file = path.join(input_dir, "simsetting.txt")
     if path.isfile(input_file):
-        with open(input_file, newline='') as csvfile:
+        with open(input_file, newline="") as csvfile:
             values = csv.reader(csvfile)
             for row in values:
                 if len(row) > 0:  # skip empty lines in csv
@@ -73,8 +70,9 @@ if __name__ == "__main__":
                         time_step = float(row[1])
 
     # run simulation
-    [out_dist, out_vx, out_vy, out_x, out_y] = launch(gravity, mass, velocity, angle, height,
-                                                      air_resistance, time_step)
+    [out_dist, out_vx, out_vy, out_x, out_y] = launch(
+        gravity, mass, velocity, angle, height, air_resistance, time_step
+    )
     # Write distance travelled to output csv file
     # check if output_dir is exists
     if not path.exists(output_dir):
