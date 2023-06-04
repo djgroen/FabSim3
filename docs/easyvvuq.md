@@ -110,6 +110,7 @@ Issuing this command also computes the Sobol indices at each point in the timese
 
 In this directory
 - The first order Sobol indices are stored in `sobols.yml`. The contents of this file should look like:
+
     ```yaml
     campaign_info:
     name: "dyn_SA_SCSampler"
