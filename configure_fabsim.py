@@ -12,8 +12,8 @@ import importlib
 
 def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
     """
-        Import a Module,
-        if that fails, try to use the command pip to install it.
+    Import a Module,
+    if that fails, try to use the command pip to install it.
     """
     already_installed = False
     if pip_pkg_name is None:
@@ -24,21 +24,24 @@ def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
         already_installed = True
     except ImportError:
         # Error if Module is not installed Yet, then install it
+
+        check_call_list = ["python3", "-m", "pip", "install", pip_pkg_name]
+        if pip_pkg_name == "fabric2":
+            check_call_list.append("invoke==2.0.0")
+
         print("Installing {} package ...".format(pkg_name))
         if bool(os.environ.get("VIRTUAL_ENV")) is True:
             print("Executing : python3 -m pip install {}".format(pip_pkg_name))
-            subprocess.check_call(
-                ["python3", "-m", "pip", "install", pip_pkg_name],
-                # stdout=subprocess.DEVNULL
-            )
+
+            subprocess.check_call(check_call_list)
+
         else:
-            print("Executing : python3 -m pip install --user {}".format(
-                pip_pkg_name)
+            print(
+                "Executing : python3 -m pip install --user {}".format(
+                    pip_pkg_name
+                )
             )
-            subprocess.check_call(
-                ["python3", "-m", "pip", "install", "--user", pip_pkg_name],
-                # stdout=subprocess.DEVNULL
-            )
+            subprocess.check_call(check_call_list)
 
     return already_installed
 
@@ -66,23 +69,25 @@ for pkg_name, pip_pkg_name in required.items():
         from rich import print
         from rich.panel import Panel
         from rich.syntax import Syntax
+
         console = Console()
 
     if pkg_name == "ruamel.yaml":
         import ruamel.yaml
+
         yaml = ruamel.yaml.YAML()
 
     if already_installed:
         console.print(
-            "Package {} is already installed :thumbs_up:".format(
-                pkg_name),
-            style="green"
+            "Package {} is already installed :thumbs_up:".format(pkg_name),
+            style="green",
         )
     else:
         console.print(
             "Package {} is installed in your system :party_popper:".format(
-                pkg_name),
-            style="yellow"
+                pkg_name
+            ),
+            style="yellow",
         )
 
 
@@ -99,7 +104,7 @@ def get_platform():
         "linux2": "Linux",
         "linux3": "Linux",
         "darwin": "OSX",
-        "win32": "Windows"
+        "win32": "Windows",
     }
     try:
         return platforms[sys.platform]
@@ -109,7 +114,6 @@ def get_platform():
 
 
 class AttributeDict(dict):
-
     def __getattr__(self, key):
         try:
             return self[key]
@@ -131,53 +135,64 @@ def linux_distribution():
         return "N/A"
 
 
-FS3_env = AttributeDict({
-    "OS_system": get_platform(),
-    "OS_release": platform.release(),
-    "OS_version": platform.version(),
-    # os.getcwd() : not working if your call is outside of FabSim3 folder
-    "FabSim3_PATH": os.path.dirname(os.path.realpath(__file__)),
-    "user_name": getpass.getuser(),
-    "machines_user_yml": None
-})
+FS3_env = AttributeDict(
+    {
+        "OS_system": get_platform(),
+        "OS_release": platform.release(),
+        "OS_version": platform.version(),
+        # os.getcwd() : not working if your call is outside of FabSim3 folder
+        "FabSim3_PATH": os.path.dirname(os.path.realpath(__file__)),
+        "user_name": getpass.getuser(),
+        "machines_user_yml": None,
+    }
+)
 
 
 def config_yml_files():
     # Load and invoke the default non-machine specific config JSON
     # dictionaries.
     FS3_env.machines_user_yml = yaml.load(
-        open(os.path.join(FS3_env.FabSim3_PATH,
-                          "fabsim",
-                          "deploy",
-                          "machines_user_example.yml"))
+        open(
+            os.path.join(
+                FS3_env.FabSim3_PATH,
+                "fabsim",
+                "deploy",
+                "machines_user_example.yml",
+            )
+        )
     )
     # setup machines_user.yml
     S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
     FS3_env.machines_user_yml["localhost"]["home_path_template"] = S(
-        os.path.join(FS3_env.FabSim3_PATH, "localhost_exe"))
+        os.path.join(FS3_env.FabSim3_PATH, "localhost_exe")
+    )
     FS3_env.machines_user_yml["default"]["home_path_template"] = S(
-        os.path.join(FS3_env.FabSim3_PATH, "localhost_exe"))
+        os.path.join(FS3_env.FabSim3_PATH, "localhost_exe")
+    )
 
-    FS3_env.machines_user_yml["default"][
-        "local_results"] = os.path.join(FS3_env.FabSim3_PATH, "results")
+    FS3_env.machines_user_yml["default"]["local_results"] = os.path.join(
+        FS3_env.FabSim3_PATH, "results"
+    )
     FS3_env.machines_user_yml["default"]["local_configs"] = os.path.join(
-        FS3_env.FabSim3_PATH, "config_files")
+        FS3_env.FabSim3_PATH, "config_files"
+    )
     FS3_env.machines_user_yml["default"]["username"] = FS3_env.user_name
     FS3_env.machines_user_yml["localhost"]["username"] = FS3_env.user_name
 
-    machines_user_PATH = os.path.join(FS3_env.FabSim3_PATH,
-                                      "fabsim",
-                                      "deploy",
-                                      "machines_user.yml")
+    machines_user_PATH = os.path.join(
+        FS3_env.FabSim3_PATH, "fabsim", "deploy", "machines_user.yml"
+    )
 
     # backup the machines_user.yml if it exits
     if os.path.isfile(machines_user_PATH):
         os.rename(
             machines_user_PATH,
-            os.path.join(FS3_env.FabSim3_PATH,
-                         "fabsim",
-                         "deploy",
-                         "machines_user_backup.yml")
+            os.path.join(
+                FS3_env.FabSim3_PATH,
+                "fabsim",
+                "deploy",
+                "machines_user_backup.yml",
+            ),
         )
 
     # save machines_user.yml
@@ -190,7 +205,6 @@ def config_yml_files():
 
 
 def main():
-
     config_yml_files()
 
     # setup ssh localhost
@@ -207,20 +221,26 @@ def main():
     if FS3_env.OS_system == "OSX":
         os.system("ssh-add /Users/{}/.ssh/id_rsa".format(FS3_env.user_name))
 
-    bash_scripts = ["~/.bashrc", "~/.bash_profile",
-                    "~/.zshrc", "~/.bash_aliases"]
+    bash_scripts = [
+        "~/.bashrc",
+        "~/.bash_profile",
+        "~/.zshrc",
+        "~/.bash_aliases",
+    ]
     title = "[orange_red1]Congratulation :clinking_beer_mugs:[/orange_red1]\n"
     msg = "[dark_cyan]FabSim3 installation was successful :heavy_check_mark:[/dark_cyan]\n\n"
     msg += "In order to use fabsim command anywhere in your PC, you need to "
     msg += "update the [blue]PATH[/blue] and [blue]PYTHONPATH[/blue] environmental variables.\n\n"
     msg += "\t[red1]export[/red1] [blue]PATH[/blue]={}/fabsim/bin:[blue]$PATH[/blue]\n".format(
-        FS3_env.FabSim3_PATH)
+        FS3_env.FabSim3_PATH
+    )
     msg += "\t[red1]export[/red1] [blue]PYTHONPATH[/blue]={}:[blue]$PYTHONPATH[/blue]\n\n".format(
-        FS3_env.FabSim3_PATH)
+        FS3_env.FabSim3_PATH
+    )
     msg += "\t[red1]export[/red1] [blue]PATH[/blue]=~/.local/bin:[blue]$PATH[/blue]\n"
 
     msg += "\nThe last list is added because the required packages are "
-    msg += "installed with flag \"--user\" which makes pip install packages "
+    msg += 'installed with flag "--user" which makes pip install packages '
     msg += "in your home directory instead of system directory."
 
     print(Panel.fit(msg, title=title, border_style="orange_red1"))
@@ -229,13 +249,18 @@ def main():
     msg = "\nTo make these updates permanent, you can add the export commands "
     msg += "above at the end of your bash shell script which could be one of "
     msg += "[{}] files, depends on your OS System.\n\n".format(
-        ", ".join(["[light_sea_green]{}[/light_sea_green]".format(name)
-                   for name in bash_scripts])
-
+        ", ".join(
+            [
+                "[light_sea_green]{}[/light_sea_green]".format(name)
+                for name in bash_scripts
+            ]
+        )
     )
     msg += ":bellhop_bell: To load the new updates in [blue]PATH[/blue] and [blue]PYTHONPATH[/blue] "
     msg += "you need to reload your bash shell script, e.g., "
-    msg += "[red1]source[/red1] [light_sea_green]~/.bashrc[/light_sea_green], or "
+    msg += (
+        "[red1]source[/red1] [light_sea_green]~/.bashrc[/light_sea_green], or "
+    )
     msg += "lunch a new terminal."
 
     print(Panel.fit(msg, title=title, border_style="dark_green"))
@@ -248,7 +273,7 @@ def main():
                 "fabsim [red1]command is already added to the [/red1][blue]PATH[/blue] "
                 "[red1]variable. Please make sure you remove the old FabSim3 directory "
                 "from your bash shell script.",
-                title="[orange_red1]WARNING[/orange_red1]"
+                title="[orange_red1]WARNING[/orange_red1]",
             )
         )
 
