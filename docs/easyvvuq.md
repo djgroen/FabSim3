@@ -15,3 +15,35 @@ $$ \dfrac{dy}{dt} = \dfrac{x + a - by}{c} $$
 where $a$, $b$ and $c$ are three real-valued parameters that determine the time-evolution of dynamical variables $x$ and $y$.
 
 In order to use FabSim3 with the `Dynamics` software, we use the `FabDynamics` plugin. This plugin would help us submit large ensembles of simulation runs and perform sensitivity analysis. We discuss this aspect of the plugin in the following sections of the tutorial.
+
+## Installing Dynamics
+
+In order to install the `Dynamics` software:
+
+1. Clone the software repository in a directory of your choice:
+
+    ```sh
+    git clone https://github.com/arindamsaha1507/dynamics.git
+    ```
+2. Enter the newly created directory:
+    ```sh
+    cd dynamics
+    ```
+3. Install the required dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+4. This should complete the installation process. Check that the software works properly by issuing the command:
+    ```sh
+    python run.py
+    ```
+    This should create a new file called `timeseries.csv` which contains the time-evolution of variables $x$ and $y$.
+5. To check that the results are as expected, you can plot the results using:
+    ```sh
+    python plotter.py
+    ```
+    This should result in a plot similar to the one shown below.
+
+<figure>
+    <img src="../images/fhn_plot.png" width="600"> 
+</figure>
