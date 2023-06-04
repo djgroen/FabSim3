@@ -145,7 +145,7 @@ In this directory
         sobols_first: [0.0097, 0.0098, 0.0099, 0.01, 0.0101, 0.0102, 0.0103, 0.0104, 0.0105, 0.0106, 0.0107, ... 0.0197, 0.0195, 0.0194, 0.0192, 0.0191, 0.0189, 0.0188, 0.0186, 0.0185, 0.0183, 0.0182]
     ```
 
-    As evident from the contents of the file, the first order Sobol indices for each parameter is computed separately.
+As evident from the contents of the file, the first order Sobol indices for each parameter is computed separately.
 
 - The plot of the first-order Sobol indices is stored in `plot_sobols_first[x].png`. The plot should look similar to:
 
