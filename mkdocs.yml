@@ -186,6 +186,7 @@ nav:
       - Plugins: plugins.md
       - Create new plugin: create_new_plugin.md
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
+      - Sensitivity analysis tutorial: easyvvuq.md
       - VVUQ Patterns : patterns.md
       - VVP tutorials: eov_migration_tutorial.md
       - Advanced Topics : advanced_topics.md

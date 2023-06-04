@@ -1,0 +1,11 @@
+# Sensitivity analysis using FabSim3 and EasyVVUQ
+
+FabSim3 is very useful when submitting a large number of jobs at together. One of the cases where this becomes especially useful is for sensitivity analysis. Sensitivity analysis can be breifly described as the process of evaluating the extent to which various input parameters affect the output of a simulation. One of the popular ways of quantifying this effect of parameters on the simulations is throgh Sobol Indices. Computation of Sobol Indices involves running the simulation for a large number of parameter sets and then comuting the variances among the various subsets of results obtained. Given the large number of computations required, this becomes a suitable candidate for simplification using FabSim3.
+
+In this tutorial, we showcase how to conduct sensitivity analysis using FabSim3 and the python packages EasyVVUQ and QCG-PilotJob. Theb tutorial will use a simple plugin called `FabDynamics` which has been tailored for this purpose.
+
+## Brief introduction of Dynamics and FabDynamics
+
+At the core of this tutorial is the `Dynamics` software which numerically solves a system of differential equations for a fixed amount of time. By default, if no arguments are provided, the program solves the FitzHugh-Nagumo system of differential equations:
+
+$$ \dot{x} = \frac{x^3}{3} - x + \frac{1}{2} $$
