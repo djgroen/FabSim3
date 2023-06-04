@@ -113,36 +113,36 @@ In this directory
 
     ```yaml
     campaign_info:
-    name: "dyn_SA_SCSampler"
-    work_dir: "/home/arindam/FabSim3/plugins/FabDynamics"
-    num_runs: 64
-    output_column: "x"
-    polynomial_order: 3
-    sampler: "SCSampler"
-    distribution_type: "Uniform"
-    sparse: "False"
-    growth: "False"
-    quadrature_rule: "G"
-    midpoint_level1: "False"
-    dimension_adaptive: "False"
+        name: "dyn_SA_SCSampler"
+        work_dir: "/home/arindam/FabSim3/plugins/FabDynamics"
+        num_runs: 64
+        output_column: "x"
+        polynomial_order: 3
+        sampler: "SCSampler"
+        distribution_type: "Uniform"
+        sparse: "False"
+        growth: "False"
+        quadrature_rule: "G"
+        midpoint_level1: "False"
+        dimension_adaptive: "False"
     a:
-    # arithmetic mean i.e., (x1 + x2 + … + xn)/n
-    sobols_first_mean: 0.435
-    # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
-    sobols_first_gmean: 0.4329
-    sobols_first: [0.5201, 0.5201, 0.5201, 0.5201, 0.52, 0.52, 0.52, 0.5199, 0.5199,  0.3959, 0.3956, 0.3953, 0.395, 0.3947, 0.3945, 0.3942, 0.3938, 0.3935]
+        # arithmetic mean i.e., (x1 + x2 + … + xn)/n
+        sobols_first_mean: 0.435
+        # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
+        sobols_first_gmean: 0.4329
+        sobols_first: [0.5201, 0.5201, 0.5201, 0.5201, 0.52, 0.52, 0.52, 0.5199, 0.5199,  0.3959, 0.3956, 0.3953, 0.395, 0.3947, 0.3945, 0.3942, 0.3938, 0.3935]
     b:
-    # arithmetic mean i.e., (x1 + x2 + … + xn)/n
-    sobols_first_mean: 0.011
-    # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
-    sobols_first_gmean: 0.0085
-    sobols_first: [0.0042, 0.0042, 0.0041, 0.0041, 0.004, 0.004, 0.004, 0.0039, 0.0039, 0.0039, 0.0038, 0.0038, 0.0037, 0.0037, 0.0037, 0.0036, 0.0036, 0.0036, 0.0036, 0.0035, ... 0.0069, 0.007, 0.007, 0.007, 0.0071, 0.0071, 0.0072, 0.0072, 0.0073, 0.0073]
+        # arithmetic mean i.e., (x1 + x2 + … + xn)/n
+        sobols_first_mean: 0.011
+        # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
+        sobols_first_gmean: 0.0085
+        sobols_first: [0.0042, 0.0042, 0.0041, 0.0041, 0.004, 0.004, 0.004, 0.0039, 0.0039, 0.0039, 0.0038, 0.0038, 0.0037, 0.0037, 0.0037, 0.0036, 0.0036, 0.0036, 0.0036, 0.0035, ... 0.0069, 0.007, 0.007, 0.007, 0.0071, 0.0071, 0.0072, 0.0072, 0.0073, 0.0073]
     c:
-    # arithmetic mean i.e., (x1 + x2 + … + xn)/n
-    sobols_first_mean: 0.0382
-    # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
-    sobols_first_gmean: 0.0288
-    sobols_first: [0.0097, 0.0098, 0.0099, 0.01, 0.0101, 0.0102, 0.0103, 0.0104, 0.0105, 0.0106, 0.0107, ... 0.0197, 0.0195, 0.0194, 0.0192, 0.0191, 0.0189, 0.0188, 0.0186, 0.0185, 0.0183, 0.0182]
+        # arithmetic mean i.e., (x1 + x2 + … + xn)/n
+        sobols_first_mean: 0.0382
+        # geometric mean, i.e., n-th root of (x1 * x2 * … * xn)
+        sobols_first_gmean: 0.0288
+        sobols_first: [0.0097, 0.0098, 0.0099, 0.01, 0.0101, 0.0102, 0.0103, 0.0104, 0.0105, 0.0106, 0.0107, ... 0.0197, 0.0195, 0.0194, 0.0192, 0.0191, 0.0189, 0.0188, 0.0186, 0.0185, 0.0183, 0.0182]
     ```
 
     As evident from the contents of the file, the first order Sobol indices for each parameter is computed separately.
