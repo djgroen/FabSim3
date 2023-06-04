@@ -73,7 +73,7 @@ Now, with the `Dynamics` software installed, we must install the `FabDynamics` p
 
 4. Now edit the the last line of the `machines_FabDynamics_user.yml` file with the location where dynamics software is installed:
 
-    ```yaml #10
+    ```yaml
     default:
 
     dynamics_args:
