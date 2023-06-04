@@ -29,15 +29,18 @@ In order to install the `Dynamics` software:
     ```sh
     cd dynamics
     ```
+
 3. Install the required dependencies:
     ```sh
     pip install -r requirements.txt
     ```
+
 4. This should complete the installation process. Check that the software works properly by issuing the command:
     ```sh
     python run.py
     ```
     This should create a new file called `timeseries.csv` which contains the time-evolution of variables $x$ and $y$.
+
 5. To check that the results are as expected, you can plot the results using:
     ```sh
     python plotter.py
@@ -47,3 +50,38 @@ In order to install the `Dynamics` software:
 <figure>
     <img src="../images/fhn_plot.png" width="600"> 
 </figure>
+
+## Installing FabDynamics
+
+Now, with the `Dynamics` software installed, we must install the `FabDynamics` plugin so that we can use it with FabSim3:
+
+1. With FabSim3 installed properly, issue the following command:
+    ```sh
+    fabsim localhost install_plugin:FabDynamics
+    ```
+    This should create a `FabDynamics` subdirectory in the `FabSim3/plugins` directory.
+
+2. Change to the newly created directory:
+    ```sh
+    cd <path to FabSim3 directory>/plugins/FabDynamics
+    ```
+
+3. Copy the contents of the `machines_FabDynamics_user_example.yml` file into a new file `machines_FabDynamics_user.yml`:
+    ```sh
+    cp machines_FabDynamics_user.yml machines_FabDynamics_user_example.yml
+    ```
+
+4. Now edit the the last line of the `machines_FabDynamics_user.yml` file with the location where dynamics software is installed:
+
+    ```yml #10
+    default:
+
+    dynamics_args:
+
+        outfile: 'timeseries.csv'
+
+    localhost:
+
+    # location of dynamics in your local PC
+    dynamics_location: "<path/to/dynamics/software>"
+    ```
