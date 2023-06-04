@@ -73,15 +73,15 @@ Now, with the `Dynamics` software installed, we must install the `FabDynamics` p
 
 4. Now edit the the last line of the `machines_FabDynamics_user.yml` file with the location where dynamics software is installed:
 
-```yaml
-default:
+    ```yaml
+    default:
 
-dynamics_args:
+    dynamics_args:
 
-    outfile: 'timeseries.csv'
+        outfile: 'timeseries.csv'
 
-localhost:
+    localhost:
 
-# location of dynamics in your local PC
-dynamics_location: "<path/to/dynamics/software>"
-```
+    # location of dynamics in your local PC
+    dynamics_location: "<path/to/dynamics/software>"
+    ```
