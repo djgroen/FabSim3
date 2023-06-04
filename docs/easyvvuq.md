@@ -9,6 +9,7 @@ In this tutorial, we showcase how to conduct sensitivity analysis using FabSim3 
 At the core of this tutorial is the `Dynamics` software which numerically solves a system of differential equations for a fixed amount of time. By default, if no arguments are provided, the program solves the FitzHugh-Nagumo system of differential equations:
 
 $$ \dfrac{dx}{dt} = \dfrac{x^3}{3} - x + \dfrac{1}{2} $$
+
 $$ \dfrac{dy}{dt} = \dfrac{x + a - by}{c} $$
 
 where $a$, $b$ and $c$ are three real-valued parameters that determine the time-evolution of dynamical variables $x$ and $y$.
