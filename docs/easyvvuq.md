@@ -151,13 +151,18 @@ In this directory
 - The plot of the first-order Sobol indices is stored in `plot_sobols_first[x].png`. The plot should look similar to:
 
 <figure>
-    <img src="../images/fhn_plot.png" width="600"> 
+    <img src="../images/plot_sobols_first[x]" width="600"> 
 </figure>
 
 - Similar plot showing all Sobol indices (inclding the higher order indices) is stored in `plot_all_sobol[x].png`. The plot should look similar to:
 
 <figure>
-    <img src="../images/fhn_plot.png" width="600"> 
+    <img src="../images/plot_all_sobol[x].png" width="600"> 
 </figure>
 
-- The command also creates other plots not directly related to the Sobol indices, namely `raw[x].png` and `plot_statistical_moments[x].png`.
+- The command also creates other plots related to the results of the simulation runs, namely `raw[x].png` and `plot_statistical_moments[x].png`.
+
+<figure>
+    <img src="../images/raw[x].png" width="400"> 
+    <img src="../images/plot_statistical_moments[x].png" width="400"> 
+</figure>
