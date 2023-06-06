@@ -163,6 +163,151 @@ In this directory
 - The command also creates other plots related to the results of the simulation runs, namely `raw[x].png` and `plot_statistical_moments[x].png`.
 
 <figure>
-    <img src="../images/raw[x].png" width="400"> 
-    <img src="../images/plot_statistical_moments[x].png" width="400"> 
+    <img src="../images/raw[x].png" width="600"> 
+    <img src="../images/plot_statistical_moments[x].png" width="600"> 
 </figure>
+
+## Configuring sensitivity analysis
+
+After the steps taken above, the dirctory structure of the FabDynamics plugin should look like:
+
+```
+FabDynamics
+├── config_files
+│   ├── fhn
+│   └── testing
+├── FabDynamics.py
+├── LICENSE
+├── machines_FabDynamics_user_example.yml
+├── machines_FabDynamics_user.yml
+├── __pycache__
+│   ├── FabDynamics.cpython-310.pyc
+│   └── FabDynamics.cpython-38.pyc
+├── README.md
+├── requirements.txt
+├── SA
+│   ├── dyn_SA_config.yml
+│   ├── dyn_sa.py
+│   ├── dyn_SA_SCSampler
+│   └── __pycache__
+└── templates
+    ├── dynamics
+    ├── params.json
+    └── template_inputs
+```
+
+Out of these files, the following determine the configuration for senstivity analysis:
+
+The **dyn_sa.py** module contains the central function that controls the sensitivity analysis. So, when we issue the command:
+
+```sh
+fabsim localhost dyn_init_SA:config=fhn
+```
+
+The following function in `dyn_sa.py` is run:
+
+```python
+@task
+@load_plugin_env_vars("FabDynamics")
+def dyn_init_SA(config,
+                outdir=".",
+                script="dynamics",
+                dynamics_script="run.py",
+                sampler_name=None,
+                ** args):
+```
+
+with the argument `config=fhn`.
+
+After the required pre-processing, this function creates an EasyVVUQ campaign in the following line:
+
+```python
+runs_dir, campaign_dir = init_dyn_SA_campaign(
+        campaign_name=campaign_name,
+        campaign_config=dyn_SA_campaign_config,
+        polynomial_order=polynomial_order,
+        campaign_work_dir=campaign_work_dir,
+        template='template_inputs',
+        target='inputs.yml'
+    )
+```
+
+The specifics of how the sensitivity analysis campaign would work is defined in the arguments of the `init_dyn_SA_campaign()` function. In particular, the `template='template_inputs'` and `target='inputs.yml'` arguments specify that the `inputs.yml` configuration file for the individual run has to be formatted according to the `template_inputs` template file.
+
+Let us have a look at the `inputs.yml` file in the `FabDynamics/config_files/fhn/configuration/` directory:
+
+```yaml
+family: 'ode'
+
+ode_system: 'fhn'
+
+parameters:
+  a: 
+    min: -1.0
+    max: 1.0
+    default: 0.7
+  b: 
+    min: 0.0
+    max: 1.0
+    default: 0.8
+  c:
+    min: 0.0
+    max: 20.0
+    default: 12.5
+
+initial_conditions:
+  x: 
+    min: -5.0
+    max: 5.0
+    default: 0.1
+  y:
+    min: -5.0
+    max: 5.0
+    default: 0.1
+
+time:
+  ti: 0.0
+  tf: 1000.0
+  dt: 0.01
+  tr: 0.8
+```
+
+This is very similar to the `template_inputs` template file in the `FabDynamics/templates/` directory:
+
+```yaml
+family: 'ode'
+
+ode_system: 'fhn'
+
+parameters:
+  a: 
+    min: -1.0
+    max: 1.0
+    default: $a
+  b: 
+    min: 0.0
+    max: 1.0
+    default: $b
+  c:
+    min: 0.0
+    max: 20.0
+    default: $c
+
+initial_conditions:
+  x: 
+    min: -5.0
+    max: 5.0
+    default: 0.1
+  y:
+    min: -5.0
+    max: 5.0
+    default: 0.1
+
+time:
+  ti: 0.0
+  tf: 1000.0
+  dt: 0.01
+  tr: 0.8
+```
+
+In fact, the only difference between the two files is that instaed of numerical values for keys `a`, `b` and `c`, the template file contains symbols `$a`, `$b` and `$c`.
