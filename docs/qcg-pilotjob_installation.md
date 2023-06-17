@@ -23,6 +23,12 @@ The pre-requisites for installing QCG Pilot Job on a **remote machine** using **
 
 - Access to the remote machine
 
+Additionally, OpenBLAS and some related packages are also required. These can be installed using:
+
+```sh
+sudo apt install libopenblas-dev pkg-config libopenblas64-dev
+```
+
 ## Installation
 
 For the installation itself, install the following command from the terminal
