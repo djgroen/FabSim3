@@ -310,4 +310,89 @@ time:
   tr: 0.8
 ```
 
-In fact, the only difference between the two files is that instaed of numerical values for keys `a`, `b` and `c`, the template file contains symbols `$a`, `$b` and `$c`.
+In fact, the only difference between the two files is that instaed of numerical values for keys `a`, `b` and `c`, the template file contains symbols `$a`, `$b` and `$c`. 
+
+Essentially the `init_dyn_SA_campaign()` function copies the `template='template_inputs'` into `target='inputs.yml'` file after substituting the `$` variables with numerical values. The algorithm by which the numerical values are substituted are determined by `dyn_SA_config.yml` and `params.json` files.
+
+Let us look at the `dyn_SA_config.yml` file:
+
+```yaml
+vary_parameters_range:
+    # <parameter_name:>
+    #   range: [<lower value>,<upper value>] 
+    a:
+        range: [-1.0, 1.0]
+    b:
+        range: [0.5, 0.9]
+    c:
+        range: [12.0, 13.0]
+
+selected_vary_parameters: ["a",
+                           "b",
+                           "c",
+                          ]
+
+distribution_type: "Uniform" # Uniform, DiscreteUniform
+
+polynomial_order: 3
+
+decoder_output_column: "x"
+
+#   ---------------------------------------------------------------
+# sampler_name: str
+#   Samplers in the context of EasyVVUQ are classes that generate
+#   sequences of parameter dictionaries.
+#   available sampler: [SCSampler,PCESampler]
+#
+#   SCSampler: Stochastic Collocation sampler
+#   PCESampler : Polynomial Chaos Expansion
+#   ---------------------------------------------------------------
+sampler_name: "SCSampler"
+
+
+# quadrature_rule : char
+#     The quadrature method, default is Gaussian "G".
+#     "G" -> Gaussian , "C" -> Clenshaw_Curtis
+quadrature_rule: "G"
+
+# ------- NOTE ------------
+# if you set quadrature_rule="C", then you need to make sure
+#     sparse=True
+#     growth=True
+#     midpoint_level1=True
+
+
+# sparse : bool
+#             If True use sparse grid instead of normal tensor product grid,
+#             default is False
+sparse: False
+
+# growth: bool
+#     Sets the growth rule to exponential for Clenshaw Curtis quadrature,
+#     which makes it nested, and therefore more efficient for sparse grids.
+#     Default is False.
+growth: False
+
+# midpoint_level1: bool,  ----- ONLY FOR SCSampler ------
+#     determines how many points the 1st level of a sparse grid will have.
+#     If midpoint_level1 = True, order 0 quadrature will be generated
+midpoint_level1: False
+
+# dimension_adaptive: bool, ----- ONLY FOR SCSampler ------
+#     determines wether to use an insotropic sparse grid, or to adapt
+#     the levels in the sparse grid based on a hierachical error measure
+dimension_adaptive: False
+
+# regression: bool, ----- ONLY FOR PCESampler ------
+#    If True, regression variante (point collecation) will be used,
+#    otherwise projection variante (pseud-spectral) will be used.
+#    Default value is False.
+regression: False
+
+```
+
+This file determines the overall configuration of the sensitivity analysis. In particular, the key `selected_vary_parameters` determines the variables with respect to which the sensitivity analysis is to be performed. Therefore, in the example, variables `a`, `b` abd `c` would be varied. The ranges in which the variables will be varied is determined by the `vary_parameters_range` key. 
+
+Therefore, during the analysis in the example, the parameters are scanned in a three-dimensional space. The granularity with which the parameter space is scanned is determined by the `polynomial_order` key. With a `polynomial_order` of $n$, a total of $n+1$ samples will be taken for each parameter. If there are a total of $p$ parameters to be varied, there will be a total of $(n+1)^p$ samples taken from the parameter space. Therefore, in the example above an ensemble size of $4^3=64$ will be created.
+
+The `decoder_output_column` key in the `dyn_SA_config.yml` file determines the column in the output file based on which the the Sobol indices are to be computed. In addition, the file also determines other factors such as the sampler and other EasyVVUQ specific parameters. These are explained in detain in the comments of the file.
