@@ -396,3 +396,38 @@ This file determines the overall configuration of the sensitivity analysis. In p
 Therefore, during the analysis in the example, the parameters are scanned in a three-dimensional space. The granularity with which the parameter space is scanned is determined by the `polynomial_order` key. With a `polynomial_order` of $n$, a total of $n+1$ samples will be taken for each parameter. If there are a total of $p$ parameters to be varied, there will be a total of $(n+1)^p$ samples taken from the parameter space. Therefore, in the example above an ensemble size of $4^3=64$ will be created.
 
 The `decoder_output_column` key in the `dyn_SA_config.yml` file determines the column in the output file based on which the the Sobol indices are to be computed. In addition, the file also determines other factors such as the sampler and other EasyVVUQ specific parameters. These are explained in detain in the comments of the file.
+
+Finally, we note the role of `params.json` file in configuring the sensitivity analysis. Let us first look at the file:
+
+```json
+{
+    "a": {
+      "type": "float",
+      "min": -1.0,
+      "max": 1.0,
+      "default": 0.7
+    },
+    "b": {
+      "type": "float",
+      "min": 0.0,
+      "max": 1.0,
+      "default": 0.8
+    },
+    "c": {
+      "type": "float",
+      "min": 0.0,
+      "max": 20.0,
+      "default": 12.5
+    },
+    "out_file": {
+      "type": "string",
+      "default": "timeseries.csv"
+    }
+}
+```
+
+The file first lists the variables that **are allowed** to be varied, which are `a`, `b` and `c`. It also lists the `out_file` variable which gives the file in which the output file will be written. 
+
+Similar to the `dyn_SA_config.yml` file, the `params.json` file also states a mininum and a maximum value of the parameters. This is because, the `params.json` file is meant to be system-specific, whereas the `dyn_SA_config.yml` file is meant to be spficit to the current sensitivity analysis run. Hence, the limits set in `params.json` file are supposed to be the *theoretical* limits of the variables. However, the limits in the `dyn_SA_config.yml` file determines the *actual* limits within which the values of the variables will be varied during the sensitivity analysis. Therefore, the limits set in `dyn_SA_config.yml` must be a subset of the limits set in `params.json` file.
+
+The `params.json` file also specifies a `default` value for each variable. This is the value given to the variable when it is not being used in a particular run of sensitivity analysis. Therefore, if the `selected_vary_parameters` key in the `dyn_SA_config.yml` file is set to `[a, b]`, value of `$c` that will be substitute in `template_inputs` will be `12.5` as that is the `default` value assigned to `c` in `params.json` file.
