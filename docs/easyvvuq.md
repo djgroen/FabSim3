@@ -95,13 +95,11 @@ fabsim localhost dyn_init_SA:config=fhn
 ```
 
 !!! note
-  If you wish to use QCG-PilotJob during the SA runs on HPC's, simply modify the command as
-
-  ```sh
-  fabsim <machine_name> dyn_init_SA:config=fhn,PJ=True
-  ```
-
-  Please ensure that QCG-PilotJob is installed on the machine beforehand.
+    If you wish to use QCG-PilotJob during the SA runs on HPC's, simply modify the command as
+    ```sh
+    fabsim <machine_name> dyn_init_SA:config=fhn,PJ=True
+    ```
+    Please ensure that QCG-PilotJob is installed on the machine beforehand.
 
 Based on the pre-set configuration, issuing this command selects 64 points in the three-dimensional parameter space defined by parameters $a$, $b$ and $c$. It then submits one simulation run for each parameter set to the localhost.
 
