@@ -31,7 +31,8 @@ def script_template_content(template_name: str):
         raise UnboundLocalError(
             "FabSim Error: could not find template file {} . \
             FabSim looked for it in the following directories: {}".format(
-                template_name, env.local_templates_path)
+                template_name, env.local_templates_path
+            )
         )
 
 

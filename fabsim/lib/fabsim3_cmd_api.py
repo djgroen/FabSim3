@@ -28,8 +28,8 @@ def fabsim(task, arguments, machine="localhost"):
         machine (str, optional): the name of the remote machine as indicated in
           machines_user.yml
     """
-    print("Executing\n\n", "\tfabsim {} {}:{}".format(
-        machine, task, arguments)
+    print(
+        "Executing\n\n", "\tfabsim {} {}:{}".format(machine, task, arguments)
     )
 
     os.system("fabsim {} {}:{}".format(machine, task, arguments))
@@ -66,7 +66,7 @@ def status(machine="localhost"):
     fabsim("stat", "", machine)
 
 
-def wait(machine='localhost', sleep=1):
+def wait(machine="localhost", sleep=1):
     """
     Subroutine which returns when all jobs on the remote machine have finished.
 
@@ -85,16 +85,17 @@ def wait(machine='localhost', sleep=1):
     while not finished:
         # get the output lines of fab <machine> stat
         try:
-            out = subprocess.run(['fab', machine, 'stat'],
-                                 stdout=subprocess.PIPE)
+            out = subprocess.run(
+                ["fab", machine, "stat"], stdout=subprocess.PIPE
+            )
         except Exception:
-            print('wait subroutine failed')
+            print("wait subroutine failed")
             return finished
 
-        out = out.stdout.decode('utf-8').split("\n")
+        out = out.stdout.decode("utf-8").split("\n")
         # number of uncompleted runs
         n_uncompleted = 0
-        print('Checking job status...')
+        print("Checking job status...")
         for i in range(header, len(out)):
             # remove all spaces from current line
             line = out[i].split()
@@ -102,13 +103,13 @@ def wait(machine='localhost', sleep=1):
             # line = '' means no Job ID, and if the number of uncompleted runs
             # is zero, we are done
             if len(line) == 0 and n_uncompleted == 0:
-                print('All runs have completed')
+                print("All runs have completed")
                 finished = True
                 return finished
             # If the first entry is a number, we have found a running/pending
             # or completing job ID
             elif len(line) > 0 and line[0].isnumeric():
-                print('Job %s is %s' % (line[0], line[1]))
+                print("Job %s is %s" % (line[0], line[1]))
                 n_uncompleted += 1
 
         # no more jobs
@@ -126,16 +127,18 @@ def run_uq_ensemble(campaign_dir, script_name, machine="localhost", **kwargs):
     """
 
     sim_ID = campaign_dir.split("/")[-1]
-    arguments = "{},campaign_dir={},script_name={}".format(sim_ID,
-                                                           campaign_dir,
-                                                           script_name
-                                                           )
+    arguments = "{},campaign_dir={},script_name={}".format(
+        sim_ID, campaign_dir, script_name
+    )
     # add additional named arguments list
     if len(kwargs) > 0:
         arguments += ",{}".format(
-            (",".join("%s=%s" % (arg_name, kwargs[arg_name])
-                      for arg_name in kwargs)
-             )
+            (
+                ",".join(
+                    "%s=%s" % (arg_name, kwargs[arg_name])
+                    for arg_name in kwargs
+                )
+            )
         )
 
     fabsim("run_uq_ensemble", arguments, machine=machine)
@@ -146,15 +149,17 @@ def get_uq_samples(campaign_dir, machine="localhost", **kwargs):
     Retrieves results from UQ ensemble
     """
     sim_ID = campaign_dir.split("/")[-1]
-    arguments = "{},campaign_dir={}".format(sim_ID,
-                                            campaign_dir
-                                            )
+    arguments = "{},campaign_dir={}".format(sim_ID, campaign_dir)
 
     # add additional named arguments list
     if len(kwargs) > 0:
         arguments += ",{}".format(
-            (",".join("%s=%s" % (arg_name, kwargs[arg_name])
-                      for arg_name in kwargs))
+            (
+                ",".join(
+                    "%s=%s" % (arg_name, kwargs[arg_name])
+                    for arg_name in kwargs
+                )
+            )
         )
 
     fabsim("get_uq_samples", arguments, machine=machine)

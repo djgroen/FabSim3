@@ -23,9 +23,7 @@ env.update(config["default"])
 
 try:
     user_config = yaml.safe_load(
-        open(os.path.join(env.fabsim_root, "deploy",
-                          "machines_user.yml")
-             )
+        open(os.path.join(env.fabsim_root, "deploy", "machines_user.yml"))
     )
 except FileNotFoundError:
     # raise FileNotFoundError(
@@ -33,9 +31,11 @@ except FileNotFoundError:
     # )
     print("There is not machines_user.yml under fabsim/deploy folder!!!\n")
     user_config = yaml.safe_load(
-        open(os.path.join(env.fabsim_root, "deploy",
-                          "machines_user_example.yml")
-             )
+        open(
+            os.path.join(
+                env.fabsim_root, "deploy", "machines_user_example.yml"
+            )
+        )
     )
 env.update(user_config["default"])
 
@@ -243,8 +243,9 @@ def load_plugins() -> None:
             try:
                 to_import = plugin.__all__
             except AttributeError:
-                to_import = [name for name in plugin_dict
-                             if not name.startswith("_")]
+                to_import = [
+                    name for name in plugin_dict if not name.startswith("_")
+                ]
 
             caller_globals.update(
                 {name: plugin_dict[name] for name in to_import}
