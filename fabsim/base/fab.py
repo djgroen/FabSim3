@@ -46,9 +46,9 @@ def get_plugin_path(name: str) -> str:
     plugin_path = os.path.join(env.localroot, "plugins", name)
     if not os.path.exists(plugin_path):
         raise RuntimeError(
-            "The requested plugin {} does not exist ({}).\n"
+            f"The requested plugin {name} does not exist ({plugin_path}).\n"
             "you can install it by typing:\n\t"
-            "fabsim localhost install_plugin:{}".format(name, plugin_path, name)
+            f"fabsim localhost install_plugin:{name}"
         )
     return plugin_path
 
@@ -78,7 +78,9 @@ def put_results(name: str) -> None:
             )
         )
     else:
-        rsync_project(local_dir=env.job_results_local + "/", remote_dir=env.job_results)
+        rsync_project(
+            local_dir=env.job_results_local + "/", remote_dir=env.job_results
+        )
 
 
 @task
@@ -244,7 +246,11 @@ def put_configs(config: str) -> None:
     # created automatically whenever a config file is uploaded.
 
     run(
-        template("{}; mkdir -p $job_config_path".format(get_setup_fabsim_dirs_string()))
+        template(
+            "{}; mkdir -p $job_config_path".format(
+                get_setup_fabsim_dirs_string()
+            )
+        )
     )
 
     rsync_delete = False
@@ -348,7 +354,9 @@ def calc_total_mem() -> None:
 
 
 @beartype
-def find_config_file_path(name: str, ExceptWhenNotFound: Optional[bool] = True) -> str:
+def find_config_file_path(
+    name: str, ExceptWhenNotFound: Optional[bool] = True
+) -> str:
     """
     Find the config file path
 
@@ -373,7 +381,9 @@ def find_config_file_path(name: str, ExceptWhenNotFound: Optional[bool] = True) 
 
         solution = "localhost:\n"
         solution += "   ...\n"
-        solution += '   home_path_template: "{}/localhost_exe"'.format(env.localroot)
+        solution += '   home_path_template: "{}/localhost_exe"'.format(
+            env.localroot
+        )
         rich_print(
             Panel(
                 "{}[green3]{}[/green3]".format(msg, solution),
@@ -393,7 +403,8 @@ def find_config_file_path(name: str, ExceptWhenNotFound: Optional[bool] = True) 
     if path_used is None:
         if ExceptWhenNotFound:
             raise Exception(
-                "Error: config file directory '{}' " "not found in: ".format(name),
+                "Error: config file directory '{}' "
+                "not found in: ".format(name),
                 env.local_config_file_path,
             )
         else:
@@ -424,7 +435,9 @@ def with_config(name: str):
 
     env.job_config_path_local = os.path.join(path_used)
     env.job_config_contents = os.path.join(env.job_config_path, "*")
-    env.job_config_contents_local = os.path.join(env.job_config_path_local, "*")
+    env.job_config_contents_local = os.path.join(
+        env.job_config_path_local, "*"
+    )
     # name of the job sh submission script.
     env.job_name_template_sh = template("{}.sh".format(env.job_name_template))
 
@@ -664,7 +677,10 @@ def job(*job_args):
             #####################################
             #       job submission phase      #
             #####################################
-            msg = "Submit all generated job scripts to " "the target remote machine"
+            msg = (
+                "Submit all generated job scripts to "
+                "the target remote machine"
+            )
             rich_print(
                 Panel.fit(
                     msg,
@@ -674,7 +690,11 @@ def job(*job_args):
             )
             for job_script in job_scripts_to_submit:
                 job_submission(dict(job_script=job_script))
-            print("submitted job script = \n{}".format(pformat(job_scripts_to_submit)))
+            print(
+                "submitted job script = \n{}".format(
+                    pformat(job_scripts_to_submit)
+                )
+            )
 
     # POOL.shutdown_threads()
 
@@ -708,7 +728,8 @@ def job_preparation(*job_args):
     # sys.exit()
 
     for i in range(
-        args["replica_start_number"], int(env.replicas) + args["replica_start_number"]
+        args["replica_start_number"],
+        int(env.replicas) + args["replica_start_number"],
     ):
         env.replica_number = i
 
@@ -744,7 +765,9 @@ def job_preparation(*job_args):
             env.run_prefix += (
                 "\n\n"
                 "# copy files from SWEEP folder\n"
-                "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(env.label)
+                "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(
+                    env.label
+                )
             )
 
         if not (hasattr(env, "venv") and str(env.venv).lower() == "true"):
@@ -790,7 +813,9 @@ def job_preparation(*job_args):
         """
         # here, instead of returning PATH to script folder, it is better to
         # submit script from results_path folder, specially in case of PJ job
-        return_job_scripts.append(env.pather.join(env.job_results, dst_script_name))
+        return_job_scripts.append(
+            env.pather.join(env.job_results, dst_script_name)
+        )
 
         copy(tmp_job_script, dst_job_script)
         # chmod +x dst_job_script
@@ -806,7 +831,9 @@ def job_preparation(*job_args):
         # job_name_template_sh
         # job_results_contents
         # job_results_contents_local
-        with open(env.pather.join(tmp_job_results, "env.yml"), "w") as env_yml_file:
+        with open(
+            env.pather.join(tmp_job_results, "env.yml"), "w"
+        ) as env_yml_file:
             yaml.dump(
                 dict(
                     env,
@@ -982,7 +1009,8 @@ def job_submission(*job_args):
             )
         elif env.ssh_monsoon_mode:
             cmd = template(
-                "ssh $remote_compute " "-C '$job_dispatch {}'".format(job_script)
+                "ssh $remote_compute "
+                "-C '$job_dispatch {}'".format(job_script)
             )
             run(cmd, cd=env.pather.dirname(job_script))
         else:
@@ -1036,7 +1064,9 @@ def ensemble2campaign(
                 )
     # copy all runs from FabSim results directory to campaign directory
     else:
-        local("rsync -pthrvz {}/RUNS/ {}/runs".format(results_dir, campaign_dir))
+        local(
+            "rsync -pthrvz {}/RUNS/ {}/runs".format(results_dir, campaign_dir)
+        )
 
 
 @task
@@ -1078,7 +1108,11 @@ def campaign2ensemble(
             # if X > skip, copy run directory to the sweep dir
             if run_id > int(skip):
                 print("Copying {}".format(run))
-                local("rsync -pthrz {}/runs/{} {}".format(campaign_dir, run, sweep_dir))
+                local(
+                    "rsync -pthrz {}/runs/{} {}".format(
+                        campaign_dir, run, sweep_dir
+                    )
+                )
     # if skip = 0: copy all runs from EasyVVUQ run directort to the sweep dir
     else:
         local("rsync -pthrz {}/runs/ {}".format(campaign_dir, sweep_dir))
@@ -1161,7 +1195,9 @@ def run_ensemble(
     print("reading SWEEP folder from remote machine")
     if len(sweepdir_items) == 0:
         raise RuntimeError(
-            "ERROR: no files where found in the sweep_dir : {}".format(sweep_dir)
+            "ERROR: no files where found in the sweep_dir : {}".format(
+                sweep_dir
+            )
         )
 
     # reorder an exec_first item for priority execution.
@@ -1201,7 +1237,9 @@ def run_ensemble(
             # TODO: this loop should be improved
             env.idsID = index
             env.idsPath = job_script
-            submitted_jobs_list.append(script_template_content("qcg-PJ-task-template"))
+            submitted_jobs_list.append(
+                script_template_content("qcg-PJ-task-template")
+            )
         env.submitted_jobs_list = "\n".join(submitted_jobs_list)
 
         # to avoid apply replicas functionality on PilotJob folders
@@ -1224,10 +1262,14 @@ def run_ensemble(
             PJ_CMD.append("module unload python\n")
             PJ_CMD.append("# load QCG-PilotJob from VirtualEnv")
             PJ_CMD.append(
-                'eval "$({}/bin/conda shell.bash hook)"\n'.format(env.virtual_env_path)
+                'eval "$({}/bin/conda shell.bash hook)"\n'.format(
+                    env.virtual_env_path
+                )
             )
             PJ_CMD.append("# load QCG-PJ-Python file")
-            PJ_CMD.append("{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH))
+            PJ_CMD.append(
+                "{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH)
+            )
 
         else:
             PJ_CMD.append("# Install QCG-PJ in user's home space")
@@ -1280,25 +1322,33 @@ def install_packages(venv: bool = "False"):
         venv (str, optional): `True` means the VirtualEnv is already installed
             in the remote machine
     """
-    applications_yml_file = os.path.join(env.fabsim_root, "deploy", "applications.yml")
+    applications_yml_file = os.path.join(
+        env.fabsim_root, "deploy", "applications.yml"
+    )
     user_applications_yml_file = os.path.join(
         env.fabsim_root, "deploy", "applications_user.yml"
     )
     if not os.path.exists(user_applications_yml_file):
         copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(open(user_applications_yml_file), Loader=yaml.SafeLoader)
+    config = yaml.load(
+        open(user_applications_yml_file), Loader=yaml.SafeLoader
+    )
 
     tmp_app_dir = "{}/tmp_app".format(env.localroot)
     local("mkdir -p {}".format(tmp_app_dir))
 
     for dep in config["packages"]:
-        local("pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep))
+        local(
+            "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
+        )
     add_dep_list_compressed = sorted(
         Path(tmp_app_dir).iterdir(), key=lambda f: f.stat().st_mtime
     )
     for it in range(len(add_dep_list_compressed)):
-        add_dep_list_compressed[it] = os.path.basename(add_dep_list_compressed[it])
+        add_dep_list_compressed[it] = os.path.basename(
+            add_dep_list_compressed[it]
+        )
 
     # Create  directory in the remote machine to store dependency packages
     run(template("mkdir -p {}".format(env.app_repository)))
@@ -1399,14 +1449,18 @@ def install_app(name="", external_connexion="no", venv="False"):
     Install a specific Application through FasbSim3
 
     """
-    applications_yml_file = os.path.join(env.fabsim_root, "deploy", "applications.yml")
+    applications_yml_file = os.path.join(
+        env.fabsim_root, "deploy", "applications.yml"
+    )
     user_applications_yml_file = os.path.join(
         env.fabsim_root, "deploy", "applications_user.yml"
     )
     if not os.path.exists(user_applications_yml_file):
         copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(open(user_applications_yml_file), Loader=yaml.SafeLoader)
+    config = yaml.load(
+        open(user_applications_yml_file), Loader=yaml.SafeLoader
+    )
     info = config[name]
 
     # Offline cluster installation - --user install
@@ -1428,12 +1482,16 @@ def install_app(name="", external_connexion="no", venv="False"):
 
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
-        local("pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep))
+        local(
+            "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
+        )
     add_dep_list_compressed = sorted(
         Path(tmp_app_dir).iterdir(), key=lambda f: f.stat().st_mtime
     )
     for it in range(len(add_dep_list_compressed)):
-        add_dep_list_compressed[it] = os.path.basename(add_dep_list_compressed[it])
+        add_dep_list_compressed[it] = os.path.basename(
+            add_dep_list_compressed[it]
+        )
 
     # Download all the dependencies of the application
     # This first method should download all the dependencies needed
