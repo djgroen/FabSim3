@@ -628,6 +628,7 @@ def job(*job_args):
                 ),
             )
     else:
+        args["replica_start_number"] = env.replica_start_number
         POOL.add_task(func=job_preparation, func_args=args)
 
     print("Submit tasks to multiprocessingPool : done ...")
@@ -702,9 +703,9 @@ def job_preparation(*job_args):
 
     return_job_scripts = []
 
-    print(env)
+    # print(env)
 
-    sys.exit()
+    # sys.exit()
 
     for i in range(
         args["replica_start_number"], int(env.replicas) + args["replica_start_number"]
