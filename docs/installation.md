@@ -1,3 +1,10 @@
+## Introduction
+
+**FabSim3 is an automation toolkit that is normally installed on your local
+machine** (e.g. laptop or desktop). It requires a Linux-like environment, and
+has been used extensively on e.g. Ubuntu And Mac OS X. If you wish to use
+FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
+
 ## Dependencies
 
 1. FabSim3 requires the following Python modules
