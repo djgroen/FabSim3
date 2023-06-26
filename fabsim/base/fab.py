@@ -1173,10 +1173,13 @@ def run_ensemble(
         sweepdir_items = os.listdir(sweep_dir)
         if len(upscale) > 0:
             upscale = upscale.split(";")
-            print("upscale: ", upscale)
-            print("sweepdir_items: ", sweepdir_items)
 
-            sweepdir_items = upscale
+            if set(upscale).issubset(set(sweepdir_items)):
+                sweepdir_items = upscale
+            else:
+                raise RuntimeError(
+                    f"ERROR: upscale item: {set(upscale) - set(sweepdir_items)} not found in SWEEP folder"
+                )
     else:
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
