@@ -1117,6 +1117,7 @@ def run_ensemble(
     sweep_dir: str,
     sweep_on_remote: Optional[bool] = False,
     execute_put_configs: Optional[bool] = True,
+    upscale: str = "",
     **args
 ) -> None:
     """
@@ -1170,6 +1171,12 @@ def run_ensemble(
 
     if sweep_on_remote is False:
         sweepdir_items = os.listdir(sweep_dir)
+        if len(upscale) > 0:
+            upscale = upscale.split(";")
+            print("upscale: ", upscale)
+            print("sweepdir_items: ", sweepdir_items)
+
+            sweepdir_items = upscale
     else:
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
