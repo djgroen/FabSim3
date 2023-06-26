@@ -626,12 +626,18 @@ def job(*job_args):
     )
 
     print("Submit tasks to multiprocessingPool : start ...")
+
+    if "replica_start_number" in args:
+        env.replica_start_number = int(args["replica_start_number"])
+    else:
+        env.replica_start_number = 1
+
     if env.ensemble_mode is True:
         for task_label in env.sweepdir_items:
             POOL.add_task(
                 func=job_preparation,
                 func_args=dict(
-                    ensemble_mode=env.ensemble_mode, label=task_label
+                    ensemble_mode=env.ensemble_mode, label=task_label, replica_start_number=env.replica_start_number
                 ),
             )
     else:
@@ -714,15 +720,10 @@ def job_preparation(*job_args):
     else:
         env.label = ""
 
-    if "replica_start_number" in args:
-        env.replica_start_number = int(args["replica_start_number"])
-    else:
-        env.replica_start_number = 1
-
     return_job_scripts = []
 
     for i in range(
-        env.replica_start_number, int(env.replicas) + env.replica_start_number
+        args["replica_start_number"], int(env.replicas) + args["replica_start_number"]
     ):
         env.replica_number = i
 
@@ -1118,6 +1119,7 @@ def run_ensemble(
     sweep_on_remote: Optional[bool] = False,
     execute_put_configs: Optional[bool] = True,
     upscale: str = "",
+    replica_start_number: str = "1",
     **args
 ) -> None:
     """
@@ -1200,13 +1202,14 @@ def run_ensemble(
 
     if execute_put_configs is True:
         execute(put_configs, config)
-
+    
     # output['everything'] = False
     job_scripts_to_submit = job(
         dict(
             ensemble_mode=True,
             sweepdir_items=sweepdir_items,
             sweep_dir=sweep_dir,
+            replica_start_number=replica_start_number,
         )
     )
 
