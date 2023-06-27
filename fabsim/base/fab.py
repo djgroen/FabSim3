@@ -579,7 +579,6 @@ def job(*job_args):
             "Function with_config did NOT called, "
             "Please call it before calling job()"
         )
-        # sys.exit()
 
     update_environment(args)
     #   Add label, mem, core to env.
@@ -626,18 +625,28 @@ def job(*job_args):
     print("Submit tasks to multiprocessingPool : start ...")
 
     if "replica_start_number" in args:
-        env.replica_start_number = int(args["replica_start_number"])
+        if isinstance(args["replica_start_number"], list):
+            env.replica_start_number = list(
+                int(x) for x in args["replica_start_number"]
+                )
+        else:
+            env.replica_start_number = int(args["replica_start_number"])
     else:
         env.replica_start_number = 1
 
     if env.ensemble_mode is True:
-        for task_label in env.sweepdir_items:
+        for index, task_label in enumerate(env.sweepdir_items):
+            if isinstance(env.replica_start_number, list):
+                replica_start_number = env.replica_start_number[index]
+            else:
+                replica_start_number = env.replica_start_number
+
             POOL.add_task(
                 func=job_preparation,
                 func_args=dict(
                     ensemble_mode=env.ensemble_mode,
                     label=task_label,
-                    replica_start_number=env.replica_start_number,
+                    replica_start_number=replica_start_number,
                 ),
             )
     else:
@@ -722,10 +731,6 @@ def job_preparation(*job_args):
         env.label = ""
 
     return_job_scripts = []
-
-    # print(env)
-
-    # sys.exit()
 
     for i in range(
         args["replica_start_number"],
@@ -1157,6 +1162,12 @@ def run_ensemble(
     """
     update_environment(args)
 
+    if ";" in replica_start_number:
+        raise NotImplementedError(
+            "Multiple replica_start_numbers are " 
+            "not yet implemented for end users."
+        )
+
     if "script" not in env:
         raise RuntimeError(
             "ERROR: run_ensemble function has been called,"
@@ -1181,6 +1192,12 @@ def run_ensemble(
         sweepdir_items = os.listdir(sweep_dir)
         if len(upscale) > 0:
             upscale = upscale.split(";")
+
+            if len(upscale) != len(replica_start_number):
+                raise RuntimeError(
+                    "ERROR: length of upscale and replica_start_number "
+                    "should be equal"
+                )
 
             if set(upscale).issubset(set(sweepdir_items)):
                 sweepdir_items = upscale
