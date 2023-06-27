@@ -27,3 +27,5 @@ fabsim/deploy/applications_user.yml
 **/.DS_Store
 
 .hypothesis/
+
+.vscode/
