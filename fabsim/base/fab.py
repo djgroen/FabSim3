@@ -1200,10 +1200,6 @@ def run_ensemble(
 
             replica_start_number = list(count_folders(path, dir) + 1 for dir in upscale)
 
-            print(replica_start_number)
-
-            # sys.exit()
-
             if set(upscale).issubset(set(sweepdir_items)):
                 sweepdir_items = upscale
             else:
