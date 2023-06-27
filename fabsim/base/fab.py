@@ -628,7 +628,7 @@ def job(*job_args):
         if isinstance(args["replica_start_number"], list):
             env.replica_start_number = list(
                 int(x) for x in args["replica_start_number"]
-                )
+            )
         else:
             env.replica_start_number = int(args["replica_start_number"])
     else:
