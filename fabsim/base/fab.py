@@ -1164,7 +1164,7 @@ def run_ensemble(
 
     if ";" in replica_start_number:
         raise NotImplementedError(
-            "Multiple replica_start_numbers are "
+            "Multiple replica_start_numbers are"
             "not yet implemented for end users."
         )
 
