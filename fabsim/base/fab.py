@@ -1193,11 +1193,16 @@ def run_ensemble(
         if len(upscale) > 0:
             upscale = upscale.split(";")
 
-            if len(upscale) != len(replica_start_number):
-                raise RuntimeError(
-                    "ERROR: length of upscale and replica_start_number "
-                    "should be equal"
-                )
+            folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
+            path = os.path.join(env.results_path, folder_name, "RUNS")
+            print(env)
+            print(path)
+
+            replica_start_number = list(count_folders(path, dir) + 1 for dir in upscale)
+
+            print(replica_start_number)
+
+            # sys.exit()
 
             if set(upscale).issubset(set(sweepdir_items)):
                 sweepdir_items = upscale
