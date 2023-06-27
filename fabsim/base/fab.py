@@ -1656,6 +1656,7 @@ def install_app(name="", external_connexion="no", venv="False"):
 
     local("rm -rf {}".format(tmp_app_dir))
 
+
 def count_folders(dir_path: str, prefix: str):
     """
     Count the number of folders in a path that match a pattern
