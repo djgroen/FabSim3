@@ -1655,3 +1655,10 @@ def install_app(name="", external_connexion="no", venv="False"):
     run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
     local("rm -rf {}".format(tmp_app_dir))
+
+def count_folders(dir_path: str, prefix: str):
+    """
+    Count the number of folders in a path that match a pattern
+    """
+    dirs = os.listdir(dir_path)
+    return len([d for d in dirs if d.startswith(prefix)])
