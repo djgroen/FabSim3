@@ -158,6 +158,10 @@ def fetch_results(
             )
         )
 
+    if debug:
+        print("The current env variables are:")
+        print(env)
+
 
 @task
 @beartype
