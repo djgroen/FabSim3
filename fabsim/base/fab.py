@@ -165,7 +165,7 @@ def fetch_results(
 
 @task
 @beartype
-def fetch_configs(config: str) -> None:
+def fetch_configs(configs: str) -> None:
     """
     Fetch config files from the remote machine, via `rsync`.
 
@@ -178,7 +178,7 @@ def fetch_configs(config: str) -> None:
     Args:
         config (str): the name of config directory
     """
-    with_config(config)
+    with_config(configs)
     if env.manual_gsissh:
         local(
             template(
@@ -210,23 +210,23 @@ def clear_results(name: str) -> None:
 
 
 @beartype
-def execute(task: Callable, *args, **kwargs) -> None:
+def execute(task_function: Callable, *args, **kwargs) -> None:
     """
     Execute a task (callable function).
-    The input arg `task` can be an actual callable function or its name.
+    The input arg `task_function` can be an actual callable function or its name.
 
     The target function can be warped by @task or not.
 
     """
     f_globals = inspect.stack()[1][0].f_globals
-    if callable(task):
-        task(*args, **kwargs)
-    elif task in f_globals:
-        f_globals[task](*args, **kwargs)
+    if callable(task_function):
+        task_function(*args, **kwargs)
+    elif task_function in f_globals:
+        f_globals[task_function](*args, **kwargs)
     else:
         msg = (
-            f"The request task [green3]{task}[/green3] passed to execute() "
-            "function can not be found !!!"
+            f"The request task [green3]{task_function}[/green3] "
+            "passed to execute() function can not be found !!!"
         )
         console = Console()
         console.print(
@@ -240,14 +240,14 @@ def execute(task: Callable, *args, **kwargs) -> None:
 
 
 @beartype
-def put_configs(config: str) -> None:
+def put_configs(configs: str) -> None:
     """
     Transfer config files to the remote machine, via `rsync`.
 
     Args:
-        config (str): Specify a config directory
+        configs (str): Specify a config directory
     """
-    with_config(config)
+    with_config(configs)
 
     # by using get_setup_fabsim_dirs_string(), the FabSim3 directories will
     # created automatically whenever a config file is uploaded.
@@ -343,7 +343,7 @@ def calc_total_mem() -> None:
     mem_size = int(re.findall("\\d+", str(env.memory))[0])
     try:
         mem_unit_str = re.findall("[a-zA-Z]+", str(env.memory))[0]
-    except Exception:
+    except IndexError:
         mem_unit_str = ""
 
     if mem_unit_str.upper() == "GB" or mem_unit_str.upper() == "G":
@@ -360,7 +360,7 @@ def calc_total_mem() -> None:
 
 @beartype
 def find_config_file_path(
-    name: str, ExceptWhenNotFound: Optional[bool] = True
+    name: str, except_when_not_found: Optional[bool] = True
 ) -> str:
     """
     Find the config file path
@@ -395,7 +395,7 @@ def find_config_file_path(
                 expand=False,
             )
         )
-        exit()
+        sys.exit()
 
     path_used = None
     for p in env.local_config_file_path:
@@ -404,14 +404,15 @@ def find_config_file_path(
             path_used = config_file_path
 
     if path_used is None:
-        if ExceptWhenNotFound:
-            raise Exception(
-                "Error: config file directory '{}' "
-                "not found in: ".format(name),
+        if except_when_not_found:
+            raise FileNotFoundError(
+                f"Error: config file directory '{name}' "
+                "not found in: ",
                 env.local_config_file_path,
             )
-        else:
-            return False
+
+        return False
+
     return path_used
 
 
@@ -755,7 +756,7 @@ def job_preparation(*job_args):
             env.results_path, env.tmp_results_path
         )
 
-        env["job_name"] = env.name[0 : env.max_job_name_chars]
+        env["job_name"] = env.name[:env.max_job_name_chars]
         complete_environment()
 
         env.run_command = template(env.run_command)
