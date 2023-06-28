@@ -213,7 +213,8 @@ def clear_results(name: str) -> None:
 def execute(task_function: Callable, *args, **kwargs) -> None:
     """
     Execute a task (callable function).
-    The input arg `task_function` can be an actual callable function or its name.
+    The input arg `task_function` can be an actual callable function or its
+    name.
 
     The target function can be warped by @task or not.
 
@@ -398,8 +399,8 @@ def find_config_file_path(
         sys.exit()
 
     path_used = None
-    for p in env.local_config_file_path:
-        config_file_path = os.path.join(p, name)
+    for file_path in env.local_config_file_path:
+        config_file_path = os.path.join(file_path, name)
         if os.path.exists(config_file_path):
             path_used = config_file_path
 
@@ -443,7 +444,7 @@ def with_config(name: str):
         env.job_config_path_local, "*"
     )
     # name of the job sh submission script.
-    env.job_name_template_sh = template("{}.sh".format(env.job_name_template))
+    env.job_name_template_sh = template(f"{env.job_name_template}.sh")
 
 
 @beartype
