@@ -532,7 +532,7 @@ def with_job(
     else:
         results_path_name = env.pather.join(env.results_path, name)
         job_results = f"{results_path_name}/RUNS/{label}"
-        local_path_name =  os.path.join(env.local_results, name)
+        local_path_name = os.path.join(env.local_results, name)
         job_results_local = f"{local_path_name}/RUNS/{label}"
 
     env.job_results_contents = env.pather.join(job_results, "*")
