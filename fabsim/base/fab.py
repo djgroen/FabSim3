@@ -1441,6 +1441,10 @@ def install_packages(venv: bool = "False"):
     put(env.job_script, env.dest_name)
     #
     run(template("mkdir -p $job_results"))
+
+    if not hasattr(env, "job_dispatch"):
+        env.job_dispatch = ""
+
     with cd(env.pather.dirname(env.job_results)):
         run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
