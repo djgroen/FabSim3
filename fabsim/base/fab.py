@@ -530,21 +530,19 @@ def with_job(
         job_results = env.pather.join(env.results_path, name)
         job_results_local = os.path.join(env.local_results, name)
     else:
-        job_results = "{}/RUNS/{}".format(
-            env.pather.join(env.results_path, name), label
-        )
-        job_results_local = "{}/RUNS/{}".format(
-            os.path.join(env.local_results, name), label
-        )
+        results_path_name = env.pather.join(env.results_path, name)
+        job_results = f"{results_path_name}/RUNS/{label}"
+        local_path_name =  os.path.join(env.local_results, name)
+        job_results_local = f"{local_path_name}/RUNS/{label}"
 
     env.job_results_contents = env.pather.join(job_results, "*")
     env.job_results_contents_local = os.path.join(job_results_local, "*")
 
     # Template name is now depending of the label of the job when needed
     if label is not None:
-        env.job_name_template_sh = "{}_{}.sh".format(name, label)
+        env.job_name_template_sh = f"{name}_{label}.sh"
     else:
-        env.job_name_template_sh = "{}.sh".format(name)
+        env.job_name_template_sh = f"{name}.sh"
 
     return job_results, job_results_local
 
