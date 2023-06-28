@@ -1,3 +1,7 @@
+"""Main module of fabsim."""
+
+# pylint: disable=too-many-lines
+
 import math
 import os
 import re
