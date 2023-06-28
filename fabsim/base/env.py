@@ -1,10 +1,12 @@
+"""Environment variable for FabSim3."""
+# pylint: disable=invalid-name
+# pylint: disable=import-outside-toplevel
+
 import getpass
 import io
 import os
 import posixpath
-from io import StringIO
 
-from rich import pretty, traceback
 from rich.console import Console
 from rich.table import Table, box
 
@@ -29,7 +31,7 @@ class _lookupDict(dict):
             return self[key]
         except KeyError:
             # to conform with __getattr__ spec
-            raise AttributeError(key)
+            raise AttributeError(key)  # pylint: disable=raise-missing-from
 
     def __setattr__(self, key, value):
         self[key] = value
@@ -50,7 +52,7 @@ class _lookupDict(dict):
         table.add_column("Variables", style="blue")
         table.add_column("Value", style="magenta")
         for key, value in self.items():
-            table.add_row(key, "{}".format(value))
+            table.add_row(key, f"{value}")
         # console = Console()
         # console.print(table)
         f = io.StringIO()
