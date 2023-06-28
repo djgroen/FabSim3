@@ -1303,22 +1303,6 @@ def run_ensemble(
         env.NoEnvScript = False
 
 
-def input_to_range(arg, default):
-    ttype = type(default)
-    # regexp for a array generator like [1.2:3:0.2]
-    gen_regexp = r"\[([\d\.]+):([\d\.]+):([\d\.]+)\]"
-    if not arg:
-        return [default]
-    match = re.match(gen_regexp, str(arg))
-    if match:
-        vals = list(map(ttype, match.groups()))
-        if ttype == int:
-            return range(*vals)
-        else:
-            return np.arange(*vals)
-    return [ttype(arg)]
-
-
 @task
 def install_packages(venv: bool = "False"):
     """
