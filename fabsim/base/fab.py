@@ -1169,12 +1169,10 @@ def run_ensemble(
             upscale = upscale.split(";")
 
             folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
-            path = os.path.join(env.results_path, folder_name, "RUNS")
-            print(env)
-            print(path)
+            pathname = os.path.join(env.results_path, folder_name, "RUNS")
 
             replica_start_number = list(
-                count_folders(path, dir) + 1 for dir in upscale
+                count_folders(pathname, dir) + 1 for dir in upscale
             )
 
             if set(upscale).issubset(set(sweepdir_items)):
@@ -1187,13 +1185,11 @@ def run_ensemble(
     else:
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
-        sweepdir_items = run("ls -1 {}".format(sweep_dir)).splitlines()
+        sweepdir_items = run(f"ls -1 {sweep_dir}").splitlines()
     print("reading SWEEP folder from remote machine")
     if len(sweepdir_items) == 0:
         raise RuntimeError(
-            "ERROR: no files where found in the sweep_dir : {}".format(
-                sweep_dir
-            )
+            f"ERROR: no files where found in the sweep_dir : {sweep_dir}"
         )
 
     # reorder an exec_first item for priority execution.
@@ -1251,29 +1247,27 @@ def run_ensemble(
         env.batch_header = env.PJ_header
         env.submit_job = True
         # load QCG-PJ-PY file
-        PJ_CMD = []
+        pj_cmd = []
         if hasattr(env, "venv") and str(env.venv).lower() == "true":
             # QCG-PJ should load from virtualenv
-            PJ_CMD.append("# unload any previous loaded python module")
-            PJ_CMD.append("module unload python\n")
-            PJ_CMD.append("# load QCG-PilotJob from VirtualEnv")
-            PJ_CMD.append(
-                'eval "$({}/bin/conda shell.bash hook)"\n'.format(
-                    env.virtual_env_path
-                )
+            pj_cmd.append("# unload any previous loaded python module")
+            pj_cmd.append("module unload python\n")
+            pj_cmd.append("# load QCG-PilotJob from VirtualEnv")
+            pj_cmd.append(
+                f'eval "$({env.virtual_env_path}/bin/conda shell.bash hook)"\n'
             )
-            PJ_CMD.append("# load QCG-PJ-Python file")
-            PJ_CMD.append(
-                "{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH)
+            pj_cmd.append("# load QCG-PJ-Python file")
+            pj_cmd.append(
+                f"{env.virtual_env_path}/bin/python3 {env.PJ_PATH}"
             )
 
         else:
-            PJ_CMD.append("# Install QCG-PJ in user's home space")
-            PJ_CMD.append("pip3 install --user --upgrade  qcg-pilotjob\n")
-            PJ_CMD.append("# load QCG-PJ-Python file")
-            PJ_CMD.append("python3 {}".format(env.PJ_PATH))
+            pj_cmd.append("# Install QCG-PJ in user's home space")
+            pj_cmd.append("pip3 install --user --upgrade  qcg-pilotjob\n")
+            pj_cmd.append("# load QCG-PJ-Python file")
+            pj_cmd.append(f"python3 {env.PJ_PATH}")
 
-        env.run_QCG_PilotJob = "\n".join(PJ_CMD)
+        env.run_QCG_PilotJob = "\n".join(pj_cmd)
         job(dict(ensemble_mode=False, label="PJ_header", NoEnvScript=True))
         env.batch_header = backup_header
         env.NoEnvScript = False
@@ -1311,14 +1305,15 @@ def install_packages(venv: bool = "False"):
     if not os.path.exists(user_applications_yml_file):
         copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(
-        open(user_applications_yml_file), Loader=yaml.SafeLoader
+    configs = yaml.load(
+        open(user_applications_yml_file, encoding="utf-8"),
+        Loader=yaml.SafeLoader
     )
 
     tmp_app_dir = "{}/tmp_app".format(env.localroot)
     local("mkdir -p {}".format(tmp_app_dir))
 
-    for dep in config["packages"]:
+    for dep in configs["packages"]:
         local(
             "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
         )
