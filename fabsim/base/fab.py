@@ -596,6 +596,7 @@ def job(*job_args):
     ########################################################
     #  temporary folder to save job files/folders/scripts  #
     ########################################################
+    #pylint: disable=protected-access
     env.tmp_work_path = env.pather.join(
         tempfile._get_default_tempdir(),
         next(tempfile._get_candidate_names()),
@@ -611,12 +612,12 @@ def job(*job_args):
     os.makedirs(env.tmp_scripts_path)
     os.makedirs(env.tmp_results_path)
 
-    POOL = MultiProcessingPool(PoolSize=int(env.nb_process))
+    pool = MultiProcessingPool(PoolSize=int(env.nb_process))
 
     #####################################
     #       job preparation phase       #
     #####################################
-    msg = "tmp_work_path = {}".format(env.tmp_work_path)
+    msg = f"tmp_work_path = {env.tmp_work_path}"
     rich_print(
         Panel.fit(
             msg,
@@ -644,7 +645,7 @@ def job(*job_args):
             else:
                 replica_start_number = env.replica_start_number
 
-            POOL.add_task(
+            pool.add_task(
                 func=job_preparation,
                 func_args=dict(
                     ensemble_mode=env.ensemble_mode,
@@ -654,19 +655,19 @@ def job(*job_args):
             )
     else:
         args["replica_start_number"] = env.replica_start_number
-        POOL.add_task(func=job_preparation, func_args=args)
+        pool.add_task(func=job_preparation, func_args=args)
 
     print("Submit tasks to multiprocessingPool : done ...")
-    job_scripts_to_submit = POOL.wait_for_tasks()
+    job_scripts_to_submit = pool.wait_for_tasks()
 
     #####################################
     #       job transmission phase      #
     #####################################
     msg = (
         "Copy all generated files/folder from\n"
-        "tmp_work_path = {}\n"
+        f"tmp_work_path = {env.tmp_work_path}\n"
         "to\n"
-        "work_path = {}".format(env.tmp_work_path, env.work_path)
+        f"work_path = {env.work_path}"
     )
     rich_print(
         Panel.fit(
@@ -703,12 +704,10 @@ def job(*job_args):
             for job_script in job_scripts_to_submit:
                 job_submission(dict(job_script=job_script))
             print(
-                "submitted job script = \n{}".format(
-                    pformat(job_scripts_to_submit)
-                )
+                f"submitted job script = \n{pformat(job_scripts_to_submit)}"
             )
 
-    # POOL.shutdown_threads()
+    # pool.shutdown_threads()
 
     return job_scripts_to_submit
 
@@ -815,10 +814,9 @@ def job_preparation(*job_args):
 
         # Add target job script to return list
 
-        """
-        return_job_scripts.append(env.pather.join(env.scripts_path,
-                                               dst_script_name)
-        """
+        # return_job_scripts.append(env.pather.join(env.scripts_path,
+        #                                        dst_script_name)
+
         # here, instead of returning PATH to script folder, it is better to
         # submit script from results_path folder, specially in case of PJ job
         return_job_scripts.append(
