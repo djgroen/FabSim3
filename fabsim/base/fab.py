@@ -596,7 +596,7 @@ def job(*job_args):
     ########################################################
     #  temporary folder to save job files/folders/scripts  #
     ########################################################
-    #pylint: disable=protected-access
+    # pylint: disable=protected-access
     env.tmp_work_path = env.pather.join(
         tempfile._get_default_tempdir(),
         next(tempfile._get_candidate_names()),
@@ -763,28 +763,25 @@ def job_preparation(*job_args):
             env.run_prefix += (
                 "\n\n"
                 "# copy files from config folder\n"
-                "config_dir={}\n"
+                f"config_dir={env.job_config_path}\n"
                 "rsync -pthrvz --inplace --exclude SWEEP "
-                "$config_dir/* .".format(env.job_config_path)
+                "$config_dir/* ."
             )
 
         if env.ensemble_mode:
             env.run_prefix += (
                 "\n\n"
                 "# copy files from SWEEP folder\n"
-                "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(
-                    env.label
-                )
+                f"rsync -pthrvz --inplace $config_dir/SWEEP/{env.label}/ ."
             )
 
         if not (hasattr(env, "venv") and str(env.venv).lower() == "true"):
             if hasattr(env, "py_pkg") and len(env.py_pkg) > 0:
+                str_pkg = " ".join(pkg for pkg in env.py_pkg)
                 env.run_prefix += (
                     "\n\n"
                     "# Install requested python packages\n"
-                    "pip3 install --user --upgrade {}".format(
-                        " ".join(pkg for pkg in env.py_pkg)
-                    )
+                    f"pip3 install --user --upgrade {str_pkg}"
                 )
 
         # this is a tricky situation,
@@ -838,7 +835,8 @@ def job_preparation(*job_args):
         # job_results_contents
         # job_results_contents_local
         with open(
-            env.pather.join(tmp_job_results, "env.yml"), "w"
+            env.pather.join(tmp_job_results, "env.yml"), "w",
+            encoding="utf-8",
         ) as env_yml_file:
             yaml.dump(
                 dict(
@@ -882,47 +880,34 @@ def job_transmission(*job_args):
         # Note: there is another option, using perl which is much faster than
         #       rsync -a --delete, but I am not sure if we can use it on
         #       all HPC resources
-        empty_folder = "/tmp/{}".format(next(tempfile._get_candidate_names()))
+
+        # pylint: disable=protected-access
+        empty_folder = f"/tmp/{next(tempfile._get_candidate_names())}"
         results_dir_items = os.listdir(env.tmp_results_path)
         for results_dir_item in results_dir_items:
             print("empty folder: ", empty_folder)
             print("results_dir_item: ", results_dir_item)
             if env.ssh_monsoon_mode:
                 task_string = template(
-                    "mkdir -p {} && "
-                    "mkdir -p {}/results/{} && "
-                    "rm -rf {}/results/{}/*".format(
-                        empty_folder,
-                        env.work_path,
-                        results_dir_item,
-                        env.work_path,
-                        results_dir_item,
-                    )
+                    f"mkdir -p {empty_folder} && "
+                    f"mkdir -p {env.work_path}/results/{results_dir_item} && "
+                    f"rm -rf {env.work_path}/results/{results_dir_item}/*"
                 )
 
                 run(
                     template(
-                        "{} ; ssh $remote_compute -C"
-                        "'{}'".format(
-                            task_string,
-                            task_string,
-                        )
+                        f"{task_string} ; ssh $remote_compute -C"
+                        f"'{task_string}'"
                     )
                 )
 
             else:
                 run(
                     template(
-                        "mkdir -p {} && "
-                        "mkdir -p {}/results &&"
-                        "rsync -a --delete --inplace {}/ "
-                        "{}/results/{}/".format(
-                            empty_folder,
-                            env.work_path,
-                            empty_folder,
-                            env.work_path,
-                            results_dir_item,
-                        )
+                        f"mkdir -p {empty_folder} && "
+                        f"mkdir -p {env.work_path}/results &&"
+                        f"rsync -a --delete --inplace {empty_folder}/ "
+                        f"{env.work_path}/results/{results_dir_item}/"
                     )
                 )
 
@@ -942,18 +927,12 @@ def job_transmission(*job_args):
             local(
                 template(
                     "ssh $remote -C "
-                    "'mkdir -p {}' && "
-                    "scp -r {} "
-                    "$username@$remote:{}/../ && "
+                    f"'mkdir -p {sync_dst}' && "
+                    f"scp -r {sync_src} "
+                    f"$username@$remote:{sync_dst}/../ && "
                     "ssh $remote -C "
-                    "'scp -r {} "
-                    "$remote_compute:{}/../'".format(
-                        sync_dst,
-                        sync_src,
-                        sync_dst,
-                        sync_dst,
-                        sync_dst,
-                    )
+                    f"'scp -r {sync_dst} "
+                    f"$remote_compute:{sync_dst}/../'"
                 )
             )
         elif env.manual_sshpass:
@@ -963,7 +942,7 @@ def job_transmission(*job_args):
                 template(
                     "rsync -pthrvz "
                     "--rsh='sshpass -f $sshpass ssh  -p 22  ' "
-                    "{}/ $username@$remote:{}/ ".format(sync_src, sync_dst)
+                    f"{sync_src}/ $username@$remote:{sync_dst}/ "
                 )
             )
         elif env.manual_gsissh:
@@ -971,8 +950,8 @@ def job_transmission(*job_args):
             local(
                 template(
                     "globus-url-copy -p 10 -cd -r -sync "
-                    "file://{}/ "
-                    "gsiftp://$remote/{}/".format(sync_src, sync_dst)
+                    f"file://{sync_src}/ "
+                    f"gsiftp://$remote/{sync_dst}/"
                 )
             )
         else:
@@ -988,8 +967,8 @@ def job_submission(*job_args):
         please make sure to pass the list of job scripts be summited as
         an input to this function
     """
-    CRED = "\33[31m"
-    CEND = "\33[0m"
+    cred = "\33[31m"
+    cend = "\33[0m"
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
@@ -1006,22 +985,20 @@ def job_submission(*job_args):
 
     elif not env.get("noexec", False):
         if env.remote == "localhost":
+            temp = template(f"$job_dispatch {job_script}")
             run(
-                cmd="{} && {}".format(
-                    env.run_prefix,
-                    template("$job_dispatch {}".format(job_script)),
-                ),
+                cmd=f"{env.run_prefix} && {temp}",
                 cd=env.pather.dirname(job_script),
             )
         elif env.ssh_monsoon_mode:
             cmd = template(
                 "ssh $remote_compute "
-                "-C '$job_dispatch {}'".format(job_script)
+                f"-C '$job_dispatch {job_script}'"
             )
             run(cmd, cd=env.pather.dirname(job_script))
         else:
             run(
-                cmd=template("$job_dispatch {}".format(job_script)),
+                cmd=template(f"$job_dispatch {job_script}"),
                 cd=env.pather.dirname(job_script),
             )
 
@@ -1031,9 +1008,9 @@ def job_submission(*job_args):
     # )
     print(
         "Use "
-        + CRED
-        + "fabsim {} fetch_results".format(env.machine_name)
-        + CEND
+        + cred
+        + f"fabsim {env.machine_name} fetch_results"
+        + cend
         + " to copy the results "
         "back to local machine!"
     )
