@@ -120,7 +120,7 @@ def fetch_results(
         includes_files = " ".join(
             [
                 *["--include='*/' "],
-                *["--include='{}' ".format(file) for file in fetch_files],
+                *[f"--include='{file}' " for file in fetch_files],
                 *["--exclude='*'  "],
                 *["--prune-empty-dirs "],
             ]
@@ -135,26 +135,26 @@ def fetch_results(
     if env.manual_sshpass:
         local(
             template(
-                "rsync -pthrvz -e 'sshpass -f $sshpass ssh -p $port' {}"
-                "$username@$remote:$job_results/{}  "
-                "$job_results_local".format(includes_files, regex)
+                "rsync -pthrvz -e "
+                f"'sshpass -f $sshpass ssh -p $port' {includes_files}"
+                f"$username@$remote:$job_results/{regex} $job_results_local"
             )
         )
     elif env.manual_gsissh:
         local(
             template(
-                "globus-url-copy -cd -r -sync {}"
-                "gsiftp://$remote/$job_results/{} "
-                "file://$job_results_local/".format(includes_files, regex)
+                f"globus-url-copy -cd -r -sync {includes_files}"
+                f"gsiftp://$remote/$job_results/{regex} "
+                "file://$job_results_local/"
             )
         )
     else:
         local(
             template(
                 # "rsync -pthrvz --port=$port \
-                "rsync -pthrvz -e 'ssh -p $port' {}"
-                "$username@$remote:$job_results/{} "
-                "$job_results_local".format(includes_files, regex)
+                f"rsync -pthrvz -e 'ssh -p $port' {includes_files}"
+                f"$username@$remote:$job_results/{regex} "
+                "$job_results_local"
             )
         )
 
@@ -225,13 +225,13 @@ def execute(task: Callable, *args, **kwargs) -> None:
         f_globals[task](*args, **kwargs)
     else:
         msg = (
-            "The request task [green3]{}[/green3] passed to execute() "
-            "function can not be found !!!".format(task)
+            f"The request task [green3]{task}[/green3] passed to execute() "
+            "function can not be found !!!"
         )
         console = Console()
         console.print(
             Panel(
-                "{}".format(msg),
+                f"{msg}",
                 title="[red1]Error[/red1]",
                 border_style="red1",
                 expand=False,
@@ -254,9 +254,7 @@ def put_configs(config: str) -> None:
 
     run(
         template(
-            "{}; mkdir -p $job_config_path".format(
-                get_setup_fabsim_dirs_string()
-            )
+            f"{get_setup_fabsim_dirs_string()}; mkdir -p $job_config_path"
         )
     )
 
@@ -388,12 +386,10 @@ def find_config_file_path(
 
         solution = "localhost:\n"
         solution += "   ...\n"
-        solution += '   home_path_template: "{}/localhost_exe"'.format(
-            env.localroot
-        )
+        solution += f'   home_path_template: "{env.localroot}/localhost_exe"'
         rich_print(
             Panel(
-                "{}[green3]{}[/green3]".format(msg, solution),
+                f"{msg}[green3]{solution}[/green3]",
                 title="[red1]Error[/red1]",
                 border_style="red1",
                 expand=False,
@@ -759,7 +755,7 @@ def job_preparation(*job_args):
             env.results_path, env.tmp_results_path
         )
 
-        env["job_name"] = env.name[0: env.max_job_name_chars]
+        env["job_name"] = env.name[0 : env.max_job_name_chars]
         complete_environment()
 
         env.run_command = template(env.run_command)
@@ -1050,7 +1046,7 @@ def job_submission(*job_args):
 @task
 @beartype
 def ensemble2campaign(
-    results_dir: str, campaign_dir: str, skip: Optional[Union[int, str]]=0
+    results_dir: str, campaign_dir: str, skip: Optional[Union[int, str]] = 0
 ) -> None:
     """
     Converts FabSim3 ensemble results to EasyVVUQ campaign definition.
@@ -1084,7 +1080,7 @@ def ensemble2campaign(
 @task
 @beartype
 def campaign2ensemble(
-    config: str, campaign_dir: str, skip: Optional[Union[int, str]]=0
+    config: str, campaign_dir: str, skip: Optional[Union[int, str]] = 0
 ) -> None:
     """
     Converts an EasyVVUQ campaign run set TO a FabSim3 ensemble definition.
@@ -1205,8 +1201,9 @@ def run_ensemble(
             print(env)
             print(path)
 
-            replica_start_number = list(count_folders(path, dir) + 1
-                                        for dir in upscale)
+            replica_start_number = list(
+                count_folders(path, dir) + 1 for dir in upscale
+            )
 
             if set(upscale).issubset(set(sweepdir_items)):
                 sweepdir_items = upscale
