@@ -11,10 +11,9 @@ from beartype.typing import Callable, Optional, Tuple, Union
 from rich import print as rich_print
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table, box
 
 # from fabsim.base.utils import add_prefix, print_prefix
-from fabsim.base.decorators import load_plugin_env_vars, task
+from fabsim.base.decorators import task
 from fabsim.base.env import env
 from fabsim.base.manage_remote_job import *
 from fabsim.base.MultiProcessingPool import MultiProcessingPool
