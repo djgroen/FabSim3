@@ -62,13 +62,15 @@ This function transfers config files to the target machine (local and remote res
 #### **`job(args)`**
 This is an internal low-level job launcher. It will submit a single job to the target machine (local and remote resources). All required parameters for the job are determined from the prepared fabric environment.
 
-#### **`run_ensemble(config, sweep_dir,sweep_on_remote=False, execute_put_configs=True, **args)`**
+#### **`run_ensemble(config, sweep_dir, sweep_on_remote, execute_put_configs, upscale, replica_start_number, **args,)`**
 This function maps and submits an ensemble job to the target machine. For each listed directory from sweep folder, an individual job will be submitted. The input arguments are:
 
 * `config`: the input config folder name;
 * `sweep_dir`: the PATH to the sweep directory;
 * `sweep_on_remote` (optional): this flag indicates if you sweep directory located on your local machine or is saved on remote machine. By default is `#!python False`;
 * `execute_put_configs` (optional): this flag transfers all config files to the remote machine. In case of having config files on the remote machine, these arguments should be set to `#!python False`, to avoid overwriting config files.
+* `upsample` (optional): list of subdirectories in the `sweepdir` to be upsampled. This flag, if provided, performs ensemble runs for the specified subset of directories while keeping the previous ensemble runs.
+* `replica_start_number` (optional): the starting point of replica numbering. Defaults to 1.
 
 #### **`find_config_file_path(config_name)`**
 Returns the PATH of input config_name in your plugin.
