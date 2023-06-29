@@ -110,29 +110,3 @@ FabUQCampaign is a FabSim3 plugin for a climate modelling. It used to run an ens
 	* FabUQCampaign 2D ocean model documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/Tutorial_ocean.md)
 
 
-### FabDummy testing on localhost
-
-#### FabDummy Plugin Installation
-Open a terminal, and simply type:
-```sh
-fabsim localhost install_plugin:FabDummy
-```
-!!! info
-	FabDummy plugin will be downloaded under `FabSim3/plugins/FabDummy`.
-
-#### Testing
-1. To run a dummy job, type:
-```sh
-fabsim localhost dummy:dummy_test
-```
-2. To run an ensemble of dummy jobs, type:
-```sh
-fabsim localhost dummy_ensemble:dummy_test
-```
-3. For both cases, i.e. a single dummy job or an ensemble of dummy jobs, you can fetch the results by using:
-```sh
-fabsim localhost fetch_results
-```
-
-For more advanced testing features, please refer to the FabDummy tutorial at <https://github.com/djgroen/FabDummy/blob/master/README.md>.
-

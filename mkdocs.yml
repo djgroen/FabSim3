@@ -183,6 +183,7 @@ nav:
     - Home:
       - Introduction: index.md
       - Installation: installation.md
+      - Testing: testing.md
       - Plugins: plugins.md
       - Create new plugin: create_new_plugin.md
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
