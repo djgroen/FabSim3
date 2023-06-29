@@ -46,11 +46,9 @@ def get_plugin_path(name: str) -> str:
     plugin_path = os.path.join(env.localroot, "plugins", name)
     if not os.path.exists(plugin_path):
         raise RuntimeError(
-            "The requested plugin {} does not exist ({}).\n"
+            f"The requested plugin {name} does not exist ({plugin_path}).\n"
             "you can install it by typing:\n\t"
-            "fabsim localhost install_plugin:{}".format(
-                name, plugin_path, name
-            )
+            f"fabsim localhost install_plugin:{name}"
         )
     return plugin_path
 
@@ -581,7 +579,6 @@ def job(*job_args):
             "Function with_config did NOT called, "
             "Please call it before calling job()"
         )
-        # sys.exit()
 
     update_environment(args)
     #   Add label, mem, core to env.
@@ -626,15 +623,34 @@ def job(*job_args):
     )
 
     print("Submit tasks to multiprocessingPool : start ...")
+
+    if "replica_start_number" in args:
+        if isinstance(args["replica_start_number"], list):
+            env.replica_start_number = list(
+                int(x) for x in args["replica_start_number"]
+            )
+        else:
+            env.replica_start_number = int(args["replica_start_number"])
+    else:
+        env.replica_start_number = 1
+
     if env.ensemble_mode is True:
-        for task_label in env.sweepdir_items:
+        for index, task_label in enumerate(env.sweepdir_items):
+            if isinstance(env.replica_start_number, list):
+                replica_start_number = env.replica_start_number[index]
+            else:
+                replica_start_number = env.replica_start_number
+
             POOL.add_task(
                 func=job_preparation,
                 func_args=dict(
-                    ensemble_mode=env.ensemble_mode, label=task_label
+                    ensemble_mode=env.ensemble_mode,
+                    label=task_label,
+                    replica_start_number=replica_start_number,
                 ),
             )
     else:
+        args["replica_start_number"] = env.replica_start_number
         POOL.add_task(func=job_preparation, func_args=args)
 
     print("Submit tasks to multiprocessingPool : done ...")
@@ -714,15 +730,11 @@ def job_preparation(*job_args):
     else:
         env.label = ""
 
-    if "replica_start_number" in args:
-        env.replica_start_number = int(args["replica_start_number"])
-    else:
-        env.replica_start_number = 1
-
     return_job_scripts = []
 
     for i in range(
-        env.replica_start_number, int(env.replicas) + env.replica_start_number
+        args["replica_start_number"],
+        int(env.replicas) + args["replica_start_number"],
     ):
         env.replica_number = i
 
@@ -835,7 +847,7 @@ def job_preparation(*job_args):
                         "passwords": None,
                         "password": None,
                         "sweepdir_items": None,
-                    }
+                    },
                 ),
                 env_yml_file,
                 default_flow_style=False,
@@ -1117,7 +1129,9 @@ def run_ensemble(
     sweep_dir: str,
     sweep_on_remote: Optional[bool] = False,
     execute_put_configs: Optional[bool] = True,
-    **args
+    upsample: str = "",
+    replica_start_number: str = "1",
+    **args,
 ) -> None:
     """
     Map and execute ensemble jobs.
@@ -1148,6 +1162,12 @@ def run_ensemble(
     """
     update_environment(args)
 
+    if ";" in replica_start_number:
+        raise NotImplementedError(
+            "Multiple replica_start_numbers are"
+            "not yet implemented for end users."
+        )
+
     if "script" not in env:
         raise RuntimeError(
             "ERROR: run_ensemble function has been called,"
@@ -1170,6 +1190,24 @@ def run_ensemble(
 
     if sweep_on_remote is False:
         sweepdir_items = os.listdir(sweep_dir)
+        if len(upsample) > 0:
+            upsample = upsample.split(";")
+
+            folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
+            path = os.path.join(env.results_path, folder_name, "RUNS")
+            print(env)
+            print(path)
+
+            replica_start_number = list(count_folders(path, dir) + 1
+                                        for dir in upsample)
+
+            if set(upsample).issubset(set(sweepdir_items)):
+                sweepdir_items = upsample
+            else:
+                error = "ERROR: upsample item: "
+                error += f"{set(upsample)-set(sweepdir_items)}"
+                error += "not found in SWEEP folder"
+                raise RuntimeError(error)
     else:
         # in case of reading SWEEP folder from remote machine, we need a
         # SSH tunnel and then list the directories
@@ -1197,6 +1235,7 @@ def run_ensemble(
             ensemble_mode=True,
             sweepdir_items=sweepdir_items,
             sweep_dir=sweep_dir,
+            replica_start_number=replica_start_number,
         )
     )
 
@@ -1635,3 +1674,11 @@ def install_app(name="", external_connexion="no", venv="False"):
     run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
     local("rm -rf {}".format(tmp_app_dir))
+
+
+def count_folders(dir_path: str, prefix: str):
+    """
+    Count the number of folders in a path that match a pattern
+    """
+    dirs = os.listdir(dir_path)
+    return len([d for d in dirs if d.startswith(prefix)])
