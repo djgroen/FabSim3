@@ -1129,7 +1129,7 @@ def run_ensemble(
     sweep_dir: str,
     sweep_on_remote: Optional[bool] = False,
     execute_put_configs: Optional[bool] = True,
-    upscale: str = "",
+    upsample: str = "",
     replica_start_number: str = "1",
     **args,
 ) -> None:
@@ -1190,8 +1190,8 @@ def run_ensemble(
 
     if sweep_on_remote is False:
         sweepdir_items = os.listdir(sweep_dir)
-        if len(upscale) > 0:
-            upscale = upscale.split(";")
+        if len(upsample) > 0:
+            upsample = upsample.split(";")
 
             folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
             path = os.path.join(env.results_path, folder_name, "RUNS")
@@ -1199,13 +1199,13 @@ def run_ensemble(
             print(path)
 
             replica_start_number = list(count_folders(path, dir) + 1
-                                        for dir in upscale)
+                                        for dir in upsample)
 
-            if set(upscale).issubset(set(sweepdir_items)):
-                sweepdir_items = upscale
+            if set(upsample).issubset(set(sweepdir_items)):
+                sweepdir_items = upsample
             else:
-                error = "ERROR: upscale item: "
-                error += f"{set(upscale)-set(sweepdir_items)}"
+                error = "ERROR: upsample item: "
+                error += f"{set(upsample)-set(sweepdir_items)}"
                 error += "not found in SWEEP folder"
                 raise RuntimeError(error)
     else:
