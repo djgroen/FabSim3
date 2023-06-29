@@ -19,11 +19,15 @@ from rich.panel import Panel
 # from fabsim.base.utils import add_prefix, print_prefix
 from fabsim.base.decorators import task
 from fabsim.base.env import env
-from fabsim.base.manage_remote_job import *
+from fabsim.base.manage_remote_job import sys
 from fabsim.base.MultiProcessingPool import MultiProcessingPool
 from fabsim.base.networks import local, put, rsync_project, run
-from fabsim.base.setup_fabsim import *
-from fabsim.deploy.machines import *
+from fabsim.base.setup_fabsim import yaml, get_setup_fabsim_dirs_string
+from fabsim.deploy.machines import (
+    inspect,
+    update_environment,
+    complete_environment
+)
 from fabsim.deploy.templates import (
     script_template_content,
     script_templates,
@@ -1100,7 +1104,7 @@ def campaign2ensemble(
 
 @beartype
 def run_ensemble(
-    config: str,
+    configs: str,
     sweep_dir: str,
     sweep_on_remote: Optional[bool] = False,
     execute_put_configs: Optional[bool] = True,
@@ -1199,7 +1203,7 @@ def run_ensemble(
         )
 
     if execute_put_configs is True:
-        execute(put_configs, config)
+        execute(put_configs, configs)
 
     # output['everything'] = False
     job_scripts_to_submit = job(
@@ -1421,21 +1425,21 @@ def install_app(name="", venv="False"):
     if not os.path.exists(user_applications_yml_file):
         copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(
-        open(user_applications_yml_file), Loader=yaml.SafeLoader
+    configs = yaml.load(
+        open(user_applications_yml_file, encoding="utf-8"),
+        Loader=yaml.SafeLoader
     )
-    info = config[name]
+    info = configs[name]
 
     # Offline cluster installation - --user install
     # Temporary folder
-    tmp_app_dir = "{}/tmp_app".format(env.localroot)
-    local("mkdir -p {}".format(tmp_app_dir))
+    tmp_app_dir = f"{env.localroot}/tmp_app"
+    local(f"mkdir -p {tmp_app_dir}")
 
     # First download all the Miniconda3 installation script
     local(
-        "wget {} -O {}/miniconda.sh".format(
-            config["Miniconda-installer"]["repository"], tmp_app_dir
-        )
+        f"wget {configs['Miniconda-installer']['repository']} "
+        f"-O {tmp_app_dir}/miniconda.sh"
     )
 
     # Install app-specific requirements
@@ -1445,16 +1449,12 @@ def install_app(name="", venv="False"):
 
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
-        local(
-            "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
-        )
+        local(f"pip3 download --no-binary=:all: -d {tmp_app_dir} {dep}")
     add_dep_list_compressed = sorted(
         Path(tmp_app_dir).iterdir(), key=lambda f: f.stat().st_mtime
     )
-    for it in range(len(add_dep_list_compressed)):
-        add_dep_list_compressed[it] = os.path.basename(
-            add_dep_list_compressed[it]
-        )
+    for index, item in enumerate(add_dep_list_compressed):
+        add_dep_list_compressed[index] = os.path.basename(item)
 
     # Download all the dependencies of the application
     # This first method should download all the dependencies needed
@@ -1462,20 +1462,19 @@ def install_app(name="", venv="False"):
     # --> Possible Issue during the installation in the remote
     # (it's not a cross-plateform install yet)
     local(
-        "pip3 download --no-binary=:all: -d {} git+{}@v{}".format(
-            tmp_app_dir, info["repository"], info["version"]
-        )
+        f"pip3 download --no-binary=:all: "
+        f"-d {tmp_app_dir} git+{info['repository']}@v{info['version']}"
     )
 
     # Create  directory in the remote machine to store dependency packages
-    run(template("mkdir -p {}".format(env.app_repository)))
+    run(template(f"mkdir -p {env.app_repository}"))
     # Send the dependencies (and the dependencies of dependencies) to the
     # remote machine
     for whl in os.listdir(tmp_app_dir):
         local(
             template(
-                "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
+                f"rsync -pthrvz -e 'ssh -p $port'  {tmp_app_dir}/{whl} "
+                "$username@$remote:$app_repository"
             )
         )
 
@@ -1485,16 +1484,14 @@ def install_app(name="", venv="False"):
     env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
-    with open(script, "w") as sc:
+    with open(script, "w", encoding="utf-8") as script_handle:
         install_dir = ""
         if venv == "True":
             # clean virtualenv and App_repo directory on remote machine side
             # To make sure everything is going to be installed from scratch
-            """
-            sc.write("find %s/ -maxdepth 1 -mindepth 1 -type d \
-                -exec rm -rf \"{}\" \\;\n" % (env.app_repository))
-            sc.write("rm -rf %s\n" % (env.virtual_env_path))
-            """
+            # sc.write("find %s/ -maxdepth 1 -mindepth 1 -type d \
+            #     -exec rm -rf \"{}\" \\;\n" % (env.app_repository))
+            # sc.write("rm -rf %s\n" % (env.virtual_env_path))
 
             # It seems some version of python/virtualenv doesn't support
             # the option --no-download. So there is sometime a problem :
@@ -1505,80 +1502,59 @@ def install_app(name="", venv="False"):
             # right version ?
             # TODO
             #
-            sc.write(
-                "if [ ! -d {} ]; then \n\t bash {}/miniconda.sh -b -p {} "
+            script_handle.write(
+                f"if [ ! -d {env.virtual_env_path} ]; "
+                f"then \n\t bash {env.app_repository}/miniconda.sh "
+                f"-b -p {env.virtual_env_path} "
                 "|| echo 'WARNING : virtualenv is not installed "
-                "or has a problem' \nfi".format(
-                    env.virtual_env_path,
-                    env.app_repository,
-                    env.virtual_env_path,
-                )
+                "or has a problem' \nfi"
             )
-            sc.write(
-                '\n\neval "$$({}/bin/conda shell.bash hook)"\n\n'.format(
-                    env.virtual_env_path
-                )
+            script_handle.write(
+                f'\n\neval "$$({env.virtual_env_path}'
+                '/bin/conda shell.bash hook)"\n\n'
             )
             # install_dir = ""
-            """
-            with the latest version of numpy, I got this error:
-            1. Check that you expected to use Python3.8 from ...,
-                and that you have no directories in your PATH or PYTHONPATH
-                that can interfere with the Python and numpy version "1.18.1"
-                you're trying to use.
-            so, since that we are using VirtualEnv, to avoid any conflict,
-            it is better to clear PYTHONPATH
-            """
+
+            # with the latest version of numpy, I got this error:
+            # 1. Check that you expected to use Python3.8 from ...,
+            #     and that you have no directories in your PATH or PYTHONPATH
+            #     that can interfere with the Python and numpy version "1.18.1"
+            #     you're trying to use.
+            # so, since that we are using VirtualEnv, to avoid any conflict,
+            # it is better to clear PYTHONPATH
+
             # sc.write("\nexport PYTHONPATH=\"\"\n")
-            sc.write("\nmodule unload python\n")
+            script_handle.write("\nmodule unload python\n")
 
         # First install the additional_dependencies
         for dep in reversed(add_dep_list_compressed):
             print(dep)
             if dep.endswith(".zip"):
-                sc.write(
-                    "\nunzip {}/{} -d {} && cd {}/{} "
-                    "&& {}/bin/python3 setup.py install {}\n".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".zip", ""),
-                        env.virtual_env_path,
-                        install_dir,
-                    )
+                script_handle.write(
+                    f"\nunzip {env.app_repository}/{dep} "
+                    f"-d {env.app_repository} && "
+                    f"cd {env.app_repository}/{dep.replace('.zip', '')} "
+                    f"&& {env.virtual_env_path}/bin/python3 "
+                    f"setup.py install {install_dir}\n"
                 )
             elif dep.endswith(".tar.gz"):
-                sc.write(
-                    "\ntar xf {}/{} -C {} && cd {}/{} "
-                    "&& {}/bin/python3 setup.py install {}\n".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".tar.gz", ""),
-                        env.virtual_env_path,
-                        install_dir,
-                    )
+                script_handle.write(
+                    f"\ntar xf {env.app_repository}/{dep} -C "
+                    f"{env.app_repository} && "
+                    f"cd {env.app_repository}/{dep.replace('.tar.gz', '')} "
+                    f"&& {env.virtual_env_path}/bin/python3 "
+                    f"setup.py install {install_dir}\n"
                 )
 
-        sc.write(
-            "{}/bin/pip install --no-index --no-build-isolation "
-            "--find-links=file:{} {}/{}-{}.zip {} || "
-            "{}/bin/pip install --no-index "
-            "--find-links=file:{} {}/{}-{}.zip".format(
-                env.virtual_env_path,
-                env.app_repository,
-                env.app_repository,
-                info["name"],
-                info["version"],
-                install_dir,
-                env.virtual_env_path,
-                env.app_repository,
-                env.app_repository,
-                info["name"],
-                info["version"],
-            )
+        script_handle.write(
+            f"{env.virtual_env_path}/bin/pip install "
+            f"--no-index --no-build-isolation "
+            f"--find-links=file:{env.app_repository} "
+            f"{env.app_repository}/{info['name']}-{info['version']}.zip "
+            f"{install_dir} || "
+            f"{env.virtual_env_path}/bin/pip install --no-index "
+            f"--find-links=file:{env.app_repository} "
+            f"{env.app_repository}/{info['name']}-{info['version']}.zip"
         )
 
     # Add the tmp_app_dir directory in the local templates path because the
@@ -1614,9 +1590,9 @@ def install_app(name="", venv="False"):
     print(env.job_dispatch)
     print(env.dest_name)
 
-    run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    run(template(f"{env.job_dispatch} {env.dest_name}"))
 
-    local("rm -rf {}".format(tmp_app_dir))
+    local(f"rm -rf {tmp_app_dir}")
 
 
 def count_folders(dir_path: str, prefix: str):
