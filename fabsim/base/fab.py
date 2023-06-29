@@ -1,6 +1,8 @@
 """Main module of fabsim."""
 
 # pylint: disable=too-many-lines
+# pylint: disable=wildcard-import
+# pylint: disable=unused-wildcard-import
 
 import math
 import os
@@ -19,15 +21,11 @@ from rich.panel import Panel
 # from fabsim.base.utils import add_prefix, print_prefix
 from fabsim.base.decorators import task
 from fabsim.base.env import env
-from fabsim.base.manage_remote_job import sys
+from fabsim.base.manage_remote_job import *
 from fabsim.base.MultiProcessingPool import MultiProcessingPool
 from fabsim.base.networks import local, put, rsync_project, run
-from fabsim.base.setup_fabsim import yaml, get_setup_fabsim_dirs_string
-from fabsim.deploy.machines import (
-    inspect,
-    update_environment,
-    complete_environment
-)
+from fabsim.base.setup_fabsim import *
+from fabsim.deploy.machines import *
 from fabsim.deploy.templates import (
     script_template_content,
     script_templates,
