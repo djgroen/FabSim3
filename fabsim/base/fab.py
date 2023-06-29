@@ -1310,31 +1310,27 @@ def install_packages(venv: bool = "False"):
         Loader=yaml.SafeLoader
     )
 
-    tmp_app_dir = "{}/tmp_app".format(env.localroot)
-    local("mkdir -p {}".format(tmp_app_dir))
+    tmp_app_dir = f"{env.localroot}/tmp_app"
+    local(f"mkdir -p {tmp_app_dir}")
 
     for dep in configs["packages"]:
-        local(
-            "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
-        )
+        local(f"pip3 download --no-binary=:all: -d {tmp_app_dir} {dep}")
     add_dep_list_compressed = sorted(
         Path(tmp_app_dir).iterdir(), key=lambda f: f.stat().st_mtime
     )
-    for it in range(len(add_dep_list_compressed)):
-        add_dep_list_compressed[it] = os.path.basename(
-            add_dep_list_compressed[it]
-        )
+    for index, item in enumerate(add_dep_list_compressed):
+        add_dep_list_compressed[index] = os.path.basename(item)
 
     # Create  directory in the remote machine to store dependency packages
-    run(template("mkdir -p {}".format(env.app_repository)))
+    run(template(f"mkdir -p {env.app_repository}"))
 
     # Send the dependencies (and the dependencies of dependencies) to the
     # remote machine
     for whl in os.listdir(tmp_app_dir):
         local(
             template(
-                "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
+                f"rsync -pthrvz -e 'ssh -p $port'  {tmp_app_dir}/{whl} "
+                "$username@$remote:$app_repository"
             )
             # "rsync -pthrvz %s/%s eagle:$app_repository"%(tmp_app_dir, whl)
         )
@@ -1345,17 +1341,16 @@ def install_packages(venv: bool = "False"):
     env.nodes = env.cores
     script = os.path.join(tmp_app_dir, "script")
     # Write the Install command in a file
-    with open(script, "w") as sc:
+    with open(script, "w", encoding="utf-8") as script_handle:
         install_dir = "--user"
         if venv.lower() == "true":
-            sc.write(
-                "if [ ! -d {} ]; then \n\t python -m virtualenv "
-                "{} || echo 'WARNING : virtualenv is not installed "
-                "or has a problem' \nfi\n\nsource {}/bin/activate\n".format(
-                    env.virtual_env_path,
-                    env.virtual_env_path,
-                    env.virtual_env_path,
-                )
+            script_handle.write(
+                f"if [ ! -d {env.virtual_env_path} ]; then \n\t "
+                "python -m virtualenv "
+                f"{env.virtual_env_path} || "
+                "echo 'WARNING : virtualenv is not installed "
+                "or has a problem' \nfi\n\n"
+                f"source {env.virtual_env_path}/bin/activate\n"
             )
             install_dir = ""
 
@@ -1363,28 +1358,18 @@ def install_packages(venv: bool = "False"):
         for dep in reversed(add_dep_list_compressed):
             print(dep)
             if dep.endswith(".zip"):
-                sc.write(
-                    "\nunzip {}/{} -d {} && cd {}/{} "
-                    "&& python3 setup.py install {}".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".zip", ""),
-                        install_dir,
-                    )
+                script_handle.write(
+                    f"\nunzip {env.app_repository}/{dep} "
+                    f"-d {env.app_repository} && "
+                    f"cd {env.app_repository}/{dep.replace('.zip', '')} "
+                    f"&& python3 setup.py install {install_dir}"
                 )
             elif dep.endswith(".tar.gz"):
-                sc.write(
-                    "\ntar xf {}/{} -C {} && cd {}/{} "
-                    "&& python3 setup.py install {}\n".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".tar.gz", ""),
-                        install_dir,
-                    )
+                script_handle.write(
+                    f"\ntar xf {env.app_repository}/{dep} "
+                    f"-C {env.app_repository} && cd "
+                    f"{env.app_repository}/{dep.replace('.tar.gz', '')} "
+                    f"&& python3 setup.py install {install_dir}\n"
                 )
 
     # Add the tmp_app_dir directory in the local templates path because the
@@ -1416,14 +1401,13 @@ def install_packages(venv: bool = "False"):
     if not hasattr(env, "job_dispatch"):
         env.job_dispatch = ""
 
-    with cd(env.pather.dirname(env.job_results)):
-        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    run(template(f"{env.job_dispatch} {env.dest_name}"))
 
-    local("rm -rf {}".format(tmp_app_dir))
+    local(f"rm -rf {tmp_app_dir}")
 
 
 @task
-def install_app(name="", external_connexion="no", venv="False"):
+def install_app(name="", venv="False"):
     """
     Install a specific Application through FasbSim3
 
