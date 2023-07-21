@@ -2,8 +2,26 @@
 
 import os
 import fnmatch
+import re
 
 from dataclasses import dataclass, field
+
+import yaml
+
+
+def get_machines(filemane):
+    """Get the machines from the machines.yml file."""
+
+    with open(filemane, "r", encoding="utf-8") as file_handler:
+        machines = yaml.safe_load(file_handler)
+
+    return list(machines.keys())
+
+
+def remove_consecutive_spaces(input_string):
+    """Remove consecutive spaces from a string."""
+
+    return re.sub(r"\s+", " ", input_string)
 
 
 @dataclass
@@ -83,6 +101,35 @@ def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
     return definitions
 
 
+def write_to_file_task_args(tasks: list[Task], filename: str):
+    """Write the task arguments to a file."""
+
+    with open(filename, "w", encoding="utf-8") as file_handler:
+        for task in tasks:
+            file_handler.write(f'{task.name}="')
+
+            string1 = " ".join(task.arguments)
+            string2 = " ".join(task.optional_arguments)
+            string = string1 + " " + string2
+
+            string = string.replace("**", "")
+            string = string.replace("args", "")
+
+            string = remove_consecutive_spaces(string)
+
+            string = string.strip()
+            file_handler.write(f'{string}"\n')
+
+
+def write_machines_to_file(machines: list[str], filename: str):
+    """Write the machines to a file."""
+
+    with open(filename, "w", encoding="utf-8") as file_handler:
+        file_handler.write('machines="')
+        file_handler.write(" ".join(machines))
+        file_handler.write('"\n')
+
+
 def main():
     """Main function."""
 
@@ -92,9 +139,10 @@ def main():
     definitions = find_task_definitions(py_files)
 
     tasks = list(map(lambda x: Task(x[0], x[1]), definitions))
+    machines = get_machines("fabsim/deploy/machines.yml")
 
-    for task in tasks:
-        print(task)
+    write_to_file_task_args(tasks, "task_args.txt")
+    write_machines_to_file(machines, "machines.txt")
 
 
 if __name__ == "__main__":

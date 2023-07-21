@@ -1,0 +1,1 @@
+machines="default cartesius prometheus cirrus supermuc2 ohm Kathleen bluejoule bluewonder2 oppenheimer localhost QCG_PJ Eagle qcg eagle_vecma eagle_hidalgo eagle_seavea supermuc_vecma genji training_hidalgo archer2 marenostrum4 piz_daint monsoonfab"
