@@ -161,9 +161,12 @@ def main():
     machines = get_machines("fabsim/deploy/machines.yml")
 
     write_to_file_task_args(
-        tasks, "task_args.txt", "standalone_tasks.txt", "tasks_with_args.txt"
+        tasks,
+        "lists/task_args.txt",
+        "lists/standalone_tasks.txt",
+        "lists/tasks_with_args.txt",
     )
-    write_machines_to_file(machines, "machines.txt")
+    write_machines_to_file(machines, "lists/machines.txt")
 
 
 if __name__ == "__main__":
