@@ -102,11 +102,12 @@ def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
 
 
 def write_to_file_task_args(
-    tasks: list[Task], filename: str, standalone_file: str
+    tasks: list[Task], filename: str, standalone_file: str, with_args_file: str
 ):
     """Write the task arguments to a file."""
 
     standalone = []
+    with_args = []
 
     with open(filename, "w", encoding="utf-8") as file_handler:
         for task in tasks:
@@ -124,12 +125,18 @@ def write_to_file_task_args(
             if len(string) == 0:
                 standalone.append(task.name)
             else:
+                with_args.append(task.name)
                 file_handler.write(f'{task.name}="')
                 file_handler.write(f'{string}"\n')
 
     with open(standalone_file, "w", encoding="utf-8") as file_handler:
         file_handler.write('standalone_tasks="')
         file_handler.write(" ".join(standalone))
+        file_handler.write('"\n')
+
+    with open(with_args_file, "w", encoding="utf-8") as file_handler:
+        file_handler.write('tasks_with_args="')
+        file_handler.write(" ".join(with_args))
         file_handler.write('"\n')
 
 
@@ -153,7 +160,9 @@ def main():
     tasks = list(map(lambda x: Task(x[0], x[1]), definitions))
     machines = get_machines("fabsim/deploy/machines.yml")
 
-    write_to_file_task_args(tasks, "task_args.txt", "standalone_tasks.txt")
+    write_to_file_task_args(
+        tasks, "task_args.txt", "standalone_tasks.txt", "tasks_with_args.txt"
+    )
     write_machines_to_file(machines, "machines.txt")
 
 
