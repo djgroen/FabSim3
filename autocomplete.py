@@ -112,7 +112,6 @@ def main():
     
     # Populate the dictionary with task names and their arguments
     for task in tasks:
-        print(task.name)
         arguments = " ".join(task.arguments)
         optional_arguments = " ".join(task.optional_arguments)
         combined = arguments + " " + optional_arguments
