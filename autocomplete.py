@@ -1,41 +1,36 @@
-"""Helper to the FabSim3 autocomplete command."""
+"""
+This script:
+Searches python scripts in designated directories,
+Creates dictionary for fabsim autocompete in bash,
+Stores dict in JSON format.
+"""
 
 import os
 import fnmatch
 import re
+import json
 
-from dataclasses import dataclass, field
+from typing import List, Tuple, Dict
 
 import yaml
 
-
-def get_machines(filemane):
-    """Get the machines from the machines.yml file."""
-
-    with open(filemane, "r", encoding="utf-8") as file_handler:
+def get_machines(filename: str) -> List[str]:
+    with open(filename, "r", encoding="utf-8") as file_handler:
         machines = yaml.safe_load(file_handler)
 
     return list(machines.keys())
 
-
-def remove_consecutive_spaces(input_string):
-    """Remove consecutive spaces from a string."""
-
-    return re.sub(r"\s+", " ", input_string)
-
-
-@dataclass
 class Task:
-    """A FabSim3 task."""
+    def __init__(self, plugin: str, definition: str):
+        self.plugin = plugin
+        self.definition = definition
+        self.name = ""
+        self.arguments = []
+        self.optional_arguments = []
+        self.optional_arguments_default = []
+        self.__post_init()
 
-    plugin: str
-    definition: str = field(repr=False)
-    name: str = field(init=False)
-    arguments: list[str] = field(default_factory=list)
-    optional_arguments: list[str] = field(default_factory=list)
-    optional_arguments_default: list[str] = field(default_factory=list)
-
-    def __post_init__(self):
+    def __post_init(self):
         if not self.definition.startswith("def"):
             raise ValueError("Task definition must start with 'def'.")
 
@@ -46,16 +41,11 @@ class Task:
         for argument in all_arguments:
             if "=" in argument:
                 self.optional_arguments.append(argument.split("=")[0].strip())
-                self.optional_arguments_default.append(
-                    argument.split("=")[1].strip()
-                )
+                self.optional_arguments_default.append(argument.split("=")[1].strip())
             else:
                 self.arguments.append(argument)
 
-
-def find_py_files(directory: str) -> list[str]:
-    """Find all python files in a directory."""
-
+def find_py_files(directory: str) -> List[str]:
     py_files = []
     for root, _, files in os.walk(directory):
         for filename in fnmatch.filter(files, "*.py"):
@@ -63,9 +53,7 @@ def find_py_files(directory: str) -> list[str]:
     return py_files
 
 
-def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
-    """Find all FabSim3 tasks in a directory."""
-
+def find_task_definitions(files: List[str]) -> List[Tuple[str, str]]:
     definitions = []
     track = False
     start = False
@@ -93,81 +81,54 @@ def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
                     if line.strip().endswith(":"):
                         track = False
                         start = False
-                        definitions.append(
-                            (file.split("/")[-1], "".join(deflines).strip())
-                        )
+                        definitions.append((file.split("/")[-1], "".join(deflines).strip()))
                         deflines = []
 
     return definitions
 
 
-def write_to_file_task_args(
-    tasks: list[Task], filename: str, standalone_file: str, with_args_file: str
-):
-    """Write the task arguments to a file."""
-
-    standalone = []
-    with_args = []
-
-    with open(filename, "w", encoding="utf-8") as file_handler:
-        for task in tasks:
-            string1 = " ".join(task.arguments)
-            string2 = " ".join(task.optional_arguments)
-            string = string1 + " " + string2
-
-            string = string.replace("**", "")
-            string = string.replace("args", "")
-
-            string = remove_consecutive_spaces(string)
-
-            string = string.strip()
-
-            if len(string) == 0:
-                standalone.append(task.name)
-            else:
-                with_args.append(task.name)
-                file_handler.write(f'{task.name}="')
-                file_handler.write(f'{string}"\n')
-
-    with open(standalone_file, "w", encoding="utf-8") as file_handler:
-        file_handler.write('standalone_tasks="')
-        file_handler.write(" ".join(standalone))
-        file_handler.write('"\n')
-
-    with open(with_args_file, "w", encoding="utf-8") as file_handler:
-        file_handler.write('tasks_with_args="')
-        file_handler.write(" ".join(with_args))
-        file_handler.write('"\n')
-
-
-def write_machines_to_file(machines: list[str], filename: str):
-    """Write the machines to a file."""
-
-    with open(filename, "w", encoding="utf-8") as file_handler:
-        file_handler.write('machines="')
-        file_handler.write(" ".join(machines))
-        file_handler.write('"\n')
-
-
 def main():
-    """Main function."""
-
+    # Set the directory path to search for Python files
     directory_path = "plugins"
+    # Find Python files in the specified directory
     py_files = find_py_files(directory_path)
 
+    # Find task definitions in the Python files and extract their details
     definitions = find_task_definitions(py_files)
 
+    # Create Task objects from the extracted definitions
     tasks = list(map(lambda x: Task(x[0], x[1]), definitions))
-    machines = get_machines("fabsim/deploy/machines.yml")
+    
+    # Get a list of machine names from the YAML file
+    machines_list = get_machines("fabsim/deploy/machines.yml")
 
-    write_to_file_task_args(
-        tasks,
-        "lists/task_args.txt",
-        "lists/standalone_tasks.txt",
-        "lists/tasks_with_args.txt",
-    )
-    write_machines_to_file(machines, "lists/machines.txt")
-
+    # Concatenate machine names into a single string without ", " pattern
+    machines = " ".join(machines_list)
+    
+    # Create a dictionary to store the autocompletion options for Bash
+    lists_dict = {}
+    # Add the machine names to the dictionary
+    lists_dict["machines"] = machines
+    
+    # Populate the dictionary with task names and their arguments
+    for task in tasks:
+        print(task.name)
+        arguments = " ".join(task.arguments)
+        optional_arguments = " ".join(task.optional_arguments)
+        combined = arguments + " " + optional_arguments
+        combined = combined.replace("**", "")
+        combined = combined.replace("args", "")
+        combined = re.sub(r"\s+", " ", combined)
+        combined = combined.strip()
+        key = task.name
+        value = combined
+        if key in lists_dict:
+            lists_dict[key].append(value)
+        else:
+            lists_dict[key] = [value]
+            
+    # Print the JSON format for Bash processing
+    print(json.dumps(lists_dict))
 
 if __name__ == "__main__":
     main()
