@@ -44,8 +44,6 @@ _fabsim_completion() {
         done < <(echo "$python_output" | jq -r 'to_entries | map("\(.key)=\(.value)") | .[]')
     }
 
-    echo "$python_output"
-
     # Declare associative arrays
     declare -A machines_dict
     declare -A tasks_dict
