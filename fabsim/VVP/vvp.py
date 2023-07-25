@@ -286,10 +286,11 @@ def ensemble_vvp(
         ensemble_vvp_results.update({results_dir: {}})
 
         ensemble_vvp_results[results_dir].update(
-            {"names": names,"scores": scores, "scores_aggregation": scores_aggregation}
+            {"names": names, "scores": scores,
+                "scores_aggregation": scores_aggregation}
         )
 
-    #print(ensemble_vvp_results)
+    # print(ensemble_vvp_results)
     return ensemble_vvp_results
 
 
