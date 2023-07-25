@@ -260,6 +260,7 @@ def ensemble_vvp(
         results_dirs = tmp
 
     for results_dir in results_dirs:
+        names = []
         scores = []
 
         # use user-specified sample directories if specified,
@@ -272,6 +273,7 @@ def ensemble_vvp(
         for item in items:
             if os.path.isdir(os.path.join(results_dir, item)):
                 print(os.path.join(results_dir, item))
+                names.append(item)
                 scores.append(
                     sample_testing_function(
                         os.path.join(results_dir, item), **kwargs
@@ -284,9 +286,11 @@ def ensemble_vvp(
         ensemble_vvp_results.update({results_dir: {}})
 
         ensemble_vvp_results[results_dir].update(
-            {"scores": scores, "scores_aggregation": scores_aggregation}
+            {"names": names, "scores": scores,
+                "scores_aggregation": scores_aggregation}
         )
 
+    # print(ensemble_vvp_results)
     return ensemble_vvp_results
 
 
