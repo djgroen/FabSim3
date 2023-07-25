@@ -1,0 +1,1 @@
+standalone_tasks="refresh_local_measures sync_facs test_load_conflict test_change_capacities test_add_camp test_delete_location test_close_camp test_close_border test_redirect test_clear_active_conflict get_flee_location sync_flee clear_active_conflict run_ssudan_paper"
