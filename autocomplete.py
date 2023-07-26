@@ -1,65 +1,24 @@
-"""
-This script:
-Searches python scripts in designated directories,
-Creates dictionary for fabsim autocompete in bash,
-Stores dict in JSON format.
-"""
-
 import os
 import fnmatch
 import re
 import json
-
 from typing import List, Tuple, Dict
 
 import yaml
 
-def get_machines(filename: str) -> List[str]:
-    with open(filename, "r", encoding="utf-8") as file_handler:
-        machines = yaml.safe_load(file_handler)
+def main():
+    # Set the directory path to search for Python files
+    directory_path = "plugins"
+    # Find Python files in the specified directory using list comprehension
+    py_files = [os.path.join(root, filename) for root, _, files in os.walk(directory_path) for filename in fnmatch.filter(files, "*.py")]
 
-    return list(machines.keys())
-
-class Task:
-    def __init__(self, plugin: str, definition: str):
-        self.plugin = plugin
-        self.definition = definition
-        self.name = ""
-        self.arguments = []
-        self.optional_arguments = []
-        self.optional_arguments_default = []
-        self.__post_init()
-
-    def __post_init(self):
-        if not self.definition.startswith("def"):
-            raise ValueError("Task definition must start with 'def'.")
-
-        self.name = self.definition.split(" ")[1].split("(")[0]
-
-        all_arguments = self.definition.split("(")[1].split(")")[0].split(",")
-
-        for argument in all_arguments:
-            if "=" in argument:
-                self.optional_arguments.append(argument.split("=")[0].strip())
-                self.optional_arguments_default.append(argument.split("=")[1].strip())
-            else:
-                self.arguments.append(argument)
-
-def find_py_files(directory: str) -> List[str]:
-    py_files = []
-    for root, _, files in os.walk(directory):
-        for filename in fnmatch.filter(files, "*.py"):
-            py_files.append(os.path.join(root, filename))
-    return py_files
-
-
-def find_task_definitions(files: List[str]) -> List[Tuple[str, str]]:
+    # Find task definitions in the Python files and extract their details
     definitions = []
     track = False
     start = False
     deflines = []
 
-    for file in files:
+    for file in py_files:
         # Open the file
         with open(file, "r", encoding="utf-8") as file_handler:
             lines = file_handler.readlines()
@@ -84,48 +43,37 @@ def find_task_definitions(files: List[str]) -> List[Tuple[str, str]]:
                         definitions.append((file.split("/")[-1], "".join(deflines).strip()))
                         deflines = []
 
-    return definitions
-
-
-def main():
-    # Set the directory path to search for Python files
-    directory_path = "plugins"
-    # Find Python files in the specified directory
-    py_files = find_py_files(directory_path)
-
-    # Find task definitions in the Python files and extract their details
-    definitions = find_task_definitions(py_files)
-
-    # Create Task objects from the extracted definitions
-    tasks = list(map(lambda x: Task(x[0], x[1]), definitions))
-    
     # Get a list of machine names from the YAML file
-    machines_list = get_machines("fabsim/deploy/machines.yml")
+    with open("fabsim/deploy/machines.yml", "r", encoding="utf-8") as file_handler:
+        machines = yaml.safe_load(file_handler)
+
+    machines_list = list(machines.keys())
 
     # Concatenate machine names into a single string without ", " pattern
-    machines = " ".join(machines_list)
-    
+    machines_str = " ".join(machines_list)
+
     # Create a dictionary to store the autocompletion options for Bash
-    lists_dict = {}
-    # Add the machine names to the dictionary
-    lists_dict["machines"] = machines
-    
-    # Populate the dictionary with task names and their arguments
-    for task in tasks:
-        arguments = " ".join(task.arguments)
-        optional_arguments = " ".join(task.optional_arguments)
-        combined = arguments + " " + optional_arguments
-        combined = combined.replace("**", "")
-        combined = combined.replace("args", "")
-        combined = re.sub(r"\s+", " ", combined)
-        combined = combined.strip()
-        key = task.name
-        value = combined
-        if key in lists_dict:
-            lists_dict[key].append(value)
-        else:
-            lists_dict[key] = [value]
-            
+    lists_dict = {"machines": machines_str}
+
+    # Populate the dictionary with task names and their arguments using list comprehension
+    for file, definition in definitions:
+        if not definition.startswith("def"):
+            raise ValueError("Task definition must start with 'def'.")
+
+        name = definition.split(" ")[1].split("(")[0]
+        all_arguments = definition.split("(")[1].split(")")[0].split(",")
+
+        # Create a list to store all arguments (including optional arguments) using list comprehension
+        arguments_list = [arg.split("=")[0].strip() if "=" in arg else arg.strip() for arg in all_arguments]
+
+        arguments = " ".join(arguments_list)
+        arguments = "".join(arguments.split("**")).replace("args", "")
+        arguments = re.sub(r"\s+", " ", arguments).strip()
+
+        key = name
+        value = arguments
+        lists_dict.setdefault(key, []).append(value)
+
     # Print the JSON format for Bash processing
     print(json.dumps(lists_dict))
 

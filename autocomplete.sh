@@ -96,7 +96,8 @@ _fabsim_completion() {
         local output_string=""
 
         # Get the total number of words in the modified_string
-        local total_words=$(wc -w <<< "$modified_string")
+        local total_words
+        total_words=$(wc -w <<< "$modified_string")
 
         # Loop through the words in the modified_string and modify them individually
         for word in $modified_string; do
@@ -125,7 +126,7 @@ _fabsim_completion() {
         local machines_values
         machines_values="${machines_dict["machines"]}"
         IFS=', ' read -r -a parsed_machines_values <<< "$machines_values"
-        COMPREPLY=( $(compgen -W "${parsed_machines_values[*]}" -- "${cur}") )
+        mapfile -t COMPREPLY < <(compgen -W "${parsed_machines_values[*]}" -- "${cur}")
         return 0
     fi
 
@@ -176,7 +177,7 @@ _fabsim_completion() {
     fi
 
     # If no completions are provided so far, fallback to default completion
-    COMPREPLY=($(compgen -W "${tasks_dict[*]}" -- "$cur"))
+    mapfile -t COMPREPLY < <(compgen -W "${tasks_dict[*]}" -- "$cur")
 }
 
 # Register the completion function
