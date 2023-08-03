@@ -9,6 +9,7 @@ echo " - Start typing a <COMMAND><SPACE><TAB> to see suggestions."
 echo " - For machines, type 'fabsim<SPACE><TAB>' to see available machines."
 echo " - For stanalone tasks, type 'fabsim localhost<SPACE><TAB>' to see available options."
 echo " - For options with argument(s), type 'fabsim localhost flare_local:<TAB>' to see available options."
+echo " - If autocomplete does not provide options, please 'source autocomplete.sh' script again."
 
 _fabsim_completion() {
     local cur prev1 prev2
@@ -121,6 +122,9 @@ _fabsim_completion() {
         echo "$output_string"
     }
 
+    # Define a list of default options that users will always see
+    default_options=("install_plugin:")
+
     # If the current word is the first argument, provide machines as completion options
     if [[ ${COMP_CWORD} -eq 1 ]]; then
         local machines_values
@@ -132,48 +136,60 @@ _fabsim_completion() {
 
     # Your existing code for autocompletion based on the dictionaries
     if [[ ${COMP_CWORD} -eq 2 ]]; then
-        # Create a copy of the 'tasks_dict' array to avoid modifying the original one
-        declare -A tasks_dict_copy=()
-        for key in "${!tasks_dict[@]}"; do
-            tasks_dict_copy["$key"]="${tasks_dict[$key]}"
-        done
+        if [[ -z "${tasks_dict[*]}" ]]; then
+            # Tasks_dict is empty, provide default_options as completion options
+            IFS=$'\n' read -r -d '' -a completions < <(compgen -W "${default_options[*]}" -- "${cur}"; printf '\0')
 
-        # Modify keys in the copied associative array
-        modify_keys "tasks_dict_copy"
+            # Set the completions with the modified keys
+            COMPREPLY=("${completions[@]}")
 
-        # Get the original keys (without modifications) for completions
-        IFS=$'\n' read -r -d '' -a completions < <(compgen -W "${!tasks_dict_copy[*]}" -- "${cur}"; printf '\0')
+            return 0
+        else
+            declare -A tasks_dict_copy=()
+            for key in "${!tasks_dict[@]}"; do
+                tasks_dict_copy["$key"]="${tasks_dict[$key]}"
+            done
 
-        # Set the completions with the modified keys
-        COMPREPLY=("${completions[@]}")
+            # Modify keys in the copied associative array
+            modify_keys "tasks_dict_copy"
 
-        return 0
+            # Get the original keys (without modifications) for completions
+            IFS=$'\n' read -r -d '' -a completions < <(compgen -W "${!tasks_dict_copy[*]}" -- "${cur}"; printf '\0')
+
+            # Set the completions with the modified keys
+            COMPREPLY=("${completions[@]}")
+
+            return 0
+        fi
     fi
 
-    # Check if the user selects a key that matches the current word (prev2)
-    for key in "${!tasks_dict[@]}"; do
-        if [[ "$key" == "${prev1}" ]]; then
-            local values="${tasks_dict[$key]}"
+    if [[ ! -z "${tasks_dict[*]}" ]]; then
+
+        # Check if the user selects a key that matches the current word (prev1)
+        for key in "${!tasks_dict[@]}"; do
+            if [[ "$key" == "${prev1}" ]]; then
+                local values="${tasks_dict[$key]}"
+
+                # Call list processing function
+                processed_values=$(modify_values "$values")
+
+                # Add the processed values to COMPREPLY without a space after prev1
+                COMPREPLY+=("${processed_values}")
+                return 0
+            fi
+        done
+
+        # Handle the scenario when the current word ends with a colon (':') and TAB is pressed
+        if [[ $cur == *: && $prev2 != "" ]]; then
+            local values="${tasks_dict[$prev2]}"
 
             # Call list processing function
             processed_values=$(modify_values "$values")
 
-            # Add the processed values to COMPREPLY without a space after prev2
-            COMPREPLY+=("${processed_values}")
+            # Append the values to COMPREPLY without a space after prev2
+            COMPREPLY+=("${prev2}${processed_values}")
             return 0
         fi
-    done
-
-    # Handle the scenario when the current word ends with a colon (':') and TAB is pressed
-    if [[ $cur == *: && $prev2 != "" ]]; then
-        local values="${tasks_dict[$prev2]}"
-
-        # Call list processing function
-        processed_values=$(modify_values "$values")
-
-        # Append the values to COMPREPLY without a space after prev2
-        COMPREPLY+=("${prev2}${processed_values}")
-        return 0
     fi
 
     # If no completions are provided so far, fallback to default completion
