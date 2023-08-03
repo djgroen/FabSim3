@@ -18,14 +18,20 @@ _fabsim_completion() {
     prev1="${COMP_WORDS[COMP_CWORD-1]}"
     prev2="${COMP_WORDS[COMP_CWORD-2]}"
 
-    # Check if the generate_tasks_dict.py file exists
-    if [[ ! -f "autocomplete.py" ]]; then
+    # Check if the FABSIM3_HOME environment variable is set
+    if [[ -z "${FABSIM3_HOME}" ]]; then
+        echo "Error: FABSIM3_HOME environment variable is not set!"
+        return 1
+    fi
+
+    # Check if the autocomplete.py file exists in the FABSIM3_HOME directory
+    if [[ ! -f "${FABSIM3_HOME}/autocomplete.py" ]]; then
         echo "Error: autocomplete.py file not found!"
         return 1
     fi
 
     # Run the generate_tasks_dict.py script and capture its output
-    python_output=$(python autocomplete.py)
+    python_output=$(python "${FABSIM3_HOME}/autocomplete.py")
 
     # Function to parse the Python output and populate the bash associative arrays
     parse_python_output() {

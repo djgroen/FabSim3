@@ -7,8 +7,18 @@ from typing import List, Tuple, Dict
 import yaml
 
 def main():
-    # Set the directory path to search for Python files
-    directory_path = "plugins"
+    
+    # Check if the FABSIM3_PATH environment variable is set
+    if "FABSIM3_HOME" not in os.environ:
+        print("Error: FABSIM3_HOME environment variable is not set!")
+        exit(1)
+
+    # Get the FABSIM3_HOME path from the environment variable
+    fabsim3_home = os.environ["FABSIM3_HOME"]
+    
+    # Set the directory path to search for Python files (using FABSIM3_HOME)
+    directory_path = os.path.join(fabsim3_home, "plugins")
+    
     # Find Python files in the specified directory using list comprehension
     py_files = [os.path.join(root, filename) for root, _, files in os.walk(directory_path) for filename in fnmatch.filter(files, "*.py")]
 
@@ -42,9 +52,18 @@ def main():
                         start = False
                         definitions.append((file.split("/")[-1], "".join(deflines).strip()))
                         deflines = []
+                        
+        
+    # Get the path to the machines.yml file using FABSIM3_HOME
+    machines_file_path = os.path.join(fabsim3_home, "fabsim", "deploy", "machines.yml")
 
-    # Get a list of machine names from the YAML file
-    with open("fabsim/deploy/machines.yml", "r", encoding="utf-8") as file_handler:
+    # Check if the machines.yml file exists
+    if not os.path.isfile(machines_file_path):
+        print(f"Error: machines.yml file not found in {machines_file_path}")
+        exit(1)
+
+    # Load the machines.yml file
+    with open(machines_file_path, "r", encoding="utf-8") as file_handler:
         machines = yaml.safe_load(file_handler)
 
     machines_list = list(machines.keys())
