@@ -92,14 +92,6 @@ default:
   # Default command for cancelling jobs.
   cancel_job_command: "qdel"
   
-  # Default arguments to LAMMPS - OBSOLETE?
-  lammps_args: "-log log.lammps -screen [lammps_scr_output.txt"
-  
-  # Default location for blackbox scripts. - OBSOLETE?
-  local_blackbox_path: ["$fabsim_root/blackbox"]
-  # Default location for Python scripts. - OBSOLETE?
-  local_python_path: ["$fabsim_root/python"]
-  
   # Default location for config_files.
   local_config_file_path: ["$fabsim_root/config_files"]
 
