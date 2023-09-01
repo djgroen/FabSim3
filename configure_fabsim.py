@@ -169,7 +169,6 @@ def config_yml_files():
     FS3_env.machines_user_yml["default"]["home_path_template"] = S(
         os.path.join(FS3_env.FabSim3_PATH, "localhost_exe")
     )
-
     FS3_env.machines_user_yml["default"]["local_results"] = os.path.join(
         FS3_env.FabSim3_PATH, "results"
     )
@@ -276,6 +275,19 @@ def main():
                 title="[orange_red1]WARNING[/orange_red1]",
             )
         )
+        
+    # Set the FABSIM3_HOME environment variable
+    os.environ["FABSIM3_HOME"] = FS3_env.FabSim3_PATH
+    export_cmd = f'export FABSIM3_HOME="{FS3_env.FabSim3_PATH}"'
+
+    # Check if the export command already exists in the shell configuration file
+    shell_config_file = os.path.expanduser("~/.bashrc")  # Modify the file name if needed
+    with open(shell_config_file, "r") as f:
+        shell_config_content = f.read()
+    if export_cmd not in shell_config_content:
+        # Add the export command to the shell configuration file if it doesn't exist
+        with open(shell_config_file, "a") as f:
+            f.write("\n" + export_cmd + "\n")
 
 
 if __name__ == "__main__":
