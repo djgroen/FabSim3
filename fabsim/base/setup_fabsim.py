@@ -176,7 +176,7 @@ def get_clean_fabsim_dirs_string(prefix):
     return (
         "rm -rf $config_path/{}*; "
         "rm -rf $results_path/{}*; "
-        "rm -rf $scripts_path/{}*".format(prefix,prefix,prefix)
+        "rm -rf $scripts_path/{}*".format(prefix, prefix, prefix)
     )
 
 
