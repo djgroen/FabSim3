@@ -165,6 +165,21 @@ def get_setup_fabsim_dirs_string():
         "mkdir -p $scripts_path"
     )
 
+def get_clean_fabsim_dirs_string():
+    """
+    Returns the commands required to clean the fabric directories. This
+    is not in the env, because modifying this is likely to break FabSim
+    in most cases. This is stored in an individual function, so that the
+    string can be appended in existing commands, reducing the
+    performance overhead.
+    """
+    return (
+        "rm -rf $config_path/*; "
+        "rm -rf $results_path/*; "
+        "rm -rf $scripts_path/*"
+    )
+
+
 
 @task
 def setup_fabsim_dirs():
@@ -172,6 +187,14 @@ def setup_fabsim_dirs():
     Sets up directories required for the use of FabSim.
     """
     run(template(get_setup_fabsim_dirs_string()))
+
+
+@task
+def clean_fabsim_dirs():
+    """
+    Cleans up directories used by FabSim.
+    """
+    run(template(get_clean_fabsim_dirs_string()))
 
 
 @task
