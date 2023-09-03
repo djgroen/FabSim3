@@ -165,6 +165,7 @@ def get_setup_fabsim_dirs_string():
         "mkdir -p $scripts_path"
     )
 
+
 def get_clean_fabsim_dirs_string(prefix):
     """
     Returns the commands required to clean the fabric directories. This
@@ -178,7 +179,6 @@ def get_clean_fabsim_dirs_string(prefix):
         "rm -rf $results_path/{}*; "
         "rm -rf $scripts_path/{}*".format(prefix, prefix, prefix)
     )
-
 
 
 @task

@@ -150,5 +150,10 @@ def wait_complete(jobname_syntax: str = "") -> None:
     their name are complete, then return
     """
     # time.sleep(120)
+    i = 0
+    wait_times = [120, 180, 300, 600]
     while not check_complete(jobname_syntax):
-        time.sleep(600)
+        if i < 30:
+            i += 1
+        time.sleep(wait_times[int(i / 10)])
+        print("Waiting {} seconds.".format(wait_times[int(i / 10)]))
