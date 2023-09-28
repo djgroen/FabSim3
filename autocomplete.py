@@ -1,77 +1,34 @@
-"""Helper to the FabSim3 autocomplete command."""
-
 import os
 import fnmatch
 import re
-
-from dataclasses import dataclass, field
+import json
+from typing import List, Tuple, Dict
 
 import yaml
 
+def main():
+    
+    # Check if the FABSIM3_PATH environment variable is set
+    if "FABSIM3_HOME" not in os.environ:
+        print("Error: FABSIM3_HOME environment variable is not set!")
+        exit(1)
 
-def get_machines(filemane):
-    """Get the machines from the machines.yml file."""
+    # Get the FABSIM3_HOME path from the environment variable
+    fabsim3_home = os.environ["FABSIM3_HOME"]
+    
+    # Set the directory path to search for Python files (using FABSIM3_HOME)
+    directory_path = os.path.join(fabsim3_home, "plugins")
+    
+    # Find Python files in the specified directory using list comprehension
+    py_files = [os.path.join(root, filename) for root, _, files in os.walk(directory_path) for filename in fnmatch.filter(files, "*.py")]
 
-    with open(filemane, "r", encoding="utf-8") as file_handler:
-        machines = yaml.safe_load(file_handler)
-
-    return list(machines.keys())
-
-
-def remove_consecutive_spaces(input_string):
-    """Remove consecutive spaces from a string."""
-
-    return re.sub(r"\s+", " ", input_string)
-
-
-@dataclass
-class Task:
-    """A FabSim3 task."""
-
-    plugin: str
-    definition: str = field(repr=False)
-    name: str = field(init=False)
-    arguments: list[str] = field(default_factory=list)
-    optional_arguments: list[str] = field(default_factory=list)
-    optional_arguments_default: list[str] = field(default_factory=list)
-
-    def __post_init__(self):
-        if not self.definition.startswith("def"):
-            raise ValueError("Task definition must start with 'def'.")
-
-        self.name = self.definition.split(" ")[1].split("(")[0]
-
-        all_arguments = self.definition.split("(")[1].split(")")[0].split(",")
-
-        for argument in all_arguments:
-            if "=" in argument:
-                self.optional_arguments.append(argument.split("=")[0].strip())
-                self.optional_arguments_default.append(
-                    argument.split("=")[1].strip()
-                )
-            else:
-                self.arguments.append(argument)
-
-
-def find_py_files(directory: str) -> list[str]:
-    """Find all python files in a directory."""
-
-    py_files = []
-    for root, _, files in os.walk(directory):
-        for filename in fnmatch.filter(files, "*.py"):
-            py_files.append(os.path.join(root, filename))
-    return py_files
-
-
-def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
-    """Find all FabSim3 tasks in a directory."""
-
+    # Find task definitions in the Python files and extract their details
     definitions = []
     track = False
     start = False
     deflines = []
 
-    for file in files:
+    for file in py_files:
         # Open the file
         with open(file, "r", encoding="utf-8") as file_handler:
             lines = file_handler.readlines()
@@ -93,81 +50,51 @@ def find_task_definitions(files: list[str]) -> list[tuple[str, str]]:
                     if line.strip().endswith(":"):
                         track = False
                         start = False
-                        definitions.append(
-                            (file.split("/")[-1], "".join(deflines).strip())
-                        )
+                        definitions.append((file.split("/")[-1], "".join(deflines).strip()))
                         deflines = []
+                        
+        
+    # Get the path to the machines.yml file using FABSIM3_HOME
+    machines_file_path = os.path.join(fabsim3_home, "fabsim", "deploy", "machines.yml")
 
-    return definitions
+    # Check if the machines.yml file exists
+    if not os.path.isfile(machines_file_path):
+        print(f"Error: machines.yml file not found in {machines_file_path}")
+        exit(1)
 
+    # Load the machines.yml file
+    with open(machines_file_path, "r", encoding="utf-8") as file_handler:
+        machines = yaml.safe_load(file_handler)
 
-def write_to_file_task_args(
-    tasks: list[Task], filename: str, standalone_file: str, with_args_file: str
-):
-    """Write the task arguments to a file."""
+    machines_list = list(machines.keys())
 
-    standalone = []
-    with_args = []
+    # Concatenate machine names into a single string without ", " pattern
+    machines_str = " ".join(machines_list)
 
-    with open(filename, "w", encoding="utf-8") as file_handler:
-        for task in tasks:
-            string1 = " ".join(task.arguments)
-            string2 = " ".join(task.optional_arguments)
-            string = string1 + " " + string2
+    # Create a dictionary to store the autocompletion options for Bash
+    lists_dict = {"machines": machines_str}
 
-            string = string.replace("**", "")
-            string = string.replace("args", "")
+    # Populate the dictionary with task names and their arguments using list comprehension
+    for file, definition in definitions:
+        if not definition.startswith("def"):
+            raise ValueError("Task definition must start with 'def'.")
 
-            string = remove_consecutive_spaces(string)
+        name = definition.split(" ")[1].split("(")[0]
+        all_arguments = definition.split("(")[1].split(")")[0].split(",")
 
-            string = string.strip()
+        # Create a list to store all arguments (including optional arguments) using list comprehension
+        arguments_list = [arg.split("=")[0].strip() if "=" in arg else arg.strip() for arg in all_arguments]
 
-            if len(string) == 0:
-                standalone.append(task.name)
-            else:
-                with_args.append(task.name)
-                file_handler.write(f'{task.name}="')
-                file_handler.write(f'{string}"\n')
+        arguments = " ".join(arguments_list)
+        arguments = "".join(arguments.split("**")).replace("args", "")
+        arguments = re.sub(r"\s+", " ", arguments).strip()
 
-    with open(standalone_file, "w", encoding="utf-8") as file_handler:
-        file_handler.write('standalone_tasks="')
-        file_handler.write(" ".join(standalone))
-        file_handler.write('"\n')
+        key = name
+        value = arguments
+        lists_dict.setdefault(key, []).append(value)
 
-    with open(with_args_file, "w", encoding="utf-8") as file_handler:
-        file_handler.write('tasks_with_args="')
-        file_handler.write(" ".join(with_args))
-        file_handler.write('"\n')
-
-
-def write_machines_to_file(machines: list[str], filename: str):
-    """Write the machines to a file."""
-
-    with open(filename, "w", encoding="utf-8") as file_handler:
-        file_handler.write('machines="')
-        file_handler.write(" ".join(machines))
-        file_handler.write('"\n')
-
-
-def main():
-    """Main function."""
-
-    directory_path = "plugins"
-    py_files = find_py_files(directory_path)
-
-    definitions = find_task_definitions(py_files)
-
-    tasks = list(map(lambda x: Task(x[0], x[1]), definitions))
-    machines = get_machines("fabsim/deploy/machines.yml")
-
-    write_to_file_task_args(
-        tasks,
-        "lists/task_args.txt",
-        "lists/standalone_tasks.txt",
-        "lists/tasks_with_args.txt",
-    )
-    write_machines_to_file(machines, "lists/machines.txt")
-
+    # Print the JSON format for Bash processing
+    print(json.dumps(lists_dict))
 
 if __name__ == "__main__":
     main()

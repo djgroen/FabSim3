@@ -8,6 +8,8 @@ FabSim3 is built on top of the [Python Fabric library](http://www.fabfile.org/),
 
 ### FabSim3 Remote Job Management Command
 
+
+
 #### Job submission
 
 To submit a job on the remote machine, type
@@ -37,6 +39,14 @@ You can fetch the remote data using
 ```sh
 fab <remote machine name> fetch_results
 ```
+
+#### Cleaning up all remote directories
+
+You can clear out ALL remote FabSim3 execution directories using
+```sh
+fab <remote machine name> clean_fabsim_dirs
+```
+NOTE: results will be lost if you did not fetch them first.
 
 ### How to add new remote a machine configuration
 By default, a FabSim3 install will contain 3 machine-specific YML files:
