@@ -31,3 +31,4 @@ fabsim/deploy/applications_user.yml
 .vscode/
 
 venv/
+.venv/
