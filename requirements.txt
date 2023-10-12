@@ -6,4 +6,4 @@ pytest-pep8
 ruamel.yaml
 numpy
 beartype>=0.11
-
+invoke>=2.2
