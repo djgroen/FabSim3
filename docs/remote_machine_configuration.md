@@ -48,14 +48,14 @@ fab <remote machine name> clean_fabsim_dirs
 ```
 NOTE: results will be lost if you did not fetch them first.
 
-### How to add new remote a machine configuration
+## How to add a new remote machine for use by the community
 By default, a FabSim3 install will contain 3 machine-specific YML files:
 
 * `FabSim3/fabsim/deploy/machines.yml`, which shows default values for machine-specific variables for each machine.
 * `FabSim3/fabsim/deploy/machines_user.yml`, which shows user-specific values for machine-specific variables for each machine. This may include the name of the user account. This file is not committed to the repository.
 * `FabSim3/fabsim/deploy/machines_user_example.yml`, a basic example of `machines_user.yml`
 
-#### Adding a new machine to be used by the community
+### Remote Machine Definition
 To add a new machine definition, to be used by the community, one can add a corresponding entry to the `machines.yml` file. For example, for the Prometheus supercomputer in Cracow, Poland, this could be done as follow:
 ```yaml
 prometheus:

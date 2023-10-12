@@ -29,3 +29,6 @@ fabsim/deploy/applications_user.yml
 .hypothesis/
 
 .vscode/
+
+venv/
+.venv/
