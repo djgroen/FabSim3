@@ -129,7 +129,7 @@ def fetch_results(
     if not os.path.isdir(env.job_results_local):
         os.makedirs(env.job_results_local)
 
-    if env.manual_sshpass or env.env_sshpass:
+    if env.manual_sshpass:
         sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
         local(
             template(
@@ -273,7 +273,7 @@ def put_configs(config: str) -> None:
             )
         )
 
-    elif env.manual_sshpass or env.env_sshpass:
+    elif env.manual_sshpass:
         sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
         local(
             template(
@@ -957,7 +957,7 @@ def job_transmission(*job_args):
                     )
                 )
             )
-        elif env.manual_sshpass or env.env_sshpass:
+        elif env.manual_sshpass:
             sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
             # TODO: maybe the better option here is to overwrite the
             #       rsync_project
