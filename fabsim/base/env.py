@@ -92,5 +92,6 @@ env = _lookupDict(
         "default_ssh_config_path": os.path.join(
             os.path.expanduser("~"), ".ssh", "config"
         ),
+        "env_sshpass": "SSHPASS" in os.environ,
     }
 )

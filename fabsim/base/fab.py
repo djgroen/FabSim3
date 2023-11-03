@@ -129,12 +129,13 @@ def fetch_results(
     if not os.path.isdir(env.job_results_local):
         os.makedirs(env.job_results_local)
 
-    if env.manual_sshpass:
+    if env.manual_sshpass or env.env_sshpass:
+        sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
         local(
             template(
-                "rsync -pthrvz -e 'sshpass -f $sshpass ssh -p $port' {}"
+                "rsync -pthrvz -e '{} ssh -p $port' {}"
                 "$username@$remote:$job_results/{}  "
-                "$job_results_local".format(includes_files, regex)
+                "$job_results_local".format(sshpass_cmd, includes_files, regex)
             )
         )
     elif env.manual_gsissh:
@@ -272,10 +273,11 @@ def put_configs(config: str) -> None:
             )
         )
 
-    elif env.manual_sshpass:
+    elif env.manual_sshpass or env.env_sshpass:
+        sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
         local(
             template(
-                "rsync -pthrvz --rsh='sshpass -f $sshpass ssh  -p 22  ' "
+                f"rsync -pthrvz --rsh='{sshpass_cmd} ssh  -p 22  ' "
                 "$job_config_path_local/ "
                 "$username@$remote:$job_config_path/"
             )
@@ -955,13 +957,14 @@ def job_transmission(*job_args):
                     )
                 )
             )
-        elif env.manual_sshpass:
+        elif env.manual_sshpass or env.env_sshpass:
+            sshpass_cmd = "sshpass -e" if env.env_sshpass else "sshpass -f $sshpass"
             # TODO: maybe the better option here is to overwrite the
             #       rsync_project
             local(
                 template(
                     "rsync -pthrvz "
-                    "--rsh='sshpass -f $sshpass ssh  -p 22  ' "
+                    f"--rsh='{sshpass_cmd} ssh  -p 22  ' "
                     "{}/ $username@$remote:{}/ ".format(sync_src, sync_dst)
                 )
             )
