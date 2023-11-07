@@ -53,3 +53,6 @@ FabDynamics:
 
 FabABMCPP:
   repository: https://github.com/shakir507/FabABMCPP
+  
+FabEco:
+  repository: https://github.com/arindamsaha1507/FabEco
