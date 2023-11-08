@@ -1,6 +1,7 @@
 import math
 import os
 import re
+import subprocess
 import tempfile
 from pathlib import Path
 from pprint import pformat, pprint
@@ -1004,7 +1005,15 @@ def job_submission(*job_args):
         print("job dispatch is done locally\n")
 
     elif not env.get("noexec", False):
-        if env.remote == "localhost":
+        if env.dry_run:
+            if env.host == "localhost":
+                print("Dry run")
+                subprocess.call(["cat", job_script])
+            else:
+                print("Dry run available only on localhost")
+            exit()
+
+        elif env.remote == "localhost":
             run(
                 cmd="{} && {}".format(
                     env.run_prefix,
