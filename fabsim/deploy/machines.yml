@@ -202,6 +202,11 @@ Kathleen:
     # list of modules to be loaded on remote machine
     all: ["load python/3.7.4", "load lammps/16Mar18/userintel/intel-2018"]
 
+myriad:
+  home_path_template: "/home/$username"
+  remote: "myriad.rc.ucl.ac.uk"
+  batch_header: myriad-header
+
 bluejoule:
   job_dispatch: "llsubmit"
   run_command: "runjob --env-all -p $corespernode -n $cores :"
