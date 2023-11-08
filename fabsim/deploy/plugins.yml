@@ -56,3 +56,6 @@ FabABMCPP:
   
 FabEco:
   repository: https://github.com/arindamsaha1507/FabEco
+  
+FabOasis:
+  repository: https://github.com/arindamsaha1507/FabOasis
