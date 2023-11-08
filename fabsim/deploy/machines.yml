@@ -76,7 +76,7 @@ default:
   # Flag to use GSISSH instead of SSH.
   manual_gsissh: false
   
-  # Flag to use sshpass within SSH.
+  # Flag to use sshpass within SSH (requires that either value for sshpass is set with filename of plaintext password file for this machine or SSHPASS set in environment)
   manual_sshpass: false
 
   # Flag to use 'monsoon mode', which avoids rsync altogether and copies 

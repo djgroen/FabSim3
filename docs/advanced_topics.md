@@ -253,4 +253,24 @@ archer2:
 ```
 
 
+## SSH password authentication with `sshpass`
+If (in addition to a public key which can be set in `~/.ssh/config`) a password is required for SSH authentication,  
+set `manual_sshpass: true` in your `machine.yml`.  
 
+Example:
+```yml
+myMachine:
+  remote: myHost # see ~/.ssh/config
+  manual_sshpass: true
+```
+The password may then be provided as an environment variable:
+```bash
+# Avoid leaking password to ~/.bash_history
+read -sr SSHPASS && export SSHPASS
+# SSHPASS is automatically used if manual_sshpass is set
+fabsim myMachine dummy:dummy_test
+```
+
+It is also possible to provide a plain text file containing the password by including `sshpass: 'path/to/password.secret'` in your `machine.yml` instead of providing it as an environment variable.  
+Make sure that the password is not readable by other users with `chmod g=-rwx,o=-rwx path/to/password.secret`.  
+**NOTE:** This does not provide any real security and the use of this method is highly discouraged!
