@@ -110,3 +110,10 @@ FabUQCampaign is a FabSim3 plugin for a climate modelling. It used to run an ens
 	* FabUQCampaign 2D ocean model documentation : [:fontawesome-solid-book:](https://github.com/wedeling/FabUQCampaign/blob/master/Tutorial_ocean.md)
 
 
+#### FabNESO
+
+FabNESO is a FabSim3 plugin for [Neptune Exploratory SOftware (NESO)](https://github.com/ExCALIBUR-NEPTUNE/NESO). 
+It can be used to run both single instances and ensemble runs of NESO simulations.
+
+* FabNESO github repository : [:octicons-mark-github-16:](https://github.com/UCL/FabNESO)
+* FabNESO documentation : [:fontawesome-solid-book:](https://github.com/UCL/FabNESO/blob/main/README.md)
