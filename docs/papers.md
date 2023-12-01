@@ -1,6 +1,10 @@
 
 This page contains a list of selected papers that have extensively used FabSim3, or its predecessor FabSim.
 
+!!! note
+        This list is maintained manually, and may not contain certain (recent) relevant publications.
+
+
 ## Core FabSim3 papers
 
 * Groen, D., Arabnejad, H., Suleimenova, D., Edeling, W., Raffin, E., Xue, Y., Bronik, K., Monnier, N. and Coveney, P.V., 2023. FabSim3: An automation toolkit for verified simulations using high performance computing. Computer Physics Communications, 283, p.108596.
