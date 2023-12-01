@@ -197,7 +197,7 @@ nav:
       - Remote QCG PilotJob Installation: qcg-pilotjob_installation.md
       - Containerized versions : containerized_versions.md
       - Additional links : additional_links.md
-      - Papers : papers.md
+      - Literature / cite us : FabSim3_Literature.md
 
     - Code Reference:
        - Base APIs:
