@@ -3,9 +3,10 @@ This page contains a list of selected papers that have extensively used FabSim3,
 
 ## Core FabSim3 papers
 
-* Groen, D., Bhati, A.P., Suter, J., Hetherington, J., Zasada, S.J. and Coveney, P.V., 2016. FabSim: facilitating computational research through automation on large-scale and distributed e-infrastructures. Computer Physics Communications, 207, pp.375-385.
+* Groen, D., Arabnejad, H., Suleimenova, D., Edeling, W., Raffin, E., Xue, Y., Bronik, K., Monnier, N. and Coveney, P.V., 2023. FabSim3: An automation toolkit for verified simulations using high performance computing. Computer Physics Communications, 283, p.108596.
 * Groen, D., Arabnejad, H., Jancauskas, V., Edeling, W.N., Jansson, F., Richardson, R.A., Lakhlili, J., Veen, L., Bosak, B., Kopta, P. and Wright, D.W., 2021. VECMAtk: a scalable verification, validation and uncertainty quantification toolkit for scientific simulations. Philosophical Transactions of the Royal Society A, 379(2197), p.20200221.
 * Suleimenova, D., Arabnejad, H., Edeling, W.N., Coster, D., Luk, O.O., Lakhlili, J., Jancauskas, V., Kulczewski, M., Veen, L., Ye, D. and Zun, P., 2021. Tutorial applications for Verification, Validation and Uncertainty Quantification using VECMA toolkit. Journal of Computational Science, 53, p.101402.
+* Groen, D., Bhati, A.P., Suter, J., Hetherington, J., Zasada, S.J. and Coveney, P.V., 2016. FabSim: facilitating computational research through automation on large-scale and distributed e-infrastructures. Computer Physics Communications, 207, pp.375-385.
 
 ## FabSim3 application papers
 
