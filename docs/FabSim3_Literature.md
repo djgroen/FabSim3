@@ -1,6 +1,7 @@
 # FabSim3 Literature
 
 This page serves to provide definitive references for key aspects of the FabSim3 automation toolkit.
+A full list of relevant FabSim3 papers can be found [here](papers.md).
 
 ## FabSim 3 paper
 Groen, D., Arabnejad, H., Suleimenova, D., Edeling, W., Raffin, E., Xue, Y., Bronik, K., Monnier, N. and Coveney, P.V., 2023. FabSim3: An automation toolkit for verified simulations using high performance computing. Computer Physics Communications, 283, p.108596.
