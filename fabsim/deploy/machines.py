@@ -237,7 +237,7 @@ def load_plugins() -> None:
             with add_print_prefix(prefix="loading plugin", color=28):
                 print("{} ...".format(key))
 
-            plugin = importlib.import_module("plugins.{}.{}".format(key, key))
+            plugin = importlib.import_module("plugins.{}.{}.{}".format(key, key.lower(), key.lower()))
             plugin_dict = plugin.__dict__
 
             try:
@@ -251,6 +251,10 @@ def load_plugins() -> None:
                 {name: plugin_dict[name] for name in to_import}
             )
             env.localplugins.update({key: plugin_dir})
+
+        except ModuleNotFoundError as e:
+            print(e)
+            #raise ModuleNotFoundError(e)
 
         except ImportError as e:
             print(e)
