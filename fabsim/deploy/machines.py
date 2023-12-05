@@ -254,8 +254,9 @@ def load_plugins() -> None:
 
             else:
                 print(f"ERROR: Plugin {key} is not recognised by FabSim3.")
-                print(
-                    f"It may not contain either a {key}/{key}.py file or a {key}/{key.lower()} package with a {key.lower()}.py file in it.")
+                print(f"It may not contain either a {key}/{key}.py file") 
+                print(f"or a {key}/{key.lower()} package,")
+                print(f"with a {key.lower()}.py file in it.")
                 sys.exit()
 
             plugin_dict = plugin.__dict__
