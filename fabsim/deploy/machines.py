@@ -239,19 +239,23 @@ def load_plugins() -> None:
 
             plugin = None
 
-            #print(os.path.join(plugin_dir, key.lower()))
-            #print(os.path.join(plugin_dir, key))
+            # print(os.path.join(plugin_dir, key.lower()))
+            # print(os.path.join(plugin_dir, key))
             if os.path.isdir(os.path.join(plugin_dir, key.lower())):
                 # Check for new style plugins
-                plugin = importlib.import_module("plugins.{}.{}.{}".format(key, key.lower(), key.lower()))
+                plugin = importlib.import_module(
+                    "plugins.{}.{}.{}".format(
+                        key, key.lower(), key.lower()))
 
             elif os.path.isfile(os.path.join(plugin_dir, f"{key}.py")):
                 # Check for old style plugins
-                plugin = importlib.import_module("plugins.{}.{}".format(key, key))
+                plugin = importlib.import_module(
+                    "plugins.{}.{}".format(key, key))
 
             else:
                 print(f"ERROR: Plugin {key} is not recognised by FabSim3.")
-                print(f"It may not contain either a {key}/{key}.py file or a {key}/{key.lower()} package with a {key.lower()}.py file in it.")
+                print(
+                    f"It may not contain either a {key}/{key}.py file or a {key}/{key.lower()} package with a {key.lower()}.py file in it.")
                 sys.exit()
 
             plugin_dict = plugin.__dict__
@@ -270,7 +274,7 @@ def load_plugins() -> None:
 
         except ModuleNotFoundError as e:
             print(e)
-            #raise ModuleNotFoundError(e)
+            # raise ModuleNotFoundError(e)
 
         except ImportError as e:
             print(e)
