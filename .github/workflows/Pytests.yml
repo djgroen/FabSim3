@@ -96,7 +96,7 @@ jobs:
         run: |
           source ~/.bash_profile
           python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
-          pytest --pep8  fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
+          pycodestyle fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
 
       - name: Run isort 🚀
         run: |
