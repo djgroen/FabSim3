@@ -105,7 +105,7 @@ def colored(color_code, text):
 
 
 @contextmanager
-def add_print_perfix(prefix, color=24):
+def add_print_prefix(prefix, color=24):
     # source : https://stackabuse.com/how-to-print-colored-text-in-python
 
     current_out = sys.stdout

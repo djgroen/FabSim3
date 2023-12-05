@@ -7,7 +7,7 @@ from pprint import pprint
 from beartype import beartype
 
 from fabsim.base.env import env
-from fabsim.base.utils import add_print_perfix, colored
+from fabsim.base.utils import add_print_prefix, colored
 
 """
 def colored(r, g, b, text):
@@ -69,7 +69,7 @@ def task(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         wrapper.has_been_called = True
-        with add_print_perfix(prefix="Executing task", color=196):
+        with add_print_prefix(prefix="Executing task", color=196):
             print("{}".format(func.__name__))
 
         return func(*args, **kwargs)

@@ -9,7 +9,7 @@ from beartype.typing import List, Optional, Tuple
 from fabric2 import Config, Connection
 
 from fabsim.base.env import env
-from fabsim.base.utils import add_print_perfix
+from fabsim.base.utils import add_print_prefix
 from fabsim.deploy.templates import template
 
 
@@ -28,7 +28,7 @@ def local(command: str, capture: Optional[bool] = False) -> Tuple[str, str]:
         shell (None, optional): Description
     """
 
-    with add_print_perfix(prefix="local", color=196):
+    with add_print_prefix(prefix="local", color=196):
         print("{}".format(command))
 
     # set stdout and stderr for subprocess
@@ -114,7 +114,7 @@ class HostConnection:
 
         # env.remote : localhost
         # env.host_string : user@localhost
-        with add_print_perfix(
+        with add_print_prefix(
             prefix="run on {}".format(env.host_string), color=196
         ):
             print("{}".format(command))
@@ -124,7 +124,7 @@ class HostConnection:
         if capture is True:
             # here, I only set to hide the stdout, and capture any stderr
             hide = "out"
-        with add_print_perfix(prefix=env.host_string):
+        with add_print_prefix(prefix=env.host_string):
             with self.ssh_connection() as conn:
                 run = conn.sudo if self.use_sudo else conn.run
                 if cd is None:
@@ -295,7 +295,7 @@ def rsync_project(
     #     local_dir, env.host_string, remote_dir
     # )
 
-    with add_print_perfix(prefix="rsync_project", color=196):
+    with add_print_prefix(prefix="rsync_project", color=196):
         print("{}".format(rync_cmd))
     # conn = HostConnection()
     # return conn.run_command(command=rync_cmd, capture=capture)
@@ -378,7 +378,7 @@ def put(
             default_opts, rsh_opts, src, env.host_string, dst
         )
 
-    with add_print_perfix(prefix="put", color=196):
+    with add_print_prefix(prefix="put", color=196):
         print("{}".format(put_cmd))
 
     return local(command=put_cmd, capture=capture)
