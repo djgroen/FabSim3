@@ -2,7 +2,7 @@ rich
 fabric2
 pyyaml
 pytest
-pytest-pep8
+pycodestyle
 ruamel.yaml
 numpy
 beartype>=0.11
