@@ -13,7 +13,7 @@ from rich.panel import Panel
 
 from fabsim.base.decorators import task
 from fabsim.base.env import env
-from fabsim.base.utils import add_print_perfix
+from fabsim.base.utils import add_print_prefix
 from fabsim.deploy.templates import template
 
 config = yaml.safe_load(
@@ -234,7 +234,7 @@ def load_plugins() -> None:
             continue
 
         try:
-            with add_print_perfix(prefix="loading plugin", color=28):
+            with add_print_prefix(prefix="loading plugin", color=28):
                 print("{} ...".format(key))
 
             plugin = importlib.import_module("plugins.{}.{}".format(key, key))
