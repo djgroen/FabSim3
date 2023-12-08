@@ -13,7 +13,7 @@ from rich.panel import Panel
 from fabsim.base.env import env
 from fabsim.base.fab import *
 from fabsim.base.utils import (
-    OpenVPNWrapper,
+    OpenVPNContext,
     find_all_avail_tasks,
     show_avail_machines,
     show_avail_tasks,
@@ -158,7 +158,7 @@ def main():
     ##############################
     # execute the requested task #
     ##############################
-    with OpenVPNWrapper(env):
+    with OpenVPNContext(env):
         env.exec_func(*env.task_args, **env.task_kwargs)
 
 

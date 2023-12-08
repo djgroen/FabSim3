@@ -125,7 +125,7 @@ def add_print_prefix(prefix, color=24):
         sys.stdout = current_out
 
 
-class OpenVPNWrapper(object):
+class OpenVPNContext(object):
     """
     Connect to and disconnect from OpenVPN,
     if a configuration is specified in the environment.
@@ -133,7 +133,7 @@ class OpenVPNWrapper(object):
 
     Usage:
     ```python
-    with OpenVPNWrapper(env):
+    with OpenVPNContext(env):
         # do stuff while (potentially) connected through VPN
     ```
     """
@@ -158,7 +158,7 @@ class OpenVPNWrapper(object):
         rich_print(
             Panel.fit(
                 msg,
-                title=f"[yellow]{OpenVPNWrapper.__name__}[/yellow]",
+                title=f"[yellow]{OpenVPNContext.__name__}[/yellow]",
                 border_style="yellow",
             )
         )
@@ -166,7 +166,7 @@ class OpenVPNWrapper(object):
     def __enter__(self):
         self._p = None
         if self._config is not None:
-            OpenVPNWrapper._print("Starting VPN...")
+            OpenVPNContext._print("Starting VPN...")
             cmd = ["openvpn", "--config", self._config]
             if platform.system().lower() in ["linux", "darwin"]:
                 cmd = ["sudo", "-n"] + cmd  # OpenVPN requires root privileges
@@ -178,12 +178,12 @@ class OpenVPNWrapper(object):
             if platform.system().lower() in ["linux", "darwin"]:
                 system("stty sane")  # sudo messes up the terminal output
             if self._p.poll() is not None:
-                OpenVPNWrapper._print("VPN not running")
+                OpenVPNContext._print("VPN not running")
                 exit(1)
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self._p is not None:
-            OpenVPNWrapper._print("Stopping VPN...")
+            OpenVPNContext._print("Stopping VPN...")
             try:
                 self._p.kill()
                 self._p = None
