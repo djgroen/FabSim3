@@ -187,5 +187,5 @@ class OpenVPNContext(object):
             try:
                 self._p.kill()
                 self._p = None
-            except:
+            except Exception as e:
                 pass
