@@ -1,10 +1,17 @@
 import inspect
+import platform
+import subprocess
 import sys
+import time
 from contextlib import contextmanager
+from os import system
+from pathlib import Path
 from pprint import pprint
 
 from beartype.typing import Dict
+from rich import print as rich_print
 from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table, box
 from rich.text import Text
 
@@ -116,3 +123,69 @@ def add_print_prefix(prefix, color=24):
         yield
     finally:
         sys.stdout = current_out
+
+
+class OpenVPNWrapper(object):
+    """
+    Connect to and disconnect from OpenVPN,
+    if a configuration is specified in the environment.
+    Otherwise, do nothing.
+
+    Usage:
+    ```python
+    with OpenVPNWrapper(env):
+        # do stuff while (potentially) connected through VPN
+    ```
+    """
+
+    def __init__(self, env):
+        self._config = None
+        self._auth_user_pass = None
+        path_err_msg = 'The value of X for this machine is not a valid file.'
+        if hasattr(env, "openvpn_config"):
+            self._config = env.openvpn_config
+            if not Path(self._config).is_file():
+                print(path_err_msg.replace('X', self._config), file=sys.stderr)
+                exit(1)
+        if hasattr(env, "openvpn_auth_user_pass"):
+            self._auth_user_pass = env.openvpn_auth_user_pass
+            if not Path(self._auth_user_pass).is_file():
+                print(path_err_msg.replace(
+                    'X', self._auth_user_pass), file=sys.stderr)
+                exit(1)
+
+    def _print(msg):
+        rich_print(
+            Panel.fit(
+                msg,
+                title=f"[yellow]{OpenVPNWrapper.__name__}[/yellow]",
+                border_style="yellow",
+            )
+        )
+
+    def __enter__(self):
+        self._p = None
+        if self._config is not None:
+            OpenVPNWrapper._print("Starting VPN...")
+            cmd = ["openvpn", "--config", self._config]
+            if platform.system().lower() in ["linux", "darwin"]:
+                cmd = ["sudo", "-n"] + cmd  # OpenVPN requires root privileges
+            if self._auth_user_pass is not None:
+                cmd += ["--auth-user-pass", self._auth_user_pass]
+            self._p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL)
+            # Wait a bit for the VPN connection to be established
+            time.sleep(3)
+            if platform.system().lower() in ["linux", "darwin"]:
+                system("stty sane")  # sudo messes up the terminal output
+            if self._p.poll() is not None:
+                OpenVPNWrapper._print("VPN not running")
+                exit(1)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self._p is not None:
+            OpenVPNWrapper._print("Stopping VPN...")
+            try:
+                self._p.kill()
+                self._p = None
+            except:
+                pass
