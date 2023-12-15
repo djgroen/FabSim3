@@ -1466,9 +1466,15 @@ def install_packages(venv: bool = "False"):
 @task
 def install_app(name="", external_connexion="no", venv="False"):
     """
-    Install a specific Application through FasbSim3
+    Install a specific Application through FabSim3.
 
+    Parameters:
+    - name (str): Name of the application to install.
+    - external_connexion (str): Indicates if external connection is used (not currently used in the function).
+    - venv (bool): Flag to indicate whether to use a virtual environment.
     """
+
+    # Load application configurations from local YAML files
     applications_yml_file = os.path.join(
         env.fabsim_root, "deploy", "applications.yml"
     )
@@ -1478,203 +1484,84 @@ def install_app(name="", external_connexion="no", venv="False"):
     if not os.path.exists(user_applications_yml_file):
         copyfile(applications_yml_file, user_applications_yml_file)
 
-    config = yaml.load(
-        open(user_applications_yml_file), Loader=yaml.SafeLoader
-    )
+    # Load application-specific configurations
+    config = yaml.load(open(user_applications_yml_file), Loader=yaml.SafeLoader)
     info = config[name]
 
-    # Offline cluster installation - --user install
-    # Temporary folder
-    tmp_app_dir = "{}/tmp_app".format(env.localroot)
-    local("mkdir -p {}".format(tmp_app_dir))
-
-    # First download all the Miniconda3 installation script
-    local(
-        "wget {} -O {}/miniconda.sh".format(
-            config["Miniconda-installer"]["repository"], tmp_app_dir
-        )
-    )
-
-    # Install app-specific requirements
-
+    # Handle installation for QCG-PilotJob
     if name == "QCG-PilotJob":
-        local("pip3 install -r " + env.localroot + "/qcg_requirements.txt")
+        # Define paths for the requirements file
+        local_qcg_requirements_path = os.path.join(env.localroot, "qcg_requirements.txt")
+        remote_qcg_requirements_path = os.path.join(env.scripts_path, "qcg_requirements.txt")
 
-    # Next download all the additional dependencies
-    for dep in info["additional_dependencies"]:
-        local(
-            "pip3 download --no-binary=:all: -d {} {}".format(tmp_app_dir, dep)
-        )
-    add_dep_list_compressed = sorted(
-        Path(tmp_app_dir).iterdir(), key=lambda f: f.stat().st_mtime
-    )
-    for it in range(len(add_dep_list_compressed)):
-        add_dep_list_compressed[it] = os.path.basename(
-            add_dep_list_compressed[it]
-        )
+        # Transfer requirements file to the remote machine
+        put(local_qcg_requirements_path, remote_qcg_requirements_path)
 
-    # Download all the dependencies of the application
-    # This first method should download all the dependencies needed
-    # but for the local plateform !
-    # --> Possible Issue during the installation in the remote
-    # (it's not a cross-plateform install yet)
-    local(
-        "pip3 download --no-binary=:all: -d {} git+{}@v{}".format(
-            tmp_app_dir, info["repository"], info["version"]
-        )
-    )
+        # Set environment configurations for the job
+        env.config = "Install_VECMA_App"
+        env.nodes = env.cores
+        env.job_results, env.job_results_local = with_template_job()
 
-    # Create  directory in the remote machine to store dependency packages
-    run(template("mkdir -p {}".format(env.app_repository)))
-    # Send the dependencies (and the dependencies of dependencies) to the
-    # remote machine
-    for whl in os.listdir(tmp_app_dir):
-        local(
-            template(
-                "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
-            )
-        )
+        # Create a temporary directory for script preparation
+        tmp_app_dir = "{}/tmp_app".format(env.localroot)
+        local("mkdir -p {}".format(tmp_app_dir))
+        script = os.path.join(tmp_app_dir, "script")
 
-    # Set required env variable
-    env.config = "Install_VECMA_App"
-    # env.nodes = 1
-    env.nodes = env.cores
-    script = os.path.join(tmp_app_dir, "script")
-    # Write the Install command in a file
-    with open(script, "w") as sc:
-        install_dir = ""
-        if venv == "True":
-            # clean virtualenv and App_repo directory on remote machine side
-            # To make sure everything is going to be installed from scratch
-            """
-            sc.write("find %s/ -maxdepth 1 -mindepth 1 -type d \
-                -exec rm -rf \"{}\" \\;\n" % (env.app_repository))
-            sc.write("rm -rf %s\n" % (env.virtual_env_path))
-            """
+        # Specify the Python path as per ARCHER2's recommendation:
+        # "https://docs.archer2.ac.uk/user-guide/python/"
+        python_path = "/opt/cray/pe/python/3.9.13.1/bin/python"
 
-            # It seems some version of python/virtualenv doesn't support
-            # the option --no-download. So there is sometime a problem :
-            # from pip import main
-            # ImportError: cannot import name 'main'
-            #
-            # TODO Check python version and raised a Warning if not the
-            # right version ?
-            # TODO
-            #
-            sc.write(
-                "if [ ! -d {} ]; then \n\t bash {}/miniconda.sh -b -p {} "
-                "|| echo 'WARNING : virtualenv is not installed "
-                "or has a problem' \nfi".format(
-                    env.virtual_env_path,
-                    env.app_repository,
-                    env.virtual_env_path,
-                )
-            )
-            sc.write(
-                '\n\neval "$$({}/bin/conda shell.bash hook)"\n\n'.format(
-                    env.virtual_env_path
-                )
-            )
-            # install_dir = ""
-            """
-            with the latest version of numpy, I got this error:
-            1. Check that you expected to use Python3.8 from ...,
-                and that you have no directories in your PATH or PYTHONPATH
-                that can interfere with the Python and numpy version "1.18.1"
-                you're trying to use.
-            so, since that we are using VirtualEnv, to avoid any conflict,
-            it is better to clear PYTHONPATH
-            """
-            # sc.write("\nexport PYTHONPATH=\"\"\n")
-            sc.write("\nmodule unload python\n")
+        # Write the installation script
+        with open(script, "w") as sc:
+            if str(venv).lower() == "true":
+                # Create a virtual environment if it doesn't exist
+                sc.write("rm -rf {}\n".format(env.virtual_env_path))
+                sc.write("{} -m venv {}\n".format(python_path, env.virtual_env_path))
+                sc.write("source {}/bin/activate\n".format(env.virtual_env_path))
+                sc.write("{} -m pip install --no-cache-dir --upgrade pip\n".format(python_path))
+                sc.write("{} -m pip install --no-cache-dir -r {}\n".format(python_path, remote_qcg_requirements_path))
+                sc.write("{} -m pip list\n".format(python_path))
+            else:
+                # Check if the virtual environment exists before trying to activate it
+                sc.write("if [ -d \"{0}\" ]; then\n".format(env.virtual_env_path))
+                sc.write("  source {}/bin/activate\n".format(env.virtual_env_path))
+                sc.write("else\n")
+                sc.write("  echo 'No virtual environment found at {}.'\n".format(env.virtual_env_path))
+                sc.write("  echo 'Please create a virtual environment on remote machine or set venv to True.'\n")
+                sc.write("fi\n")
 
-        # First install the additional_dependencies
-        for dep in reversed(add_dep_list_compressed):
-            print(dep)
-            if dep.endswith(".zip"):
-                sc.write(
-                    "\nunzip {}/{} -d {} && cd {}/{} "
-                    "&& {}/bin/python3 setup.py install {}\n".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".zip", ""),
-                        env.virtual_env_path,
-                        install_dir,
-                    )
-                )
-            elif dep.endswith(".tar.gz"):
-                sc.write(
-                    "\ntar xf {}/{} -C {} && cd {}/{} "
-                    "&& {}/bin/python3 setup.py install {}\n".format(
-                        env.app_repository,
-                        dep,
-                        env.app_repository,
-                        env.app_repository,
-                        dep.replace(".tar.gz", ""),
-                        env.virtual_env_path,
-                        install_dir,
-                    )
-                )
+            # Echo the completion of the installation process
+            sc.write("echo 'Installation of {} is completed.'\n".format(name))
 
-        sc.write(
-            "{}/bin/pip install --no-index --no-build-isolation "
-            "--find-links=file:{} {}/{}-{}.zip {} || "
-            "{}/bin/pip install --no-index "
-            "--find-links=file:{} {}/{}-{}.zip".format(
-                env.virtual_env_path,
-                env.app_repository,
-                env.app_repository,
-                info["name"],
-                info["version"],
-                install_dir,
-                env.virtual_env_path,
-                env.app_repository,
-                env.app_repository,
-                info["name"],
-                info["version"],
-            )
-        )
+        # Prepare environment for job submission
+        env.local_templates_path.insert(0, tmp_app_dir)
+        install_dict = dict(script="script")
+        update_environment(install_dict)
 
-    # Add the tmp_app_dir directory in the local templates path because the
-    # script is saved in it
-    env.local_templates_path.insert(0, tmp_app_dir)
+        # Determine job result paths
+        env.job_results, env.job_results_local = with_template_job()
 
-    install_dict = dict(script="script")
-    # env.script = "script"
-    update_environment(install_dict)
+        # Create and transfer the job script
+        env.job_script = script_templates(env.batch_header_install_app, script)
+        run(template("mkdir -p $scripts_path"))
+        env.dest_name = env.pather.join(env.scripts_path, env.pather.basename(env.job_script))
+        put(env.job_script, env.dest_name)
+        
+        # Create results directory on the remote machine
+        run(template("mkdir -p $job_results"))
 
-    # Determine a generated job name from environment parameters
-    # and then define additional environment parameters based on it.
-    env.job_results, env.job_results_local = with_template_job()
+        # Append to the job dispatch command
+        env.job_dispatch += " -q standard"
 
-    # Create job script based on "sbatch header" and script created above in
-    # deploy/.jobscript/
+        # Print job script and destination for debugging
+        print("Job Script: {}".format(env.job_dispatch))
+        print("Destination name: {}".format(env.dest_name))
 
-    env.job_script = script_templates(env.batch_header_install_app, env.script)
+        # Execute the job on the remote machine
+        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
-    # Create script's destination path to remote machine based on
-    run(template("mkdir -p $scripts_path"))
-    env.dest_name = env.pather.join(
-        env.scripts_path, env.pather.basename(env.job_script)
-    )
-
-    # Send Install script to remote machine
-    put(env.job_script, env.dest_name)
-    #
-    run(template("mkdir -p $job_results"))
-
-    env.job_dispatch += " -q standard"
-
-    print(env.job_dispatch)
-    print(env.dest_name)
-
-    run(template("{} {}".format(env.job_dispatch, env.dest_name)))
-
-    local("rm -rf {}".format(tmp_app_dir))
-
+        # Clean-up the local temporary directory
+        local("rm -rf {}".format(tmp_app_dir))
 
 def count_folders(dir_path: str, prefix: str):
     """
