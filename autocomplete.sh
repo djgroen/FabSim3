@@ -12,6 +12,7 @@ echo " - For options with argument(s), type 'fabsim localhost flare_local:<TAB>'
 echo " - If autocomplete does not provide options, please 'source autocomplete.sh' script again."
 
 _fabsim_completion() {
+
     local cur prev1 prev2
     # Get the current word being completed and the previous two words
     cur="${COMP_WORDS[COMP_CWORD]}"
