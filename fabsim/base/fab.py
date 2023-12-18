@@ -1029,14 +1029,16 @@ def job_submission(*job_args):
             cmd = template(
                 "ssh $remote_compute "
                 "-C '$job_dispatch {}'".format(job_script),
-                number_of_iterations=2,  # Allow for variable refs in job_dispatch
+                # Allow for variable references in job_dispatch definition
+                number_of_iterations=2,
             )
             run(cmd, cd=env.pather.dirname(job_script))
         else:
             run(
                 cmd=template(
                     "$job_dispatch {}".format(job_script),
-                    number_of_iterations=2,  # Allow for variable refs in job_dispatch
+                    # Allow for variable references in job_dispatch definition
+                    number_of_iterations=2,
                 ),
                 cd=env.pather.dirname(job_script),
             )
