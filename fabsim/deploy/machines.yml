@@ -495,7 +495,7 @@ archer2:
   budget: "d137"
   project: "d137"
   corespernode: 128
-  run_command: "srun -n $cores"
+  run_command: "srun --distribution=block:block --hint=nomultithread"
   qos_name: "standard"
   # list of available partitions : sinfo --Format=partition
   job_dispatch: "cd /work/$project/$project/$username ; sbatch"
