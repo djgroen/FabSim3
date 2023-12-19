@@ -6,6 +6,9 @@
 ## task per node
 #SBATCH --tasks-per-node=$corespernode
 
+## number of cpus per task
+#SBATCH --cpus-per-task=$cpuspertask
+
 ## wall time in format MINUTES:SECONDS
 #SBATCH --time=$job_wall_time
 
@@ -21,3 +24,5 @@
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
+# Ensure the cpus-per-task option is propagated to srun commands
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
