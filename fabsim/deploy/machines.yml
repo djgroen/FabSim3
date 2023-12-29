@@ -83,6 +83,7 @@ default:
   # openvpn_config: /path/to/config.ovpn
 
   # When connecting through OpenVPN, a username and password can be provided in a separate file
+  # (set this value to true instead to use OPENVPN_AUTH_USER and OPENVPN_AUTH_PASS from the environment)
   # openvpn_auth_user_pass: /path/to/auth-user-pass.txt
 
   # Flag to use 'monsoon mode', which avoids rsync altogether and copies 

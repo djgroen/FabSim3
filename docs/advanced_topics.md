@@ -274,3 +274,22 @@ fabsim myMachine dummy:dummy_test
 It is also possible to provide a plain text file containing the password by including `sshpass: 'path/to/password.secret'` in your `machine.yml` instead of providing it as an environment variable.  
 Make sure that the password is not readable by other users with `chmod g=-rwx,o=-rwx path/to/password.secret`.  
 **NOTE:** This does not provide any real security and the use of this method is highly discouraged!
+
+## OpenVPN
+When using machines across different private networks, the corresponding configuration in your `machine.yml` file may provide the required configuration file and optional credentials.  
+The same considerations as for the use of a password file for `sshpass` apply here.
+
+Example:
+```yml
+myMachine:
+  openvpn_config: /path/to/config.ovpn
+  openvpn_auth_user_pass: /path/to/auth-user-pass
+```
+The credentials may be provided as environment variables if `openvpn_auth_user_pass` is set to `true`:
+```bash
+# Avoid leaking credentials to ~/.bash_history
+read -sr OPENVPN_AUTH_USER && export OPENVPN_AUTH_USER
+read -sr OPENVPN_AUTH_PASS && export OPENVPN_AUTH_PASS
+# OPENVPN_AUTH_USER and OPENVPN_AUTH_PASS are used if openvpn_auth_user_pass is set to true
+fabsim myMachine dummy:dummy_test
+```
