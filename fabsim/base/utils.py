@@ -140,28 +140,31 @@ class OpenVPNContext(object):
     ```
     """
 
-    _AUTH_ENV_KEYS = ['OPENVPN_AUTH_USER', 'OPENVPN_AUTH_PASS']
+    _AUTH_ENV_VARS = ['OPENVPN_AUTH_USER', 'OPENVPN_AUTH_PASS']
 
     def __init__(self, env):
         self._config = None
         self._auth_user_pass = None
-        path_err_msg = 'The value of X for this machine is not a valid file or boolean.'
+        path_err_msg = 'The value of X for this machine is not a valid file.'
         if hasattr(env, "openvpn_config"):
             self._config = env.openvpn_config
             if not Path(self._config).is_file():
                 print(path_err_msg.replace('X', self._config), file=sys.stderr)
                 exit(1)
-        if hasattr(env, "openvpn_auth_user_pass"):
-            self._auth_user_pass = env.openvpn_auth_user_pass
+        env_key_auth = 'openvpn_auth_user_pass'
+        if hasattr(env, env_key_auth):
+            self._auth_user_pass = env[env_key_auth]
             if type(self._auth_user_pass) != bool or \
                 (type(self._auth_user_pass) == str and
                     not Path(self._auth_user_pass).is_file()):
                 print(path_err_msg.replace(
-                    'X', self._auth_user_pass), file=sys.stderr)
+                    'X', self._auth_user_pass)[:-1] + ' or boolean.',
+                    file=sys.stderr)
                 exit(1)
-            if len(set(OpenVPNContext._AUTH_ENV_KEYS).intersection(os.environ)) != 2:
-                print(' and '.join(OpenVPNContext._AUTH_ENV_KEYS) +
-                      'must be set in environment if openvpn_auth_user_pass is true.')
+            if len(set(OpenVPNContext._AUTH_ENV_VARS)
+                   .intersection(os.environ)) != 2:
+                print(' and '.join(OpenVPNContext._AUTH_ENV_VARS) +
+                      f'must be set in environment if {env_key_auth} is true.')
                 exit(1)
 
     def _print(msg):
@@ -181,10 +184,11 @@ class OpenVPNContext(object):
             if platform.system().lower() in ["linux", "darwin"]:
                 cmd = ["sudo", "-n"] + cmd  # OpenVPN requires root privileges
             # Create a temporary file for holding credentials from environment
-            # (Workaround, because the shell might not support the <() operator)
+            # (Workaround: The shell might not support the <() operator and
+            #  using pipes does not seem to work with the OpenVPN client)
             with NamedTemporaryFile(mode='wt', delete=True) as temporaryFile:
-                if self._auth_user_pass == True:
-                    for v in OpenVPNContext._AUTH_ENV_KEYS:
+                if self._auth_user_pass is True:
+                    for v in OpenVPNContext._AUTH_ENV_VARS:
                         temporaryFile.write(f'{os.environ[v]}\n')
                     temporaryFile.flush()
                     self._auth_user_pass = temporaryFile.name
