@@ -3,12 +3,12 @@ import os
 import platform
 import subprocess
 import sys
-from tempfile import NamedTemporaryFile
 import time
 from contextlib import contextmanager
 from os import system
 from pathlib import Path
 from pprint import pprint
+from tempfile import NamedTemporaryFile
 
 from beartype.typing import Dict
 from rich import print as rich_print
