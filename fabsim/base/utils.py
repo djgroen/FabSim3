@@ -154,8 +154,8 @@ class OpenVPNContext(object):
         env_key_auth = 'openvpn_auth_user_pass'
         if hasattr(env, env_key_auth):
             self._auth_user_pass = env[env_key_auth]
-            if type(self._auth_user_pass) != bool or \
-                (type(self._auth_user_pass) == str and
+            if not isinstance(self._auth_user_pass, bool) or \
+                (isinstance(self._auth_user_pass, str) and
                     not Path(self._auth_user_pass).is_file()):
                 print(path_err_msg.replace(
                     'X', self._auth_user_pass)[:-1] + ' or boolean.',
