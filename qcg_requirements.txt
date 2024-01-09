@@ -23,7 +23,7 @@ easyvvuq==0.9.3
 exceptiongroup==1.1.0
 execnet==1.9.0
 fabric2==3.0.0
-fonttools==4.38.0
+fonttools==4.43.0
 fsspec==2023.1.0
 google-auth==2.16.0
 greenlet==2.0.2
