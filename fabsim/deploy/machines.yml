@@ -21,7 +21,7 @@ default:
   cores: 16
   
   # Commands to execute remotely as part of remote run jobs, prior to execution of the main code.
-  run_prefix_commands: []
+  run_prefix_commands: [". /home/mghorbani/workspace/python/venv/bin/activate"]
   
   # Templates to use to find space to build codes and execute workflows remotely.
   # All user- and generally- defined values in these config dictionaries will be interpolated via $foo
