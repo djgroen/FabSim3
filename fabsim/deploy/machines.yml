@@ -213,6 +213,7 @@ myriad:
   home_path_template: "/home/$username"
   remote: "myriad.rc.ucl.ac.uk"
   batch_header: myriad-header
+  job_dispatch: "qsub"
 
 bluejoule:
   job_dispatch: "llsubmit"
