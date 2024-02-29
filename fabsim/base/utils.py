@@ -164,7 +164,7 @@ class OpenVPNContext(object):
             if len(set(OpenVPNContext._AUTH_ENV_VARS)
                    .intersection(os.environ)) != 2:
                 print(' and '.join(OpenVPNContext._AUTH_ENV_VARS) +
-                      f'must be set in environment if {env_key_auth} is true.')
+                      f' must be set in environment if {env_key_auth} is true.')
                 exit(1)
 
     def _print(msg):
