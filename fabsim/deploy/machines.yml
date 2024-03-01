@@ -484,7 +484,8 @@ training_hidalgo:
 
 archer2:
   <<: *Eagle_Default_Config
-  <<: *QCG_PilotJob  
+  <<: *QCG_PilotJob 
+  virtual_env_path: "/work/$project/$project/$username/VirtualEnv"
   remote: "archer2" #ARCHER2 always requires multiplexing, so here we need an alias.
   budget: "d137"
   project: "d137"
@@ -502,7 +503,7 @@ archer2:
   home_path_template: "/work/$project/$project/$username"   
   modules:
     all: ["load cray-python"]
-  run_prefix_commands: ["export PYTHONUSERBASE=/work/$project/$project/$username/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH", "export SLURM_CPU_FREQ_REQ=2250000"]
+  run_prefix_commands: ["export PYTHONUSERBASE=/work/$project/$project/$username/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH", "export SLURM_CPU_FREQ_REQ=2250000", "export ENV_DIR=/work/$project/$project/$username/VirtualEnv"]
 
 marenostrum4:
   <<: *Eagle_Default_Config

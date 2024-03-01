@@ -63,13 +63,13 @@ def install_plugin(plugin_name, branch=None):
 
     if branch is None:
         local(
-            "git clone {} {}/{}".format(
+            "git clone {} '{}/{}'".format(
                 info["repository"], plugin_dir, plugin_name
             )
         )
     else:
         local(
-            "git clone --branch {} {} {}/{}".format(
+            "git clone --branch {} {} '{}/{}'".format(
                 branch, info["repository"], plugin_dir, plugin_name
             )
         )
