@@ -65,3 +65,8 @@ training_hidalgo:
   username: "<your-username>"
   home_path_template: "/work/<your-username>"
   partition_name: "hidalgo"
+
+
+myriad:
+  username: "<your-UCL-ID>"
+  workdir: "<specify-a-work-dir>"
