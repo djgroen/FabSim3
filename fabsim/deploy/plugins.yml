@@ -11,6 +11,9 @@ FabParticleDA:
 FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
 
+FabCannonSim:
+  repository: https://github.com/arabnejad/FabCannonsim.git
+
 FabUQCampaign:
   repository: https://github.com/wedeling/FabUQCampaign.git
   
