@@ -14,6 +14,9 @@ FabDummy:
 FabCannonSim:
   repository: https://github.com/arabnejad/FabCannonsim.git
 
+FabMaMiCo:
+  repository: https://github.com/HSU-HPC/FabMaMiCo.git
+
 FabUQCampaign:
   repository: https://github.com/wedeling/FabUQCampaign.git
   
