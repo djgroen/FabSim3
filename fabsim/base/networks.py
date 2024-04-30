@@ -230,6 +230,7 @@ def rsync_project(
     ssh_opts: Optional[str] = "",
     default_opts: Optional[str] = "-pthrvz",
     capture: Optional[bool] = False,
+    quiet: Optional[bool] = False,
 ) -> Tuple[str, str]:
     """
     Synchronize a remote directory with the current project directory via
@@ -275,15 +276,19 @@ def rsync_project(
     # add --delete options if needed
     delete_opt = "--delete" if delete is True else ""
 
+    # add --quiet option if needed
+    quiet_opt = "--quiet" if quiet is True else ""
+
     # set port arg
     port_opt = "-p {}".format(env.port)
 
     # set RSH arg
     rsh_opts = "--rsh='ssh {}'".format(" ".join([port_opt, ssh_opts]))
 
-    rync_cmd = "rsync {} {} {} {} {} {}:{}".format(
+    rync_cmd = "rsync {} {} {} {} {} {} {}:{}".format(
         delete_opt,
         exclude_opts,
+        quiet_opt,
         default_opts,
         rsh_opts,
         local_dir,
