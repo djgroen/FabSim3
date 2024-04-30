@@ -266,7 +266,7 @@ def rsync_project(
 
     # create --exclude options from exclude list
     if len(exclude) > 0:
-        exclude_opts = " ".join(["--exclude {}".format(item) for item in exclude])
+        exclude_opts = " ".join(["--exclude={}".format(item) for item in exclude])
     else:
         exclude_opts = ""
 
