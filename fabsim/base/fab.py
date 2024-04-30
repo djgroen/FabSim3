@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
+import numpy as np
 
 from beartype import beartype
 from beartype.typing import Callable, Optional, Tuple, Union
