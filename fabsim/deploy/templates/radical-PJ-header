@@ -1,0 +1,20 @@
+#RADICAL note=FabSim_PJ_RADICAL
+
+#RADICAL host=archer2
+#RADICAL queue=$queue
+#RADICAL nodes=$PJ_size:$cores
+#RADICAL walltime=$PJ_wall_time
+#RADICAL grant=$budget
+#RADICAL memory=$total_mem
+
+#RADICAL output=$job_results/$${JOB_ID}.output
+#RADICAL error=$job_results/$${JOB_ID}.error
+
+#RADICAL stage-in-file=$PJ_PATH
+#RADICAL stage-out-dir=.->$job_results/eagle.wd.$${JOB_ID}
+
+##RADICAL application=rp-pm-client
+#RADICAL application=rp-pm-api/master-3.7.3
+
+#RADICAL argument=$PJ_FileName
+

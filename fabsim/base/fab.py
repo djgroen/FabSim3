@@ -1518,6 +1518,9 @@ def install_app(name="", external_connexion="no", venv="False"):
 
     if name == "QCG-PilotJob":
         local("pip3 install -r " + env.localroot + "/qcg_requirements.txt")
+    
+    else: name == "RADICAL_Pilot":
+        local("pip3 install -r " + env.localroot + "/radical_requirements.txt")
 
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
