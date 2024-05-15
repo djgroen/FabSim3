@@ -142,7 +142,7 @@ def check_complete(jobname_syntax: Optional[str] = "") -> bool:
             f"The number of active (not finished) jobs = {count}"
             )
         return False
-    
+
     print("All jobs are finished :)")
     return True
 
