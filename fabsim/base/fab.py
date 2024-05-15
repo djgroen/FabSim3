@@ -306,7 +306,6 @@ def put_configs(config: str) -> None:
             local_dir=env.job_config_path_local + "/",
             remote_dir=env.job_config_path,
             delete=rsync_delete,
-            exclude=["file1.txt", "dir1/*", "dir2"],
         )
 
 
