@@ -1,25 +1,7 @@
 #!/bin/bash -l
-
-# Batch script to run a serial job under SGE.
-
-# Request ten minutes of wallclock time (format hours:minutes:seconds).
-#$ -l h_rt=2:0:0
-
-# Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
-#$ -l mem=1G
-
-# Request 15 gigabyte of TMPDIR space (default is 10 GB)
-#$ -l tmpfs=10G
-
-
-# Set the name of the job.
-#$ -N serial_test
-
-
-# Set the working directory to somewhere in your scratch space.  
-#  This is a necessary step as compute nodes cannot write to $HOME.
-# Replace "<your_UCL_id>" with your UCL user ID.
+#$ -pe smp $cores
+#$ -l mem=4G
+#$ -l h_rt=1:00:00
 #$ -wd $workdir
-
-
-#set -euo pipefail
+#$ -j y
+#$ -o $job_results/job_$JOB_ID.out
