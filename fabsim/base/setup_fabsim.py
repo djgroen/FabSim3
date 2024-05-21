@@ -28,7 +28,8 @@ def warn_duplicate_plugin(plugin_dir, plugin_name, random_string_length=5):
     console = Console()
     console.print(
         Panel(
-            f"[orange_red1]The {plugin_name} plugin directory is already exists.\n"
+            f"[orange_red1]The {plugin_name} "
+            "plugin directory already exists.\n"
             "To keep your previous folder, we rename it to[/orange_red1]: "
             f"[dark_cyan]{plugin_name}_{res}[/dark_cyan]",
             title="[dark_cyan]WARNING[/dark_cyan]",
@@ -68,7 +69,8 @@ def install_plugin(plugin_name, branch=None):
         local(f"git clone {info['repository']} '{plugin_dir}/{plugin_name}'")
     else:
         local(
-            f"git clone --branch {branch} {info['repository']} '{plugin_dir}/{plugin_name}'"
+            f"git clone --branch {branch} {info['repository']} "
+            f"'{plugin_dir}/{plugin_name}'"
         )
 
     print(f"{plugin_name} plugin installed...")
@@ -206,7 +208,8 @@ def setup_ssh_keys(password=""):
         print("local id_rsa key already exists.")
     else:
         local(
-            f'ssh-keygen -q -f {home}/.ssh/id_rsa -t rsa -b 4096 -N "{password}"'
+            f'ssh-keygen -q -f {home}/.ssh/id_rsa'
+            f' -t rsa -b 4096 -N "{password}"'
         )
     local(
         template(
