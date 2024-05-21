@@ -19,7 +19,9 @@ def warn_duplicate_plugin(plugin_dir, plugin_name, random_string_length=5):
     """Warn user about the duplicate plugin directory."""
 
     res = "".join(
-        random.choices(string.ascii_uppercase + string.digits, k=random_string_length)
+        random.choices(
+            string.ascii_uppercase + string.digits, k=random_string_length
+        )
     )
     rename(f"{plugin_dir}/{plugin_name}", f"{plugin_dir}/{plugin_name}_{res}")
     print("\n")
@@ -145,7 +147,11 @@ def get_setup_fabsim_dirs_string():
     string can be appended in existing commands, reducing the
     performance overhead.
     """
-    return "mkdir -p $config_path; " "mkdir -p $results_path; " "mkdir -p $scripts_path"
+    return (
+        "mkdir -p $config_path; "
+        "mkdir -p $results_path; "
+        "mkdir -p $scripts_path"
+    )
 
 
 def get_clean_fabsim_dirs_string(prefix):
@@ -199,9 +205,12 @@ def setup_ssh_keys(password=""):
     if path.isfile(f"{home}/.ssh/id_rsa.pub"):
         print("local id_rsa key already exists.")
     else:
-        local(f'ssh-keygen -q -f {home}/.ssh/id_rsa -t rsa -b 4096 -N "{password}"')
+        local(
+            f'ssh-keygen -q -f {home}/.ssh/id_rsa -t rsa -b 4096 -N "{password}"'
+        )
     local(
         template(
-            f"ssh-copy-id -i ~/.ssh/id_rsa.pub {env.host_string} 2>ssh_copy_id.log"
+            "ssh-copy-id -i ~/.ssh/id_rsa.pub "
+            f"{env.host_string} 2>ssh_copy_id.log"
         )
     )
