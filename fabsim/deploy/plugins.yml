@@ -68,3 +68,6 @@ FabOasis:
 
 FabNESO:
   repository: https://github.com/UCL/FabNESO
+
+FabGPDR:
+  repository: ...

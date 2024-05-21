@@ -32,3 +32,4 @@ fabsim/deploy/applications_user.yml
 
 venv/
 .venv/
+pyproject.toml
