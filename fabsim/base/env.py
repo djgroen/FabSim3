@@ -93,5 +93,7 @@ env = _lookupDict(
             os.path.expanduser("~"), ".ssh", "config"
         ),
         "env_sshpass": "SSHPASS" in os.environ,
+        "RP_PYheader": os.path.join(fabsim_root, "deploy", "templates", "RP_PYheader"),
+        "RP_header": os.path.join(fabsim_root, "deploy", "templates", "RP_header"),
     }
 )
