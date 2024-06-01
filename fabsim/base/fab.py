@@ -1193,10 +1193,6 @@ def run_ensemble(
     tasks = upsample_list if upsample_list else [config]
     replicas = replica_list if replica_list else [int(replicas)]
 
-    # Generate folder name and path for results
-    folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
-    path = os.path.join(env.results_path, folder_name, "RUNS")
-
     # Check if upsample items are present in the sweep_dir
     sweepdir_items = os.listdir(sweep_dir) if sweep_dir else []
     if set(tasks).issubset(set(sweepdir_items)):
@@ -1207,6 +1203,10 @@ def run_ensemble(
     # Sync config_files local and config_files remote
     execute(put_configs, config)
     
+    # Generate folder name and path for results
+    folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
+    path = os.path.join(env.results_path, folder_name, "RUNS") 
+
     # Create a list to hold task scripts
     task_scripts = []
 
@@ -1225,27 +1225,32 @@ def run_ensemble(
             print(f"Setting up task {task} replica {replica + 1}")
             # Create the folder for the task
             task_path = os.path.join(path, task, f"replica_{replica + 1}")
-            os.makedirs(task_path, exist_ok=True)
-            env.update(task_env) # Update env with task_env variables
+            
+            # Batch mkdir and rsync commands for remote directory creation and file syncing
+            run(f"mkdir -p {task_path}")
+            run(f"ls {task_path}")
+            local(template(f"rsync -pthrvz {sweep_dir}/{task}/ $username@$remote:{task_path}"))
+            
+            # Update env with task_env variables
+            env.update(task_env)
             task_script_content = script_template_content(env.script)
             task_script_name = f"{config}_{task}_replica_{replica + 1}.sh"
             task_script_path = os.path.join(task_path, task_script_name)
-            with open(task_script_path, 'w') as f:
+
+            # Create a temporary local file with the task script content
+            temp_script_path = f"/tmp/{task_script_name}"
+            with open(temp_script_path, 'w') as f:
                 f.write(task_script_content)
-                
+            
+            # Transfer the temporary file to the remote machine
+            local(template(f"rsync -pthrvz {temp_script_path} $username@$remote:{task_script_path}"))
+
             # Make the script executable
-            os.chmod(task_script_path, 0o755)
-                
+            run(f"chmod +x {task_script_path}")
+
             # Collect the script path for the final job submission script
             task_scripts.append(task_script_path)
-            
-            # Ensure each replica has its own dummy.in file
-            local_sweep_files = os.path.join(sweep_dir, task)
-            local(
-                template(
-                    f"rsync -pthrvz {local_sweep_files}/ $username@$remote:{task_path}/"
-                )
-            )
+
             
     if PJ and env.PJ_TYPE == "radical":
         print(
@@ -1299,27 +1304,27 @@ def run_ensemble(
             task_script_content = script_template_content("RP_PYheader")
             task_script_name = f"{env.config}_{env.machine_name}_{env.cores}_task_{index}.py"
             task_script_path = os.path.join(os.path.dirname(task_script), task_script_name)
-            with open(task_script_path, 'w') as f:
+
+            # Create a temporary local file with the task script content
+            temp_script_path = f"/tmp/{task_script_name}"
+            with open(temp_script_path, 'w') as f:
                 f.write(task_script_content)
             
+            # Transfer the temporary file to the remote machine
+            local(template(f"rsync -pthrvz {temp_script_path} $username@$remote:{task_script_path}"))
+
+            # Collect the script path for the final job submission script
             submit_task_scripts.append(task_script_path)
-        
+
         # Make sure submit_task_scripts is a list of strings
         if isinstance(submit_task_scripts, str):
             submit_task_scripts = submit_task_scripts.split('\n')
-
-        # Retrieve python virtual environment from system variables
-        if venv:
-            if "VIRTUAL_ENV" in os.environ:
-                env.venv_activate = os.path.join(os.environ["VIRTUAL_ENV"], "bin", "activate")
-            else:
-                raise RuntimeError("VIRTUAL_ENV is not set and venv is True. Please activate a virtual environment.")
         
         # Construct the run_Radical_PilotJob command
         RP_CMD = []
         if venv:
             RP_CMD.append("# Activate the virtual environment")
-            RP_CMD.append(f"source {env.venv_activate}\n")
+            RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
 
         RP_CMD.append("# Install Radical PilotJob in user's home space")
         RP_CMD.append("pip3 install --upgrade radical.pilot\n")
