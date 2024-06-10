@@ -7,6 +7,7 @@ from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
 
+import numpy as np
 from beartype import beartype
 from beartype.typing import Callable, Optional, Tuple, Union
 from rich import print as rich_print
@@ -306,7 +307,6 @@ def put_configs(config: str) -> None:
             local_dir=env.job_config_path_local + "/",
             remote_dir=env.job_config_path,
             delete=rsync_delete,
-            exclude=["file1.txt", "dir1/*", "dir2"],
         )
 
 
@@ -832,7 +832,7 @@ def job_preparation(*job_args):
         # write access for the owner of the file
         os.chmod(dst_job_script, 0o755)
 
-        os.makedirs(tmp_job_results)
+        os.makedirs(tmp_job_results, exist_ok=True)
         copy(dst_job_script, env.pather.join(tmp_job_results, dst_script_name))
 
         # TODO: these env variables are not used anywhere
@@ -1153,11 +1153,11 @@ def run_ensemble(
     venv: Optional[str] = "False",
     **args,
 ) -> None:
-    # info: Convert PJ and venv from string to boolean as beartype likes
+    # Convert PJ and venv from string to boolean as beartype likes
     PJ = PJ.lower() == 'true'
     venv = venv.lower() == 'true'
     print(f"Arguments received: config={config}, sweep_dir={sweep_dir}, upsample={upsample}, replicas={replicas}, PJ={PJ}, PJ_TYPE={PJ_TYPE}, venv={venv}")
-    
+
     # Check for PJ and PJ_TYPE
     if PJ:
         if PJ_TYPE.lower() not in ["qcg", "radical"]:
@@ -1186,8 +1186,6 @@ def run_ensemble(
     if not sweep_dir:
         sweep_dir = "SWEEP"  # Set default value for sweep_dir if not provided
         print(f"sweep_dir not provided. Using default: {sweep_dir}")
-        
-    # import pdb; pdb.set_trace()
 
     # Handling the tasks and replicas
     tasks = upsample_list if upsample_list else [config]
@@ -1199,13 +1197,13 @@ def run_ensemble(
         sweepdir_items = tasks
     else:
         raise RuntimeError("Upsample items not found in the sweep directory")
-    
+
     # Sync config_files local and config_files remote
     execute(put_configs, config)
-    
+
     # Generate folder name and path for results
     folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
-    path = os.path.join(env.results_path, folder_name, "RUNS") 
+    path = os.path.join(env.results_path, folder_name, "RUNS")
 
     # Create a list to hold task scripts
     task_scripts = []
@@ -1225,12 +1223,12 @@ def run_ensemble(
             print(f"Setting up task {task} replica {replica + 1}")
             # Create the folder for the task
             task_path = os.path.join(path, task, f"replica_{replica + 1}")
-            
+
             # Batch mkdir and rsync commands for remote directory creation and file syncing
             run(f"mkdir -p {task_path}")
             run(f"ls {task_path}")
             local(template(f"rsync -pthrvz {sweep_dir}/{task}/ $username@$remote:{task_path}"))
-            
+
             # Update env with task_env variables
             env.update(task_env)
             task_script_content = script_template_content(env.script)
@@ -1238,10 +1236,10 @@ def run_ensemble(
             task_script_path = os.path.join(task_path, task_script_name)
 
             # Create a temporary local file with the task script content
-            temp_script_path = f"/tmp/{task_script_name}"
+            temp_script_path = f"{env.temp_path}/{task_script_name}"
             with open(temp_script_path, 'w') as f:
                 f.write(task_script_content)
-            
+
             # Transfer the temporary file to the remote machine
             local(template(f"rsync -pthrvz {temp_script_path} $username@$remote:{task_script_path}"))
 
@@ -1251,184 +1249,166 @@ def run_ensemble(
             # Collect the script path for the final job submission script
             task_scripts.append(task_script_path)
 
-            
     if PJ and env.PJ_TYPE == "radical":
-        print(
-            Panel.fit(
-                "NOW, we submitting Radical Pilot jobs",
-                title="[orange_red1]PJ job submission phase[/orange_red1]",
-                border_style="orange_red1",
+        run_radical(task_scripts, venv)
+    elif PJ and env.PJ_TYPE == "qcg":
+        run_qcg(task_scripts, venv)
+
+def run_radical(task_scripts: list, venv: bool):
+    print(
+        Panel.fit(
+            "NOW, we submitting Radical Pilot jobs",
+            title="[orange_red1]PJ job submission phase[/orange_red1]",
+            border_style="orange_red1",
+        )
+    )
+
+    # Create a list to hold task scripts
+    submit_task_scripts = []
+    
+    # Set task model to default
+    if not hasattr(env, "task_model"):
+        env.task_model = "default"
+
+    # Define the resource mapping
+    resource_mapping = {
+        "localhost": "local.localhost",
+        "archer2": "epcc.archer2",
+        # Add other machine mappings as needed
+    }
+
+    # Set the default resource
+    default_resource = "local.localhost"
+
+    # Get the resource from the mapping
+    resource = resource_mapping.get(env.machine_name, default_resource)
+
+    # Create arguments for radical task scripts
+    for index, task_script in enumerate(task_scripts, start=1):
+        env.idsID = index
+        env.idsPath = task_script
+        task_env = env.copy()
+        task_env.update({
+            "task_name": f"task{index}",
+            "executable": task_script,
+            "resource": resource,
+            "project": env.get("project", "default_project"),
+            "queue": env.get("queue", "default_queue"),
+            "runtime": env.get("runtime", 1),
+            "cores": env.cores,
+            "gpus": env.get("gpus", 0),
+            "sandbox": os.path.dirname(task_script),
+            "arguments": "",
+            "pre_exec": "",
+            "ranks": 1,
+            "cores_per_rank": 1,
+            "task_sandbox": os.path.join(os.path.dirname(task_script), f"task_{index}_sandbox")
+        })
+        env.update(task_env)  # Update env with task_env variables
+        task_script_content = script_template_content("radical-PJ-py")
+        task_script_name = f"{env.config}_{env.machine_name}_{env.cores}_task_{index}.py"
+        task_script_path = os.path.join(os.path.dirname(task_script), task_script_name)
+
+        # Create a temporary local file with the task script content
+        temp_script_path = f"{env.temp_path}/{task_script_name}"
+        with open(temp_script_path, 'w') as f:
+            f.write(task_script_content)
+
+        # Transfer the temporary file to the remote machine
+        local(template(f"rsync -pthrvz {temp_script_path} $username@$remote:{task_script_path}"))
+
+        # Collect the script path for the final job submission script
+        submit_task_scripts.append(task_script_path)
+
+    # Make sure submit_task_scripts is a list of strings
+    if isinstance(submit_task_scripts, str):
+        submit_task_scripts = submit_task_scripts.split('\n')
+
+    # Construct the run_Radical_PilotJob command
+    RP_CMD = []
+    if venv:
+        RP_CMD.append("# Activate the virtual environment")
+        RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
+
+    RP_CMD.append("# Install Radical PilotJob in user's home space")
+    RP_CMD.append("pip3 install --upgrade radical.pilot\n")
+    for task_script in submit_task_scripts:
+        RP_CMD.append("# Python command for task submission")
+        RP_CMD.append(f"python3 {task_script}\n")
+
+    env.run_Radical_PilotJob = "\n".join(RP_CMD)
+    
+    # Avoid replicas functionality on PilotJob folders
+    env.replicas = "1"
+    backup_header = env.batch_header
+    env.batch_header = env.radical_PJ_header
+    env.submit_job = True
+    
+    job(dict(ensemble_mode=False, label="radical-PJ-header", NoEnvScript=True))
+    env.batch_header = backup_header
+    env.NoEnvScript = False
+
+def run_qcg(task_scripts: list, venv: bool):
+    print(
+        Panel.fit(
+            "NOW, we submitting PJ jobs",
+            title="[orange_red1]PJ job submission phase[/orange_red1]",
+            border_style="orange_red1",
+        )
+    )
+
+    # first, add all generated tasks script to PJ_PY
+    submitted_jobs_list = []
+    if not hasattr(env, "task_model"):
+        env.task_model = "default"
+    # Python's indexes start at zero, to start from 1, set start=1
+    for index, job_script in enumerate(task_scripts, start=1):
+        env.idsID = index
+        env.idsPath = job_script
+        submitted_jobs_list.append(
+            script_template_content("qcg-PJ-task-template")
+        )
+    env.submitted_jobs_list = "\n".join(submitted_jobs_list)
+
+    # to avoid apply replicas functionality on PilotJob folders
+    env.replicas = "1"
+    backup_header = env.batch_header
+    env.batch_header = env.PJ_PYheader
+    job_scripts_to_submit = job(
+        dict(ensemble_mode=False, label="PJ_PYheader", NoEnvScript=True)
+    )
+
+    env.PJ_PATH = job_scripts_to_submit[0]
+    env.PJ_FileName = env.pather.basename(env.PJ_PATH)
+    env.batch_header = env.PJ_header
+    env.submit_job = True
+    # load QCG-PJ-PY file
+    PJ_CMD = []
+    if hasattr(env, "venv") and str(env.venv).lower() == "true":
+        # QCG-PJ should load from virtualenv
+        PJ_CMD.append("# unload any previous loaded python module")
+        PJ_CMD.append("module unload python\n")
+        PJ_CMD.append("# load QCG-PilotJob from VirtualEnv")
+        PJ_CMD.append(
+            'eval "$({}/bin/conda shell.bash hook)"\n'.format(
+                env.virtual_env_path
             )
         )
-
-        # Create a list to hold task scripts
-        submit_task_scripts = []
-        if not hasattr(env, "task_model"):
-            env.task_model = "default"
-            
-        # Define the resource mapping
-        resource_mapping = {
-            "localhost": "local.localhost",
-            "archer2": "epcc.archer2",
-            # Add other machine mappings as needed
-        }
-
-        # Set the default resource
-        default_resource = "local.localhost"
-
-        # Get the resource from the mapping
-        resource = resource_mapping.get(env.machine_name, default_resource)
-
-        # Create arguments for radical task scripts
-        for index, task_script in enumerate(task_scripts, start=1):
-            env.idsID = index
-            env.idsPath = task_script
-            task_env = env.copy()
-            task_env.update({
-                "task_name": f"task{index}",
-                "executable": task_script,
-                "resource": resource,
-                "project": env.get("project", "default_project"),
-                "queue": env.get("queue", "default_queue"),
-                "runtime": env.get("runtime", 1),
-                "cores": env.cores,
-                "gpus": env.get("gpus", 0),
-                "sandbox": os.path.dirname(task_script),
-                "arguments": "",
-                "pre_exec": "",
-                "ranks": 1,
-                "cores_per_rank": 1,
-                "task_sandbox": os.path.join(os.path.dirname(task_script), f"task_{index}_sandbox")
-            })
-            env.update(task_env)  # Update env with task_env variables
-            task_script_content = script_template_content("RP_PYheader")
-            task_script_name = f"{env.config}_{env.machine_name}_{env.cores}_task_{index}.py"
-            task_script_path = os.path.join(os.path.dirname(task_script), task_script_name)
-
-            # Create a temporary local file with the task script content
-            temp_script_path = f"/tmp/{task_script_name}"
-            with open(temp_script_path, 'w') as f:
-                f.write(task_script_content)
-            
-            # Transfer the temporary file to the remote machine
-            local(template(f"rsync -pthrvz {temp_script_path} $username@$remote:{task_script_path}"))
-
-            # Collect the script path for the final job submission script
-            submit_task_scripts.append(task_script_path)
-
-        # Make sure submit_task_scripts is a list of strings
-        if isinstance(submit_task_scripts, str):
-            submit_task_scripts = submit_task_scripts.split('\n')
-        
-        # Construct the run_Radical_PilotJob command
-        RP_CMD = []
-        if venv:
-            RP_CMD.append("# Activate the virtual environment")
-            RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
-
-        RP_CMD.append("# Install Radical PilotJob in user's home space")
-        RP_CMD.append("pip3 install --upgrade radical.pilot\n")
-        for task_script in submit_task_scripts:
-            RP_CMD.append("# Python command for task submission")
-            RP_CMD.append(f"python3 {task_script}\n")
-
-        env.run_Radical_PilotJob = "\n".join(RP_CMD)
-        
-        # Function to read the content of a template
-        def read_template_content(template_path):
-            with open(template_path, 'r') as file:
-                return file.read()
-
-        # Function to write content to a template
-        def write_template_content(template_path, content):
-            with open(template_path, 'w') as file:
-                file.write(content)
-        
-        # Use RP_header to generate the final executable script
-        env.replicas = "1"
-        backup_header = env.batch_header
-        env.batch_header = env.RP_header
-        RP_header_backup = read_template_content(env.RP_header)
-        env.submit_job = True
-
-        # Generate the final script template with the updated env variables
-        final_script_content = script_template_content(env.RP_header)
-        
-        # Write content of final script to the template
-        write_template_content(env.RP_header, final_script_content)
-        
-        # Submit the final job
-        job(dict(ensemble_mode=False, label="RP_header", NoEnvScript=True))
-        
-        # Write the content of backup template back to a the RP_header
-        write_template_content(env.RP_header, RP_header_backup)
-        env.batch_header = backup_header
-        env.NoEnvScript = False
-        
-    # qcg pilot job submission
-    if PJ and env.PJ_TYPE == "qcg":
-        print(
-            Panel.fit(
-                "NOW, we submitting PJ jobs",
-                title="[orange_red1]PJ job submission phase[/orange_red1]",
-                border_style="orange_red1",
-            )
+        PJ_CMD.append("# load QCG-PJ-Python file")
+        PJ_CMD.append(
+            "{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH)
         )
 
-        # first, add all generated tasks script to PJ_PY
-        submitted_jobs_list = []
-        if not hasattr(env, "task_model"):
-            env.task_model = "default"
-        # Python's indexes start at zero, to start from 1, set start=1
-        for index, job_script in enumerate(job_scripts_to_submit, start=1):
-            # TODO: this loop should be improved
-            env.idsID = index
-            env.idsPath = job_script
-            submitted_jobs_list.append(
-                script_template_content("qcg-PJ-task-template")
-            )
-        env.submitted_jobs_list = "\n".join(submitted_jobs_list)
+    else:
+        PJ_CMD.append("# Install QCG-PJ in user's home space")
+        PJ_CMD.append("pip3 install --user --upgrade  qcg-pilotjob\n")
+        PJ_CMD.append("# load QCG-PJ-Python file")
+        PJ_CMD.append("python3 {}".format(env.PJ_PATH))
 
-        # to avoid apply replicas functionality on PilotJob folders
-        env.replicas = "1"
-        backup_header = env.batch_header
-        env.batch_header = env.PJ_PYheader
-        job_scripts_to_submit = job(
-            dict(ensemble_mode=False, label="PJ_PYheader", NoEnvScript=True)
-        )
-
-        env.PJ_PATH = job_scripts_to_submit[0]
-        env.PJ_FileName = env.pather.basename(env.PJ_PATH)
-        env.batch_header = env.PJ_header
-        env.submit_job = True
-        # load QCG-PJ-PY file
-        PJ_CMD = []
-        if hasattr(env, "venv") and str(env.venv).lower() == "true":
-            # QCG-PJ should load from virtualenv
-            PJ_CMD.append("# unload any previous loaded python module")
-            PJ_CMD.append("module unload python\n")
-            PJ_CMD.append("# load QCG-PilotJob from VirtualEnv")
-            PJ_CMD.append(
-                'eval "$({}/bin/conda shell.bash hook)"\n'.format(
-                    env.virtual_env_path
-                )
-            )
-            PJ_CMD.append("# load QCG-PJ-Python file")
-            PJ_CMD.append(
-                "{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH)
-            )
-
-        else:
-            PJ_CMD.append("# Install QCG-PJ in user's home space")
-            PJ_CMD.append("pip3 install --user --upgrade  qcg-pilotjob\n")
-            PJ_CMD.append("# load QCG-PJ-Python file")
-            PJ_CMD.append("python3 {}".format(env.PJ_PATH))
-
-        env.run_QCG_PilotJob = "\n".join(PJ_CMD)
-        job(dict(ensemble_mode=False, label="PJ_header", NoEnvScript=True))
-        env.batch_header = backup_header
-        env.NoEnvScript = False
-
+    env.run_QCG_PilotJob = "\n".join(PJ_CMD)
+    job(dict(ensemble_mode=False, label="PJ_header", NoEnvScript=True))
+    env.batch_header = backup_header
+    env.NoEnvScript = False
 
 def input_to_range(arg, default):
     ttype = type(default)
@@ -1626,9 +1606,6 @@ def install_app(name="", external_connexion="no", venv="False"):
 
     if name == "QCG-PilotJob":
         local("pip3 install -r " + env.localroot + "/qcg_requirements.txt")
-    
-    # else: name == "RADICAL_Pilot":
-    #     local("pip3 install -r " + env.localroot + "/radical_requirements.txt")
 
     # Next download all the additional dependencies
     for dep in info["additional_dependencies"]:
