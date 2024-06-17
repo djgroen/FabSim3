@@ -1229,6 +1229,14 @@ def run_ensemble(
         for replica in range(num_replicas):
             # Create the folder for the task
             task_path = os.path.join(path, task, f"replica_{replica + 1}")
+            
+            # Update runtime environment with task info
+            env.update({
+                "task_name": task,
+                "replica_id": replica,
+                "job_results": os.path.join(path, task, f"replica_{replica + 1}")
+                # add more task related variables in job script template
+            })
 
             # Batch mkdir and rsync commands for remote directory creation and file syncing
             run(f"mkdir -p {task_path}")
@@ -1274,36 +1282,21 @@ def run_radical(task_scripts: list, venv: bool):
     radical_working_dir = os.path.join("/tmp", f"radical_{env.config}_{env.machine_name}_{env.cores}")
     os.makedirs(radical_working_dir, exist_ok=True)
     
-    task_descriptions = []
-
     # Prepare the environment for radical TaskDescription
+    task_descriptions = []
     for index, task_script in enumerate(task_scripts, start=1):
-        task_env = env.copy()
-        task_env.update({
-            'task_name': f'task.{index}',
+        env.update({
+            'task_name': f"{env.get('task_name_prefix', 'task')}.{index}",
             'executable': task_script,
-            'arguments': "[]",  # Update if you have arguments
-            'pre_exec': "[]",  # Update if you have pre_exec commands
-            'ranks': env.get('ranks', 1),
-            'cores_per_rank': env.get('cores_per_rank', 1),
-            'sandbox': os.path.join(radical_working_dir, f"task_{index}_sandbox")
+            'sandbox': os.path.join(radical_working_dir, f"task_{index}_sandbox"),
         })
         task_descriptions.append(task_script)
-    env.update(task_env)  # Update env with task_env variables
 
     # Prepare the environment for radical pd_init
-    radical_env = env.copy()
-    radical_env.update({
-        'num_tasks': len(task_descriptions),
+    env.update({
         'task_descriptions': task_descriptions,
-        'resource': env.remote,
-        'project': env.get('project', 'default_project'),
-        'queue': env.get('queue', 'default_queue'),
-        'runtime': env.get('runtime', 60),
-        'nodes': env.get('nodes', 1),
         'sandbox': os.path.join(radical_working_dir, 'radical_sandbox')
     })
-    env.update(radical_env)  # Update env with radical_env variables
 
     # Locate and copy the radical resources script to the sandbox directory
     radical_resources_content = script_template_content("radical-resources")

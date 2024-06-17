@@ -27,7 +27,7 @@ def get_platform_ids(hostname:str) -> List[str]:
     return output
 
 def main():
-    platform_ids = get_platform_ids('${resource}')
+    platform_ids = get_platform_ids('${rp_resource}')
     platform_id = 'local.localhost' if not platform_ids else platform_ids[0]
 
     session = rp.Session()
@@ -37,9 +37,9 @@ def main():
     pd_init = {
         'resource' : platform_id,
         'project'  : '${project}',
-        'queue'    : '${queue}',
-        'runtime'  : ${runtime},
-        'nodes'    : ${nodes},
+        'queue'    : '${rp_queue}',
+        'runtime'  : ${rp_runtime},
+        'nodes'    : ${rp_nodes},
         'sandbox'  : '${sandbox}'
     }
     pilot = pmgr.submit_pilots(rp.PilotDescription(pd_init))
@@ -51,10 +51,10 @@ def main():
     for task_desc in task_descriptions:
         task_description_scripts.append(rp.TaskDescription({
             'executable'     : task_desc,
-            'arguments'      : ${arguments},
-            'pre_exec'       : ${pre_exec},
-            'ranks'          : ${ranks},
-            'cores_per_rank' : ${cores_per_rank},
+            'arguments'      : ${rp_arguments},
+            'pre_exec'       : ${rp_pre_exec},
+            'ranks'          : ${rp_ranks},
+            'cores_per_rank' : ${rp_cores_per_rank},
             'sandbox'        : '${sandbox}'
         }))
     tmgr.submit_tasks(task_description_scripts)

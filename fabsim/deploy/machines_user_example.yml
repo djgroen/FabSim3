@@ -1,72 +1,70 @@
-# Copy this file as machines_user.yml, and fill in your details.
-# Details given in the default dictionary will override default settings in machines.yml
-# Details given in per-machine dictionaries will override machine settings in machines.yml
-
 default:
-  local_results: "~/FabSim3/results"
-  local_configs: "~/FabSim3/config_files"
-  username: "your-username"
-  # home_path_template: "/home/$username"
-  # home_path_template: "/Users/$username"  # for OSX users
-  # Allows to switch between SSH (default) and GSISSH login.
+  local_results: ~/FabSim3/results
+  local_configs: ~/FabSim3/config_files
+  username: your-username
   manual_gsissh: false
   port: 22
-# SuperMUC phase2 connecting using GSISSH
 localhost:
-  username: "your-username"
+  username: your-username
+  rp_project: ''
+  rp_arguments: []
+  rp_pre_exec: []
+  rp_ranks: 1
+  rp_cores_per_rank: 1
+  rp_resource: localhost
+  rp_queue: default_queue
+  rp_runtime: 60
+  rp_nodes: 1
 supermuc2:
-  username: "ab12cde"
-  project: "fg34hi"
-  namd_exec: "/lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2"
-  # Password set in the redisexec directory.
-  redispwd: "multiple"
-  # Switches to GSISSH login from SSH.
+  username: ab12cde
+  project: fg34hi
+  namd_exec: /lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2
+  redispwd: multiple
   manual_gsissh: true
   port: 2222
 bluejoule:
-  username: "abc12-def01"
-  groupname: "abc01"
-  project: "ABC012" #"HCP056"
-  namd_exec: "/gpfs/packages/ibm/namd/2.9/bin/namd2"
-  ensemble_dir: "rep0/replicas"   
-  
+  username: abc12-def01
+  groupname: abc01
+  project: ABC012
+  namd_exec: /gpfs/packages/ibm/namd/2.9/bin/namd2
+  ensemble_dir: rep0/replicas
 qcg:
-  username: "<your-username>"
-  flee_location: "$home_path/flee-release"
-
+  username: <your-username>
+  flee_location: $home_path/flee-release
 eagle_vecma:
-  username: "<your-username>"
-  flee_location: "$home_path/flee-release"
-
+  username: <your-username>
+  flee_location: $home_path/flee-release
 eagle_hidalgo:
-  username: "<your-username>"
-  flee_location: "$home_path/flee-release"
-  
+  username: <your-username>
+  flee_location: $home_path/flee-release
 archer2:
-  username: "<your-username>"
+  username: <your-username>
   manual_ssh: true
   remote: archer2
-  budget: "<your-budget>"
-  project: "<your-project>"
-  job_wall_time : "0-00:10:00"
-
+  budget: <your-budget>
+  project: <your-project>
+  job_wall_time: '0-00:10:00'
+  rp_project: 'e723'
+  rp_arguments: []
+  rp_pre_exec: []
+  rp_ranks: 1
+  rp_cores_per_rank: 1
+  rp_resource: archer2
+  rp_queue: default_queue
+  rp_runtime: 60
+  rp_nodes: 1
 marenostrum4:
-  username: "pr1emk01"
-  fabric_dir: "FabSim3"
+  username: pr1emk01
+  fabric_dir: FabSim3
   corespernode: 46
   taskpersocket: 23
   cores: 1
-  # list of available queue for the job : bsc_queues
-  queue_name: "debug" # or "bsc_case"
-  memconfig_name: "highmem" #"highmem"
-
-
+  queue_name: debug
+  memconfig_name: highmem
 training_hidalgo:
-  username: "<your-username>"
-  home_path_template: "/work/<your-username>"
-  partition_name: "hidalgo"
-
-
+  username: <your-username>
+  home_path_template: /work/<your-username>
+  partition_name: hidalgo
 myriad:
-  username: "<your-UCL-ID>"
-  workdir: "<specify-a-work-dir>"
+  username: <your-UCL-ID>
+  workdir: <specify-a-work-dir>
