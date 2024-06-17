@@ -18,7 +18,7 @@ default:
   module_load_at_connect: true
   
   # Default number of cores per job.
-  cores: 16
+  cores: 4
   
   # Commands to execute remotely as part of remote run jobs, prior to execution of the main code.
   run_prefix_commands: []
@@ -94,7 +94,7 @@ default:
   local_templates_path: ["$fabsim_root/deploy/templates"]
 
   # Default command syntax for getting the job status.
-  stat: "qstat -u $username"
+  stat: "squeue -u $username"
   
   # Default command for cancelling jobs.
   cancel_job_command: "qdel"
