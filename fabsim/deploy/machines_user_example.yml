@@ -6,13 +6,11 @@ default:
   port: 22
 localhost:
   username: your-username
-  rp_project: ''
-  rp_arguments: []
-  rp_pre_exec: []
+  rp_project: <your-project>
   rp_ranks: 1
   rp_cores_per_rank: 1
   rp_resource: localhost
-  rp_queue: default_queue
+  rp_queue: standard
   rp_runtime: 60
   rp_nodes: 1
 supermuc2:
@@ -44,13 +42,11 @@ archer2:
   budget: <your-budget>
   project: <your-project>
   job_wall_time: '0-00:10:00'
-  rp_project: 'e723'
-  rp_arguments: []
-  rp_pre_exec: []
+  rp_project: <your-project>
   rp_ranks: 1
   rp_cores_per_rank: 1
   rp_resource: archer2
-  rp_queue: default_queue
+  rp_queue: standard
   rp_runtime: 60
   rp_nodes: 1
 marenostrum4:

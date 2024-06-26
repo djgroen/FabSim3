@@ -36,7 +36,7 @@ def main():
 
     pd_init = {
         'resource' : platform_id,
-        'project'  : '${project}',
+        'project'  : '${rp_project}',
         'queue'    : '${rp_queue}',
         'runtime'  : ${rp_runtime},
         'nodes'    : ${rp_nodes},
@@ -51,8 +51,8 @@ def main():
     for task_desc in task_descriptions:
         task_description_scripts.append(rp.TaskDescription({
             'executable'     : task_desc,
-            'arguments'      : ${rp_arguments},
-            'pre_exec'       : ${rp_pre_exec},
+            'arguments'      : [],
+            'pre_exec'       : [],
             'ranks'          : ${rp_ranks},
             'cores_per_rank' : ${rp_cores_per_rank},
             'sandbox'        : '${sandbox}'
