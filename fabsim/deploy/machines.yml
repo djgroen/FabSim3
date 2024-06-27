@@ -435,8 +435,8 @@ archer2:
   virtual_env_path: /work/$project/$project/$username/VirtualEnv
   app_repository: $home_path/App_repo
   remote: archer2
-  budget: d137
-  project: d137
+  budget: e723-brunel
+  project: e723
   corespernode: 128
   run_command: 'srun --distribution=block:block --hint=nomultithread'
   qos_name: standard

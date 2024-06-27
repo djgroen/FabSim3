@@ -1295,9 +1295,10 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     if not hasattr(env, "task_model"):
         env.task_model = "default"
 
-    # Create a working directory in /tmp for radical runtime files
-    radical_working_dir = os.path.join("/tmp", f"radical_{env.config}_{env.machine_name}_{env.cores}")
-    os.makedirs(radical_working_dir, exist_ok=True)
+    # Create a temprary working directory for radical runtime files
+    local_working_dir = path.join(env.tmp_results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
+    remote_working_dir = path.join(env.results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
+    os.makedirs(local_working_dir, exist_ok=True)
     
     # Prepare the environment for radical TaskDescription
     task_descriptions = []
@@ -1311,27 +1312,28 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     # Prepare the environment for radical pd_init
     env.update({
         'task_descriptions': task_descriptions,
-        'sandbox': radical_working_dir
+        'sandbox': remote_working_dir,
     })
 
     # Locate and copy the radical resources script to the sandbox directory
     radical_resources_content = script_template_content("radical-resources")
-    sandbox_resources_path = os.path.join(radical_working_dir, '.radical', 'pilot', 'configs')
+    sandbox_resources_path = path.join(local_working_dir, '.radical', 'pilot', 'configs')
     os.makedirs(sandbox_resources_path, exist_ok=True)
-    with open(os.path.join(sandbox_resources_path, 'resource_fabsim.json'), 'w') as f:
+    with open(path.join(sandbox_resources_path, 'resource_fabsim.json'), 'w') as f:
         f.write(radical_resources_content)
 
     # Generate the radical-PJ-py script using the combined template
     radical_script_content = script_template_content("radical-PJ-py")
     radical_script_name = f"{env.config}_{env.machine_name}_{env.cores}_radical.py"
-    radical_script_path = os.path.join(radical_working_dir, radical_script_name)
+    radical_local_script_path = path.join(local_working_dir, radical_script_name)
+    radical_remote_script_path = path.join(remote_working_dir, radical_script_name)
 
     # Create a temporary local file with the radical script content
-    with open(radical_script_path, 'w') as f:
+    with open(radical_local_script_path, 'w') as f:
         f.write(radical_script_content)
-
+        
     # Transfer the temporary file to the remote machine
-    local(template(f"rsync -pthrvz {radical_working_dir}/ $username@$remote:{radical_working_dir}/"))
+    local(template(f"rsync -pthrvz {local_working_dir}/ $username@$remote:{remote_working_dir}/"))
 
     # Construct the run_Radical_PilotJob command
     RP_CMD = []
@@ -1343,7 +1345,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     RP_CMD.append("python3 -c 'import radical.pilot' 2>/dev/null || pip3 install --upgrade radical.pilot\n")
     # RP_CMD.append("pip3 install git+https://github.com/radical-cybertools/radical.pilot.git@devel\n")
     RP_CMD.append("# Python command for task submission")
-    RP_CMD.append(f"python3 {radical_script_path}\n")
+    RP_CMD.append(f"python3 {radical_remote_script_path}\n")
 
     env.run_Radical_PilotJob = "\n".join(RP_CMD)
 

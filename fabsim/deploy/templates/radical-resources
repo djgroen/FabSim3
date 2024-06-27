@@ -26,8 +26,6 @@
             ],
             "SRUN": {}
         },
-        "rp_version": "local",
-        "virtenv_mode": "create",
-        "python_dist": "default"
+        "virtenv_mode": "local"
     }
 }

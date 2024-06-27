@@ -5,6 +5,7 @@ import radical.pilot as rp
 
 # Create a working directory
 os.environ['RADICAL_CONFIG_USER_DIR'] = '${sandbox}'
+os.environ['RADICAL_PILOT_BASE'] = '${sandbox}'
 
 # for debug purposes
 os.environ['RADICAL_LOG_LVL'] = 'DEBUG'
@@ -27,7 +28,7 @@ def get_platform_ids(hostname:str) -> List[str]:
     return output
 
 def main():
-    platform_ids = get_platform_ids('${rp_resource}')
+    platform_ids = get_platform_ids('${resource}')
     platform_id = 'local.localhost' if not platform_ids else platform_ids[0]
 
     session = rp.Session()
@@ -36,10 +37,10 @@ def main():
 
     pd_init = {
         'resource' : platform_id,
-        'project'  : '${rp_project}',
-        'queue'    : '${rp_queue}',
-        'runtime'  : ${rp_runtime},
-        'nodes'    : ${rp_nodes},
+        'project'  : '${project}',
+        'queue'    : '${partition_name}:${qos_name}',
+        'runtime'  : ${runtime},
+        'nodes'    : ${nodes},
         'sandbox'  : '${sandbox}'
     }
     pilot = pmgr.submit_pilots(rp.PilotDescription(pd_init))
@@ -53,8 +54,8 @@ def main():
             'executable'     : task_desc,
             'arguments'      : [],
             'pre_exec'       : [],
-            'ranks'          : ${rp_ranks},
-            'cores_per_rank' : ${rp_cores_per_rank},
+            'ranks'          : ${ranks},
+            'cores_per_rank' : ${cores_per_rank},
             'sandbox'        : '${sandbox}'
         }))
     tmgr.submit_tasks(task_description_scripts)
