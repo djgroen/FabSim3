@@ -1264,10 +1264,11 @@ def run_ensemble(
         )
     )
     
-    if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() in ["rp", "qcg"]:
-        if env.PJ_TYPE.lower() == "rp":
+    if hasattr(env, "PJ_TYPE"):
+        pj_type = env.PJ_TYPE.lower()
+        if pj_type == "rp":
             run_radical(job_scripts_to_submit, env.get("venv", False))
-        elif env.PJ_TYPE.lower() == "qcg":
+        elif pj_type == "qcg":
             run_qcg(job_scripts_to_submit, env.get("venv", False))
         else:
             print("Error: 'PJ_TYPE' must be set to either 'rp' or 'qcg'. Exiting...")
@@ -1337,7 +1338,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
 
     # Construct the run_Radical_PilotJob command
     RP_CMD = []
-    if venv:
+    if hasattr(env, "venv") and str(env.venv).lower() == "true":
         RP_CMD.append("# Activate the virtual environment")
         RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
 

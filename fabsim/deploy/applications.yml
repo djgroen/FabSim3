@@ -13,17 +13,12 @@ QCG-PilotJob:
         - mpi4py
         - cython
 
-RADICAL_Pilot:
+RADICAL-Pilot:
     repository: https://github.com/radical-cybertools/radical.pilot
-    name: radical_pilot
-    version: 0.40.4
+    name: radical-pilot
+    version: v.5.10
     additional_dependencies:
-        - pandas
-        - numpy
-        - pytest
-        - scipy
-        - mpi4py
-        - cython
+        - radical.pilot
 
 packages:
     - matplotlib

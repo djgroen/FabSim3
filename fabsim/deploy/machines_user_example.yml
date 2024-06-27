@@ -6,13 +6,12 @@ default:
   port: 22
 localhost:
   username: your-username
-  rp_project: <your-project>
-  rp_ranks: 1
-  rp_cores_per_rank: 1
-  rp_resource: localhost
-  rp_queue: standard
-  rp_runtime: 60
-  rp_nodes: 1
+  partition_name: "standard"
+  qos_name: "short"
+  runtime: 10
+  nodes: 1
+  ranks: 1
+  cores_per_rank : 1
 supermuc2:
   username: ab12cde
   project: fg34hi
@@ -42,13 +41,12 @@ archer2:
   budget: <your-budget>
   project: <your-project>
   job_wall_time: '0-00:10:00'
-  rp_project: <your-project>
-  rp_ranks: 1
-  rp_cores_per_rank: 1
-  rp_resource: archer2
-  rp_queue: standard
-  rp_runtime: 60
-  rp_nodes: 1
+  partition_name: "standard"
+  qos_name: "short"
+  runtime: 10
+  nodes: 1
+  ranks: 1
+  cores_per_rank : 1
 marenostrum4:
   username: pr1emk01
   fabric_dir: FabSim3
