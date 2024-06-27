@@ -87,14 +87,16 @@ To submit jobs using Radical Pilot, use the PJ and PJ_TYPE arguments in your com
 
 ### Running Specific Jobs with Radical Pilot
 For running specific jobs like FabDummy in replica mode:
-    ```bash
-    fabsim archer2 dummy:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
-    ```
+
+```bash
+fabsim archer2 dummy:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
+```
 
 For running specific jobs in ensemble mode:
-    ```bash
-    fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
-    ```
+
+```bash
+fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
+```
 
 ## Troubleshooting
 
