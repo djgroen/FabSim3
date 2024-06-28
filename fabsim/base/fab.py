@@ -705,9 +705,9 @@ def job(*job_args):
             )
             
             if hasattr(env, "PJ") and env.PJ.lower() == "true" and not hasattr(env, "in_ensemble_mode"):
-                if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "rp":
+                if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "RP":
                     run_radical(job_scripts_to_submit, env.get("venv", False))
-                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "qcg":
+                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "QCG-PJ":
                     run_qcg(job_scripts_to_submit, env.get("venv", False))
             else:
                 for job_script in job_scripts_to_submit:
@@ -1286,7 +1286,7 @@ def run_ensemble(
 def run_radical(job_scripts_to_submit: list, venv = "False"):
     print(
         Panel.fit(
-            "NOW, we are submitting Radical Pilot Jobs",
+            "NOW, we are submitting RADICAL-Pilot Jobs",
             title="[orange_red1]PJ job submission phase[/orange_red1]",
             border_style="orange_red1",
         )
@@ -1296,7 +1296,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     if not hasattr(env, "task_model"):
         env.task_model = "default"
 
-    # Create a temprary working directory for radical runtime files
+    # Create a temprary working directory for RADICAL runtime files
     local_working_dir = path.join(env.tmp_results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
     remote_working_dir = path.join(env.results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
     os.makedirs(local_working_dir, exist_ok=True)
@@ -1336,19 +1336,19 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     # Transfer the temporary file to the remote machine
     local(template(f"rsync -pthrvz {local_working_dir}/ $username@$remote:{remote_working_dir}/"))
 
-    # Construct the run_Radical_PilotJob command
+    # Construct the run_Radical-Pilot command
     RP_CMD = []
     if hasattr(env, "venv") and str(env.venv).lower() == "true":
         RP_CMD.append("# Activate the virtual environment")
         RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
 
-    RP_CMD.append("# Check if Radical PilotJob is installed")
+    RP_CMD.append("# Check if Job is installed")
     RP_CMD.append("python3 -c 'import radical.pilot' 2>/dev/null || pip3 install --upgrade radical.pilot\n")
     # RP_CMD.append("pip3 install git+https://github.com/radical-cybertools/radical.pilot.git@devel\n")
     RP_CMD.append("# Python command for task submission")
     RP_CMD.append(f"python3 {radical_remote_script_path}\n")
 
-    env.run_Radical_PilotJob = "\n".join(RP_CMD)
+    env.run_Radical-Pilot = "\n".join(RP_CMD)
 
     # Avoid replicas functionality on PilotJob folders
     env.replicas = "1"
