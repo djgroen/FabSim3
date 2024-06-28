@@ -705,9 +705,9 @@ def job(*job_args):
             )
             
             if hasattr(env, "PJ") and env.PJ.lower() == "true" and not hasattr(env, "in_ensemble_mode"):
-                if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "RP":
+                if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "rp":
                     run_radical(job_scripts_to_submit, env.get("venv", False))
-                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "QCG":
+                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "qcg":
                     run_qcg(job_scripts_to_submit, env.get("venv", False))
             else:
                 for job_script in job_scripts_to_submit:
