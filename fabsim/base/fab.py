@@ -153,7 +153,7 @@ def fetch_results(
     else:
         local(
             template(
-                # "rsync -pthrvz --port=$port \
+                # "rsync -pthrvz --port=$port
                 "rsync -pthrvz -e 'ssh -p $port' {}"
                 "$username@$remote:$job_results/{} "
                 "$job_results_local".format(includes_files, regex)
