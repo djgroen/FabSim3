@@ -1272,12 +1272,14 @@ def run_ensemble(
             sys.exit(1)
     else:
         # If PJ_TYPE is not set, submit the jobs normally
-        for job_script in job_scripts_to_submit:
-            job_submission(dict(job_script=job_script))
-        print(
-            "submitted job script = \n{}".format(
-                pformat(job_scripts_to_submit)
-            )
+        job_scripts_to_submit = job(
+            dict(
+                ensemble_mode=True,
+                sweepdir_items=sweepdir_items,
+                sweep_dir=sweep_dir,
+                replica_start_number=replica_start_number,
+            ),
+            prepare_only=False
         )
             
             
