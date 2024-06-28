@@ -1336,7 +1336,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     # Transfer the temporary file to the remote machine
     local(template(f"rsync -pthrvz {local_working_dir}/ $username@$remote:{remote_working_dir}/"))
 
-    # Construct the run_Radical-Pilot command
+    # Construct the run_Radical_Pilot command
     RP_CMD = []
     if hasattr(env, "venv") and str(env.venv).lower() == "true":
         RP_CMD.append("# Activate the virtual environment")
@@ -1348,7 +1348,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     RP_CMD.append("# Python command for task submission")
     RP_CMD.append(f"python3 {radical_remote_script_path}\n")
 
-    env.run_Radical-Pilot = "\n".join(RP_CMD)
+    env.run_Radical_Pilot = "\n".join(RP_CMD)
 
     # Avoid replicas functionality on PilotJob folders
     env.replicas = "1"
