@@ -1266,9 +1266,9 @@ def run_ensemble(
     
     if hasattr(env, "PJ_TYPE"):
         pj_type = env.PJ_TYPE.lower()
-        if pj_type == "RP":
+        if pj_type == "rp":
             run_radical(job_scripts_to_submit, env.get("venv", False))
-        elif pj_type == "QCG":
+        elif pj_type == "qcg":
             run_qcg(job_scripts_to_submit, env.get("venv", False))
         else:
             print("Error: 'PJ_TYPE' must be set to either 'RP' or 'QCG'. Exiting...")
