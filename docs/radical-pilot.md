@@ -13,7 +13,7 @@ This documentation provides detailed instructions on how to configure, use, and 
     ```bash
     mkdir -p ~/workspace
     cd ~/workspace
-    python3 -m venv VirualEnv
+    python3 -m venv VirtualEnv
     source VirtualEnv/bin/activate
     ```
 
@@ -53,7 +53,7 @@ sandbox: ''            # The working directory where job-related files will be s
 ```
 
 ### Adding RADICAL Parameters to machines_user.yml
-In your `machines_user.yml`, add the RADICAL-Pilot specific parameters under the appropriate machine section. For example, for `archer2`:
+In your `machines_user.yml`, add the RADICAL-Pilot parameters under the appropriate machine section. For example, for `archer2`:
 
 ```yaml
 archer2:
@@ -81,18 +81,13 @@ archer2:
 
 ### Running Jobs with RADICAL-Pilot
 To submit jobs using RADICAL-Pilot, use the PJ and PJ_TYPE arguments in your command. Here’s an example command to run an ensemble job with RADICAL-Pilot (RP):
-    ```bash
-    fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ=true,PJ_TYPE=RP,venv=true
-    ```
-
-### Running Specific Jobs with RADICAL-Pilot
-For running specific jobs like FabDummy in replica mode:
 
 ```bash
-fabsim archer2 dummy:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=RP,venv=true
+fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ=true,PJ_TYPE=RP,venv=true
 ```
 
-For running specific jobs in ensemble mode:
+### Running Specific Jobs with RADICAL-Pilot
+For running jobs like FabDummy in ensemble and replica mode:
 
 ```bash
 fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=RP,venv=true
@@ -112,16 +107,18 @@ fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TY
 
 3. Python Package Installation Issues:
 
-    - Ensure that RADICAL-Pilot is installed in your virtual environment and venv is set to true.
     - Verify that the virtual environment is activated before running the FabSim3 commands.
-    - To check if RADICAL-Pilot is installed, you can use the following Python command:
-        ```bash
-        python3 -c 'import RADICAL.pilot' && echo "RADICAL-Pilot is installed." || echo "RADICAL-Pilot is NOT installed."
-        ```
+    - Let FabSim3 locate the virtual environment by setting the `virtual_env_path` in machines_user.yml file.
+    - Ensure that RADICAL-Pilot is installed in your virtual environment and venv is set to true.
+
+4. RADICAL-Pilot Installation Issues. Check the installation by the following Python command:
+  
+```python
+python3 -c 'import radical.pilot' && echo "RADICAL-Pilot is installed." || echo "RADICAL-Pilot is NOT installed."
+```
 
 ## Contributing
 We welcome contributions to improve the RADICAL-Pilot integration in FabSim3. Please follow the standard GitHub pull request process.
 
 ## Contact
 For any questions or support, please contact FabSim3 Support.
-
