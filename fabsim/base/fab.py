@@ -557,7 +557,7 @@ def with_template_config() -> None:
     with_config(template(env.config_name_template))
 
 
-def job(*job_args):
+def job(*job_args, prepare_only=False):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
@@ -661,6 +661,10 @@ def job(*job_args):
 
     print("Submit tasks to multiprocessingPool : done ...")
     job_scripts_to_submit = POOL.wait_for_tasks()
+    
+    
+    if prepare_only:
+        return job_scripts_to_submit
 
     #####################################
     #       job transmission phase      #
@@ -703,20 +707,13 @@ def job(*job_args):
                     border_style="orange_red1",
                 )
             )
-            
-            if hasattr(env, "PJ") and env.PJ.lower() == "true" and not hasattr(env, "in_ensemble_mode"):
-                if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "rp":
-                    run_radical(job_scripts_to_submit, env.get("venv", False))
-                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "qcg":
-                    run_qcg(job_scripts_to_submit, env.get("venv", False))
-            else:
-                for job_script in job_scripts_to_submit:
-                    job_submission(dict(job_script=job_script))
-                print(
-                    "submitted job script = \n{}".format(
-                        pformat(job_scripts_to_submit)
-                    )
+            for job_script in job_scripts_to_submit:
+                job_submission(dict(job_script=job_script))
+            print(
+                "submitted job script = \n{}".format(
+                    pformat(job_scripts_to_submit)
                 )
+            )
 
     # POOL.shutdown_threads()
     return job_scripts_to_submit
@@ -1201,7 +1198,7 @@ def run_ensemble(
             "but the parameter 'script' was not specified."
         )
 
-    # check if with_config function is already called or not
+    # check if with_config function is already called
     if not hasattr(env, "job_config_path"):
         raise RuntimeError(
             "Function with_config did NOT called, "
@@ -1210,7 +1207,6 @@ def run_ensemble(
 
     # check for PilotJob option
     if hasattr(env, "PJ") and env.PJ.lower() == "true":
-        # env.batch_header = "no_batch"
         env.submitted_jobs_list = []
         env.submit_job = False
         env.batch_header = "bash_header"
@@ -1253,7 +1249,7 @@ def run_ensemble(
 
     if execute_put_configs is True:
         execute(put_configs, config)
-
+        
     # output['everything'] = False
     job_scripts_to_submit = job(
         dict(
@@ -1261,7 +1257,8 @@ def run_ensemble(
             sweepdir_items=sweepdir_items,
             sweep_dir=sweep_dir,
             replica_start_number=replica_start_number,
-        )
+        ),
+        prepare_only=True
     )
     
     if hasattr(env, "PJ_TYPE"):
@@ -1274,6 +1271,7 @@ def run_ensemble(
             print("Error: 'PJ_TYPE' must be set to either 'RP' or 'QCG'. Exiting...")
             sys.exit(1)
     else:
+        # If PJ_TYPE is not set, submit the jobs normally
         for job_script in job_scripts_to_submit:
             job_submission(dict(job_script=job_script))
         print(
@@ -1284,7 +1282,7 @@ def run_ensemble(
             
             
 def run_radical(job_scripts_to_submit: list, venv = "False"):
-    print(
+    rich_print(
         Panel.fit(
             "NOW, we are submitting RADICAL-Pilot Jobs",
             title="[orange_red1]PJ job submission phase[/orange_red1]",
@@ -1296,12 +1294,12 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     if not hasattr(env, "task_model"):
         env.task_model = "default"
 
-    # Create a temprary working directory for RADICAL runtime files
+    # Create a temprary working directory for Radical runtime files
     local_working_dir = path.join(env.tmp_results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
     remote_working_dir = path.join(env.results_path, f"radical_{env.config}_{env.machine_name}_{env.cores}")
     os.makedirs(local_working_dir, exist_ok=True)
     
-    # Prepare the environment for radical TaskDescription
+    # Prepare the environment for Radical TaskDescription
     task_descriptions = []
     for index, task_script in enumerate(job_scripts_to_submit, start=1):
         env.update({
@@ -1310,7 +1308,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
         })
         task_descriptions.append(task_script)
 
-    # Prepare the environment for radical pd_init
+    # Prepare the environment for Radical pd_init
     env.update({
         'task_descriptions': task_descriptions,
         'sandbox': remote_working_dir,
@@ -1323,7 +1321,7 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     with open(path.join(sandbox_resources_path, 'resource_fabsim.json'), 'w') as f:
         f.write(radical_resources_content)
 
-    # Generate the radical-PJ-py script using the combined template
+    # Generate the radical-PJ-py script using the template
     radical_script_content = script_template_content("radical-PJ-py")
     radical_script_name = f"{env.config}_{env.machine_name}_{env.cores}_radical.py"
     radical_local_script_path = path.join(local_working_dir, radical_script_name)
@@ -1333,10 +1331,10 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
     with open(radical_local_script_path, 'w') as f:
         f.write(radical_script_content)
         
-    # Transfer the temporary file to the remote machine
+    # Transfer Radical configuration script to remote machine
     local(template(f"rsync -pthrvz {local_working_dir}/ $username@$remote:{remote_working_dir}/"))
 
-    # Construct the run_Radical_Pilot command
+    # Construct the run_Radical_PilotJob command
     RP_CMD = []
     if hasattr(env, "venv") and str(env.venv).lower() == "true":
         RP_CMD.append("# Activate the virtual environment")
@@ -1344,28 +1342,26 @@ def run_radical(job_scripts_to_submit: list, venv = "False"):
 
     RP_CMD.append("# Check if Job is installed")
     RP_CMD.append("python3 -c 'import radical.pilot' 2>/dev/null || pip3 install --upgrade radical.pilot\n")
-    # RP_CMD.append("pip3 install git+https://github.com/radical-cybertools/radical.pilot.git@devel\n")
     RP_CMD.append("# Python command for task submission")
     RP_CMD.append(f"python3 {radical_remote_script_path}\n")
 
-    env.run_Radical_Pilot = "\n".join(RP_CMD)
+    env.run_Radical_PilotJob = "\n".join(RP_CMD)
 
-    # Avoid replicas functionality on PilotJob folders
+    # Avoid apply replicas functionality on PilotJob folders
     env.replicas = "1"
     backup_header = env.batch_header
     env.batch_header = env.radical_PJ_header
     env.submit_job = True
-    env.in_ensemble_mode = True
 
     job(dict(ensemble_mode=False, label="radical-PJ-header", NoEnvScript=True))
-    env.in_ensemble_mode = False
     env.batch_header = backup_header
     env.NoEnvScript = False
-            
+
+
 def run_qcg(job_scripts_to_submit: list, venv: bool):
-    print(
+    rich_print(
         Panel.fit(
-            "NOW, we submitting PJ jobs",
+            "NOW, we are submitting QCG Pilot jobs",
             title="[orange_red1]PJ job submission phase[/orange_red1]",
             border_style="orange_red1",
         )
@@ -1375,17 +1371,18 @@ def run_qcg(job_scripts_to_submit: list, venv: bool):
     submitted_jobs_list = []
     if not hasattr(env, "task_model"):
         env.task_model = "default"
+        
     # Python's indexes start at zero, to start from 1, set start=1
     for index, job_script in enumerate(job_scripts_to_submit, start=1):
-        # TODO: this loop should be improved
         env.idsID = index
         env.idsPath = job_script
+        env.dirPath = path.dirname(env.idsPath)
         submitted_jobs_list.append(
             script_template_content("qcg-PJ-task-template")
         )
     env.submitted_jobs_list = "\n".join(submitted_jobs_list)
 
-    # to avoid apply replicas functionality on PilotJob folders
+    # Avoid apply replicas functionality on PilotJob folders
     env.replicas = "1"
     backup_header = env.batch_header
     env.batch_header = env.PJ_PYheader
@@ -1397,29 +1394,19 @@ def run_qcg(job_scripts_to_submit: list, venv: bool):
     env.PJ_FileName = env.pather.basename(env.PJ_PATH)
     env.batch_header = env.PJ_header
     env.submit_job = True
-    # load QCG-PJ-PY file
+    
+    # Construct the run_QCG_PilotJob command
     PJ_CMD = []
     if hasattr(env, "venv") and str(env.venv).lower() == "true":
         # QCG-PJ should load from virtualenv
-        PJ_CMD.append("# unload any previous loaded python module")
-        PJ_CMD.append("module unload python\n")
-        PJ_CMD.append("# load QCG-PilotJob from VirtualEnv")
-        PJ_CMD.append(
-            'eval "$({}/bin/conda shell.bash hook)"\n'.format(
-                env.virtual_env_path
-            )
-        )
-        PJ_CMD.append("# load QCG-PJ-Python file")
-        PJ_CMD.append(
-            "{}/bin/python3 {}".format(env.virtual_env_path, env.PJ_PATH)
-        )
+        PJ_CMD.append("# Activate the virtual environment")
+        PJ_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
 
-    else:
-        PJ_CMD.append("# Install QCG-PJ in user's home space")
-        PJ_CMD.append("pip3 install --user --upgrade  qcg-pilotjob\n")
-        PJ_CMD.append("# load QCG-PJ-Python file")
-        PJ_CMD.append("python3 {}".format(env.PJ_PATH))
-
+    PJ_CMD.append("# Check if qcg-pilotjob is installed")
+    PJ_CMD.append("python3 -c 'import qcg-pilotjob' 2>/dev/null || pip3 install --upgrade qcg-pilotjob\n")
+    PJ_CMD.append("# Python command for qcg-pilotjob execution")
+    PJ_CMD.append(f"python3 {env.PJ_PATH}")
+    
     env.run_QCG_PilotJob = "\n".join(PJ_CMD)
     job(dict(ensemble_mode=False, label="PJ_header", NoEnvScript=True))
     env.batch_header = backup_header

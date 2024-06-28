@@ -95,5 +95,7 @@ env = _lookupDict(
         "env_sshpass": "SSHPASS" in os.environ,
         "radical_PJ_py": os.path.join(fabsim_root, "deploy", "templates", "radical-PJ-py"),
         "radical_PJ_header": os.path.join(fabsim_root, "deploy", "templates", "radical-PJ-header"),
+        "PJ_PYheader": os.path.join(fabsim_root, "deploy", "templates", "PJ-PYheader"),
+        "PJ_header": os.path.join(fabsim_root, "deploy", "templates", "PJ-header")
     }
 )
