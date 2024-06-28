@@ -707,7 +707,7 @@ def job(*job_args):
             if hasattr(env, "PJ") and env.PJ.lower() == "true" and not hasattr(env, "in_ensemble_mode"):
                 if hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "RP":
                     run_radical(job_scripts_to_submit, env.get("venv", False))
-                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "QCG-PJ":
+                elif hasattr(env, "PJ_TYPE") and env.PJ_TYPE.lower() == "QCG":
                     run_qcg(job_scripts_to_submit, env.get("venv", False))
             else:
                 for job_script in job_scripts_to_submit:
@@ -1266,12 +1266,12 @@ def run_ensemble(
     
     if hasattr(env, "PJ_TYPE"):
         pj_type = env.PJ_TYPE.lower()
-        if pj_type == "rp":
+        if pj_type == "RP":
             run_radical(job_scripts_to_submit, env.get("venv", False))
-        elif pj_type == "qcg":
+        elif pj_type == "QCG":
             run_qcg(job_scripts_to_submit, env.get("venv", False))
         else:
-            print("Error: 'PJ_TYPE' must be set to either 'rp' or 'qcg'. Exiting...")
+            print("Error: 'PJ_TYPE' must be set to either 'RP' or 'QCG'. Exiting...")
             sys.exit(1)
     else:
         for job_script in job_scripts_to_submit:
