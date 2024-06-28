@@ -1,14 +1,14 @@
-# FabSim3 Radical Integration Documentation
+# FabSim3 and RADICAL-Pilot Integration Documentation
 
 ## Introduction
-This documentation provides detailed instructions on how to configure, use, and troubleshoot the Radical Pilot integration in FabSim3.
+This documentation provides detailed instructions on how to configure, use, and troubleshoot the RADICAL-Pilot (RP) integration in FabSim3.
 
 ### Prerequisites
 - Python 3.6 or higher
-- Radical Pilot
+- RADICAL-Pilot
 - FabSim3
 
-### Installing FabSim3 and Radical Pilot
+### Installing FabSim3 and RADICAL-Pilot
 1. **Set up and Activate your Python virtual environment (optional but recommended):**
     ```bash
     mkdir -p ~/workspace
@@ -28,15 +28,15 @@ This documentation provides detailed instructions on how to configure, use, and 
     python3 configure_fabsim.py
     ```
 
-4. **Install Radical Pilot:**
+4. **Install RADICAL-Pilot:**
     ```bash
     fabsim <machine> install_app:RADICAL-Pilot,venv=True
     ```
 
 ## Configuration
 
-### Example Parameters Configuration for Radical
-Although these parameters belong to Radical, not all of them need to be configured. The required ones are noted in the following section.
+### Example Parameters Configuration for RADICAL
+Although these parameters belong to RADICAL, not all of them need to be configured. The required ones are noted in the following section.
 
 ```yaml
 resource: ''           # The target computing resource (e.g., 'local.localhost', 'epcc.archer2') where the job will be submitted.
@@ -52,8 +52,8 @@ cores_per_rank: 1      # The number of CPU cores to allocate per MPI rank or pro
 sandbox: ''            # The working directory where job-related files will be stored and accessed. This should be a path on the target resource.
 ```
 
-### Adding Radical Parameters to machines_user.yml
-In your `machines_user.yml`, add the Radical Pilot-specific parameters under the appropriate machine section. For example, for `archer2`:
+### Adding RADICAL Parameters to machines_user.yml
+In your `machines_user.yml`, add the RADICAL-Pilot specific parameters under the appropriate machine section. For example, for `archer2`:
 
 ```yaml
 archer2:
@@ -69,33 +69,33 @@ archer2:
     - export PYTHONUSERBASE=/work/$project/$project/your_username/.local
     - 'export PATH=$PYTHONUSERBASE/bin:$PATH'
     - 'export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH'
-  partition_name: "standard" # Radical Pilot partition name
-  qos_name: "short"          # Radical Pilot qos name
-  runtime: 10                # Radical Pilot runtime in minutes
-  nodes: 1                   # Radical Pilot nodes 
-  ranks: 1                   # Radical Pilot ranks 
-  cores_per_rank : 1         # Radical Pilot cores per rank
+  partition_name: "standard" # RADICAL-Pilot partition name
+  qos_name: "short"          # RADICAL-Pilot qos name
+  runtime: 10                # RADICAL-Pilot runtime in minutes
+  nodes: 1                   # RADICAL-Pilot nodes 
+  ranks: 1                   # RADICAL-Pilot ranks 
+  cores_per_rank : 1         # RADICAL-Pilot cores per rank
 ```
 
 ## Usage
 
-### Running Jobs with Radical Pilot
-To submit jobs using Radical Pilot, use the PJ and PJ_TYPE arguments in your command. Here’s an example command to run an ensemble job with Radical Pilot:
+### Running Jobs with RADICAL-Pilot
+To submit jobs using RADICAL-Pilot, use the PJ and PJ_TYPE arguments in your command. Here’s an example command to run an ensemble job with RADICAL-Pilot (RP):
     ```bash
-    fabsim <machine> <function>:config=<config_files>,replicas=<integer>,PJ=true,PJ_TYPE=radical,venv=true
+    fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ=true,PJ_TYPE=RP,venv=true
     ```
 
-### Running Specific Jobs with Radical Pilot
+### Running Specific Jobs with RADICAL-Pilot
 For running specific jobs like FabDummy in replica mode:
 
 ```bash
-fabsim archer2 dummy:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
+fabsim archer2 dummy:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=RP,venv=true
 ```
 
 For running specific jobs in ensemble mode:
 
 ```bash
-fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=rp,venv=true
+fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=RP,venv=true
 ```
 
 ## Troubleshooting
@@ -108,19 +108,19 @@ fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TY
 
 2. Missing or Incorrect 'PJ', 'PJ_TYPE' Argument:
 
-    - Ensure that you have included PJ=true and PJ_TYPE=radical or PJ_TYPE=qcg in your command.
+    - Ensure that you have included PJ=true and PJ_TYPE=RP or PJ_TYPE=QCG-PJ in your command.
 
 3. Python Package Installation Issues:
 
-    - Ensure that Radical Pilot is installed in your virtual environment and venv is set to true.
+    - Ensure that RADICAL-Pilot is installed in your virtual environment and venv is set to true.
     - Verify that the virtual environment is activated before running the FabSim3 commands.
-    - To check if Radical Pilot is installed, you can use the following Python command:
+    - To check if RADICAL-Pilot is installed, you can use the following Python command:
         ```bash
-        python3 -c 'import radical.pilot' && echo "Radical Pilot is installed." || echo "Radical Pilot is NOT installed."
+        python3 -c 'import RADICAL.pilot' && echo "RADICAL-Pilot is installed." || echo "RADICAL-Pilot is NOT installed."
         ```
 
 ## Contributing
-We welcome contributions to improve the Radical Pilot integration in FabSim3. Please follow the standard GitHub pull request process.
+We welcome contributions to improve the RADICAL-Pilot integration in FabSim3. Please follow the standard GitHub pull request process.
 
 ## Contact
 For any questions or support, please contact FabSim3 Support.
