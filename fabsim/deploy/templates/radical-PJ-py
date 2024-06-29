@@ -1,0 +1,67 @@
+import os
+from typing import List
+
+import radical.pilot as rp
+
+# Create a working directory
+os.environ['RADICAL_CONFIG_USER_DIR'] = '${sandbox}'
+os.environ['RADICAL_PILOT_BASE'] = '${sandbox}'
+
+# for debug purposes
+os.environ['RADICAL_LOG_LVL'] = 'DEBUG'
+os.environ['RADICAL_REPORT']  = 'TRUE'
+
+# convert hostname into RP style platform ID (i.e., platform label)
+def get_platform_ids(hostname:str) -> List[str]:
+    platform_cfgs = rp.utils.get_resource_configs()
+    facilities = list(platform_cfgs)
+    for skip_facility in ['debug', 'local']:
+        facilities.remove(skip_facility)
+    output = []
+    for facility in facilities:
+        for platform in platform_cfgs[facility]:
+            if platform.split('_')[0] in hostname:
+                output.append('%s.%s' % (facility, platform))
+        if output:
+            output.sort()
+            break
+    return output
+
+def main():
+    platform_ids = get_platform_ids('${remote}')
+    platform_id = 'local.localhost' if not platform_ids else platform_ids[0]
+
+    session = rp.Session()
+    pmgr    = rp.PilotManager(session=session)
+    tmgr    = rp.TaskManager(session=session)
+
+    pd_init = {
+        'resource' : platform_id,
+        'project'  : '${project}',
+        'queue'    : '${partition_name}:${qos_name}',
+        'runtime'  : ${runtime},
+        'nodes'    : ${nodes},
+        'sandbox'  : '${sandbox}'
+    }
+    pilot = pmgr.submit_pilots(rp.PilotDescription(pd_init))
+    tmgr.add_pilots(pilot)
+
+    task_descriptions = ${task_descriptions}
+
+    task_description_scripts = []
+    for task_desc in task_descriptions:
+        task_description_scripts.append(rp.TaskDescription({
+            'executable'     : task_desc,
+            'arguments'      : [],
+            'pre_exec'       : [],
+            'ranks'          : ${ranks},
+            'cores_per_rank' : ${cores_per_rank},
+            'sandbox'        : '${sandbox}'
+        }))
+    tmgr.submit_tasks(task_description_scripts)
+
+    tmgr.wait_tasks()
+    session.close(download=True)
+
+if __name__ == '__main__':
+    main()
