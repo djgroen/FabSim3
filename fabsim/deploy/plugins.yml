@@ -11,6 +11,9 @@ FabParticleDA:
 FabDummy:
   repository: https://github.com/djgroen/FabDummy.git
 
+FabGuard:
+  repository: https://github.com/rumineykova/fabguard.git
+
 FabCannonSim:
   repository: https://github.com/arabnejad/FabCannonsim.git
 
@@ -68,3 +71,6 @@ FabOasis:
 
 FabNESO:
   repository: https://github.com/UCL/FabNESO
+
+FabGPDR:
+  repository: https://github.com/arindamsaha1507/FabGPDR.git

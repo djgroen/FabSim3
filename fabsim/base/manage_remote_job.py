@@ -135,16 +135,16 @@ def check_complete(jobname_syntax: Optional[str] = "") -> bool:
     check_jobs_dispatched_on_remote_machine()
     jobs_dict = jobs_list(quiet=True)
 
+    count = jobs_dict.count('\n') + 1
+
     if len(jobs_dict) > 0:
         print(
-            "The number of active (not finished) jobs = {}".format(
-                len(jobs_dict)
+            f"The number of active (not finished) jobs = {count}"
             )
-        )
         return False
-    else:
-        print("All jobs are finished :)")
-        return True
+
+    print("All jobs are finished :)")
+    return True
 
 
 @task

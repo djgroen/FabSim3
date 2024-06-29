@@ -11,7 +11,9 @@ FabSim
 
 
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/djgroen/FabSim3?style=flat)](https://github.com/djgroen/FabSim3/tags)
+<!---
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/djgroen/FabSim3.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/djgroen/FabSim3/context:python)
+-->
 [![GitHub Issues](https://img.shields.io/github/issues/djgroen/FabSim3.svg)](https://github.com/djgroen/FabSim3/issues)
 [![GitHub last-commit](https://img.shields.io/github/last-commit/djgroen/FabSim3.svg)](https://github.com/djgroen/FabSim3/commits/master)
 
