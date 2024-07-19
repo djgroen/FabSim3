@@ -19,6 +19,16 @@ from fabsim.deploy.templates import template
 config = yaml.safe_load(
     open(os.path.join(env.fabsim_root, "deploy", "machines.yml"))
 )
+# Include private machines
+config_file_private = os.path.join(
+    env.fabsim_root, "deploy", "machines_private.yml"
+)
+if os.path.isfile(config_file_private):
+    config_private = yaml.safe_load(
+        open(config_file_private)
+    )
+    config |= config_private
+
 env.update(config["default"])
 
 try:
