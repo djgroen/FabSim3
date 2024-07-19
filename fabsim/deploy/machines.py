@@ -21,8 +21,8 @@ config = yaml.safe_load(
 )
 # Include private machines
 config_file_private = os.path.join(
-        env.fabsim_root, "deploy", "machines_private.yml"
-    )
+    env.fabsim_root, "deploy", "machines_private.yml"
+)
 if os.path.isfile(config_file_private):
     config_private = yaml.safe_load(
         open(config_file_private)
