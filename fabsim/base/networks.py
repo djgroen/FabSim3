@@ -16,7 +16,7 @@ from fabsim.deploy.templates import template
 @beartype
 def local(
     command: str,
-    cwd: Optional[str | None] = None,
+    cwd: Optional[str] = None,
     capture: Optional[bool] = False
 ) -> Tuple[str, str]:
     """
