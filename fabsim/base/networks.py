@@ -157,8 +157,8 @@ def manual_sshpass(
     else:
         commands = []
 
-    if env.get("cwd"):
-        commands.append("cd {}".format(env.cwd))
+    if cd is not None:
+        commands.append("cd {}".format(cd))
 
     commands.append(cmd)
     manual_command = " && ".join(commands)
@@ -180,8 +180,8 @@ def manual_gsissh(
     else:
         commands = []
 
-    if env.get("cwd"):
-        commands.append("cd {}".format(env.cwd))
+    if cd is not None:
+        commands.append("cd {}".format(cd))
 
     commands.append(cmd)
     manual_command = " && ".join(commands)
@@ -199,8 +199,8 @@ def manual(
     else:
         commands = []
 
-    if env.get("cwd"):
-        commands.append("cd {}".format(env.cwd))
+    if cd is not None:
+        commands.append("cd {}".format(cd))
 
     commands.append(cmd)
     manual_command = " && ".join(commands)
