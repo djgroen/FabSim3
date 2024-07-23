@@ -14,12 +14,17 @@ from fabsim.deploy.templates import template
 
 
 @beartype
-def local(command: str, capture: Optional[bool] = False) -> Tuple[str, str]:
+def local(
+    command: str,
+    cwd: Optional[str | None] = None,
+    capture: Optional[bool] = False
+) -> Tuple[str, str]:
     """
     Run a command on the local system.
 
     Args:
         command (str): the command to be executed
+        cwd (str, optional): the current working directory
         capture (bool, optional): if `False`, the local subprocess will use
             your terminal for stdout and stderr. Otherwise, if `True`, then
             nothing will be printed in the terminal, and any subprocess'
@@ -42,7 +47,9 @@ def local(command: str, capture: Optional[bool] = False) -> Tuple[str, str]:
 
     # execute the command on the local system
     try:
-        p = subprocess.Popen(command, shell=True, stdout=stdout, stderr=stderr)
+        p = subprocess.Popen(
+            command, cwd=cwd, shell=True, stdout=stdout, stderr=stderr
+        )
         # p.wait()
         # yield f"{command} Rsync process completed."
         (stdout, stderr) = p.communicate()
