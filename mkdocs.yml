@@ -182,7 +182,9 @@ markdown_extensions:
 nav:
     - Home:
       - Introduction: index.md
-      - Installation: installation.md
+      - Installation:
+        - Install FabSim3: installation.md
+        - Install WSL2 for Windows: install_wsl.md
       - Testing: testing.md
       - Getting Started: getting_started.md
       - Plugins: plugins.md
