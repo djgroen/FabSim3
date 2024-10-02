@@ -10,15 +10,42 @@ WSL is especially useful for running tools like **FabSim3**, which are designed 
 
 To simplify the installation of WSL and Ubuntu, you can either download or copy the script below.
 
-### Option 1: [Download install_wsl.bat](https://github.com/mzrghorbani/FabSim3_Jupyter/blob/main/wsl_install.bat)
+### Option 1: Clone GitHub Repository 
 
-You can clone an automated script for WSL installation. Once the script is downloaded, right-click on the script and **Run As Administrator**. Also, you can open a Powershell termial on Windows as administrator, go to directory where script is downloaded and run the script by tryping `.\install_wsl.bat`.
+You can clone an automated script for WSL installation from [FabSim3_Jupyter](https://github.com/mzrghorbani/FabSim3_Jupyter.git). Once the repository is clonned, right-click on the `install_wsl.bat` script and **Run As Administrator**. Also, you can open a Powershell termial on Windows as administrator, go to directory where script is downloaded and run the script by tryping `.\install_wsl.bat`.
+
+1. Press Windows Key + X and select Terminal for Windows PowerShell or Command Prompt.
+
+2. Navigate to the Directory Where You Want to Clone the Repository:
+
+```bash
+cd C:\Users\YourUsername\Documents
+```
+
+3. Clone the GitHub Repository:
+
+```bash
+git clone https://github.com/mzrghorbani/FabSim3_Jupyter.git
+```
+
+4. Open Repository in Windows Explorer:
+
+```bash
+explorer.exe FabSim3_Jupyter
+```
+
+This will open Windows Explorer with the content of the repository. Righ_click on `install_wsl.bat` and **Run as Administrator**.
+
+If you encountered any issues with `git : The term 'git' is not recognized`, please install git from here: https://git-scm.com/downloads/win
 
 ### Option 2: Copy the BAT Script
 
-You can also copy and paste the following BAT script content into a file and run it as administrator.
+You can also copy and paste the following BAT script content into a file and run it as administrator. 
 
-**Important**: Restarting is necessary to complete the WSL installation. It ensures that changes made during the installation are correctly applied.
+<span style="color: red;">**Note**</span>: Windows Defender may block the execution of `.bat` scripts as a security precaution. If you receive a security alert, review the details and choose to allow the script to run by selecting the appropriate option. Be sure that the script is from trusted source and safe before proceeding.
+
+<span style="color: red;">**Important**</span>: Restarting is necessary to complete the WSL installation. It ensures that changes made during the installation are correctly applied. After the first restart, when you run the script again, you can safely answer **no** when prompted to restart. This allows the script to continue running the remaining steps without requiring another reboot.
+
 
 ```batch
 @echo OFF
@@ -267,7 +294,7 @@ Once SSH is running, you can test the connection by running:
 ssh localhost
 ```
 
-If everything is set up correctly, you should be able to log in without issues.
+If everything is set up correctly, you should be able to log in to localhost and exit without issues.
 
 ## Installing MPI Packages in WSL Ubuntu
 
@@ -328,7 +355,7 @@ FabSim3 provides an automated configuration script to set up the necessary files
 python3 configure_fabsim.py
 ```
 
-This script performs several configuration tasks, including setting environment variables and preparing the necessary directories for FabSim3 to work properly. You may need to follow on-screen prompts during this process.
+This script performs several configuration tasks, including setting environment variables and preparing the necessary directories for FabSim3 to work properly. You may need to follow on-screen prompts during this process. If dependencies like rich is missing, please install them using pip3.
 
 ### Step 4: Add FabSim3 to Your System Path
 
@@ -385,14 +412,7 @@ Follow these steps to install and run Jupyter Notebook in your WSL environment:
 1. **Install Python and Pip**: Jupyter Notebook requires Python and Pip (Python's package installer). If they aren’t already installed, run the following commands:
    
 ```bash
-sudo apt-get update
-sudo apt-get install python3-dev python3-pip
-```
-
-**Install Jupyter Notebook**: Once Python and Pip are installed, use Pip to install Jupyter Notebook:
-
-```bash
-pip3 install notebook
+sudo apt-get install jupyter-notebook
 ```
 
 ### Step 2: Launch Jupyter Notebook
@@ -414,9 +434,9 @@ After running jupyter notebook, you will see output in the terminal that looks s
 [I 13:27:13.891 NotebookApp] http://localhost:8888/?token=your_token
 ```
 
-Copy the URL (the one that looks like http://localhost:8888/?token=your_token) and paste it into your browser’s address bar on Windows.
+Click or Copy the URL (the one that looks like http://localhost:8888/?token=your_token) and paste it into your browser’s address bar on Windows.
 
-You should now see the Jupyter Notebook interface in your browser, and you can begin running Python code interactively.
+You should now see the Jupyter Notebook interface in your browser. Please close the Jupyter Notebook and continue the instructions.
 
 ### Troubleshooting
 - **Can't Access Jupyter Notebook in Browser**: Make sure you are copying the entire URL from the terminal, including the token. If the terminal shows http://localhost:8888/, but you can’t connect, ensure that port 8888 is not being blocked by a firewall or other application.
@@ -428,12 +448,12 @@ FabSim3 comes with a Jupyter Notebook repository, **FabSim3_Jupyter**, which pro
 
 ### Step 1: Clone the FabSim3 Jupyter Repository
 
-First, open your **WSL terminal (Ubuntu)** and navigate to the directory where you want to clone the repository.
+First, navigate to the directory where you want to clone the repository.
 
-1. Change to the desired directory (e.g., your home directory):
+1. Change to the desired directory (e.g., projects):
 
 ```bash
-cd ~
+cd ~/projects
 ```
 
 ### Step 2: Clone the FabSim3 Jupyter repository:
