@@ -507,8 +507,6 @@ piz_daint:
   remote: daint.cscs.ch
 monsoonfab:
   remote: “monsoonfab”
-
-
 hsuper:
   remote: "hsuper-login01.hsu-hh.de"
   cores: 1
@@ -522,4 +520,3 @@ hsuper:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
     --noheader
-
