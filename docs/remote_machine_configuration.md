@@ -75,7 +75,8 @@ prometheus:
 ```
 When defining a new machine in this way, all variables will by default have a value that is specified under the `#!yaml "default:"` heading of `machines.yml`.  
 
-We recommend commiting these type of definitions to the GitHub repository of FabSim3, unless the machine is non-public.
+We recommend commiting these type of definitions to the GitHub repository of FabSim3, unless the machine is non-public.  
+In that case, create `machines_private.yml` in the same directory and add all non-public machines to it.
 
 #### Adding user information for an existing machine
 

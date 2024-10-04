@@ -1,5 +1,9 @@
 fabsim/deploy/machines_user.yml
 
+fabsim/deploy/machines_private.yml
+
+fabsim/deploy/machines_user_backup.yml
+
 base/__pycache__/
 
 fabsim/deploy/\.jobscripts/

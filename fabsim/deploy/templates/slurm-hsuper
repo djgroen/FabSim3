@@ -1,0 +1,24 @@
+#!/bin/sh
+## Helmut-Schmidt-University Hamburg - HSUper
+
+## Job Name
+#SBATCH --job-name=$job_name
+
+## Partition Name
+#SBATCH --partition=$partition_name
+
+## Number of Nodes
+#SBATCH --nodes=$nodes
+
+## Number of Tasks per Node
+#SBATCH --tasks-per-node=$corespernode
+
+## Wall Time in format days-hours:minutes:seconds
+#SBATCH --time=$job_wall_time
+
+## Output File Name
+#SBATCH --output=%j.out
+
+## Error File Name
+#SBATCH --error=%j.err
+

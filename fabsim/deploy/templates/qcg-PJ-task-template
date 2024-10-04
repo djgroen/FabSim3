@@ -1,1 +1,9 @@
-jobs.add(name = 'TaskID$idsID', exec = 'bash', args = ['-l','$idsPath'], stdout = 'tasks-log/$${jname}__$${uniq}.stdout', stderr = 'tasks-log/$${jname}__$${uniq}.stderr', numCores = { 'exact': $cores }, model = '$task_model') 
+jobs.add(
+    name='TaskID${idsID}',
+    exec='bash',
+    args=['-l', '${idsPath}'],
+    stdout='${dirPath}/$${jname}_$${uniq}.stdout',
+    stderr='${dirPath}/$${jname}_$${uniq}.stderr',
+    numCores={'exact': ${cores}},
+    model='${task_model}'
+)
