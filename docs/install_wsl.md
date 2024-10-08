@@ -14,21 +14,21 @@ To simplify the installation of WSL and Ubuntu, you can either download or copy 
 
 You can clone an automated script for WSL installation from [FabSim3_Jupyter](https://github.com/mzrghorbani/FabSim3_Jupyter.git). Once the repository is clonned, right-click on the `install_wsl.bat` script and **Run As Administrator**. Also, you can open a Powershell termial on Windows as administrator, go to directory where script is downloaded and run the script by tryping `.\install_wsl.bat`.
 
-#### Step 1: Press Windows Key + X and select Terminal for Windows PowerShell or Command Prompt.
+##### Step 1: Press Windows Key + X and select Terminal for Windows PowerShell or Command Prompt.
 
-#### Step 2: Navigate to the Directory Where You Want to Clone the Repository:
+##### Step 2: Navigate to the Directory Where You Want to Clone the Repository:
 
 ```bash
 cd C:\Users\YourUsername\Documents
 ```
 
-#### Step 3: Clone the GitHub Repository:
+##### Step 3: Clone the GitHub Repository:
 
 ```bash
 git clone https://github.com/mzrghorbani/FabSim3_Jupyter.git
 ```
 
-#### Step 4: Open Repository in Windows Explorer:
+##### Step 4: Open Repository in Windows Explorer:
 
 ```bash
 explorer.exe FabSim3_Jupyter
@@ -215,13 +215,13 @@ pause >nul
 
 Once WSL Kenel and Ubuntu are installed, you will be asked to create a **new user** for the Linux environment. This is a typical process when setting up a new Linux system, and it’s important to follow the instructions carefully.
 
-### Step 1: Create a Username
+#### Step 1: Create a Username
 
 When prompted, you will need to choose a **username** for your Ubuntu environment. This username will be used for login and to run commands as that user.
 
 - **Tip**: Choose a simple, memorable username. For example, you can use your first name, or a common username like `fabuser` you use on other systems. This is the equivalent of the user account name in Windows.
 
-### Step 2: Set Your Password
+#### Step 2: Set Your Password
 
 After choosing a username, you will be prompted to **enter a password**. Please note the following:
 
@@ -261,7 +261,7 @@ sudo apt-get install build-essential python3-dev python3-pip
 
 ## OpenSSH Server for SSH Connections
 
-### Step 1: Install OpenSSH Server
+#### Step 1: Install OpenSSH Server
 
 First, ensure that the OpenSSH server is installed on your WSL Ubuntu system. You can install it by running the following command:
 
@@ -269,7 +269,7 @@ First, ensure that the OpenSSH server is installed on your WSL Ubuntu system. Yo
 sudo apt-get install openssh-server
 ```
 
-### Step 2: Start the SSH Service
+#### Step 2: Start the SSH Service
 
 Once the OpenSSH server is installed, start the SSH service:
 
@@ -277,15 +277,15 @@ Once the OpenSSH server is installed, start the SSH service:
 sudo service ssh start
 ```
 
-### Step 3: Start the SSH Service
+#### Step 3: Start the SSH Service
 
-Enable SSH with the following commands:
+Enable SSH with the following command:
 
- ```bash
+```bash
 sudo systemctl enable ssh
 ```
 
-### Step 4: Verify SSH Service Status
+#### Step 4: Verify SSH Service Status
 
 After starting the SSH service, verify that it's running properly:
 
@@ -293,7 +293,7 @@ After starting the SSH service, verify that it's running properly:
 sudo service ssh status
 ```
 
-### Step 5: Test SSH Connection
+#### Step 5: Test SSH Connection
 
 Once SSH is running, you can test the connection by running:
 
@@ -334,7 +334,7 @@ Once your system has finished updating and upgrading, you’re ready to start us
 
 Follow these steps to set up and configure FabSim3 within your WSL environment (Ubuntu).
 
-### Step 1: Clone the FabSim3 Repository
+#### Step 1: Clone the FabSim3 Repository
 
 Open your WSL terminal (Ubuntu), navigate to the directory where you want to install FabSim3, and clone the FabSim3 repository:
 
@@ -343,7 +343,7 @@ mkdir -p ~/projects
 cd ~/projects
 ```
 
-### Step 2: Clone the FabSim3 repository
+#### Step 2: Clone the FabSim3 repository
 
 ```bash
 git clone https://github.com/djgroen/FabSim3.git
@@ -352,7 +352,7 @@ cd FabSim3
 
 This command will download the FabSim3 repository to your local machine and navigate into the FabSim3 directory.
 
-### Step 3: Configure FabSim3
+#### Step 3: Configure FabSim3
 
 FabSim3 provides an automated configuration script to set up the necessary files and dependencies. Run the following Python script to configure FabSim3:
 
@@ -362,7 +362,7 @@ python3 configure_fabsim.py
 
 This script performs several configuration tasks, including setting environment variables and preparing the necessary directories for FabSim3 to work properly. You may need to follow on-screen prompts during this process. If dependencies like rich is missing, please install them using pip3.
 
-### Step 4: Add FabSim3 to Your System Path
+#### Step 4: Add FabSim3 to Your System Path
 
 To make FabSim3 easily accessible from anywhere in your terminal, you need to add it to your system path. You can do this by modifying your .bashrc file (or .zshrc if you're using Zsh):
 
@@ -384,7 +384,7 @@ After editing .bashrc, apply the changes by running:
 source ~/.bashrc
 ```
 
-### Step 5: Verify FabSim3 Installation
+#### Step 5: Verify FabSim3 Installation
 
 To verify that FabSim3 has been successfully installed and that its path is correctly set, run the following command:
 
@@ -412,7 +412,7 @@ Please see installation section of [FabSim3 documetnation.](https://fabsim3.read
 
 Follow these steps to install and run Jupyter Notebook in your WSL environment:
 
-### Step 1: Install Jupyter Notebook
+#### Step 1: Install Jupyter Notebook
 
 1. **Install Python and Pip**: Jupyter Notebook requires Python and Pip (Python's package installer). If they aren’t already installed, run the following commands:
    
@@ -420,14 +420,14 @@ Follow these steps to install and run Jupyter Notebook in your WSL environment:
 sudo apt-get install jupyter-notebook
 ```
 
-### Step 2: Launch Jupyter Notebook
+#### Step 2: Launch Jupyter Notebook
 Once Jupyter Notebook is installed, you can launch it using the following command:
 
 ```bash
 jupyter notebook
 ```
 
-### Step 3: Access Jupyter Notebook from a Browser on Windows
+#### Step 3: Access Jupyter Notebook from a Browser on Windows
 When you run the jupyter notebook command, it will launch Jupyter on a local server within the WSL environment. Here’s how you can access it from your Windows browser:
 
 After running jupyter notebook, you will see output in the terminal that looks something like this:
@@ -451,7 +451,7 @@ You should now see the Jupyter Notebook interface in your browser. Please close 
 
 FabSim3 comes with a Jupyter Notebook repository, **FabSim3_Jupyter**, which provides interactive notebooks for running FabSim3 simulations. Follow the steps below to clone this repository and launch it using Jupyter Notebook in WSL.
 
-### Step 1: Clone the FabSim3 Jupyter Repository
+#### Step 1: Clone the FabSim3 Jupyter Repository
 
 First, navigate to the directory where you want to clone the repository.
 
@@ -461,7 +461,7 @@ Change to the desired directory (e.g., projects):
 cd ~/projects
 ```
 
-### Step 2: Clone the FabSim3 Jupyter repository
+#### Step 2: Clone the FabSim3 Jupyter repository
 
 Clone GitHub repository containing the Jupyter Notebook:
 
@@ -475,7 +475,7 @@ Navigate to the cloned repository:
 cd FabSim3_Jupyter
 ```
 
-### Step 3: Launch Jupyter Notebook
+##### Step 3: Launch Jupyter Notebook
 
 Once the repository is cloned, launch Jupyter Notebook from the FabSim3_Jupyter directory:
 
@@ -483,7 +483,7 @@ Once the repository is cloned, launch Jupyter Notebook from the FabSim3_Jupyter 
 jupyter notebook
 ```
 
-### Step 4: Start Running FabSim3
+##### Step 4: Start Running FabSim3
 
 Once the Jupyter Notebook interface is open in your browser, you can navigate through the FabSim3_Jupyter directory and start using the provided notebooks to run simulations with FabSim3.
 
