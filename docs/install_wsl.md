@@ -271,14 +271,20 @@ sudo apt-get install openssh-server
 
 ### Step 2: Start the SSH Service
 
-Once the OpenSSH server is installed, start the SSH service and enable it with the following commands:
+Once the OpenSSH server is installed, start the SSH service:
 
 ```bash
 sudo service ssh start
+```
+
+### Step 3: Start the SSH Service
+ Enable SSH with the following commands:
+
+ ```bash
 sudo systemctl enable ssh
 ```
 
-### Step 3: Verify SSH Service Status
+### Step 4: Verify SSH Service Status
 
 After starting the SSH service, verify that it's running properly:
 
@@ -286,7 +292,7 @@ After starting the SSH service, verify that it's running properly:
 sudo service ssh status
 ```
 
-### Step 4: Test SSH Connection
+### Step 5: Test SSH Connection
 
 Once SSH is running, you can test the connection by running:
 
@@ -295,6 +301,12 @@ ssh localhost
 ```
 
 If everything is set up correctly, you should be able to log in to localhost and exit without issues.
+
+```bash
+exit
+```
+
+Exit will return you to the original terminal. 
 
 ## Installing MPI Packages in WSL Ubuntu
 
@@ -317,7 +329,7 @@ This should display the version of OpenMPI that is installed, confirming that it
 
 Once your system has finished updating and upgrading, you’re ready to start using Ubuntu within WSL.
 
-### Official WSL Installation Guide
+### Official Microsoft WSL Installation Guide
 
 For more detailed instructions on installing and configuring WSL, you can visit the official Microsoft documentation:
 
@@ -450,13 +462,15 @@ FabSim3 comes with a Jupyter Notebook repository, **FabSim3_Jupyter**, which pro
 
 First, navigate to the directory where you want to clone the repository.
 
-1. Change to the desired directory (e.g., projects):
+Change to the desired directory (e.g., projects):
 
 ```bash
 cd ~/projects
 ```
 
-### Step 2: Clone the FabSim3 Jupyter repository:
+### Step 2: Clone the FabSim3 Jupyter repository
+
+Clone GitHub repository containing the Jupyter Notebook:
 
 ```bash
 git clone https://github.com/mzrghorbani/FabSim3_Jupyter.git
