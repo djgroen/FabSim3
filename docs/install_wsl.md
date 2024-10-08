@@ -14,21 +14,21 @@ To simplify the installation of WSL and Ubuntu, you can either download or copy 
 
 You can clone an automated script for WSL installation from [FabSim3_Jupyter](https://github.com/mzrghorbani/FabSim3_Jupyter.git). Once the repository is clonned, right-click on the `install_wsl.bat` script and **Run As Administrator**. Also, you can open a Powershell termial on Windows as administrator, go to directory where script is downloaded and run the script by tryping `.\install_wsl.bat`.
 
-1. Press Windows Key + X and select Terminal for Windows PowerShell or Command Prompt.
+#### Step 1: Press Windows Key + X and select Terminal for Windows PowerShell or Command Prompt.
 
-2. Navigate to the Directory Where You Want to Clone the Repository:
+#### Step 2: Navigate to the Directory Where You Want to Clone the Repository:
 
 ```bash
 cd C:\Users\YourUsername\Documents
 ```
 
-3. Clone the GitHub Repository:
+#### Step 3: Clone the GitHub Repository:
 
 ```bash
 git clone https://github.com/mzrghorbani/FabSim3_Jupyter.git
 ```
 
-4. Open Repository in Windows Explorer:
+#### Step 4: Open Repository in Windows Explorer:
 
 ```bash
 explorer.exe FabSim3_Jupyter
@@ -36,7 +36,7 @@ explorer.exe FabSim3_Jupyter
 
 This will open Windows Explorer with the content of the repository. Righ_click on `install_wsl.bat` and **Run as Administrator**.
 
-If you encountered any issues with `git : The term 'git' is not recognized`, please install git from here: https://git-scm.com/downloads/win
+If you encountered any issues with `git : The term 'git' is not recognized` on Windows, please install git from here: [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win)
 
 ### Option 2: Copy the BAT Script
 
@@ -278,7 +278,8 @@ sudo service ssh start
 ```
 
 ### Step 3: Start the SSH Service
- Enable SSH with the following commands:
+
+Enable SSH with the following commands:
 
  ```bash
 sudo systemctl enable ssh
@@ -328,14 +329,6 @@ This should display the version of OpenMPI that is installed, confirming that it
 ## After Updating Your System
 
 Once your system has finished updating and upgrading, you’re ready to start using Ubuntu within WSL.
-
-### Official Microsoft WSL Installation Guide
-
-For more detailed instructions on installing and configuring WSL, you can visit the official Microsoft documentation:
-
-- [Manual Installation of WSL](https://learn.microsoft.com/en-us/windows/wsl/install-manual)
-
-This guide provides more in-depth information about various installation methods, configuration options, and troubleshooting steps for WSL.
 
 ## Using FabSim3 in WSL
 
@@ -498,3 +491,11 @@ Once the Jupyter Notebook interface is open in your browser, you can navigate th
 - From there, you can interact with FabSim3 by running the notebook cells, following the instructions in each notebook.
 
 If you encountered any problem, please raise a GitHub issue. 
+
+## Official Microsoft WSL Installation Guide
+
+For more detailed instructions on installing and configuring WSL, you can visit the official Microsoft documentation:
+
+- [Manual Installation of WSL](https://learn.microsoft.com/en-us/windows/wsl/install-manual)
+
+This guide provides more in-depth information about various installation methods, configuration options, and troubleshooting steps for WSL.
