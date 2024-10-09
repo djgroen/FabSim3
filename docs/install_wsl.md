@@ -10,13 +10,13 @@ WSL is especially useful for running tools like **FabSim3**, which are designed 
 
 For the installation of WSL and a Linux distribution (e.g., Ubuntu-22.04), you can either clone and execute an automation script from [FabSim3_Jupyter](https://github.com/mzrghorbani/FabSim3_Jupyter) GitHub repository **or** visit the Official Microsoft Step-by-Step [Installation Guide](https://learn.microsoft.com/en-us/windows/wsl/install-manual).
 
-<span style="color: red;">**Note**</span>: The automation script consolidates all commands from the Microsoft guide into a single executable.
+<span style="color: red;">**Note**</span>: The automation script consolidates all Microsoft installation commands into a single executable.
 
-<span style="color: red;">**Note**</span>: The automation script is intended for native Windows 11 installations. Running WSL2 inside VirtualBox or other virtual machine environments is not supported and may result in errors. If you like to install WSL in a virtual machine, please set WSL default version in the script to 1.
+<span style="color: red;">**Note**</span>: The automation script is intended for native Windows 11 installations. Running WSL2 inside VirtualBox or other virtual machine environments is not supported and may result in Hyper-V errors. If you like to install WSL in a virtual machine, please set wsl-default-version to 1, in the script.
 
 ## Option 1: Clone GitHub Repository on Windows 
 
-<span style="color: red;">**Important**</span>: If you are installing WSL for the first time, administrator privileges are required to enable the WSL optional feature.
+<span style="color: red;">**Important**</span>: If you are installing WSL for the first time, administrator privileges are required to enable the WSL features.
 
 ### Step 1: Open PowerShell as Aministrator:
 
@@ -37,7 +37,7 @@ cd C:\Users\<YourUsername>\Documents
 git clone https://github.com/mzrghorbani/FabSim3_Jupyter.git
 ```
 
-If you encountered any issues with `git : The term 'git' is not recognized` on Windows, please install git from here: [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win). You may need to **restart PowerShell as an administrator** for the Git installation to take effect.
+If you encountered any issues with `git : The term 'git' is not recognized` on Windows, please install git from here: [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win). You may need to **restart PowerShell** as an **administrator** for the Git installation to take effect.
 
 ### Step 4: Change Directory to FabSim3_Jupyter:
 
@@ -45,7 +45,7 @@ If you encountered any issues with `git : The term 'git' is not recognized` on W
 cd .\FabSim3_Jupyter
 ```
 
-### Step 5: Execute Script in PowerShell (Admin) or Command Promp (Admin):
+### Step 5: Execute Script in PowerShell or Command Promp:
 
 ```PowerShell
 .\install_wsl.bat
@@ -55,7 +55,7 @@ cd .\FabSim3_Jupyter
 
 <span style="color: red;">**Important**</span>: Restarting is necessary to complete the WSL installation. It ensures that changes made during the installation are correctly applied. After the first restart, when you run the script again, you can safely answer **no** when prompted to restart. This allows the script to continue running the remaining steps without requiring another reboot.
 
-<span style="color: red;">**Important**</span>: If the script execution hangs and remains idle for more than five minutes, press Enter to continue.
+<span style="color: red;">**Important**</span>: If the script execution hangs and remains idle for more than five minutes, press CTRL-C or Enter to continue.
 
 ## Username and Password Setup in Ubuntu (WSL)
 
@@ -104,7 +104,7 @@ wsl.exe -l
 ### Step 2: Unregister the Linux distribution:
 
 ```PowerShell
-wsl --unregister <distribution_name>
+wsl.exe --unregister <distribution_name>
 ```
 
 ## Open Ubuntu After Closing the Terminal
@@ -241,9 +241,9 @@ You should now see the Jupyter Notebook interface in your browser.
 
 Please close the Jupyter Notebook and continue the instructions.
 
-## Cloning and Running FabSim3 Jupyter 
+## Running FabSim3 in WSL Jupyter Notebook 
 
-**FabSim3_Jupyter** provides interactive notebook for running FabSim3 simulations. Follow the steps below to clone this repository and launch it using Jupyter Notebook in WSL.
+**FabSim3_Jupyter** repository provides interactive notebook for running FabSim3 simulations. Follow the steps below to clone this repository and launch it using Jupyter Notebook in WSL.
 
 ### Step 1: Clone the FabSim3 Jupyter Repository
 
@@ -275,7 +275,7 @@ cd FabSim3_Jupyter
 jupyter notebook
 ```
 
-### Step 4: Start Running FabSim3
+### Step 5: Start Running FabSim3
 
 Once the Jupyter Notebook interface is open in your browser, you can navigate through the FabSim3_Jupyter directory and start using the provided notebook to run simulations with FabSim3.
 
