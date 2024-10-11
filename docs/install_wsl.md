@@ -2,7 +2,7 @@
 
 If you wish to run FabSim3 on Windows, then you can do so either using Docker or using the Windows Subsystem for Linux (WSL). The latter method is explained in this page.
 
-_Importantly, the installation of either Docker or WSL **does** require Administrative Privileges, even though FabSim3 itself does not. Therefore, FabSim3 cannot be installed on Windows machines where users cannot obtain Administrative Privileges._
+__Importantly, the installation of either Docker or WSL **does** require Administrative Privileges, even though FabSim3 itself does not. Therefore, FabSim3 cannot be installed on Windows machines where users cannot obtain Administrative Privileges.__
 
 ## What is Windows Subsystem for Linux (WSL)?
 
