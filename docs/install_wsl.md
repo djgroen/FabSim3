@@ -1,5 +1,9 @@
 # Installing WSL on Windows
 
+If you wish to run FabSim3 on Windows, then you can do so either using Docker or using the Windows Subsystem for Linux (WSL). The latter method is explained in this page.
+
+_Importantly, the installation of either Docker or WSL **does** require Administrative Privileges, even though FabSim3 itself does not. Therefore, FabSim3 cannot be installed on Windows machines where users cannot obtain Administrative Privileges._
+
 ## What is Windows Subsystem for Linux (WSL)?
 
 **Windows Subsystem for Linux (WSL)** allows you to run a full Linux environment on Windows, enabling access to native Linux tools and utilities. It is a powerful tool for developers working on Unix-based systems who prefer to use Windows as their main operating system. With WSL, a lightweight virtual machine runs a Linux kernel, providing access to many Windows/Linux applications.
