@@ -14,7 +14,7 @@ FabDummy:
 FabGuard:
   repository: https://github.com/rumineykova/fabguard.git
 
-FabCannonSim:
+FabCannonsim:
   repository: https://github.com/arabnejad/FabCannonsim.git
 
 FabMaMiCo:
