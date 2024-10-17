@@ -49,6 +49,12 @@ def install_plugin(plugin_name, branch=None):
         branch (str, optional): branch name
     """
 
+    if env.host != "localhost":
+        raise RuntimeError(
+            "This task should be run on the localhost.\n"
+            f"Please run 'fabsim localhost install_plugin:{plugin_name}'"
+        )
+
     fname = path.join(env.fabsim_root, "deploy", "plugins.yml")
     with open(fname, encoding="utf-8") as file:
         config = yaml.load(file, Loader=yaml.SafeLoader)
