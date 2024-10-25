@@ -1,64 +1,86 @@
+# Copy this file as machines_user.yml, and fill in your details.
+# Details given in the default dictionary will override default settings in machines.yml
+# Details given in per-machine dictionaries will override machine settings in machines.yml
+
 default:
   local_results: ~/FabSim3/results
   local_configs: ~/FabSim3/config_files
   username: your-username
-  manual_gsissh: false
+  # home_path_template: "/home/$username"
+  # home_path_template: "/Users/$username"  # for OSX users
+  manual_gsissh: false # Allows to switch between SSH (default) and GSISSH login.
   port: 22
+
 localhost:
-  username: your-username
+  username: <your-username>
   partition_name: "standard"
   qos_name: "short"
   runtime: 10
   nodes: 1
   ranks: 1
   cores_per_rank : 1
+
 supermuc2:
   username: ab12cde
   project: fg34hi
   namd_exec: /lrz/sys/applications/namd/2.10/mpi.ibmP2/namd2
-  redispwd: multiple
-  manual_gsissh: true
+  redispwd: multiple # Password set in the redisexec directory.
+  manual_gsissh: true   # Switches to GSISSH login from SSH.
   port: 2222
+  
 bluejoule:
   username: abc12-def01
   groupname: abc01
   project: ABC012
   namd_exec: /gpfs/packages/ibm/namd/2.9/bin/namd2
   ensemble_dir: rep0/replicas
+ 
+
 qcg:
   username: <your-username>
   flee_location: $home_path/flee-release
+
 eagle_vecma:
   username: <your-username>
   flee_location: $home_path/flee-release
+
 eagle_hidalgo:
   username: <your-username>
   flee_location: $home_path/flee-release
+
 archer2:
   username: <your-username>
   manual_ssh: true
-  remote: archer2
+  remote: archer2 #add host to ~/.ssh/config file
   budget: <your-budget>
   project: <your-project>
   job_wall_time: '0-00:10:00'
+  job_dispatch: 'sbatch'
   partition_name: "standard"
   qos_name: "short"
   runtime: 10
   nodes: 1
   ranks: 1
   cores_per_rank : 1
+  virtual_env_path: "/work/<your-project>/<your-project>/<your-username>/location/where/VirtualEnv/already/installed" #install python virtual environment (inc. required modules) on archer2.
+  run_prefix_commands: ["export PYTHONUSERBASE=/work/<your-project>/<your-project>/<your-username>/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH"] #This may not be needed if you have this in your archer2 .bashrc file instead. 
+ 
 marenostrum4:
   username: pr1emk01
   fabric_dir: FabSim3
   corespernode: 46
   taskpersocket: 23
   cores: 1
-  queue_name: debug
+  queue_name: "debug" # or "bsc_case"
   memconfig_name: highmem
+
 training_hidalgo:
   username: <your-username>
   home_path_template: /work/<your-username>
   partition_name: hidalgo
+
 myriad:
   username: <your-UCL-ID>
   workdir: <specify-a-work-dir>
+
+
