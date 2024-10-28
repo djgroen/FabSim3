@@ -16,6 +16,9 @@
 ## Wall Time in format days-hours:minutes:seconds
 #SBATCH --time=$job_wall_time
 
+## Quality of Service
+#SBATCH --qos=$qos_name
+
 ## Output File Name
 #SBATCH --output=%j.out
 
