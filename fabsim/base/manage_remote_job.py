@@ -125,38 +125,39 @@ def check_jobs_dispatched_on_remote_machine() -> None:
 
 
 @beartype
-def check_complete(jobname_syntax: Optional[str] = "") -> bool:
+def check_complete(job_name_syntax: Optional[str] = "") -> bool:
     """
     Return true if the user has no job running containing
-    jobname_syntax in their name
+    job_name_syntax in their name
     """
     time.sleep(10)
 
     check_jobs_dispatched_on_remote_machine()
     jobs_dict = jobs_list(quiet=True)
 
-    count = jobs_dict.count('\n') + 1
+    count = jobs_dict.count('\n')
 
-    if len(jobs_dict) > 0:
+    print("count", count)
+    if count > 0:
         print(
             f"The number of active (not finished) jobs = {count}"
             )
         return False
-
-    print("All jobs are finished :)")
-    return True
+    else: 
+        print("All jobs are finished :)")
+        return True
 
 
 @task
-def wait_complete(jobname_syntax: str = "") -> None:
+def wait_complete(job_name_syntax: str = "") -> None:
     """
-    Wait until jobs currently running containing jobname_syntax in
+    Wait until jobs currently running containing job_name_syntax in
     their name are complete, then return
     """
     # time.sleep(120)
     i = 0
     wait_times = [120, 180, 300, 600]
-    while not check_complete(jobname_syntax):
+    while not check_complete(job_name_syntax):
         if i < 15:
             i += 1
         time.sleep(wait_times[int(i / 5)])
