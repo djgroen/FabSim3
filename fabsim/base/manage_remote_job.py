@@ -136,8 +136,7 @@ def check_complete(job_name_syntax: Optional[str] = "") -> bool:
     jobs_dict = jobs_list(quiet=True)
 
     count = jobs_dict.count('\n')
-
-    print("count", count)
+    
     if count > 0:
         print(
             f"The number of active (not finished) jobs = {count}"
