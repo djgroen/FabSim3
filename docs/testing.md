@@ -52,7 +52,7 @@ run_ensemble(
 - **execute_put_configs** (optional): Set to True to transfer all configurations to the remote machine, or False to skip transferring if files are already available on the remote machine. Default is True.
 - **upscale** (optional): A list of specific subdirectories within sweep_dir to include in the ensemble run. Use this if you want to rerun or upscale only a subset of configurations.
 - **replica_start_number** (optional): The starting number for replica job numbering, allowing you to customise replica identification. Default is 1.
-- ****args**: Additional arguments that can be passed to configure or modify job behaviour further as required by the specific environment or job scheduler.
+- **`**args`**: Additional arguments that can be passed to configure or modify job behaviour further as required by the specific environment or job scheduler.
 
 #### Executing an Ensemble Job on a Remote Host
 
@@ -63,13 +63,13 @@ run_ensemble(
     - To test the setup with a dummy job, use the command: `fabsim <machine_name> dummy_ensemble:dummy_test`.
     - This command performs the following steps:
       - a. **Copy Job Inputs**: Copies the input files from `plugins/FabDummy/config_files/dummy_test` to the remote location specified by remote_path_template in `deploy/machines.yml`. Machine-specific variables defined in `machines.yml` are substituted automatically.
-      - b. **Transfer Inputs to Remote Results Directory*: Moves the input files to the designated results directory on the remote host.
+      - b. **Transfer Inputs to Remote Results Directory**: Moves the input files to the designated results directory on the remote host.
       - c. **Substitute and Rename Input Files**: For each ensemble run, substitutes the input files found in `plugins/FabDummy/config_files/dummy_test/SWEEP`. The first input file is renamed in-place to `dummy.txt` for consistency in each ensemble run.
       - d. **Start the Remote Job**: Initiates the ensemble job on the remote host.
-      - e. *Repeat Steps b–d**: Processes each base-level file or directory in `plugins/FabDummy/config_files/dummy_test/SWEEP`, submitting each as an individual job within the ensemble.
+      - e. **Repeat Steps b–d**: Processes each base-level file or directory in `plugins/FabDummy/config_files/dummy_test/SWEEP`, submitting each as an individual job within the ensemble.
 
 3. **Monitor Job Status**:
-    - Use fabsim <machine> job_stat to check the submission status of your jobs, or fabsim <machine> monitor to periodically poll for job status updates.
+    - Use `fabsim <machine> stat` to check the submission status of your jobs, or `fabsim <machine> monitor` to periodically poll for job status updates.
     - If the stat or monitor commands no longer display any active jobs, all jobs have completed (successfully or otherwise).
 
 4. **Retrieve Results**:
