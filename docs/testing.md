@@ -28,22 +28,64 @@ fabsim localhost fetch_results
 
 ### Intermediate Testing
 
-#### Executing an ensemble job on a remote host
+#### Running an Ensemble with the SWEEP Directory
+The run_ensemble function allows you to manually construct and run an ensemble of jobs using the SWEEP directory. Each subdirectory within SWEEP represents a unique job configuration that will be submitted as part of the ensemble.
 
-1. Ensure the host is defined in machines.yml, and the user login information in `deploy/machines_user.yml`.
-2. To run a dummy job, type `fabsim <machine name> dummy_ensemble:dummy_test`. This does the following:
-  a. Copy your job input, which is in `plugins/FabDummy/config_files/dummy_test`, to the remote location specified in the variable `remote_path_template` in `deploy/machines.yml` (not it will substitute in machine-specific variables provided in the same file).
-  b. Copy the input to the remote results directory.
-  c. Substitute in the first input file in `plugins/FabDummy/config_files/dummy_test/SWEEP`, renaming it in-place to dummy.txt for the first ensemble run.
-  d. Start the remote job.
-  e. Repeat b-d for each other base-level file or directory in `plugins/FabDummy/config_files/dummy_test/SWEEP`.
-3. Use `fabsim <machine> job_stat` to track the submission status of your jobs, or `fabsim <machine> monitor` to poll periodically for the job status.
-4. If the stat or monitor commands do not show any jobs being listed, then all your job has finished (successfully or unsuccessfully).
-5. You can then fetch the remote data using `fabsim localhost fetch_results`, and investigate the output as you see fit. Local results are typically locations in the various `results/` subdirectories.
+Function Overview: run_ensemble
 
-#### Executing an ensemble job on a remote host with replicas
+```bash
+run_ensemble(
+    config,
+    sweep_dir,
+    sweep_on_remote=False,
+    execute_put_configs=True,
+    upscale=None,
+    replica_start_number=1,
+    **args
+)
+```
 
-Replicas are jobs that have identical inputs and configurations. Their outputs may be different however, e.g. due to stochastic or non-deterministic aspects of the simulation algorithm. To run each instance of the ensembles with *N* replicated instances, add a `replicas=<N>` to your command. For example, to run a dummy ensemble with 5 replicas each, just use `fabsim <machine name> dummy_ensemble:dummy_test,replicas=5`.
+#### Parameter Descriptions
+- **config**: The base configuration folder or file name used for the ensemble jobs.
+- **sweep_dir**: Path to the SWEEP directory where each subdirectory corresponds to an individual job’s configuration. Each directory in sweep_dir will be submitted as a separate job.
+- **sweep_on_remote** (optional): Set to True if the SWEEP directory is located on the remote machine. Defaults to False, assuming the directory is local.
+- **execute_put_configs** (optional): Set to True to transfer all configurations to the remote machine, or False to skip transferring if files are already available on the remote machine. Default is True.
+- **upscale** (optional): A list of specific subdirectories within sweep_dir to include in the ensemble run. Use this if you want to rerun or upscale only a subset of configurations.
+- **replica_start_number** (optional): The starting number for replica job numbering, allowing you to customise replica identification. Default is 1.
+- ****args**: Additional arguments that can be passed to configure or modify job behaviour further as required by the specific environment or job scheduler.
+
+#### Executing an Ensemble Job on a Remote Host
+
+1. **Define the Remote Host**:
+    - Ensure that the target machine is defined in machines.yml and that user login information is included in deploy/machines_user.yml.
+
+2. **Run a Dummy Ensemble Job**:
+    - To test the setup with a dummy job, use the command: `fabsim <machine_name> dummy_ensemble:dummy_test`.
+    - This command performs the following steps:
+      - a. **Copy Job Inputs**: Copies the input files from `plugins/FabDummy/config_files/dummy_test` to the remote location specified by remote_path_template in `deploy/machines.yml`. Machine-specific variables defined in `machines.yml` are substituted automatically.
+      - b. **Transfer Inputs to Remote Results Directory*: Moves the input files to the designated results directory on the remote host.
+      - c. **Substitute and Rename Input Files**: For each ensemble run, substitutes the input files found in `plugins/FabDummy/config_files/dummy_test/SWEEP`. The first input file is renamed in-place to `dummy.txt` for consistency in each ensemble run.
+      - d. **Start the Remote Job**: Initiates the ensemble job on the remote host.
+      - e. *Repeat Steps b–d**: Processes each base-level file or directory in `plugins/FabDummy/config_files/dummy_test/SWEEP`, submitting each as an individual job within the ensemble.
+
+3. **Monitor Job Status**:
+    - Use fabsim <machine> job_stat to check the submission status of your jobs, or fabsim <machine> monitor to periodically poll for job status updates.
+    - If the stat or monitor commands no longer display any active jobs, all jobs have completed (successfully or otherwise).
+
+4. **Retrieve Results**:
+    - After completion, fetch the results from the remote machine using fabsim localhost fetch_results.
+    - Investigate the output files stored in the local results/ subdirectories as needed.
+
+#### Executing an Ensemble Job on a Remote Host with Replicas
+Replicas allow you to run multiple identical jobs, which can yield varying outputs if the simulation algorithm includes stochastic or non-deterministic elements.
+
+To run an ensemble job with N replicas, simply add `replicas=<N>` to your command. For example, to run a dummy ensemble with 5 replicas, use:
+
+```bash
+fabsim <machine_name> dummy_ensemble:dummy_test,replicas=5
+```
+
+This command will create N identical instances of each job in the ensemble, enabling you to gather data across multiple runs with the same configurations.
 
 #### Using a VECMA Verification and Validation Pattern (VVP) to compare two code versions
 
