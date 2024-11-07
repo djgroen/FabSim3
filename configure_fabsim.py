@@ -1,6 +1,5 @@
 import os
 import sys
-import pkg_resources
 import subprocess
 import platform
 import getpass
