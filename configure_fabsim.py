@@ -235,7 +235,11 @@ def main():
     msg += "\t[red1]export[/red1] [blue]PYTHONPATH[/blue]={}:[blue]$PYTHONPATH[/blue]\n\n".format(
         FS3_env.FabSim3_PATH
     )
-    msg += "\t[red1]export[/red1] [blue]PATH[/blue]=~/.local/bin:[blue]$PATH[/blue]\n"
+    
+    # Check if ~/.local/bin is already in PATH
+    local_bin_path = os.path.expanduser("~/.local/bin")
+    if local_bin_path not in os.environ["PATH"]:
+        msg += "\t[red1]export[/red1] [blue]PATH[/blue]=~/.local/bin:[blue]$PATH[/blue]\n"
 
     msg += "\nThe last list is added because the required packages are "
     msg += 'installed with flag "--user" which makes pip install packages '
