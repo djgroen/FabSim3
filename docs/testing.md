@@ -5,6 +5,7 @@ The easiest way to test FabSim3 is by installing the FabDummy plugin, and to try
 ## FabDummy testing on localhost
 
 ### FabDummy Plugin Installation
+
 Open a terminal, and simply type:
 ```sh
 fabsim localhost install_plugin:FabDummy
@@ -13,22 +14,57 @@ fabsim localhost install_plugin:FabDummy
 	FabDummy plugin will be downloaded under `FabSim3/plugins/FabDummy`.
 
 ### Basic Testing
-1. To run a dummy job, type:
+
+To run a dummy job, type:
+
 ```sh
 fabsim localhost dummy:dummy_test
 ```
-2. To run an ensemble of dummy jobs, type:
+
+To run an ensemble of dummy jobs, type:
+
 ```sh
 fabsim localhost dummy_ensemble:dummy_test
 ```
-3. For both cases, i.e. a single dummy job or an ensemble of dummy jobs, you can fetch the results by using:
+
+For both cases, i.e. a single dummy job or an ensemble of dummy jobs, you can fetch the results by using:
+
 ```sh
 fabsim localhost fetch_results
 ```
 
+### Known Issues
+
+Issue:
+
+```bash
+mpirun: command not found
+```
+
+Some MacOS users may encounter an error where `mpirun` is not found when running jobs locally on FabSim3. This is often due to the system not locating the correct path for `mpirun`.
+
+Solution:
+
+To resolve this issue, update the `run_command` attribute in `machines_user.yml`. For localhost execution, the attribute typically looks like this:
+
+```yaml
+default:
+  run_command: mpirun -np $cores
+```
+
+However, if mpirun is installed in a custom directory, you need to specify the full path in `machines_user.yml` under the default section. Locate where mpirun is installed on your system, then update the run_command as shown below:
+
+```yaml
+default:
+  run_command: /path/to/mpirun -np $cores
+```
+
+By adding the full path, you avoid the mpirun not found error and enable smoother execution of parallel tasks on your machine.
+
 ### Intermediate Testing
 
 #### Running an Ensemble with the SWEEP Directory
+
 The run_ensemble function allows you to manually construct and run an ensemble of jobs using the SWEEP directory. Each subdirectory within SWEEP represents a unique job configuration that will be submitted as part of the ensemble.
 
 Function Overview: run_ensemble
@@ -46,6 +82,7 @@ run_ensemble(
 ```
 
 #### Parameter Descriptions
+
 - **config**: The base configuration folder or file name used for the ensemble jobs.
 - **sweep_dir**: Path to the SWEEP directory where each subdirectory corresponds to an individual job’s configuration. Each directory in sweep_dir will be submitted as a separate job.
 - **sweep_on_remote** (optional): Set to True if the SWEEP directory is located on the remote machine. Defaults to False, assuming the directory is local.
@@ -77,6 +114,7 @@ run_ensemble(
     - Investigate the output files stored in the local results/ subdirectories as needed.
 
 #### Executing an Ensemble Job on a Remote Host with Replicas
+
 Replicas allow you to run multiple identical jobs, which can yield varying outputs if the simulation algorithm includes stochastic or non-deterministic elements.
 
 To run an ensemble job with N replicas, simply add `replicas=<N>` to your command. For example, to run a dummy ensemble with 5 replicas, use:
@@ -99,11 +137,10 @@ FabDummy contains a minimal demonstrator script of VECMA VVP 2, which compares a
 
 1. Ensure you are able to perform the first and second intermediate test.
 2. Ensure that you have QCG-PilotJob installed on the remote machine.
-3. 
+3. Add QCG-PilotJob arguments by typing:
+
 ```sh
-fabsim <machine_name> dummy_ensemble:dummy_test,replicas=5,PJ=true,cores=1,PJ_size=2
+fabsim <machine_name> dummy_ensemble:dummy_test,replicas=5,cores=1,PJ=true,PJ_TYPE=QCG
 ```
 
-Here, `cores` indicates the number of cores used per dummy program, and `PJ_size` indicates the number of **nodes** used by QCG-PilotJob in total.
-
-
+Here, `PJ` indicates the job is a pilot job, and `PJ_TYPE` indicates the use of QCG-PilotJob.
