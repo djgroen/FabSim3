@@ -72,7 +72,7 @@ On the last line, LAMMPS is run remotely (shown by `#!python script="lammps"`), 
 
 #### Accessing FabSim commands from Python scripts
 
-To launch FabSim3 commands from Python scripts, we have established a basic Python API. This file can be found [here](https://github.com/djgroen/FabSim3/blob/master/lib/fabsim3_cmd_api.py).
+To launch FabSim3 commands from Python scripts, we have established a basic Python API. This file can be found [here](https://github.com/ScientificComputingCWI/SemesterProgramme-UQ/tree/main/forward_UQ/exercises/EasyVVUQ_FabSim3).
 
 We recommend using this API rather than `#!python os.system()` or `#!python subprocess()` directly, as it will allow us to fix any emerging bugs in future versions for you.
 
