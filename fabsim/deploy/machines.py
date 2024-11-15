@@ -187,7 +187,7 @@ def complete_environment() -> None:
             module_commands
             + list(map(template, map(template, run_prefix_commands)))
         )
-        or "/bin/true || true"
+        or "true"
     )
 
     if env.temp_path_template:
