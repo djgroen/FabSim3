@@ -247,7 +247,28 @@ def load_plugins() -> None:
             with add_print_prefix(prefix="loading plugin", color=28):
                 print("{} ...".format(key))
 
-            plugin = importlib.import_module("plugins.{}.{}".format(key, key))
+            plugin = None
+
+            # print(os.path.join(plugin_dir, key.lower()))
+            # print(os.path.join(plugin_dir, key))
+            if os.path.isdir(os.path.join(plugin_dir, key.lower())):
+                # Check for new style plugins
+                plugin = importlib.import_module(
+                    "plugins.{}.{}.{}".format(
+                        key, key.lower(), key.lower()))
+
+            elif os.path.isfile(os.path.join(plugin_dir, f"{key}.py")):
+                # Check for old style plugins
+                plugin = importlib.import_module(
+                    "plugins.{}.{}".format(key, key))
+
+            else:
+                print(f"ERROR: Plugin {key} is not recognised by FabSim3.")
+                print(f"It may not contain either a {key}/{key}.py file")
+                print(f"or a {key}/{key.lower()} package,")
+                print(f"with a {key.lower()}.py file in it.")
+                sys.exit()
+
             plugin_dict = plugin.__dict__
 
             try:
@@ -261,6 +282,10 @@ def load_plugins() -> None:
                 {name: plugin_dict[name] for name in to_import}
             )
             env.localplugins.update({key: plugin_dir})
+
+        except ModuleNotFoundError as e:
+            print(e)
+            # raise ModuleNotFoundError(e)
 
         except ImportError as e:
             print(e)
