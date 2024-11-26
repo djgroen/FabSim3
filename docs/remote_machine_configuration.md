@@ -14,7 +14,7 @@ FabSim3 is built on top of the [Python Fabric library](http://www.fabfile.org/),
 
 To submit a job on the remote machine, type
 ```sh
-fab <remote machine name> <fabsim task>:<input parameters>
+fabsim <remote machine name> <fabsim task>:<input parameters>
 ```
 This does the following:
 
@@ -26,25 +26,25 @@ This does the following:
 
 * `stat`: returns a report for all submitted job(s).
 ```sh
-fab <remote machine name> job_stat
+fabsim <remote machine name> job_stat
 ```
 By default it reports the status of jobs. You can also request a report status of specific job by
 ```sh
-fab <remote machine name> job_stat:<jobID>
+fabsim <remote machine name> job_stat:<jobID>
 ```
 
 #### Fetching results
 
 You can fetch the remote data using
 ```sh
-fab <remote machine name> fetch_results
+fabsim <remote machine name> fetch_results
 ```
 
 #### Cleaning up all remote directories
 
 You can clear out ALL remote FabSim3 execution directories using
 ```sh
-fab <remote machine name> clean_fabsim_dirs
+fabsim <remote machine name> clean_fabsim_dirs
 ```
 NOTE: results will be lost if you did not fetch them first.
 
