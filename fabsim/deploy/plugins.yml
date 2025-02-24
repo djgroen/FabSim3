@@ -74,3 +74,6 @@ FabNESO:
 
 FabGPDR:
   repository: https://github.com/arindamsaha1507/FabGPDR.git
+
+FUMEplot:
+  repository: https://github.com/djgroen/FUMEplot.git
