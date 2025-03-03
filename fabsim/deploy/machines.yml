@@ -18,7 +18,8 @@ default:
   remote_path_template: $home_path/$fabric_dir
   work_path_template: $runtime_path/$fabric_dir
   batch_header: no_batch
-  run_command: mpirun -np $cores
+  run_command: /usr/bin/mpirun
+#/home/bssn029/Documents/GitHub/FabSim3/mpirun -np $cores
   temp_path_template: /tmp
   job_desc: ''
   job_name_template: '${config}_${machine_name}_${cores}${job_desc}'
