@@ -74,15 +74,13 @@ FabNESO:
 
 FabGPDR:
   repository: https://github.com/arindamsaha1507/FabGPDR.git
-<<<<<<< HEAD
 
 FUMEplot:
   repository: https://github.com/djgroen/FUMEplot.git
-=======
+
   
 FabCannonsim:
   repository: <empty>
   
 FabHomecoming:
-    repository: https://github.com/djgroen/FabHomecoming
->>>>>>> fbc4fb1 (added fabhomecoming to plugins)
+    repository: https://github.com/djgroen/FabHomecoming.git
