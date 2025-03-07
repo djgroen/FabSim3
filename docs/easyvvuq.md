@@ -68,7 +68,7 @@ Now, with the `Dynamics` software installed, we must install the `FabDynamics` p
 
 3. Copy the contents of the `machines_FabDynamics_user_example.yml` file into a new file `machines_FabDynamics_user.yml`:
     ```sh
-    cp machines_FabDynamics_user.yml machines_FabDynamics_user_example.yml
+    cp machines_FabDynamics_user_example.yml machines_FabDynamics_user.yml 
     ```
 
 4. Now edit the the last line of the `machines_FabDynamics_user.yml` file with the location where dynamics software is installed:
