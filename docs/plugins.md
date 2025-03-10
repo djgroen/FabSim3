@@ -16,6 +16,17 @@ Other plugins can be installed in FabSim3, and are listed in `fabsim/deploy/plug
 	fabsim localhost install_plugin:<plug_name>,branch=<branch_name>
 	```
 
+### Updating plugins
+
+Plugins can be updated by traversing into their respective base directory and running `git pull`. This is the recommended way to update plugins.
+
+Alternatively, users can ``update'' plugins by rerunning `install_plugin`.
+
+### Modifying plugins
+
+Each plugin directory is its own GitHub repository, so users are able to modify their plugin when they go to `plugins/<name_of_their_plugin>`, e.g. to add new shared configurations or to define new automated FabSim3 tasks.
+
+From there, they can push to GitHub as normal.
 
 ### List of available FabSim3 plugins
 
