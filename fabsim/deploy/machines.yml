@@ -522,3 +522,16 @@ hsuper:
   stat: >-
     squeue -u $username --Format=JobID:.10,Partition:.11,Name:.70,UserName:.10,State:.8,TimeUsed:.13,TimeLimit:.9,NumNodes:.6,Reason
     --noheader
+snellius:
+  remote: "snellius.surf.nl"
+  cores: 1
+  corespernode: 48
+  partition_name: "rome"
+  batch_header: "slurm-snellius"
+  job_dispatch: "sbatch"
+  cancel_job_command: "scancel $jobID"
+  job_wall_time: "0-0:10:00"
+  job_info_command: "squeue --jobs $jobID"
+  stat: >-
+    squeue -u $username --Format=JobID:.10,Partition:.11,Name:.70,UserName:.10,State:.8,TimeUsed:.13,TimeLimit:.9,NumNodes:.6,Reason
+    --noheader

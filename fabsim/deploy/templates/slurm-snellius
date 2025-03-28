@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#SBATCH --job-name=$job_name
+#SBATCH --nodes $nodes
+#SBATCH --time=$job_wall_time
+#SBATCH --output="job.out"
+#SBATCH --error="job.err"
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=rome
+# LOAD MODULES
+module load 2022
+module load Python/3.11.3-GCCcore-12.3.0
