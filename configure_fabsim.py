@@ -26,7 +26,7 @@ def install_required_modules(pkg_name: str, pip_pkg_name: str = None) -> bool:
 
         check_call_list = ["python3", "-m", "pip", "install", pip_pkg_name]
         if pip_pkg_name == "fabric2":
-            check_call_list.append("invoke==2.0.0")
+            check_call_list.append("invoke==2.2.0")
 
         print("Installing {} package ...".format(pkg_name))
         if bool(os.environ.get("VIRTUAL_ENV")) is True:
