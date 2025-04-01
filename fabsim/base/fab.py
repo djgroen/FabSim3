@@ -365,8 +365,8 @@ def find_config_file_path(
     Find the config file path
 
     Args:
-        name (str): Description
-        ExceptWhenNotFound (bool, optional): Description
+        name (str): the name of config directory
+        ExceptWhenNotFound (bool, optional): if `True`, raise an exception when the input config name not found. Defaults to `True`.
 
     Returns:
         Union[bool, str]: - `False`: if the input config name not found
@@ -1171,7 +1171,7 @@ def run_ensemble(
         execute_put_configs (bool, optional): `True` means we already called
             `put_configs` function to transfer `config` files and folders to
             remote machine.
-        **args: Description
+        **args: additional arguments to pass to the run_ensemble function
 
     Raises:
         RuntimeError: - if `with_config` function did not called before calling
