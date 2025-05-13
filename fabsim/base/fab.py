@@ -1138,7 +1138,7 @@ def campaign2ensemble(
                     campaign_dir, run, sweep_dir
                     )
                 )
-    # if skip = 0: copy all runs from EasyVVUQ run directort to the sweep dir
+    # if skip = 0: copy all runs from EasyVVUQ run directory to the sweep dir
     else:
         local("rsync -pthrz {}/runs/ {}".format(campaign_dir, sweep_dir))
 
