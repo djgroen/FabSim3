@@ -1,6 +1,4 @@
 #!/bin/bash
-## slurm-archer2
-## number of nodes
 #SBATCH --nodes $PJ_size
 
 ## task per node
@@ -18,21 +16,26 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory (prevents the home directory error)
+#SBATCH --chdir=$job_results
+
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
-## create sub-directory to save output job log
-
 cd /work/$project/$project/$username/
-logJob_dir="tasks-log"
-if [ -d "$$logJob_dir" ]; then
-  rm -rf $$logJob_dir
-fi  
-mkdir $$logJob_dir
+
+## Create log directory in working directory
+logJob_dir="$job_results/tasks-log"
+if [ -d "$logJob_dir" ]; then
+  rm -rf $logJob_dir
+fi
+mkdir -p $logJob_dir
+
+# Create QCG directory if it doesn't exist
+mkdir -p QCG
 
 $run_prefix
 
-## load QCG-PilotJob
-
+## Execute QCG-PilotJob
 $run_QCG_PilotJob
 

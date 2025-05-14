@@ -1,27 +1,92 @@
-from qcg.appscheduler.api.manager import Manager
-from qcg.appscheduler.api.manager import LocalManager
-from qcg.appscheduler.api.job import Jobs
+#!/usr/bin/env python3
+"""
+FabSim3 QCG-PilotJob manager script - automatically generated
+Controls the execution of tasks through QCG-PilotJob
+"""
+import sys
+import logging
+import traceback
 
-m = LocalManager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
-# m = Manager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
+from qcg.pilotjob.api.manager import LocalManager
+from qcg.pilotjob.api.job import Jobs
 
+# Set up logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
-# get available resources
-print("available resources:\n%s\n" % str(m.resources()))
+try:
+    # Initialize QCG-PilotJob manager
+    logging.info("Initializing QCG-PilotJob LocalManager")
+    manager = LocalManager()
+        
+    # Print available resources
+    resources = manager.resources()
+    logging.info(f"Available resources: {resources}")
 
-# submit jobs and save their names in 'ids' list
-jobs = Jobs()
+    # Create jobs collection
+    jobs = Jobs()
 
-$submitted_jobs_list
+    # Add all task jobs from FabSim3
+    logging.info("Adding job descriptions to QCG-PilotJob")
 
-ids = m.submit(jobs)
+    # TASK DESCRIPTION BLOCK START - DO NOT MODIFY THESE LINES
+$JOB_DESCRIPTIONS
+    # TASK DESCRIPTION BLOCK END
 
-# wait until submited jobs finish
-m.wait4(ids)
+    # Submit jobs and get their IDs
+    logging.info("Submitting jobs to QCG-PilotJob")
+    try:
+        ids = manager.submit(jobs)
+        logging.info(f"Submitted {len(ids)} jobs: {ids}")
+    except Exception as submit_error:
+        logging.error(f"Error submitting jobs: {str(submit_error)}")
+        logging.error(traceback.format_exc())
+        raise
 
-# get detailed information about submited and finished jobs
-print("jobs details:\n%s\n" % str(m.info(ids)))
-
-m.finish()
-m.stopManager()
-m.cleanup()
+    # Wait for all jobs to complete
+    logging.info("Waiting for jobs to complete...")
+    try:
+        manager.wait4(ids)
+    except Exception as wait_error:
+        logging.error(f"Error waiting for jobs: {str(wait_error)}")
+        logging.error(traceback.format_exc())
+        raise
+    
+    # Get job information
+    try:
+        job_info = manager.info(ids)
+        logging.info("Jobs completed with the following details:")
+        for job_id, details in job_info.items():
+            status = details.get('status', 'UNKNOWN')
+            exit_code = details.get('exit_code', 'N/A')
+            logging.info(f"Job {job_id}: Status={status}, Exit Code={exit_code}")
+    except Exception as info_error:
+        logging.error(f"Error getting job info: {str(info_error)}")
+        logging.error(traceback.format_exc())
+    
+    # Clean up
+    logging.info("All jobs completed, shutting down QCG-PilotJob manager")
+    try:
+        manager.finish()
+    except Exception as cleanup_error:
+        logging.error(f"Error during cleanup: {str(cleanup_error)}")
+        logging.error(traceback.format_exc())
+    
+    # Final status report
+    try:
+        success_count = sum(1 for job in job_info.values() if job.get('status') == 'FINISHED' and job.get('exit_code') == 0)
+        logging.info(f"Summary: {success_count}/{len(ids)} tasks completed successfully")
+    except Exception as summary_error:
+        logging.error(f"Error generating summary: {str(summary_error)}")
+        logging.error(traceback.format_exc())
+    
+    sys.exit(0 if success_count == len(ids) else 1)
+    
+except Exception as e:
+    logging.error(f"Error in QCG-PilotJob execution: {str(e)}")
+    logging.error(traceback.format_exc())
+    
+    sys.exit(1)

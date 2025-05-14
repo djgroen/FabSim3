@@ -2,8 +2,9 @@ jobs.add(
     name='TaskID${idsID}',
     exec='bash',
     args=['-l', '${idsPath}'],
-    stdout='${dirPath}/$${jname}_$${uniq}.stdout',
-    stderr='${dirPath}/$${jname}_$${uniq}.stderr',
+    stdout='${dirPath}/TaskID${idsID}_$' + '{uniq}.stdout',
+    stderr='${dirPath}/TaskID${idsID}_$' + '{uniq}.stderr',
+    wd='${dirPath}',
     numCores={'exact': ${cores}},
-    model='${task_model}'
+    model='${task_model}',
 )

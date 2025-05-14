@@ -143,7 +143,9 @@ def main():
     if task_args_str is not None:
         for sub in task_args_str.split(","):
             if "=" in sub:
-                task_kwargs.append(map(str.strip, sub.split("=", 1)))
+                # task_kwargs.append(map(str.strip, sub.split("=", 1)))
+                task_kwargs.append(tuple(map(str.strip, sub.split("=", 1))))
+
             else:
                 task_args.append(sub)
 
