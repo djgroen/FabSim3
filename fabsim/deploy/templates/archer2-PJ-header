@@ -22,20 +22,14 @@
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
-cd /work/$project/$project/$username/
-
-## Create log directory in working directory
-logJob_dir="$job_results/tasks-log"
-if [ -d "$logJob_dir" ]; then
-  rm -rf $logJob_dir
+# Environment setup summary
+if [[ "$venv" == "true" ]]; then
+  echo "[INFO] Loading virtual environment..."
+  source $virtual_env_path/bin/activate
+else
+  echo "[INFO] Loading cray-python module..."
+  module load cray-python
 fi
-mkdir -p $logJob_dir
-
-# Create QCG directory if it doesn't exist
-mkdir -p QCG
-
-$run_prefix
 
 ## Execute QCG-PilotJob
 $run_QCG_PilotJob
-
