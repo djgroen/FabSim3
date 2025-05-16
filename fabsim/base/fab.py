@@ -1144,15 +1144,10 @@ def campaign2ensemble(
     else:
         local("rsync -pthrz {}/runs/ {}".format(campaign_dir, sweep_dir))
         
-        
-from pathlib import Path
-import shutil
-import os
 
 def prepare_job_locally(item, replica, config_dir, sweep_dir, results_base, script_template_name, item_index):
-    # Create target directory
-    subfolder = f"run_{item_index}_{replica}"
-    job_folder = Path(results_base) / script_template_name / "RUNS" / subfolder
+    # Create target directory: RUNS/run_{item_index}_{replica}
+    job_folder = Path(results_base) / script_template_name / "RUNS" / f"run_{item_index}_{replica}"
     job_folder.mkdir(parents=True, exist_ok=True)
 
     # Copy config files (excluding SWEEP)
@@ -1174,7 +1169,7 @@ def prepare_job_locally(item, replica, config_dir, sweep_dir, results_base, scri
             shutil.copy2(file, dest)
 
     # Generate job script
-    script_basename = f"{script_template_name}_{item}_replica{replica}.sh"
+    script_basename = f"{script_template_name}_{item_index}_{replica}.sh"
     job_script_path = job_folder / script_basename
 
     # Set env variables needed for template rendering
@@ -1196,7 +1191,7 @@ def prepare_job_locally(item, replica, config_dir, sweep_dir, results_base, scri
     
     # Set remote path for job (used in script templates)
     env.job_results = str(
-        Path(env.results_path) / script_template_name / "RUNS" / item / f"replica{replica}"
+        Path(env.results_path) / script_template_name / "RUNS" / f"run_{item_index}_{replica}"
     )
     
     # Keep local path for rsync
@@ -1241,6 +1236,8 @@ def run_ensemble(
         **args: Additional command-line arguments from user.
     """
     update_environment(args)
+    print(f"[DEBUG] run_ensemble called with config={config}")
+    print(f"[DEBUG] run_ensemble called with sweep_dir={sweep_dir}")
     
     if "script" not in env:
         raise RuntimeError("ERROR: 'script' must be specified in the environment.")
@@ -1642,9 +1639,7 @@ def install_packages(venv: bool = "False"):
         local(
             template(
                 "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(
-                    tmp_app_dir, whl
-                )
+                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
             )
             # "rsync -pthrvz %s/%s eagle:$app_repository"%(tmp_app_dir, whl)
         )

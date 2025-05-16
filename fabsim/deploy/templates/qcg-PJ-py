@@ -66,6 +66,22 @@ $JOB_DESCRIPTIONS
     except Exception as info_error:
         logging.error(f"Error getting job info: {str(info_error)}")
         logging.error(traceback.format_exc())
+
+    try:
+        total_core_seconds = 0
+        for details in job_info.values():
+            cores = details.get('resources', {}).get('cores', 0)
+            start = details.get('start_time')
+            end = details.get('end_time')
+
+            if isinstance(start, (int, float)) and isinstance(end, (int, float)):
+                duration = end - start
+                total_core_seconds += duration * cores
+
+        core_hours = total_core_seconds / 3600
+        logging.info(f"Estimated total core-hours used: {core_hours:.2f}")
+    except Exception as e:
+        logging.warning(f"Failed to compute core-hours: {e}")
     
     # Clean up
     logging.info("All jobs completed, shutting down QCG-PilotJob manager")
