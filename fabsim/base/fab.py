@@ -1239,6 +1239,9 @@ def run_ensemble(
     print(f"[DEBUG] run_ensemble called with config={config}")
     print(f"[DEBUG] run_ensemble called with sweep_dir={sweep_dir}")
     
+    if not sweep_on_remote:
+        print("[INFO] There are no SWEEP directory on Remote machine (sweep_on_remote=False)")
+
     if "script" not in env:
         raise RuntimeError("ERROR: 'script' must be specified in the environment.")
     
@@ -1532,37 +1535,30 @@ def run_qcg(job_scripts_to_submit: list, venv: bool):
     
     env.batch_header = env.PJ_header
     env.submit_job = True
-
+    
     # -------------------------------
     # 4. Transfer & Submit
     # -------------------------------
     # Create run_QCG_PilotJob command
     PJ_CMD = []
-    PJ_CMD.append("# Ensure QCG-PilotJob is available")
-    PJ_CMD.append(
-        "python3 -c 'import qcg.pilotjob.api' 2>/dev/null || "
-        "pip3 install --upgrade qcg-pilotjob"
-    )
-    PJ_CMD.append("")
-
-    # Execute QCG-PilotJob Python manager
     PJ_CMD.append("# Run the QCG manager script")
     PJ_CMD.append(f"python3 {env.qcg_python_script}")
 
     # Store in env for SLURM template
     env.run_QCG_PilotJob = "\n".join(PJ_CMD)
-    
+
     # Temprarily create a job_results directory (X)
     env.job_results = env.qcg_dir_remote
     
     print("env.job_results", env.job_results)
     
-    submit_script_content = script_template_content("archer2-PJ-header")
-    rendered_submit_script = template(submit_script_content)
-
+    # Write the submission wrapper script (always render with template)
     with open(env.qcg_submit_script_local, "w") as f:
+        # HPC: use the full SLURM template, also render with template
+        submit_script_content = script_template_content("archer2-PJ-header")
+        rendered_submit_script = template(submit_script_content)
         f.write(rendered_submit_script)
-
+            
     os.chmod(env.qcg_submit_script_local, 0o755)
     
     # Create the QCG directory on the remote machine
