@@ -1,6 +1,4 @@
 #!/bin/bash
-## slurm-archer2
-## number of nodes
 #SBATCH --nodes $PJ_size
 
 ## task per node
@@ -18,21 +16,26 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory (prevents the home directory error)
+#SBATCH --chdir=$job_results
+
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
-## create sub-directory to save output job log
+# Python environment setup
+if [ -d "$virtual_env_path" ]; then
+  echo "Activating virtual environment: $virtual_env_path"
+  source "$virtual_env_path/bin/activate"
+else
+  echo "virtual_env_path not found, falling back to module system"
+  module load cray-python
+  export PYTHONUSERBASE="$HOME/.local"
+  export PATH="$PYTHONUSERBASE/bin:$PATH"
+  export PYTHONPATH="$PYTHONUSERBASE/lib/python3.9/site-packages:$PYTHONPATH"
 
-cd /work/$project/$project/$username/
-logJob_dir="tasks-log"
-if [ -d "$$logJob_dir" ]; then
-  rm -rf $$logJob_dir
-fi  
-mkdir $$logJob_dir
+  # Ensure qcg-pilotjob is available
+  pip3 install --upgrade --user qcg-pilotjob
+fi
 
-$run_prefix
-
-## load QCG-PilotJob
-
+## Execute QCG-PilotJob
 $run_QCG_PilotJob
-
