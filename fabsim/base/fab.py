@@ -1,10 +1,9 @@
 import math
 import os
 import re
-import shutil
+import textwrap
 import subprocess
 import tempfile
-import textwrap
 from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
@@ -560,7 +559,7 @@ def with_template_config() -> None:
     with_config(template(env.config_name_template))
 
 
-def job(*job_args, prepare_only=False):
+def job(*job_args):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
@@ -579,6 +578,9 @@ def job(*job_args, prepare_only=False):
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
+        
+    print("[DEBUG]")
+    print(f"  args: {args}")
 
     # check if with_config function is already called or not
     if not hasattr(env, "job_config_path"):
@@ -586,6 +588,8 @@ def job(*job_args, prepare_only=False):
             "Function with_config did NOT called, "
             "Please call it before calling job()"
         )
+        
+    # print(env)
 
     update_environment(args)
     #   Add label, mem, core to env.
@@ -600,13 +604,16 @@ def job(*job_args, prepare_only=False):
     ########################################################
     #  temporary folder to save job files/folders/scripts  #
     ########################################################
-    env.tmp_work_path = env.pather.join(
-        tempfile._get_default_tempdir(),
-        next(tempfile._get_candidate_names()),
-        "FabSim3",
-        # env.fabric_dir
-    )
-
+    # tmp_work_path = env.pather.join(
+    #     tempfile._get_default_tempdir(),
+    #     next(tempfile._get_candidate_names()),
+    #     "FabSim3",
+    #     # env.fabric_dir
+    # )
+    
+    # tmp_work_path = tempfile.mkdtemp(prefix="fabsim_")
+    tmp_work_path = "/tmp/fabsim"
+    env.tmp_work_path = os.path.join(tmp_work_path, "FabSim3")
     if os.path.exists(env.tmp_work_path):
         rmtree(env.tmp_work_path)
     # the config_files folder is already transfered by put_config
@@ -614,6 +621,11 @@ def job(*job_args, prepare_only=False):
     env.tmp_scripts_path = env.pather.join(env.tmp_work_path, "scripts")
     os.makedirs(env.tmp_scripts_path)
     os.makedirs(env.tmp_results_path)
+    
+    print("[DEBUG] Before job preparation:")
+    print(f"  env.tmp_work_path: {env.tmp_work_path}")
+    print(f"  env.tmp_results_path: {env.tmp_results_path}")
+    print(f"  env.tmp_scripts_path: {env.tmp_scripts_path}")
 
     POOL = MultiProcessingPool(PoolSize=int(env.nb_process))
 
@@ -631,31 +643,25 @@ def job(*job_args, prepare_only=False):
 
     print("Submit tasks to multiprocessingPool : start ...")
 
-    print("args", args)
-
-    if "replica_start_number" in args:
-        if isinstance(args["replica_start_number"], list):
-            env.replica_start_number = list(
-                int(x) for x in args["replica_start_number"]
-            )
-        else:
-            env.replica_start_number = int(args["replica_start_number"])
-    else:
-        env.replica_start_number = 1
+    env.replica_start_number = int(args.get("replica_start_number", 1))
 
     if env.ensemble_mode is True:
         for index, task_label in enumerate(env.sweepdir_items):
-            if isinstance(env.replica_start_number, list):
-                replica_start_number = env.replica_start_number[index]
+            # Get the correct replicas count for this item
+            if "replica_counts" in args:
+                replicas = args["replica_counts"][index]
             else:
-                replica_start_number = env.replica_start_number
+                replicas = args.get("replicas", 1)
+                
+            print(f"[DEBUG] Adding task: label={task_label}, replicas={replicas}")
 
             POOL.add_task(
                 func=job_preparation,
                 func_args=dict(
                     ensemble_mode=env.ensemble_mode,
                     label=task_label,
-                    replica_start_number=replica_start_number,
+                    replica_start_number=env.replica_start_number,
+                    replicas=replicas,
                 ),
             )
     else:
@@ -664,9 +670,6 @@ def job(*job_args, prepare_only=False):
 
     print("Submit tasks to multiprocessingPool : done ...")
     job_scripts_to_submit = POOL.wait_for_tasks()
-
-    if prepare_only:
-        return job_scripts_to_submit
 
     #####################################
     #       job transmission phase      #
@@ -712,153 +715,174 @@ def job(*job_args, prepare_only=False):
                 pformat(job_scripts_to_submit)
                 )
             )
-
+            
     # POOL.shutdown_threads()
+    env.job_scripts_to_submit = job_scripts_to_submit
     return job_scripts_to_submit
 
 
 def job_preparation(*job_args):
-    """
-    here, all job folders and scripts will be created in the temporary folder
-        `<tmp_folder>/{results,scripts}`, later, in job_transmission,
-    we transfer all these files and folders with a single `rsync` command.
-    This approach will helps us to reduce the number of SSH connection and
-    improve the stability of job submission workflow which can be compromised
-    by high parallel SSH connection
-    """
-    pprint(job_args)
-
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
-
-    if "label" in args:
-        env.label = args["label"]
-    else:
-        env.label = ""
+        
+    print("[DEBUG] job_preparation args:", args)
+        
+    label = args.get("label", "")
+    replicas = int(args.get("replicas", 1))
+    replica_start_number = int(args.get("replica_start_number", 1))
 
     return_job_scripts = []
 
-    for i in range(
-        args["replica_start_number"],
-        int(env.replicas) + args["replica_start_number"],
-    ):
-        env.replica_number = i
+    for i in range(replica_start_number, replicas + replica_start_number):
+        # Unique directory and script name for each replica
+        job_label = f"{label}_{i}" if replicas > 1 else label
+        env.label = job_label
+        
+        print(f"\n[DEBUG] Processing replica {i}, label: {env.label}")
 
         env.job_results, env.job_results_local = with_template_job(
             ensemble_mode=env.ensemble_mode, label=env.label
         )
-
-        if int(env.replicas) > 1:
-            if env.ensemble_mode is False:
-                env.job_results += "_replica_" + str(i)
-            else:
-                env.job_results += "_" + str(i)
-
+        
         tmp_job_results = env.job_results.replace(
             env.results_path, env.tmp_results_path
         )
 
-        env["job_name"] = env.name[0: env.max_job_name_chars]
+        # Get all templates we need
+        if hasattr(env, "NoEnvScript") and env.NoEnvScript:
+            template_paths = [env.batch_header]
+        else:
+            template_paths = [env.script]
+            
+        print(f"[DEBUG] Template paths: {template_paths}")
+        
+        # Let's examine all templates to find run_prefix references
+        for template_path in template_paths:
+            template_file = script_templates(template_path)
+            print(f"[DEBUG] Examining template file: {template_file}")
+            
+            try:
+                with open(template_file, 'r') as f:
+                    template_content = f.read()
+                    print(f"[DEBUG] Template {template_path} content:\n{template_content}")
+                    
+                    # Look for run_prefix references
+                    if "$run_prefix" in template_content:
+                        print(f"[DEBUG] Template contains '$run_prefix'")
+                    elif "${run_prefix}" in template_content:
+                        print(f"[DEBUG] Template contains '${run_prefix}'")
+            except Exception as e:
+                print(f"[ERROR] Failed to read template file: {e}")
+
+        # Script naming
+        base, extension = os.path.splitext(env.pather.basename(
+            script_templates(template_paths[0])
+        ))
+            
+        dst_script_name = f"{base}{extension}"
+
+        dst_job_script = env.pather.join(env.tmp_scripts_path, dst_script_name)
+        
+        print(f"[DEBUG] Destination script: {dst_job_script}")
+
         complete_environment()
-
         env.run_command = template(env.run_command)
+        
+        print(f"label = {env.label}")
+        print(f"label = {label}")
 
+        # Build the correct run_prefix for this job/replica
+        run_prefix = ""
         if env.label not in ["PJ_PYheader", "PJ_header"]:
-            env.run_prefix += (
+            run_prefix = (
                 "\n\n"
                 "# copy files from config folder\n"
                 "config_dir={}\n"
                 "rsync -pthrvz --inplace --exclude SWEEP "
                 "$config_dir/* .".format(env.job_config_path)
             )
-
         if env.ensemble_mode:
-            env.run_prefix += (
+            run_prefix += (
                 "\n\n"
                 "# copy files from SWEEP folder\n"
-                "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(
-                    env.label
-                )
+                "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(label)
             )
-
-        if not (hasattr(env, "venv") and str(env.venv).lower() == "true"):
-            if hasattr(env, "py_pkg") and len(env.py_pkg) > 0:
-                env.run_prefix += (
-                    "\n\n"
-                    "# Install requested python packages\n"
-                    "pip3 install --user --upgrade {}".format(
-                        " ".join(pkg for pkg in env.py_pkg)
-                    )
-                )
-
-        # this is a tricky situation,
-        # in case of ensemble runs, or simple job, we need to add env.label
-        # to generated job script name,
-        # however, for PJ_PYheader and PJ_header header script, nothing should
-        # be added at the end of script file name, so, here we pass a empty
-        # string as label
+        
+        # Set this properly for template rendering
+        env.run_prefix = run_prefix
+        print(f"[DEBUG] Set env.run_prefix for {env.label} to:\n{run_prefix}")
+        
+        # Now let's see how templates are processed in the original FabSim3 code
+        print(f"[DEBUG] Using template mechanisms to create job script")
+        
+        # Create combined script file
         if hasattr(env, "NoEnvScript") and env.NoEnvScript:
             tmp_job_script = script_templates(env.batch_header)
         else:
-            tmp_job_script = script_templates(env.batch_header, env.script)
-
-        # Separate base from extension
-        base, extension = os.path.splitext(env.pather.basename(tmp_job_script))
-        # Initial new name if we have replicas or ensemble
-
-        if int(env.replicas) > 1:
-            if env.ensemble_mode is False:
-                dst_script_name = base + "_replica_" + str(i) + extension
+            # This is where both header and script templates are combined
+            # We need to ensure run_prefix is available during this process
+            tmp_job_script = script_templates("bash_header", env.script)
+            
+        print(f"[DEBUG] tmp_job_script path: {tmp_job_script}")
+        
+        # Now copy the template to destination
+        copy(tmp_job_script, dst_job_script)
+        
+        # Let's examine the generated script for run_prefix
+        with open(dst_job_script, 'r') as f:
+            script_content = f.read()
+            print(f"[DEBUG] Generated script content before modification:\n{script_content}")
+            
+            if run_prefix in script_content:
+                print(f"[DEBUG] run_prefix is already in the script!")
+                
+                # Check if run_prefix appears more than once or with wrong label
+                all_labels = getattr(env, "sweepdir_items", [])
+                for other_label in all_labels:
+                    wrong_prefix = f"$config_dir/SWEEP/{other_label}/"
+                    correct_prefix = f"$config_dir/SWEEP/{label}/"
+                    
+                    if other_label != env.label and wrong_prefix in script_content:
+                        print(f"[WARNING] Found reference to wrong label: {other_label} in script for {label}")
+                        # Fix incorrect SWEEP folder references
+                        script_content = script_content.replace(wrong_prefix, correct_prefix)
+                        print(f"[DEBUG] Fixed incorrect SWEEP reference")
+                
+                # Check for duplicate run_prefix
+                if script_content.count(run_prefix) > 1:
+                    print(f"[WARNING] run_prefix appears multiple times in the script!")
+                    # Keep only the first occurrence and remove others
+                    parts = script_content.split(run_prefix, 1)
+                    script_content = parts[0] + run_prefix + parts[1].replace(run_prefix, "")
+                    print(f"[DEBUG] Removed duplicate run_prefix")
             else:
-                dst_script_name = base + "_" + str(i) + extension
-        else:
-            dst_script_name = base + extension
+                print(f"[WARNING] run_prefix not found in the script, adding it after shebang")
+                script_content = script_content.replace("#!/bin/bash", f"#!/bin/bash{run_prefix}")
+                
+        # Set env.config_dir for template substitution
+        env.config_dir = env.job_config_path
 
-        dst_job_script = env.pather.join(env.tmp_scripts_path, dst_script_name)
+        # Replace all $config_dir and other env variables in the script
+        script_content = template(script_content)
+        
+        # Write the corrected script
+        with open(dst_job_script, 'w') as f:
+            f.write(script_content)
+        
+        os.chmod(dst_job_script, 0o755)
+        
+        # Read back and print the whole generated script for verification
+        with open(dst_job_script, 'r') as f:
+            final_script = f.read()
+            print(f"[DEBUG] Final generated script for {dst_job_script}:\n{final_script}")
 
-        # Add target job script to return list
-
-        """
-        return_job_scripts.append(env.pather.join(env.scripts_path,
-                                               dst_script_name)
-        """
-        # here, instead of returning PATH to script folder, it is better to
-        # submit script from results_path folder, specially in case of PJ job
         return_job_scripts.append(
             env.pather.join(env.job_results, dst_script_name)
         )
-
-        copy(tmp_job_script, dst_job_script)
-        # chmod +x dst_job_script
-        # 755 means read and execute access for everyone and also
-        # write access for the owner of the file
-        os.chmod(dst_job_script, 0o755)
-
+        
         os.makedirs(tmp_job_results, exist_ok=True)
         copy(dst_job_script, env.pather.join(tmp_job_results, dst_script_name))
-
-        # TODO: these env variables are not used anywhere
-        # TODO: maybe it is better to remove them
-        # job_name_template_sh
-        # job_results_contents
-        # job_results_contents_local
-        with open(
-            env.pather.join(tmp_job_results, "env.yml"
-                            ), "w") as env_yml_file:
-            yaml.dump(
-                dict(
-                    env,
-                    **{
-                        "sshpass": None,
-                        "passwords": None,
-                        "password": None,
-                        "sweepdir_items": None,
-                    },
-                ),
-                env_yml_file,
-                default_flow_style=False,
-            )
 
     return return_job_scripts
 
@@ -1211,7 +1235,7 @@ def prepare_job_locally(item, replica, config_dir, sweep_dir, results_base, scri
     # Return path to generated script
     return str(job_script_path)
 
-        
+
 @beartype
 def run_ensemble(
     config: str,
@@ -1224,40 +1248,43 @@ def run_ensemble(
 ) -> None:
     """
     Map and execute ensemble jobs.
-    Handles both local and remote (PilotJob) execution.
+    The job results will be stored with a name pattern as defined in
+    the environment
+
+    !!! note
+        function `with_config` should be called before calling this function in
+        plugin code.
 
     Args:
-        config (str): Name of the base config directory.
-        sweep_dir (str): Path to the SWEEP directory (local or remote).
-        sweep_on_remote (bool): True if SWEEP dir is on the remote system.
-        execute_put_configs (bool): True to run put_configs().
-        upsample (str): Optional semicolon-separated list of sweep items.
-        replica_start_number (str): Replica start index (or count).
-        **args: Additional command-line arguments from user.
+        config (str): base config directory to use to define input files
+        sweep_dir (str): directory containing inputs that will vary per
+            ensemble simulation instance.
+        sweep_on_remote (bool, optional): value `True` means the `SWEEP`
+            directory is located to the remote machine.
+        execute_put_configs (bool, optional): `True` means we already called
+            `put_configs` function to transfer `config` files and folders to
+            remote machine.
+        **args: additional arguments to pass to the run_ensemble function
+
+    Raises:
+        RuntimeError: - if `with_config` function did not called before calling
+                `run_ensemble` task.
+            - if `env.script` variable did not set.
+            - if `SWEEP` directory is empty.
+
     """
     update_environment(args)
-    print(f"[DEBUG] run_ensemble called with config={config}")
-    print(f"[DEBUG] run_ensemble called with sweep_dir={sweep_dir}")
     
-    if not sweep_on_remote:
-        print("[INFO] There are no SWEEP directory on Remote machine (sweep_on_remote=False)")
-
     if "script" not in env:
         raise RuntimeError("ERROR: 'script' must be specified in the environment.")
     
     if not hasattr(env, "job_config_path"):
         raise RuntimeError("with_config() must be called before run_ensemble()")
     
-    # Set up PilotJob environment if needed
-    if hasattr(env, "PJ") and env.PJ.lower() == "true":
-        env.submitted_jobs_list = []
-        env.submit_job = False
-        env.batch_header = "bash_header"
-    
     # Always expect to work from a local SWEEP directory
     if not os.path.exists(sweep_dir):
         raise RuntimeError(f"ERROR: sweep directory '{sweep_dir}' doesn't exist")
-
+    
     # Normalize sweepdir_items from local directory
     sweepdir_items_all = [
         f for f in os.listdir(sweep_dir)
@@ -1269,91 +1296,99 @@ def run_ensemble(
 
     # Determine upsample list
     upsample_items = [item.strip() for item in upsample.split(";")] if upsample else []
-    replica_counts_raw = replica_start_number.strip()
 
-    # Handle replica logic
+    # If upsample_items is empty, use all sweepdir items (default behavior)
+    if not upsample_items:
+        upsample_items = sweepdir_items_all
+
+    replica_counts_raw = str(args.get("replicas", replica_start_number)).strip()
+
     if upsample_items:
-        # Case: user specified upsample + replica_start_number
+        # User specified upsample + per-item replicas, or defaulted to all
         if ";" in replica_counts_raw:
             replica_counts = [int(x.strip()) for x in replica_counts_raw.split(";")]
         else:
-            raise RuntimeError(
-                f"[ERROR] You specified {len(upsample_items)} upsample items "
-                f"but provided only one replica count.\n"
-                "Please provide matching replica counts, e.g.: "
-                'replica_start_number="2;2" for upsample="d1;d2"'
-            )
+            # fallback: use the same replica count for all upsample items
+            replica_counts = [int(replica_counts_raw)] * len(upsample_items)
 
         if len(replica_counts) != len(upsample_items):
             raise RuntimeError(
-                f"[ERROR] Mismatch between sweepdir_items and replica_counts.\n"
+                f"[ERROR] Mismatch between upsample items and replica counts.\n"
                 f"Items ({len(upsample_items)}): {upsample_items}\n"
                 f"Counts ({len(replica_counts)}): {replica_counts}\n"
                 f"Each item in upsample must have exactly one replica count."
             )
 
-        sweepdir_items = upsample_items
+        # Check that all upsample items exist in the sweep dir
+        if not set(upsample_items).issubset(set(sweepdir_items_all)):
+            error = "ERROR: upsample item: "
+            error += f"{set(upsample_items)-set(sweepdir_items_all)}"
+            error += " not found in SWEEP folder"
+            raise RuntimeError(error)
+        sweepdir_items = upsample_items 
     else:
-        # Default mode: use all local sweep items, 1 replica each
+        # This else should never be reached now, but keep for safety
         sweepdir_items = sweepdir_items_all
         replica_counts = [1] * len(sweepdir_items)
-    
-    # Creating directory for job dirs and scripts
-    if env.job_name_template_sh.endswith(".sh"):
-        env.job_name_template = env.job_name_template_sh[:-3]
-    else:
-        env.job_name_template = env.job_name_template_sh
         
-    if not hasattr(env, "tmp_work_path"):
-        env.tmp_work_path = Path(tempfile.mkdtemp()) / "FabSim3"
-
-    env.tmp_results_path = env.tmp_work_path / "results"
-    env.tmp_results_path.mkdir(parents=True, exist_ok=True)
+    # Set up the environment for the job
+    env.sweepdir_items = sweepdir_items
     
-    item_index_map = {item: idx + 1 for idx, item in enumerate(sweepdir_items)}
-    
-    # Generate job scripts
-    job_scripts_to_submit = []
+    # reorder an exec_first item for priority execution.
+    if hasattr(env, "exec_first"):
+        sweepdir_items.insert(
+            0, sweepdir_items.pop(sweepdir_items.index(env.exec_first))
+        )
 
-    for item, count in zip(sweepdir_items, replica_counts):
-        for replica in range(1, count + 1):
-            script_path = prepare_job_locally(
-                item=item,
-                replica=replica,
-                config_dir=env.job_config_path,
+    if execute_put_configs is True:
+        execute(put_configs, config)
+        
+    print("[DEBUG] Before job preparation:")
+    print(f"  sweepdir_items: {sweepdir_items}")
+    print(f"  replica_counts: {replica_counts}")
+    print(f"  replica_start_number: {replica_start_number}")
+
+    # Submit via PilotJob
+    if hasattr(env, "PJ_TYPE"):
+        env.submit_job = False
+        env.job_scripts_to_submit = job(
+            dict(
+                ensemble_mode=True,
+                sweepdir_items=sweepdir_items,
                 sweep_dir=sweep_dir,
-                results_base=env.tmp_results_path,
-                script_template_name=env.job_name_template,
-                item_index=item_index_map[item],
-            )
-            job_scripts_to_submit.append(script_path)
-
-    rich_print(
-        f"[INFO] Prepared {len(job_scripts_to_submit)} job scripts in {env.tmp_results_path}"
-    )
-    
-    # Create jobs according to the PJ_TYPE
-    # Create jobs according to the PilotJob type
-    pj_type = getattr(env, "PJ_TYPE", "").lower()
-
-    if pj_type:
+                replica_start_number=1,
+                replica_counts=replica_counts,
+            ),
+        )
+        pj_type = getattr(env, "PJ_TYPE", "").lower()
         rich_print(f"[INFO] Using PilotJob mode: {pj_type}")
-
         pj_dispatch = {
             "rp": run_radical,
             "qcg": run_qcg,
         }
-
         pilot_job_fn = pj_dispatch.get(pj_type)
         if pilot_job_fn:
-            pilot_job_fn(job_scripts_to_submit, env.get("venv", False))
+            pilot_job_fn()
         else:
-            raise RuntimeError(f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported types are: {', '.join(pj_dispatch.keys())}")
+            raise RuntimeError(
+                f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported types are: {', '.join(pj_dispatch.keys())}"
+            )
+    else:
+        env.submit_job = True
+        job(
+            dict(
+                ensemble_mode=True,
+                sweepdir_items=sweepdir_items,
+                sweep_dir=sweep_dir,
+                replica_start_number=1,
+                replica_counts=replica_counts,
+            ),
+        )
+        rich_print("[INFO] Ensemble submission complete")
+        
 
-    rich_print("[INFO] Ensemble submission complete")
 
-
-def run_radical(job_scripts_to_submit: list, venv="False"):
+def run_radical():
     rich_print(
         Panel.fit(
             "NOW, we are submitting RADICAL-Pilot Jobs",
@@ -1381,7 +1416,7 @@ def run_radical(job_scripts_to_submit: list, venv="False"):
 
     # Prepare the environment for Radical TaskDescription
     task_descriptions = []
-    for index, task_script in enumerate(job_scripts_to_submit, start=1):
+    for index, task_script in enumerate(env.job_scripts_to_submit, start=1):
         env.update(
             {
                 "task_name": f"{env.get('task_name_prefix', 'task')}.{index}",
@@ -1459,86 +1494,85 @@ def run_radical(job_scripts_to_submit: list, venv="False"):
     job(dict(ensemble_mode=False, label="radical-PJ-header", NoEnvScript=True))
     env.batch_header = backup_header
     env.NoEnvScript = False
+
+
+def run_qcg():
+    rich_print(
+        Panel.fit(
+            "NOW, we are submitting QCG Pilot jobs",
+            title="[orange_red1]PJ job submission phase[/orange_red1]",
+            border_style="orange_red1",
+        )
+    )
     
-
-def run_qcg(job_scripts_to_submit: list, venv: bool):
-    """Prepare and submit a QCG-PilotJob using FabSim-style templates."""
-
+    job_scripts_to_submit = env.job_scripts_to_submit
+    rich_print(f"[debug] job_scripts_to_submit {job_scripts_to_submit}]")
+    
     if not job_scripts_to_submit:
         rich_print("[red]Error: No job scripts to submit[/red]")
         return
 
-    rich_print(Panel.fit(
-        f"Preparing QCG-PilotJob submission for {len(job_scripts_to_submit)} tasks",
-        title="[orange_red1]QCG-PJ Submission[/orange_red1]",
-        border_style="orange_red1",
-    ))
-
+    # first, add all generated tasks script to PJ_PY
+    if not hasattr(env, "task_model"):
+        env.task_model = "default"
+        
     # Define run name and paths
-    run_name = env.job_name_template
+    run_name = env.job_name_template_sh[:-3]
+    print(f"[DEBUG] run_name: {run_name}")
     tmp_results_path = Path(env.tmp_results_path) / run_name
     qcg_dir_local = tmp_results_path / "QCG"
     qcg_dir_local.mkdir(parents=True, exist_ok=True)
     env.qcg_dir_remote = Path(env.results_path) / run_name / "QCG"
     
-    # Remote run name and path
-    results_path = Path(env.results_path) / run_name
-    
-    print(f"qcg_dir: {qcg_dir_local}")
-    print(f"tmp_results_path: {tmp_results_path}")
-    print(f"results_path: {results_path}")
-
-    # -------------------------------
-    # 1. Generate JOB_DESCRIPTIONS
-    # -------------------------------
+    # Python's indexes start at zero, to start from 1, set start=1
     rich_print("[INFO] Creating task descriptions...")
-    
+        
+    # Add more detailed debug prints
+    rich_print("\n[DEBUG] Detailed script analysis:")
+    for idx, script in enumerate(job_scripts_to_submit, 1):
+        rich_print(f"\nScript {idx}:")
+        rich_print(f"  Remote path: {script}")
+        local_path = script.replace(str(env.results_path), str(env.tmp_results_path))
+        rich_print(f"  Local path: {local_path}")
+        rich_print(f"  Directory exists: {os.path.exists(os.path.dirname(local_path))}")
+        rich_print(f"  File exists: {os.path.exists(local_path)}")
+        
+        # Check directory contents if directory exists
+        if os.path.exists(os.path.dirname(local_path)):
+            rich_print(f"  Directory contents: {os.listdir(os.path.dirname(local_path))}")
+
     task_blocks = []
     for index, job_script in enumerate(job_scripts_to_submit, start=1):
         env.idsID = index
-        rel_path = Path(job_script).relative_to(env.tmp_results_path)
-        remote_path = Path(env.results_path) / rel_path
-        env.idsPath = str(remote_path)
-        env.dirPath = str(remote_path.parent)
-        env.cores =  env.cores
+        env.idsPath = job_script  # already the remote path
+        env.dirPath = str(Path(job_script).parent)
+        env.cores = env.PJ_cores
         env.task_model = getattr(env, "task_model", "default")
         # Generate script content from template
         script_content = script_template_content("qcg-PJ-task-template")
         task_blocks.append(script_content)
-        
+
     rich_print(f"[INFO] Created {len(task_blocks)} task descriptions.")
 
     env.JOB_DESCRIPTIONS = textwrap.indent("\n".join(task_blocks), "    ")
 
-    # -------------------------------
     # 2. Generate QCG Python Manager Script
-    # -------------------------------
     env.qcg_python_script_local = str(qcg_dir_local / f"qcg_manager_{run_name}.py")
     env.qcg_python_script = str(Path(env.qcg_dir_remote) / f"qcg_manager_{run_name}.py")
-    
-    print("env.qcg_python_script_local", env.qcg_python_script_local)
-    print("env.qcg_python_script", env.qcg_python_script)
 
     python_script = script_template_content("qcg-PJ-py")
     with open(env.qcg_python_script_local, "w") as f:
         f.write(python_script)
     os.chmod(env.qcg_python_script_local, 0o755)
 
-    # -------------------------------
     # 3. Generate Submission Wrapper Script
-    # -------------------------------
     env.qcg_submit_script_local = str(qcg_dir_local / f"qcg_submit_{run_name}.sh")
-    env.qcg_submit_script = str(Path(env.qcg_dir_remote) / f"qcg_submit_{run_name}.sh")
-    
-    print("env.qcg_submit_script_local", env.qcg_submit_script_local)
-    print("env.qcg_submit_script", env.qcg_submit_script)
-    
+    env.qcg_submit_script = str(Path(env.qcg_dir_remote) / f"qcg_submit_{run_name}.sh")  
+
+    # Set batch header and submission flag for later use
     env.batch_header = env.PJ_header
     env.submit_job = True
-    
-    # -------------------------------
-    # 4. Transfer & Submit
-    # -------------------------------
+
     # Create run_QCG_PilotJob command
     PJ_CMD = []
     PJ_CMD.append("# Run the QCG manager script")
@@ -1546,32 +1580,46 @@ def run_qcg(job_scripts_to_submit: list, venv: bool):
 
     # Store in env for SLURM template
     env.run_QCG_PilotJob = "\n".join(PJ_CMD)
-
-    # Temprarily create a job_results directory (X)
+    
+    # Set job_results to the QCG remote directory for this run
     env.job_results = env.qcg_dir_remote
-    
-    print("env.job_results", env.job_results)
-    
+
     # Write the submission wrapper script (always render with template)
     with open(env.qcg_submit_script_local, "w") as f:
-        # HPC: use the full SLURM template, also render with template
         submit_script_content = script_template_content("archer2-PJ-header")
         rendered_submit_script = template(submit_script_content)
         f.write(rendered_submit_script)
-            
     os.chmod(env.qcg_submit_script_local, 0o755)
     
-    # Create the QCG directory on the remote machine
-    run(f"mkdir -p {env.results_path}")
-    
+    print(f"env.tmp_results_path: {env.tmp_results_path}")
+    print(f"results_path: {env.results_path}")
+
+    # Sync all results (including QCG scripts) to the remote QCG directory
     rsync_project(
-        local_dir=str(tmp_results_path), 
-        remote_dir=str(results_path)
+        local_dir=str(env.tmp_results_path) + "/", 
+        remote_dir=str(env.results_path)
     )
+
+    # Submit the QCG job using the submission wrapper script
+    job_submission(dict(job_script=env.qcg_submit_script))
     
-    qcg_job = job_submission(dict(job_script=env.qcg_submit_script))
-    
-    return qcg_job
+    rich_print("[INFO] QCG-PJ submission complete")
+
+
+def input_to_range(arg, default):
+    ttype = type(default)
+    # regexp for a array generator like [1.2:3:0.2]
+    gen_regexp = r"\[([\d\.]+):([\d\.]+):([\d\.]+)\]"
+    if not arg:
+        return [default]
+    match = re.match(gen_regexp, str(arg))
+    if match:
+        vals = list(map(ttype, match.groups()))
+        if ttype == int:
+            return range(*vals)
+        else:
+            return np.arange(*vals)
+    return [ttype(arg)]
 
 
 @task
@@ -1635,7 +1683,9 @@ def install_packages(venv: bool = "False"):
         local(
             template(
                 "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
+                "$username@$remote:$app_repository".format(
+                    tmp_app_dir, whl
+                )
             )
             # "rsync -pthrvz %s/%s eagle:$app_repository"%(tmp_app_dir, whl)
         )
@@ -1684,7 +1734,6 @@ def install_packages(venv: bool = "False"):
                         env.app_repository,
                         env.app_repository,
                         dep.replace(".tar.gz", ""),
-                        env.virtual_env_path,
                         install_dir,
                     )
                 )
@@ -1703,11 +1752,9 @@ def install_packages(venv: bool = "False"):
 
     # Create job script based on "sbatch header" and script created above in
     # deploy/.jobscript/
-
     env.job_script = script_templates(env.batch_header_install_app, env.script)
 
     # Create script's destination path to remote machine based on
-    run(template("mkdir -p $scripts_path"))
     env.dest_name = env.pather.join(
         env.scripts_path, env.pather.basename(env.job_script)
     )
@@ -1716,13 +1763,8 @@ def install_packages(venv: bool = "False"):
     put(env.job_script, env.dest_name)
     #
     run(template("mkdir -p $job_results"))
-
-    env.job_dispatch += " -q standard"
-
-    print(env.job_dispatch)
-    print(env.dest_name)
-
-    run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    with cd(env.pather.dirname(env.job_results)):
+        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
 
     local("rm -rf {}".format(tmp_app_dir))
 
@@ -1950,3 +1992,4 @@ def count_folders(dir_path: str, prefix: str):
     """
     dirs = os.listdir(dir_path)
     return len([d for d in dirs if d.startswith(prefix)])
+
