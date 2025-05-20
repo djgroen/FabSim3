@@ -1,6 +1,7 @@
 import math
 import os
 import re
+import textwrap
 import subprocess
 import tempfile
 from pathlib import Path
@@ -526,6 +527,12 @@ def with_job(
             be stored
     """
     env.name = name
+
+    if not hasattr(env, "all_job_results"):
+        env.all_job_results = []
+    if not hasattr(env, "all_job_results_local"):
+        env.all_job_results_local = []
+
     if not ensemble_mode:
         job_results = env.pather.join(env.results_path, name)
         job_results_local = os.path.join(env.local_results, name)
@@ -536,6 +543,10 @@ def with_job(
         job_results_local = "{}/RUNS/{}".format(
             os.path.join(env.local_results, name), label
         )
+
+    # Store all results paths for later use
+    env.all_job_results.append(job_results)
+    env.all_job_results_local.append(job_results_local)
 
     env.job_results_contents = env.pather.join(job_results, "*")
     env.job_results_contents_local = os.path.join(job_results_local, "*")
@@ -558,7 +569,7 @@ def with_template_config() -> None:
     with_config(template(env.config_name_template))
 
 
-def job(*job_args, prepare_only=False):
+def job(*job_args):
     """
     Internal low level job launcher.
     Parameters for the job are determined from the prepared fabric environment
@@ -648,23 +659,42 @@ def job(*job_args, prepare_only=False):
             else:
                 replica_start_number = env.replica_start_number
 
+            # Use per-item replica count if available
+            if hasattr(env, "replica_counts") and isinstance(env.replica_counts, list):
+                replicas = env.replica_counts[index]
+            else:
+                replicas = env.replicas
+
             POOL.add_task(
                 func=job_preparation,
                 func_args=dict(
                     ensemble_mode=env.ensemble_mode,
                     label=task_label,
                     replica_start_number=replica_start_number,
+                    replicas=replicas,  # <-- pass as int
                 ),
             )
     else:
         args["replica_start_number"] = env.replica_start_number
+        args["replicas"] = env.replicas
         POOL.add_task(func=job_preparation, func_args=args)
 
     print("Submit tasks to multiprocessingPool : done ...")
-    job_scripts_to_submit = POOL.wait_for_tasks()
-
-    if prepare_only:
-        return job_scripts_to_submit
+    
+    # Processing nested job scripts
+    job_scripts_nested = POOL.wait_for_tasks()
+    job_scripts_to_submit = []
+    job_script_info = {}
+    for sublist in job_scripts_nested:
+        for item in (sublist if isinstance(sublist, list) else [sublist]):
+            if isinstance(item, tuple) and len(item) == 2:
+                script_path, info = item
+                job_scripts_to_submit.append(script_path)
+                job_script_info[script_path] = info
+            else:
+                job_scripts_to_submit.append(item)
+    env.job_scripts_to_submit = job_scripts_to_submit
+    env.job_script_info = job_script_info
 
     #####################################
     #       job transmission phase      #
@@ -684,32 +714,25 @@ def job(*job_args, prepare_only=False):
     )
     job_transmission()
 
-    if not (hasattr(env, "TestOnly") and env.TestOnly.lower() == "true"):
-        # DO NOT submit any job
-        # env.submit_job is False in case of using PilotJob option
-        # therefore, DO NOT submit the job directly, only submit PJ script
-        if not (
-            hasattr(env, "submit_job")
-            and isinstance(env.submit_job, bool)
-            and env.submit_job is False
-        ):
-            #####################################
-            #       job submission phase      #
-            #####################################
-            msg = "Submit all generated job scripts to target remote machine"
-            rich_print(
-                Panel.fit(
-                    msg,
-                    title="[orange_red1]job submission phase[/orange_red1]",
-                    border_style="orange_red1",
-                )
+    if not (hasattr(env, "submit_job") and env.submit_job is False):
+        # submit jobs
+        #####################################
+        #       job submission phase      #
+        #####################################
+        msg = "Submit all generated job scripts to target remote machine"
+        rich_print(
+            Panel.fit(
+                msg,
+                title="[orange_red1]job submission phase[/orange_red1]",
+                border_style="orange_red1",
             )
-            for job_script in job_scripts_to_submit:
-                job_submission(dict(job_script=job_script))
-            print("submitted job script = \n{}".format(
-                pformat(job_scripts_to_submit)
-                )
+        )
+        for job_script in job_scripts_to_submit:
+            job_submission(dict(job_script=job_script))
+        print("submitted job script = \n{}".format(
+            pformat(job_scripts_to_submit)
             )
+        )
 
     # POOL.shutdown_threads()
     return job_scripts_to_submit
@@ -717,18 +740,17 @@ def job(*job_args, prepare_only=False):
 
 def job_preparation(*job_args):
     """
-    here, all job folders and scripts will be created in the temporary folder
-        `<tmp_folder>/{results,scripts}`, later, in job_transmission,
-    we transfer all these files and folders with a single `rsync` command.
-    This approach will helps us to reduce the number of SSH connection and
-    improve the stability of job submission workflow which can be compromised
-    by high parallel SSH connection
+    Prepare all job folders and scripts in a temporary directory:
+        `<tmp_folder>/{results,scripts}`.
+    These files and folders are later transferred in bulk using a single `rsync` command during job_transmission.
+    This reduces the number of SSH connections and improves the reliability of the job submission workflow, especially under high parallelism.
     """
-    pprint(job_args)
-
     args = {}
     for adict in job_args:
         args = dict(args, **adict)
+        
+    if not hasattr(env, "job_script_info"):
+        env.job_script_info = {}
 
     if "label" in args:
         env.label = args["label"]
@@ -739,7 +761,7 @@ def job_preparation(*job_args):
 
     for i in range(
         args["replica_start_number"],
-        int(env.replicas) + args["replica_start_number"],
+        int(args["replicas"]) + args["replica_start_number"],
     ):
         env.replica_number = i
 
@@ -747,7 +769,7 @@ def job_preparation(*job_args):
             ensemble_mode=env.ensemble_mode, label=env.label
         )
 
-        if int(env.replicas) > 1:
+        if int(args["replicas"]) > 1:
             if env.ensemble_mode is False:
                 env.job_results += "_replica_" + str(i)
             else:
@@ -805,7 +827,7 @@ def job_preparation(*job_args):
         base, extension = os.path.splitext(env.pather.basename(tmp_job_script))
         # Initial new name if we have replicas or ensemble
 
-        if int(env.replicas) > 1:
+        if int(args["replicas"]) > 1:
             if env.ensemble_mode is False:
                 dst_script_name = base + "_replica_" + str(i) + extension
             else:
@@ -814,18 +836,16 @@ def job_preparation(*job_args):
             dst_script_name = base + extension
 
         dst_job_script = env.pather.join(env.tmp_scripts_path, dst_script_name)
+        
+        # Add target job script to return list (safe mode)
+        if hasattr(env, "PJ_TYPE"):
+            script_path = env.pather.join(env.scripts_path, dst_script_name)
+        else:
+            script_path = env.pather.join(env.job_results, dst_script_name)
+        return_job_scripts.append((script_path, (env.label, str(i))))
 
-        # Add target job script to return list
-
-        """
-        return_job_scripts.append(env.pather.join(env.scripts_path,
-                                               dst_script_name)
-        """
-        # here, instead of returning PATH to script folder, it is better to
-        # submit script from results_path folder, specially in case of PJ job
-        return_job_scripts.append(
-            env.pather.join(env.job_results, dst_script_name)
-        )
+        # Store mapping for QCG
+        env.job_script_info[script_path] = (env.label, str(i))
 
         copy(tmp_job_script, dst_job_script)
         # chmod +x dst_job_script
@@ -1152,131 +1172,157 @@ def run_ensemble(
     upsample: str = "",
     replica_start_number: str = "1",
     **args,
-) -> None:
+):
     """
-    Map and execute ensemble jobs.
-    The job results will be stored with a name pattern as defined in
-    the environment
+    Launch and manage ensemble jobs, mapping each input in the sweep directory to a job execution.
+    Results are stored according to the environment's naming conventions.
 
-    !!! note
-        function `with_config` should be called before calling this function in
-        plugin code.
+    Note:
+        The `with_config` function must be called before invoking this function in plugin code.
 
     Args:
-        config (str): base config directory to use to define input files
-        sweep_dir (str): directory containing inputs that will vary per
-            ensemble simulation instance.
-        sweep_on_remote (bool, optional): value `True` means the `SWEEP`
-            directory is located to the remote machine.
-        execute_put_configs (bool, optional): `True` means we already called
-            `put_configs` function to transfer `config` files and folders to
-            remote machine.
-        **args: additional arguments to pass to the run_ensemble function
+        config (str): Name of the base configuration directory for input files.
+        sweep_dir (str): Directory containing per-instance input folders for the ensemble.
+        sweep_on_remote (bool, optional): If True, the `SWEEP` directory is on the remote machine.
+        execute_put_configs (bool, optional): If True, configuration files have already been transferred.
+        **args: Additional keyword arguments for job configuration.
 
     Raises:
-        RuntimeError: - if `with_config` function did not called before calling
-                `run_ensemble` task.
-            - if `env.script` variable did not set.
-            - if `SWEEP` directory is empty.
-
+        RuntimeError: If `with_config` was not called, `env.script` is unset, or the sweep directory is empty.
     """
     update_environment(args)
-
-    if ";" in replica_start_number:
-        raise NotImplementedError(
-            "Multiple replica_start_numbers are not yet implemented for users."
-        )
-
+    
     if "script" not in env:
         raise RuntimeError(
-            "ERROR: run_ensemble function has been called,"
+            "[ERROR] run_ensemble function has been called,"
             "but the parameter 'script' was not specified."
         )
-
-    # check if with_config function is already called
-    if not hasattr(env, "job_config_path"):
+    
+    if not config:
         raise RuntimeError(
-            "Function with_config did NOT called, "
-            "Please call it before calling run_ensemble()"
+            "[ERROR] run_ensemble function has been called, "
+            "but the parameter 'config' was not specified."
         )
 
-    # check for PilotJob option
-    if hasattr(env, "PJ") and env.PJ.lower() == "true":
-        env.submitted_jobs_list = []
-        env.submit_job = False
-        env.batch_header = "bash_header"
-
+    if not sweep_dir or not os.path.isdir(sweep_dir):
+        raise RuntimeError(
+            f"[ERROR] run_ensemble function has been called, "
+            f"but the parameter 'sweep_dir' was not specified or does not exist: {sweep_dir}"
+        )
+        
     if sweep_on_remote is False:
-        sweepdir_items = os.listdir(sweep_dir)
-        if len(upsample) > 0:
-            upsample = upsample.split(";")
+        sweepdir_items_all = [
+            f for f in os.listdir(sweep_dir)
+            if os.path.isdir(os.path.join(sweep_dir, f))
+        ]
 
-            folder_name = f"{env.config}_{env.machine_name}_{env.cores}"
-            path = os.path.join(env.results_path, folder_name, "RUNS")
+        if not sweepdir_items_all:
+            raise RuntimeError(f"[ERROR] No valid directories found in sweep_dir: {sweep_dir}")
 
-            replica_start_number = list(
-                count_folders(path, dir) + 1 for dir in upsample
-            )
+        upsample_items = [item.strip() for item in upsample.split(";")] if upsample else []
 
-            if set(upsample).issubset(set(sweepdir_items)):
-                sweepdir_items = upsample
+        if not upsample_items:
+            upsample_items = sweepdir_items_all
+
+        replica_counts_raw = str(args.get("replicas", replica_start_number)).strip()
+
+        if upsample_items:
+            if ";" in replica_counts_raw:
+                replica_counts = [int(x.strip()) for x in replica_counts_raw.split(";")]
             else:
-                error = "ERROR: upsample item: "
-                error += f"{set(upsample)-set(sweepdir_items)}"
-                error += "not found in SWEEP folder"
-                raise RuntimeError(error)
-    else:
-        # in case of reading SWEEP folder from remote machine, we need a
-        # SSH tunnel and then list the directories
-        sweepdir_items = run("ls -1 {}".format(sweep_dir)).splitlines()
-    print("reading SWEEP folder from remote machine")
-    if len(sweepdir_items) == 0:
-        raise RuntimeError(
-            "ERROR: no files where found in the sweep_dir : {}".format(
-                sweep_dir
-            )
-        )
+                replica_counts = [int(replica_counts_raw)] * len(upsample_items)
 
+            if len(replica_counts) != len(upsample_items):
+                raise RuntimeError(
+                    f"[ERROR] Mismatch between upsample items and replica counts.\n"
+                    f"Items ({len(upsample_items)}): {upsample_items}\n"
+                    f"Counts ({len(replica_counts)}): {replica_counts}\n"
+                    f"Each item in upsample must have exactly one replica count."
+                )
+
+            if not set(upsample_items).issubset(set(sweepdir_items_all)):
+                error = "[ERROR] upsample item: "
+                error += f"{set(upsample_items)-set(sweepdir_items_all)}"
+                error += " not found in SWEEP folder"
+                raise RuntimeError(error)
+            sweepdir_items = upsample_items
+        else:
+            sweepdir_items = sweepdir_items_all
+            replica_counts = [1] * len(sweepdir_items)
+
+        env.sweepdir_items = sweepdir_items
+        env.replica_counts = replica_counts
+    else:
+        sweepdir_items = run("ls -1 {}".format(sweep_dir)).splitlines()
+        if not sweepdir_items:
+            raise RuntimeError(
+                f"[ERROR] no valid directories found in remote sweep_dir: {sweep_dir}"
+            )
+        env.sweepdir_items = sweepdir_items
+        env.replica_counts = [1] * len(sweepdir_items)
+        
+    # Always keep env.replica_counts as a list
+    env.replica_counts = replica_counts
+
+    # Set env.replicas to the common value if all are the same, else None
+    if len(set(env.replica_counts)) == 1:
+        env.replicas = env.replica_counts[0]
+    else:
+        env.replicas = None
+        
     # reorder an exec_first item for priority execution.
-    if hasattr(env, "exec_first"):
-        sweepdir_items.insert(
-            0, sweepdir_items.pop(sweepdir_items.index(env.exec_first))
-        )
+    if hasattr(env, "exec_first") and env.exec_first in sweepdir_items:
+        idx = sweepdir_items.index(env.exec_first)
+        # Move both the sweepdir_item and its replica_count
+        sweepdir_items.insert(0, sweepdir_items.pop(idx))
+        replica_counts.insert(0, replica_counts.pop(idx))
+        # Update env as well
+        env.sweepdir_items = sweepdir_items
+        env.replica_counts = replica_counts
+        
+    rich_print(f"[INFO] sweepdir_items: {env.sweepdir_items}")
+    rich_print(f"[INFO] replica_counts: {env.replica_counts}")
+    rich_print(f"[INFO] replicas: {env.replicas}")
 
     if execute_put_configs is True:
         execute(put_configs, config)
-
-    # output['everything'] = False
-    job_scripts_to_submit = job(
-        dict(
+    
+    # Submit via PilotJob
+    if hasattr(env, "PJ_TYPE"):
+        env.submit_job = False  # Only prepare, do not submit jobs directly
+        job_args = dict(
             ensemble_mode=True,
             sweepdir_items=sweepdir_items,
             sweep_dir=sweep_dir,
-            replica_start_number=replica_start_number,
-        ),
-        prepare_only=True,
-    )
-
-    if hasattr(env, "PJ_TYPE"):
-        pj_type = env.PJ_TYPE.lower()
-        if pj_type == "rp":
-            run_radical(job_scripts_to_submit, env.get("venv", False))
-        elif pj_type == "qcg":
-            run_qcg(job_scripts_to_submit, env.get("venv", False))
-        else:
-            print("Error: 'PJ_TYPE' must be set to 'RP' or 'QCG'. Exiting...")
-            sys.exit(1)
-    else:
-        # If PJ_TYPE is not set, submit the jobs normally
-        job_scripts_to_submit = job(
-            dict(
-                ensemble_mode=True,
-                sweepdir_items=sweepdir_items,
-                sweep_dir=sweep_dir,
-                replica_start_number=replica_start_number,
-            ),
-            prepare_only=False,
+            replica_start_number=1,
+            replica_counts=replica_counts,
         )
+        env.job_scripts_to_submit = job(job_args)
+        pj_type = getattr(env, "PJ_TYPE", "").lower()
+        rich_print(f"[INFO] Using PilotJob mode: {pj_type}")
+        pj_dispatch = {
+            "rp": run_radical,
+            "qcg": run_qcg,
+        }
+        pilot_job_fn = pj_dispatch.get(pj_type)
+        if pilot_job_fn:
+            pilot_job_fn()
+        else:
+            raise RuntimeError(
+                f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported types are: {', '.join(pj_dispatch.keys())}"
+            )
+    else:
+        env.submit_job = True  # Prepare and submit jobs
+        job_args = dict(
+            ensemble_mode=True,
+            sweepdir_items=sweepdir_items,
+            sweep_dir=sweep_dir,
+            replica_start_number=1,
+            replica_counts=replica_counts,
+        )
+        env.job_scripts_to_submit = job(job_args)
+        
+        rich_print("[INFO] Ensemble submission complete")
 
 
 def run_radical(job_scripts_to_submit: list, venv="False"):
@@ -1387,7 +1433,7 @@ def run_radical(job_scripts_to_submit: list, venv="False"):
     env.NoEnvScript = False
 
 
-def run_qcg(job_scripts_to_submit: list, venv: bool):
+def run_qcg():
     rich_print(
         Panel.fit(
             "NOW, we are submitting QCG Pilot jobs",
@@ -1397,54 +1443,88 @@ def run_qcg(job_scripts_to_submit: list, venv: bool):
     )
 
     # first, add all generated tasks script to PJ_PY
-    submitted_jobs_list = []
     if not hasattr(env, "task_model"):
         env.task_model = "default"
-
+    
+    # Retrieve the job scripts to submit
+    job_scripts_to_submit = getattr(env, "job_scripts_to_submit", [])
+    
+    # Create run name from job name template
+    run_name = env.job_name_template_sh[:-3]
+    
     # Python's indexes start at zero, to start from 1, set start=1
+    task_blocks = []
     for index, job_script in enumerate(job_scripts_to_submit, start=1):
         env.idsID = index
         env.idsPath = job_script
-        env.dirPath = path.dirname(env.idsPath)
-        submitted_jobs_list.append(
-            script_template_content("qcg-PJ-task-template")
-        )
-    env.submitted_jobs_list = "\n".join(submitted_jobs_list)
+        label, replica = env.job_script_info.get(job_script, ("", ""))
+        if str(replica) == "1" and env.replica_counts[env.sweepdir_items.index(label)] == 1:
+            env.dirPath = os.path.join(env.results_path, run_name, "RUNS", label)
+        else:
+            env.dirPath = os.path.join(env.results_path, run_name, "RUNS", f"{label}_{replica}")
+        env.cores = env.PJ_cores
+        env.task_model = getattr(env, "task_model", "default")
+        script_content = script_template_content("qcg-PJ-task-template")
+        task_blocks.append(script_content)
+        rich_print(f"[INFO] Created {len(task_blocks)} task descriptions.")
 
-    # Avoid apply replicas functionality on PilotJob folders
-    env.replicas = "1"
-    backup_header = env.batch_header
-    env.batch_header = env.PJ_PYheader
-    job_scripts_to_submit = job(
-        dict(
-            ensemble_mode=False, label="PJ_PYheader", NoEnvScript=True
-        )
-    )
-
-    env.PJ_PATH = job_scripts_to_submit[0]
-    env.PJ_FileName = env.pather.basename(env.PJ_PATH)
-    env.batch_header = env.PJ_header
-    env.submit_job = True
-
-    # Construct the run_QCG_PilotJob command
+    env.JOB_DESCRIPTIONS = textwrap.indent("\n".join(task_blocks), "    ")
+    
+    # Create a temporary working directory for QCG runtime files
+    qcg_tmp_dir = Path(env.tmp_scripts_path) / "QCG"
+    qcg_tmp_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Prepare the scripts for QCG TaskDescription
+    qcg_local_py = qcg_tmp_dir / f"qcg_manager_{run_name}.py"
+    
+    # Render the QCG manager Python script using the template
+    qcg_manager_content = script_template_content("qcg-PJ-py")
+    
+    # Write the QCG manager script to the temporary directory
+    with open(qcg_local_py, "w") as f:
+        f.write(qcg_manager_content)
+    os.chmod(qcg_local_py, 0o755)
+    
+    # Create the remote path for the QCG manager script
+    env.qcg_remote_dir = Path(env.results_path) / run_name / "QCG"
+    run("mkdir -p {}".format(env.qcg_remote_dir))
+    env.qcg_remote_py = str(Path(env.qcg_remote_dir) / f"qcg_manager_{run_name}.py")
+    
+    # Create submit script
+    qcg_local_sh = qcg_tmp_dir / f"qcg_submit_{run_name}.sh"
+    env.qcg_remote_sh = Path(env.qcg_remote_dir) / f"qcg_submit_{run_name}.sh"
+        
+    # Create run_QCG_PilotJob command
     PJ_CMD = []
-    if hasattr(env, "venv") and str(env.venv).lower() == "true":
-        # QCG-PJ should load from virtualenv
-        PJ_CMD.append("# Activate the virtual environment")
-        PJ_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
+    PJ_CMD.append("# Run the QCG manager script")
+    PJ_CMD.append(f"python3 {env.qcg_remote_py}")
 
-    PJ_CMD.append("# Check if qcg-pilotjob is installed")
-    PJ_CMD.append(
-        "python3 -c 'import qcg-pilotjob' 2>/dev/null || "
-        "pip3 install --upgrade qcg-pilotjob\n"
-    )
-    PJ_CMD.append("# Python command for qcg-pilotjob execution")
-    PJ_CMD.append(f"python3 {env.PJ_PATH}")
-
+    # Store in env for SLURM template
     env.run_QCG_PilotJob = "\n".join(PJ_CMD)
-    job(dict(ensemble_mode=False, label="PJ_header", NoEnvScript=True))
-    env.batch_header = backup_header
-    env.NoEnvScript = False
+    
+    # Set job_results to the QCG remote directory for this run
+    env.job_results = env.qcg_remote_dir
+    
+    # Render the QCG submit bash script using the template
+    qcg_submit_content = script_template_content("archer2-PJ-header")
+    
+    print(f"env.job_results: {env.job_results}")
+    
+    # Write the QCG submit script to the temporary directory
+    with open(qcg_local_sh, "w") as f:
+        f.write(qcg_submit_content)
+    os.chmod(qcg_local_sh, 0o755)
+    
+    # Sync all results (including QCG scripts) to the remote QCG directory
+    rsync_project(
+        local_dir=str(qcg_tmp_dir) + "/", 
+        remote_dir=str(env.qcg_remote_dir) + "/",
+    )
+    
+    # Submit the QCG job using the submission wrapper script
+    job_submission(dict(job_script=env.qcg_remote_sh))
+    
+    rich_print("[INFO] QCG-PJ submission complete")
 
 
 def input_to_range(arg, default):
