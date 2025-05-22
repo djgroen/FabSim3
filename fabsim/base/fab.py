@@ -1464,66 +1464,86 @@ def run_radical(job_scripts_to_submit: list, venv="False"):
 def run_qcg():
     """
     Submit QCG Pilot jobs using generated job scripts.
-
-    Args:
-        job_scripts_to_submit (list, optional): List of job script to submit.
-            If not provided, uses env.job_scripts_to_submit.
-        venv (str, optional): Use a virtual environment ("True" or "False").
     """
-    rich_print(
-        Panel.fit(
-            "NOW, we are submitting QCG Pilot jobs",
-            title="[orange_red1]PJ job submission phase[/orange_red1]",
-            border_style="orange_red1",
-        )
-    )
+    update_environment()
+    # Get SLURM resource parameters from configuration
+    # Note: set cores in machines_user.yml to determine correct node count
+    env.corespernode = getattr(env, "corespernode", 128)
+    env.cpuspertask = getattr(env, "cpuspertask", 1)
+    # Calculate nodes through standard FabSim3 method (cores/corespernode)
+    calc_nodes()
 
-    # first, add all generated tasks script to PJ_PY
-    if not hasattr(env, "task_model"):
-        env.task_model = "default"
+    # Calculate total available resources
+    env.total_cores = env.nodes * env.corespernode
+
+    # Set QCG-specific parameters
+    env.QCG_PJ_NODES = env.nodes
+    env.QCG_PJ_CORES_PER_NODE = env.corespernode
+    env.QCG_PJ_TOTAL_CORES = env.total_cores
+    env.task_model = getattr(env, "task_model", "default")
+    env.PJ_cores = getattr(env, "coresponsetask", env.cpuspertask)
+
+    # Display resource configuration
+    rich_print(Panel.fit(
+        f"[SLURM Resources]\n"
+        f"Nodes: {env.nodes}\n"
+        f"Cores per node: {env.corespernode}\n"
+        f"CPUs per task: {env.cpuspertask}\n"
+        f"Total cores: {env.total_cores}\n\n"
+        f"[QCG-PJ Resources]\n"
+        f"QCG_PJ_NODES: {env.QCG_PJ_NODES}\n"
+        f"QCG_PJ_CORES_PER_NODE: {env.QCG_PJ_CORES_PER_NODE}\n"
+        f"QCG_PJ_TOTAL_CORES: {env.QCG_PJ_TOTAL_CORES}\n"
+        f"Cores per task: {env.PJ_cores}",
+        title="[bold blue]QCG-PilotJob Configuration[/bold blue]",
+        border_style="blue"
+    ))
 
     # Retrieve the job scripts to submit
     job_scripts_to_submit = getattr(env, "job_scripts_to_submit", [])
+    if not job_scripts_to_submit:
+        raise RuntimeError("[ERROR] No job scripts found to submit")
 
     # Create run name from job name template
     run_name = env.job_name_template_sh[:-3]
 
-    print(f"PJ_cores from env: {getattr(env, 'PJ_cores', 'Not found')}")
-
-    # Python's indexes start at zero, to start from 1, set start=1
+    # Generate task descriptions for each job script
     task_blocks = []
     for index, job_script in enumerate(job_scripts_to_submit, start=1):
         env.idsID = index
         env.idsPath = job_script
         label, replica = env.job_script_info.get(job_script, ("", ""))
-        if str(
-                replica) == "1" and env.replica_counts[
-                    env.sweepdir_items.index(label)
-        ] == 1:
+
+        # Set the correct path for job output
+        if str(replica) == "1" and \
+                env.replica_counts[env.sweepdir_items.index(label)] == 1:
             env.dirPath = os.path.join(
-                env.results_path, run_name, "RUNS", label)
+                env.results_path, run_name, "RUNS", label
+            )
         else:
             env.dirPath = os.path.join(
-                env.results_path, run_name, "RUNS", f"{label}_{replica}")
-        env.task_model = getattr(env, "task_model", "default")
-        env.PJ_cores = getattr(env, "PJ_cores", env.get("cores", 1))
+                env.results_path, run_name, "RUNS", f"{label}_{replica}"
+            )
+
+        # Set core count for task
+        env.PJ_cores = env.cpuspertask
+
+        # Generate the task description from template
         script_content = script_template_content("qcg-PJ-task-template")
         task_blocks.append(script_content)
-        rich_print(f"[INFO] Created {len(task_blocks)} task descriptions.")
 
+    rich_print(f"[INFO] Created {len(task_blocks)} task descriptions")
+
+    # Indent and join all task blocks for the QCG manager script
     env.JOB_DESCRIPTIONS = textwrap.indent("\n".join(task_blocks), "    ")
 
     # Create a temporary working directory for QCG runtime files
     qcg_tmp_dir = Path(env.tmp_scripts_path) / "QCG"
     qcg_tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    # Prepare the scripts for QCG TaskDescription
+    # Prepare and generate the QCG manager Python script
     qcg_local_py = qcg_tmp_dir / f"qcg_manager_{run_name}.py"
-
-    # Render the QCG manager Python script using the template
     qcg_manager_content = script_template_content("qcg-PJ-py")
-
-    # Write the QCG manager script to the temporary directory
     with open(qcg_local_py, "w") as f:
         f.write(qcg_manager_content)
     os.chmod(qcg_local_py, 0o755)
@@ -1532,45 +1552,37 @@ def run_qcg():
     env.qcg_remote_dir = Path(env.results_path) / run_name / "QCG"
     run("mkdir -p {}".format(env.qcg_remote_dir))
     env.qcg_remote_py = str(
-        Path(
-            env.qcg_remote_dir) /
-        f"qcg_manager_{run_name}.py")
+        Path(env.qcg_remote_dir) / f"qcg_manager_{run_name}.py"
+    )
 
-    # Create submit script
+    # Create SLURM submission script
     qcg_local_sh = qcg_tmp_dir / f"qcg_submit_{run_name}.sh"
     env.qcg_remote_sh = Path(env.qcg_remote_dir) / f"qcg_submit_{run_name}.sh"
 
-    # Create run_QCG_PilotJob command
+    # Define command to run QCG-PilotJob manager
     PJ_CMD = []
     PJ_CMD.append("# Run the QCG manager script")
     PJ_CMD.append(f"python3 {env.qcg_remote_py}")
-
-    # Store in env for SLURM template
     env.run_QCG_PilotJob = "\n".join(PJ_CMD)
 
     # Set job_results to the QCG remote directory for this run
     env.job_results = env.qcg_remote_dir
 
-    # Render the QCG submit bash script using the template
+    # Render the QCG submit bash script (SLURM header)
     qcg_submit_content = script_template_content("archer2-PJ-header")
-
-    print(f"env.job_results: {env.job_results}")
-
-    # Write the QCG submit script to the temporary directory
     with open(qcg_local_sh, "w") as f:
         f.write(qcg_submit_content)
     os.chmod(qcg_local_sh, 0o755)
 
-    # Sync all results (including QCG scripts) to the remote QCG directory
+    # Sync all QCG files to the remote QCG directory
     rsync_project(
         local_dir=str(qcg_tmp_dir) + "/",
         remote_dir=str(env.qcg_remote_dir) + "/",
     )
 
-    # Submit the QCG job using the submission wrapper script
+    # Submit the QCG job to the scheduler
     job_submission(dict(job_script=env.qcg_remote_sh))
-
-    rich_print("[INFO] QCG-PJ submission complete")
+    rich_print("[INFO] QCG-PilotJob job submitted successfully")
 
 
 def input_to_range(arg, default):
@@ -2153,7 +2165,7 @@ def direct_install_app(name="", venv="True"):
         rich_print(
             Panel.fit(
                 f"{name} installation completed successfully in "
-                f"{'venv' if venv.lower() == 'true' else 'user space'}.",
+                f"{'venv' if venv.lower() == 'true' else 'user space'}",
                 title="[green]Installation Success[/green]",
                 border_style="green",
             )

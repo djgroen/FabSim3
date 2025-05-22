@@ -5,114 +5,92 @@ Controls the execution of tasks through QCG-PilotJob
 """
 import logging
 import sys
-import traceback
+import time
 
 from qcg.pilotjob.api.job import Jobs
 from qcg.pilotjob.api.manager import LocalManager
 
-# Set up logging
+# Set up logging with WARNING level for most logs
+# Only our direct logger will use INFO
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.WARNING,  # Change the base level to WARNING
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
+# Create our logger with a higher level
+logger = logging.getLogger("QCG_Manager")
+logger.setLevel(logging.INFO)
+
+# Record start time for performance tracking
+start_time = time.time()
+
 try:
-    # Initialize QCG-PilotJob manager
-    logging.info("Initializing QCG-PilotJob LocalManager")
-    manager = LocalManager()
-        
-    # Print available resources
+    # Initialize QCG-PilotJob manager with more controlled logging
+    logger.info("Initializing QCG-PilotJob manager with nodes=${QCG_PJ_NODES}, cores=${QCG_PJ_TOTAL_CORES}")
+    manager = LocalManager(cfg={
+        'log_level': 'error',
+        'log_file': 'qcg_service.log',
+        'report_format': 'json',
+        'scheduler': {
+            'constraints': {
+                'nodes': ${QCG_PJ_NODES},
+                'cores': ${QCG_PJ_TOTAL_CORES},
+                'binding': False  # Disable strict core binding to avoid mismatch
+            }
+        },
+        'show_progress': True,
+        'enable_proc_stats': False,
+        'enable_rt_stats': False,
+        'system_core': False,  # Explicitly inform about hyperthreaded cores
+    })
+    
+    # Verify detected resources
     resources = manager.resources()
-    logging.info(f"Available resources: {resources}")
+    logger.info(f"Detected resources: {resources.get('total_cores', 'N/A')} cores, "
+                f"{resources.get('nodes', 'N/A')} nodes")
 
-    # Create jobs collection
+    # Create jobs collection and add tasks
     jobs = Jobs()
-
-    # Add all task jobs from FabSim3
-    logging.info("Adding job descriptions to QCG-PilotJob")
-
-    # TASK DESCRIPTION BLOCK START - DO NOT MODIFY THESE LINES
+    
+    # TASK DESCRIPTION BLOCK START
 $JOB_DESCRIPTIONS
     # TASK DESCRIPTION BLOCK END
 
-    # Submit jobs and get their IDs
-    logging.info("Submitting jobs to QCG-PilotJob")
-    try:
-        ids = manager.submit(jobs)
-        logging.info(f"Submitted {len(ids)} jobs: {ids}")
-    except Exception as submit_error:
-        logging.error(f"Error submitting jobs: {str(submit_error)}")
-        logging.error(traceback.format_exc())
-        raise
-
-    # Wait for all jobs to complete
-    logging.info("Waiting for jobs to complete...")
-    try:
-        manager.wait4(ids)
-    except Exception as wait_error:
-        logging.error(f"Error waiting for jobs: {str(wait_error)}")
-        logging.error(traceback.format_exc())
-        raise
+    # Submit all jobs to QCG-PilotJob
+    logger.info("Submitting jobs to QCG-PilotJob")
+    ids = manager.submit(jobs)
     
-    # Get job information
-    try:
-        job_info = manager.info(ids)
-        logging.info("Jobs completed with the following details:")
-        for job_id, details in job_info.items():
-            status = details.get('status', 'UNKNOWN')
-            exit_code = details.get('exit_code', 'N/A')
-            logging.info(f"Job {job_id}: Status={status}, Exit Code={exit_code}")
-    except Exception as info_error:
-        logging.error(f"Error getting job info: {str(info_error)}")
-        logging.error(traceback.format_exc())
-
-    try:
-        total_core_seconds = 0
-        for details in job_info.values():
-            cores = details.get('resources', {}).get('cores', 0)
-            start = details.get('start_time')
-            end = details.get('end_time')
-
-            if isinstance(start, (int, float)) and isinstance(end, (int, float)):
-                duration = end - start
-                total_core_seconds += duration * cores
-
-        core_hours = total_core_seconds / 3600
-        logging.info(f"Estimated total core-hours used: {core_hours:.2f}")
-    except Exception as e:
-        logging.warning(f"Failed to compute core-hours: {e}")
+    # Count number of job IDs
+    job_count = len(ids) if ids else 0
+    logger.info(f"Submitted {job_count} jobs")
     
-    # Clean up
-    logging.info("All jobs completed, shutting down QCG-PilotJob manager")
-    try:
-        manager.finish()
-    except Exception as cleanup_error:
-        logging.error(f"Error during cleanup: {str(cleanup_error)}")
-        logging.error(traceback.format_exc())
+    # Wait for jobs with periodic status updates
+    logger.info("Waiting for jobs to complete...")
+    completion_start = time.time()
+    manager.wait4(ids, timeout=3600)  # 1 hour timeout
+    completion_time = time.time() - completion_start
     
-    # Final status report
-    try:
-        for job_id, details in job_info.items():
-            logging.info(f"DEBUG: Job {job_id} info: {details}")
-
-        finished_statuses = {'SUCCEED', 'FINISHED', 'COMPLETED', 'DONE'}
-        success_count = 0
-        for job in job_info.values():
-            data = job.get('data', {})
-            status = str(data.get('status', '')).upper()
-            exit_code = str(data.get('runtime', {}).get('exit_code', ''))
-            if status in finished_statuses and exit_code == '0':
-                success_count += 1
-
-        logging.info(f"Summary: {success_count}/{len(job_info)} tasks completed successfully")
-    except Exception as summary_error:
-        logging.error(f"Error generating summary: {str(summary_error)}")
-        logging.error(traceback.format_exc())
-        exit(1)
-
+    # Get job summary statistics - but don't log the full response
+    logger.info(f"Execution statistics:")
+    logger.info(f"- Total runtime: {time.time() - start_time:.2f} seconds")
+    logger.info(f"- Job execution time: {completion_time:.2f} seconds")
+    
+    # Explicitly finish the manager and exit
+    logger.info("Shutting down QCG-PilotJob manager")
+    manager.finish()
+        
 except Exception as e:
-    logging.error(f"Error in QCG-PilotJob execution: {str(e)}")
-    logging.error(traceback.format_exc())
+    logger.error(f"Error in QCG-PilotJob execution: {str(e)}")
+    if hasattr(e, '__traceback__'):
+        import traceback
+        logger.error(traceback.format_exc())
+    
+    # Try to clean up if manager exists
+    if 'manager' in locals():
+        try:
+            manager.finish()
+        except:
+            pass
+    
     sys.exit(1)
-

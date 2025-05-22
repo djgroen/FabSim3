@@ -327,24 +327,56 @@ Task prioritization is valuable when some simulations produce results needed by 
 
 ### Advanced Resources Handling
 
-QCG-PilotJob offers sophisticated resource management capabilities when executing on HPC systems. You can control how resources are allocated to individual tasks within your ensemble:
+QCG-PilotJob offers resource management capabilities when executing on HPC systems. You can control how resources are allocated to individual tasks within your ensemble:
 
-#### Controlling Nodes and Cores
+#### Controlling Cores and Nodes
 
-You can specify the number of nodes and cores per task:
+FabSim3 primarily uses cores as the main resource configuration parameter, with node allocation derived from this value. This approach allows users to think in terms of computational requirements rather than physical hardware allocation.
+
+When you specify cores in FabSim3, the system automatically calculates the appropriate number of nodes based on the machine's configuration:
+
 
 ```sh
-fabsim <remote_machine> dummy_ensemble:dummy_test,PJ_nodes=1,PJ_cores=4,PJ_TYPE=qcg,venv=true
+fabsim <remote_machine> dummy_ensemble:dummy_test,upsample="d1",replicas=256,corers=256,PJ_TYPE=qcg,venv=true
 ```
 
-This assigns 4 cores on 1 node to each task in your ensemble. You can adjust these values based on your application's parallelization needs.
+In this example:
+
+- 256 cores are requested for the entire job
+- FabSim3 automatically calculates that 2 nodes are needed on ARCHER2 (where each node has 128 cores)
+- The QCG-PilotJob manager receives both the total core count and node count
+
+The actual conversion from cores to nodes happens using the corespernode value specified in your machine configuration:
+
+```sh
+archer2:
+  # Other settings...
+  cores: 256              # Total cores requested
+  corespernode: 128       # Fixed value for ARCHER2 (128 cores/node)
+```
+
+With these settings, FabSim3 will request ⌈cores ÷ corespernode⌉ = ⌈256 ÷ 128⌉ = 2 nodes from the scheduler.
+
+#### Overriding Node Allocation
+
+While core-based allocation is the default approach, you can explicitly control node allocation when necessary:
+
+```sh
+fabsim <remote_machine> dummy_ensemble:dummy_test,upsample="d1",replicas=256,nodes=2,corespertask=4,PJ_TYPE=qcg,venv=true
+```
+
+This will:
+
+- Request a total of 256 cores (2 nodes on ARCHER2)
+- Allocate 4 cores to each individual task
+- Allow QCG-PilotJob to schedule up to 64 concurrent tasks
 
 #### Memory Allocation
 
 For memory-intensive applications, you can specify memory requirements:
 
 ```sh
-fabsim <remote_machine> dummy_ensemble:dummy_test,PJ_memory=4GB,PJ_TYPE=qcg,venv=true
+fabsim <remote_machine> dummy_ensemble:dummy_test,memory=4GB,PJ_TYPE=qcg,venv=true
 ```
 
 This ensures each task receives at least 4GB of memory.
@@ -354,10 +386,10 @@ This ensures each task receives at least 4GB of memory.
 To manage execution time, you can set specific time limits for the overall job:
 
 ```sh
-fabsim <remote_machine> dummy_ensemble:dummy_test,job_wall_time=1:00:00,PJ_TYPE=qcg,venv=true
+fabsim <remote_machine> dummy_ensemble:dummy_test,job_wall_time=23:59:59,PJ_TYPE=qcg,venv=true
 ```
 
-This sets a one-hour time limit for the entire ensemble job.
+This sets a 24-hour time limit for the entire ensemble job.
 
 ### Fetching and Examining Results
 

@@ -99,11 +99,5 @@ env = _lookupDict(
         "radical_PJ_header": os.path.join(
             fabsim_root, "deploy", "templates", "radical-PJ-header"
         ),
-        "PJ_PYheader": os.path.join(
-            fabsim_root, "deploy", "templates", "PJ-PYheader"
-            ),
-        "PJ_header": os.path.join(
-            fabsim_root, "deploy", "templates", "PJ-header"
-            )
     }
 )
