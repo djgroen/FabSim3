@@ -2031,10 +2031,10 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         rich_print(
             Panel.fit(
                 f"Found existing virtual environment at: {venv_path}\n\n"
-                f"In machines_user.yml, under '{env.machine_name}' section:\n\n"
+                f"In machines_user.yml, under '{env.machine_name}':\n\n"
                 f"  add virtual_env_path: \"{venv_path}\"\n\n"
                 f"After updating machines_user.yml, install applications:\n"
-                f"  fabsim {env.machine_name} install_app:QCG-PilotJob,venv=True",
+                f"  using direct_install_app and (QCG-PilotJob,venv=True)",
                 title="[green]Existing Virtual Environment Found[/green]",
                 border_style="green",
             )
@@ -2062,7 +2062,7 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
 
         # Check if Python and venv module are available
         if ! python3 -m venv --help >/dev/null 2>&1; then
-            echo "ERROR: Python venv module is not available on {env.remote}"
+            echo "ERROR: Python venv is not available on {env.remote}"
             echo "Please ensure the correct Python module is loaded"
             exit 1
         fi
@@ -2105,11 +2105,11 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
 @task
 def direct_install_app(name="", venv="True"):
     """
-    Install a Python application in a virtual environment on a remote machine.
+    Install a Python application in a virtual env on a remote machine.
 
     Args:
         name (str): Name of the package to install (e.g., "QCG-PilotJob")
-        venv (str): Whether to use a virtual environment ("True" or "False")
+        venv (str): Whether to use a virtual env ("True" or "False")
     """
     update_environment()
 
@@ -2127,7 +2127,7 @@ def direct_install_app(name="", venv="True"):
         if not hasattr(env, "virtual_env_path") or not env.virtual_env_path:
             rich_print("[INFO] Creating a new virtual environment...")
             env.virtual_env_path = create_virtual_env()
-        rich_print(f"[INFO] Using virtual environment: {env.virtual_env_path}")
+        rich_print(f"[INFO] Using virtual env: {env.virtual_env_path}")
 
     # 2 & 3. Activate virtual env and install the application directly
     rich_print(f"[INFO] Installing {name}...")
