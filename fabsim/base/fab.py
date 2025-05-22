@@ -1334,10 +1334,9 @@ def run_ensemble(
         if pilot_job_fn:
             pilot_job_fn()
         else:
+            supported_types = ', '.join(pj_dispatch.keys())
             raise RuntimeError(
-                f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported are: {
-                    ', '.join(
-                        pj_dispatch.keys())}")
+                f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported are: {supported_types}")
     else:
         env.submit_job = True  # Prepare and submit jobs
         job_args = dict(
@@ -1486,7 +1485,7 @@ def run_qcg():
 
     # Create run name from job name template
     run_name = env.job_name_template_sh[:-3]
-    
+
     print(f"PJ_cores from env: {getattr(env, 'PJ_cores', 'Not found')}")
 
     # Python's indexes start at zero, to start from 1, set start=1
@@ -1505,7 +1504,7 @@ def run_qcg():
             env.dirPath = os.path.join(
                 env.results_path, run_name, "RUNS", f"{label}_{replica}")
         env.task_model = getattr(env, "task_model", "default")
-        env.PJ_cores = getattr(env, "PJ_cores", env.get("cores", 1)) 
+        env.PJ_cores = getattr(env, "PJ_cores", env.get("cores", 1))
         script_content = script_template_content("qcg-PJ-task-template")
         task_blocks.append(script_content)
         rich_print(f"[INFO] Created {len(task_blocks)} task descriptions.")
