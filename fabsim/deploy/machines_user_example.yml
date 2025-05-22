@@ -13,12 +13,7 @@ default:
 
 localhost:
   username: <your-username>
-  partition_name: "standard"
-  qos_name: "short"
-  runtime: 10
-  nodes: 1
-  ranks: 1
-  cores_per_rank : 1
+  virtual_env_path: ~/FabSim3/VirtualEnv
 
 supermuc2:
   username: ab12cde
@@ -34,7 +29,6 @@ bluejoule:
   project: ABC012
   namd_exec: /gpfs/packages/ibm/namd/2.9/bin/namd2
   ensemble_dir: rep0/replicas
- 
 
 qcg:
   username: <your-username>
@@ -57,13 +51,18 @@ archer2:
   job_wall_time: '0-00:10:00'
   job_dispatch: 'sbatch'
   partition_name: "standard"
-  qos_name: "short"
+  qos_name: "standard"
   runtime: 10
-  nodes: 1
+  # SLURM job allocation (outer)
+  nodes: 1  
+  cores: 128
+  # QCG task allocation (inner)
+  PJ_nodes: 1
+  PJ_cores: 4
+  # Radical task allocation (inner)
   ranks: 1
-  cores_per_rank : 1
-  virtual_env_path: "/work/<your-project>/<your-project>/<your-username>/location/where/VirtualEnv/already/installed" #install python virtual environment (inc. required modules) on archer2.
-  run_prefix_commands: ["export PYTHONUSERBASE=/work/<your-project>/<your-project>/<your-username>/.local", "export PATH=$PYTHONUSERBASE/bin:$PATH", "export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH"] #This may not be needed if you have this in your archer2 .bashrc file instead. 
+  cores_per_rank: 4
+  virtual_env_path: /work/<budget>/<project>/<username>/VirtualEnv
  
 marenostrum4:
   username: pr1emk01
@@ -82,5 +81,3 @@ training_hidalgo:
 myriad:
   username: <your-UCL-ID>
   workdir: <specify-a-work-dir>
-
-

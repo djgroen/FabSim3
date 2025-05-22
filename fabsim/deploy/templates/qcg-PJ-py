@@ -3,12 +3,12 @@
 FabSim3 QCG-PilotJob manager script - automatically generated
 Controls the execution of tasks through QCG-PilotJob
 """
-import sys
 import logging
+import sys
 import traceback
 
-from qcg.pilotjob.api.manager import LocalManager
 from qcg.pilotjob.api.job import Jobs
+from qcg.pilotjob.api.manager import LocalManager
 
 # Set up logging
 logging.basicConfig(
