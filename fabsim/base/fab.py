@@ -2031,12 +2031,10 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         rich_print(
             Panel.fit(
                 f"Found existing virtual environment at: {venv_path}\n\n"
-                f"In machines_user.yml, under the '{
-                    env.machine_name}' section:\n\n"
+                f"In machines_user.yml, under '{env.machine_name}' section:\n\n"
                 f"  add virtual_env_path: \"{venv_path}\"\n\n"
                 f"After updating machines_user.yml, install applications:\n"
-                f"  fabsim {
-                    env.machine_name} install_app:QCG-PilotJob,venv=True",
+                f"  fabsim {env.machine_name} install_app:QCG-PilotJob,venv=True",
                 title="[green]Existing Virtual Environment Found[/green]",
                 border_style="green",
             )
