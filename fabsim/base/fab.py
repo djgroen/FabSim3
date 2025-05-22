@@ -1982,8 +1982,7 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
     if hasattr(env, "virtual_env_path") and env.virtual_env_path:
         rich_print(
             Panel.fit(
-                f"Virtual environment path is already set: {
-                    env.virtual_env_path}",
+                f"venv path is already set: {env.virtual_env_path}",
                 title="[blue]Using Configured Virtual Environment[/blue]",
                 border_style="blue",
             ))
