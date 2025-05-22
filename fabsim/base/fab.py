@@ -1335,8 +1335,10 @@ def run_ensemble(
             pilot_job_fn()
         else:
             supported_types = ', '.join(pj_dispatch.keys())
-            raise RuntimeError(
-                f"[ERROR] Unsupported PJ_TYPE '{pj_type}'. Supported are: {supported_types}")
+            error_prefix = f"[ERROR] Unsupported PJ_TYPE '{pj_type}'."
+            error_suffix = f"Supported types are: {supported_types}"
+            error_message = f"{error_prefix} {error_suffix}"
+            raise RuntimeError(error_message)
     else:
         env.submit_job = True  # Prepare and submit jobs
         job_args = dict(
@@ -2030,9 +2032,9 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         rich_print(
             Panel.fit(
                 f"Found existing virtual environment at: {venv_path}\n\n"
-                f"Add the following to your machines_user.yml under the '{
+                f"In machines_user.yml, under the '{
                     env.machine_name}' section:\n\n"
-                f"  virtual_env_path: \"{venv_path}\"\n\n"
+                f"  add virtual_env_path: \"{venv_path}\"\n\n"
                 f"After updating machines_user.yml, install applications:\n"
                 f"  fabsim {
                     env.machine_name} install_app:QCG-PilotJob,venv=True",
@@ -2061,9 +2063,9 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         # Ensure directory exists
         mkdir -p {machine_config['base_path']}
 
-        # Check if Python 3 and venv module are available
+        # Check if Python and venv module are available
         if ! python3 -m venv --help >/dev/null 2>&1; then
-            echo "ERROR: Python 3 venv module is not available on {env.remote}"
+            echo "ERROR: Python venv module is not available on {env.remote}"
             echo "Please ensure the correct Python module is loaded"
             exit 1
         fi
