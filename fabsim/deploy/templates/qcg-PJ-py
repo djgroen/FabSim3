@@ -1,27 +1,96 @@
-from qcg.appscheduler.api.manager import Manager
-from qcg.appscheduler.api.manager import LocalManager
-from qcg.appscheduler.api.job import Jobs
+#!/usr/bin/env python3
+"""
+FabSim3 QCG-PilotJob manager script - automatically generated
+Controls the execution of tasks through QCG-PilotJob
+"""
+import logging
+import sys
+import time
 
-m = LocalManager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
-# m = Manager(cfg={'log_level': 'DEBUG'}, server_args=['--log', 'debug'])
+from qcg.pilotjob.api.job import Jobs
+from qcg.pilotjob.api.manager import LocalManager
 
+# Set up logging with WARNING level for most logs
+# Only our direct logger will use INFO
+logging.basicConfig(
+    level=logging.WARNING,  # Change the base level to WARNING
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
-# get available resources
-print("available resources:\n%s\n" % str(m.resources()))
+# Create our logger with a higher level
+logger = logging.getLogger("QCG_Manager")
+logger.setLevel(logging.INFO)
 
-# submit jobs and save their names in 'ids' list
-jobs = Jobs()
+# Record start time for performance tracking
+start_time = time.time()
 
-$submitted_jobs_list
+try:
+    # Initialize QCG-PilotJob manager with more controlled logging
+    logger.info("Initializing QCG-PilotJob manager with nodes=${QCG_PJ_NODES}, cores=${QCG_PJ_TOTAL_CORES}")
+    manager = LocalManager(cfg={
+        'log_level': 'error',
+        'log_file': 'qcg_service.log',
+        'report_format': 'json',
+        'scheduler': {
+            'constraints': {
+                'nodes': ${QCG_PJ_NODES},
+                'cores': ${QCG_PJ_TOTAL_CORES},
+                'binding': False  # Disable strict core binding to avoid mismatch
+            }
+        },
+        'show_progress': True,
+        'enable_proc_stats': False,
+        'enable_rt_stats': False,
+        'system_core': False,  # Explicitly inform about hyperthreaded cores
+    })
+    
+    # Verify detected resources
+    resources = manager.resources()
+    logger.info(f"Detected resources: {resources.get('total_cores', 'N/A')} cores, "
+                f"{resources.get('nodes', 'N/A')} nodes")
 
-ids = m.submit(jobs)
+    # Create jobs collection and add tasks
+    jobs = Jobs()
+    
+    # TASK DESCRIPTION BLOCK START
+$JOB_DESCRIPTIONS
+    # TASK DESCRIPTION BLOCK END
 
-# wait until submited jobs finish
-m.wait4(ids)
-
-# get detailed information about submited and finished jobs
-print("jobs details:\n%s\n" % str(m.info(ids)))
-
-m.finish()
-m.stopManager()
-m.cleanup()
+    # Submit all jobs to QCG-PilotJob
+    logger.info("Submitting jobs to QCG-PilotJob")
+    ids = manager.submit(jobs)
+    
+    # Count number of job IDs
+    job_count = len(ids) if ids else 0
+    logger.info(f"Submitted {job_count} jobs")
+    
+    # Wait for jobs with periodic status updates
+    logger.info("Waiting for jobs to complete...")
+    completion_start = time.time()
+    manager.wait4(ids, timeout=3600)  # 1 hour timeout
+    completion_time = time.time() - completion_start
+    
+    # Get job summary statistics - but don't log the full response
+    logger.info(f"Execution statistics:")
+    logger.info(f"- Total runtime: {time.time() - start_time:.2f} seconds")
+    logger.info(f"- Job execution time: {completion_time:.2f} seconds")
+    
+    # Explicitly finish the manager and exit
+    logger.info("Shutting down QCG-PilotJob manager")
+    manager.finish()
+        
+except Exception as e:
+    logger.error(f"Error in QCG-PilotJob execution: {str(e)}")
+    if hasattr(e, '__traceback__'):
+        import traceback
+        logger.error(traceback.format_exc())
+    
+    # Try to clean up if manager exists
+    if 'manager' in locals():
+        try:
+            manager.finish()
+        except:
+            pass
+    
+    sys.exit(1)
