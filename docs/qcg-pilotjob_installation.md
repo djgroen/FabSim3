@@ -391,6 +391,16 @@ fabsim <remote_machine> dummy_ensemble:dummy_test,job_wall_time=23:59:59,PJ_TYPE
 
 This sets a 24-hour time limit for the entire ensemble job.
 
+#### Assigning Multiple Processes for Ensemble
+
+The parameter `nb_process` is used to provide more processing power for job script generation. FabSim3 creates a worker pool with max size of 5 to process scripts faster. For large ensemble jobs, we recommend setting this parameter in the command:
+
+```sh
+fabsim <remote_machine> dummy_ensemble:dummy_test,nb_process=4,upsample="d1;d2",replicas="512;512",cores=1024,PJ_TYPE=qcg,venv=true
+```
+
+This makes sure, at least `4 processes` are involved in script generation.
+
 ### Fetching and Examining Results
 
 After your job completes, you can fetch and analyze the results:

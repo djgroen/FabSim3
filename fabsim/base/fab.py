@@ -1,9 +1,11 @@
 import math
 import os
 import re
+import time
 import subprocess
 import tempfile
 import textwrap
+import threading
 from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
@@ -641,8 +643,6 @@ def job(*job_args):
 
     print("Submit tasks to multiprocessingPool : start ...")
 
-    print("args", args)
-
     if "replica_start_number" in args:
         if isinstance(args["replica_start_number"], list):
             env.replica_start_number = list(
@@ -686,8 +686,37 @@ def job(*job_args):
 
     print("Submit tasks to multiprocessingPool : done ...")
 
+    # Add a progress indicator during waiting
+    total_tasks = sum(env.replica_counts)
+    print(f"Preparing {total_tasks} job scripts...")
+
+    def progress_indicator():
+        """Display a simple progress indicator while waiting."""
+        chars = ["|", "/", "-", "\\"]
+        count = 0
+        while not progress_indicator.done:
+            print(
+                f"\rGenerating job scripts... {chars[count % 4]} ",
+                end="",
+                flush=True
+            )
+            count += 1
+            time.sleep(0.5)
+        print("\rJob preparation complete!                   ")
+
+    progress_indicator.done = False
+    indicator_thread = threading.Thread(target=progress_indicator)
+    indicator_thread.daemon = True
+    indicator_thread.start()
+
     # Processing nested job scripts
-    job_scripts_nested = POOL.wait_for_tasks()
+    try:
+        job_scripts_nested = POOL.wait_for_tasks()
+    finally:
+        # Ensure we always stop the progress indicator
+        progress_indicator.done = True
+        indicator_thread.join()
+
     job_scripts_to_submit = []
     job_script_info = {}
     for sublist in job_scripts_nested:
