@@ -686,10 +686,6 @@ def job(*job_args):
 
     print("Submit tasks to multiprocessingPool : done ...")
 
-    # Add a progress indicator during waiting
-    total_tasks = sum(env.replica_counts)
-    print(f"Preparing {total_tasks} job scripts...")
-
     def progress_indicator():
         """Display a simple progress indicator while waiting."""
         chars = ["|", "/", "-", "\\"]

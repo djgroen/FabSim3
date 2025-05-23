@@ -108,8 +108,6 @@ class MultiProcessingPool:
         # effectively cleaning up the pool
         self.Pool.join()
 
-        print("All tasks are finished ...")
-
         results = [task.get() for task in self.Pool_tasks]
 
         # make Pool_tasks empty list
