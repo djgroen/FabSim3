@@ -1,22 +1,36 @@
 import os
+import sys
 from typing import List
 
 import radical.pilot as rp
 
 # Create a working directory
-os.environ['RADICAL_CONFIG_USER_DIR'] = '${sandbox}'
-os.environ['RADICAL_PILOT_BASE'] = '${sandbox}'
+os.environ['RADICAL_CONFIG_USER_DIR'] = '${RP_PILOT_SANDBOX}'
+os.environ['RADICAL_PILOT_BASE'] = '${RP_PILOT_SANDBOX}'
+
+# CRITICAL FIX: Set PSI/J work directory before importing/using PSI/J
+os.environ['PSIJ_WORK_DIR'] = '${RP_PILOT_SANDBOX}/.psij'
+os.environ['PSIJ_CONFIG_HOME'] = '${RP_PILOT_SANDBOX}/.psij/config'
+
+# Ensure the PSI/J directories exist
+import pathlib
+psij_work_dir = pathlib.Path('${RP_PILOT_SANDBOX}/.psij')
+psij_work_dir.mkdir(parents=True, exist_ok=True)
+(psij_work_dir / 'config').mkdir(exist_ok=True)
+
+print(f"INFO: PSI/J work directory set to: {psij_work_dir}")
 
 # for debug purposes
 os.environ['RADICAL_LOG_LVL'] = 'DEBUG'
 os.environ['RADICAL_REPORT']  = 'TRUE'
 
 # convert hostname into RP style platform ID (i.e., platform label)
-def get_platform_ids(hostname:str) -> List[str]:
+def get_platform_ids(hostname: str) -> List[str]:
     platform_cfgs = rp.utils.get_resource_configs()
     facilities = list(platform_cfgs)
     for skip_facility in ['debug', 'local']:
-        facilities.remove(skip_facility)
+        if skip_facility in facilities:
+            facilities.remove(skip_facility)
     output = []
     for facility in facilities:
         for platform in platform_cfgs[facility]:
@@ -28,8 +42,14 @@ def get_platform_ids(hostname:str) -> List[str]:
     return output
 
 def main():
+    # Verify PSI/J directories before starting
+    print(f"INFO: PSI/J work directory exists: {os.path.exists(os.environ['PSIJ_WORK_DIR'])}")
+    print(f"INFO: PSI/J work directory writable: {os.access(os.environ['PSIJ_WORK_DIR'], os.W_OK)}")
+    
     platform_ids = get_platform_ids('${remote}')
     platform_id = 'local.localhost' if not platform_ids else platform_ids[0]
+    
+    print(f"INFO: Using platform ID: {platform_id}")
 
     session = rp.Session()
     pmgr    = rp.PilotManager(session=session)
@@ -37,31 +57,49 @@ def main():
 
     pd_init = {
         'resource' : platform_id,
-        'project'  : '${project}',
-        'queue'    : '${partition_name}:${qos_name}',
-        'runtime'  : ${runtime},
-        'nodes'    : ${nodes},
-        'sandbox'  : '${sandbox}'
+        'account'  : '${RP_PROJECT_ID}',
+        'queue'    : '${RP_QUEUE_NAME}',
+        'runtime'  : ${RP_RUNTIME},
+        'nodes'    : ${RP_PJ_NODES},
+        'cores_per_node': ${RP_PJ_CORES_PER_NODE},
+        'gpus_per_node': 0,
+        'sandbox'  : '${RP_PILOT_SANDBOX}'
     }
+    
+    print(f"INFO: Submitting pilot with configuration: {pd_init}")
     pilot = pmgr.submit_pilots(rp.PilotDescription(pd_init))
     tmgr.add_pilots(pilot)
+    print("INFO: Pilot submitted and added to task manager")
 
-    task_descriptions = ${task_descriptions}
+    # ===== TASK DESCRIPTIONS GENERATION =====
+    all_task_descriptions = []
+${JOB_DESCRIPTIONS}
+    # ===== END TASK DESCRIPTIONS GENERATION =====
+    
+    print(f"INFO: Collected {len(all_task_descriptions)} total task descriptions")
 
-    task_description_scripts = []
-    for task_desc in task_descriptions:
-        task_description_scripts.append(rp.TaskDescription({
-            'executable'     : task_desc,
-            'arguments'      : [],
-            'pre_exec'       : [],
-            'ranks'          : ${ranks},
-            'cores_per_rank' : ${cores_per_rank},
-            'sandbox'        : '${sandbox}'
-        }))
-    tmgr.submit_tasks(task_description_scripts)
+    if all_task_descriptions:
+        print(f"INFO: Submitting {len(all_task_descriptions)} tasks to RADICAL-Pilot...")
+        
+        if len(all_task_descriptions) > 0:
+            first_task = all_task_descriptions[0]
+            print(f"INFO: First task - executable: {first_task.executable}, ranks: {first_task.ranks}, cores_per_rank: {first_task.cores_per_rank}")
+        
+        tmgr.submit_tasks(all_task_descriptions)
+        print("INFO: Tasks submitted. Waiting for completion...")
+        tmgr.wait_tasks()
+        print("INFO: All tasks completed.")
+        
+        for i, task in enumerate(tmgr.tasks):
+            print(f"INFO: Task {i+1}: {task.state} - {task.executable}")
+            
+    else:
+        print("WARNING: No valid tasks to submit to RADICAL-Pilot.")
 
-    tmgr.wait_tasks()
+    print("INFO: Closing RADICAL-Pilot session...")
     session.close(download=True)
+    print("INFO: Session closed successfully.")
 
 if __name__ == '__main__':
     main()
+    

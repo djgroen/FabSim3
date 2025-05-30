@@ -1,20 +1,75 @@
-#QCG note=FabSim_PJ_QCG
+#!/bin/bash
+#SBATCH --job-name=qcg_pj_${config}
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --cpus-per-task=$cpuspertask
 
-#QCG host=eagle
-#QCG queue=$queue
-#QCG nodes=$PJ_size:$cores
-#QCG walltime=$PJ_wall_time
-#QCG grant=$budget
-#QCG memory=$total_mem
+## wall time in format MINUTES:SECONDS
+#SBATCH --time=$job_wall_time
 
-#QCG output=$job_results/$${JOB_ID}.output
-#QCG error=$job_results/$${JOB_ID}.error
+## grant
+#SBATCH --account=$budget
 
-#QCG stage-in-file=$PJ_PATH
-#QCG stage-out-dir=.->$job_results/eagle.wd.$${JOB_ID}
+## stdout file
+#SBATCH --output=$job_results/JobID-%j.output
 
-##QCG application=qcg-pm-client
-#QCG application=qcg-pm-api/master-3.7.3
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
 
-#QCG argument=$PJ_FileName
+## Set the initial working directory
+#SBATCH --chdir=$job_results
 
+#SBATCH --partition=$partition_name
+#SBATCH --qos=$qos_name
+
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
+
+# Important for QCG-PilotJob to be aware of SLURM allocation
+export SLURM_NTASKS=$((SLURM_JOB_NUM_NODES * SLURM_NTASKS_PER_NODE))
+export QCG_PJ_NODES=$SLURM_JOB_NUM_NODES
+export QCG_PJ_CORES_PER_NODE=$SLURM_NTASKS_PER_NODE
+
+# Make SLURM allocation visible to QCG-PilotJob
+export QCG_PM_SRUN_CORES=$SLURM_NTASKS
+export QCG_PM_SRUN_NODES=$SLURM_JOB_NUM_NODES
+
+# Python environment and Radical-PilotJob setup
+if [ -d "$virtual_env_path" ]; then
+  echo "INFO: Activating virtual environment: $virtual_env_path"
+  source "$virtual_env_path/bin/activate"
+  
+  # Check if Radical-PilotJob is already installed
+  if python3 -c "import radical.pilot" 2>/dev/null; then
+    echo "INFO: Radical-PilotJob is already installed in virtual environment."
+    python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+  else
+    echo "INFO: Radical-PilotJob not found in virtual environment. Attempting installation..."
+    
+    # Attempt to install Radical-PilotJob
+    # Use job_results (which should be in /work) instead of SLURM_SUBMIT_DIR for cache
+    export PIP_CACHE_DIR="$job_results/.pip_cache_rp"
+    mkdir -p "$PIP_CACHE_DIR"
+    echo "INFO: Using PIP_CACHE_DIR: $PIP_CACHE_DIR"
+    
+    # When installing into an active virtual environment, --user is not needed.
+    pip3 install radical.pilot
+    
+    # Verify installation
+    if python3 -c "import radical.pilot" 2>/dev/null; then
+      echo "INFO: Radical-PilotJob installed successfully in virtual environment."
+      python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+    else
+      echo "ERROR: Failed to install or import Radical-PilotJob after attempting installation."
+      echo "Please ensure Radical-PilotJob can be installed (check pip, network, package availability) or is pre-installed in '$virtual_env_path'."
+      exit 1
+    fi
+  fi
+else
+  echo "ERROR: Virtual environment path does not exist: $virtual_env_path"
+  echo "Please ensure the virtual environment is correctly specified and accessible."
+  exit 1
+fi
+
+## Execute QCG-PilotJob
+$run_QCG_PilotJob

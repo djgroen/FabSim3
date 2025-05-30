@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=qcg_pj_${config}
+#SBATCH --job-name=pj_${config}
 #SBATCH --nodes=$nodes
 #SBATCH --ntasks-per-node=$corespernode
 #SBATCH --cpus-per-task=$cpuspertask
@@ -25,55 +25,5 @@
 # Set the number of threads to 1 (prevents automatic threading)
 export OMP_NUM_THREADS=1
 
-# Important for QCG-PilotJob to be aware of SLURM allocation
+# Important for pilot job to be aware of SLURM allocation
 export SLURM_NTASKS=$((SLURM_JOB_NUM_NODES * SLURM_NTASKS_PER_NODE))
-export QCG_PJ_NODES=$SLURM_JOB_NUM_NODES
-export QCG_PJ_CORES_PER_NODE=$SLURM_NTASKS_PER_NODE
-
-# Make SLURM allocation visible to QCG-PilotJob
-export QCG_PM_SRUN_CORES=$SLURM_NTASKS
-export QCG_PM_SRUN_NODES=$SLURM_JOB_NUM_NODES
-
-# Python environment and QCG-PilotJob setup
-if [ -d "$virtual_env_path" ]; then
-  echo "Activating virtual environment: $virtual_env_path"
-  source "$virtual_env_path/bin/activate"
-  
-  # Check if QCG-PilotJob is already installed
-  if python3 -c "import qcg.pilotjob" 2>/dev/null; then
-    echo "QCG-PilotJob is already installed"
-    python3 -c "import qcg.pilotjob; print('QCG-PilotJob version:', getattr(qcg.pilotjob, '__version__', 'unknown'))"
-  else
-    echo "QCG-PilotJob not found in virtual environment"
-    
-    # Test network connectivity before trying to install
-    if ping -c 1 -W 2 pypi.org > /dev/null 2>&1; then
-      echo "Network connectivity available, installing QCG-PilotJob"
-      export PIP_CACHE_DIR="$SLURM_SUBMIT_DIR/.pip_cache"
-      mkdir -p "$PIP_CACHE_DIR"
-      pip3 install --user qcg-pilotjob
-    else
-      echo "ERROR: No network connectivity and QCG-PilotJob not installed"
-      echo "Please install QCG-PilotJob in your virtual environment before submitting jobs"
-      exit 1
-    fi
-  fi
-else
-  echo "virtual_env_path not found, falling back to module system"
-  module load cray-python
-  export PYTHONUSERBASE="$HOME/.local"
-  export PATH="$PYTHONUSERBASE/bin:$PATH"
-  export PYTHONPATH="$PYTHONUSERBASE/lib/python3.9/site-packages:$PYTHONPATH"
-  
-  # Check if QCG-PilotJob is available
-  if ! python3 -c "import qcg.pilotjob" 2>/dev/null; then
-    echo "WARNING: QCG-PilotJob not available in system Python"
-    echo "Attempting to install locally (may fail if no network connectivity)"
-    export PIP_CACHE_DIR="$SLURM_SUBMIT_DIR/.pip_cache"
-    mkdir -p "$PIP_CACHE_DIR"
-    pip3 install --no-cache-dir --user qcg-pilotjob
-  fi
-fi
-
-## Execute QCG-PilotJob
-$run_QCG_PilotJob

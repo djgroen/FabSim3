@@ -1,0 +1,12 @@
+# Task block ${idsID}
+task_descriptions_${idsID} = ${task_descriptions}
+
+for task_desc in task_descriptions_${idsID}:
+    all_task_descriptions.append(rp.TaskDescription({
+        'executable'     : task_desc,
+        'arguments'      : [],
+        'pre_exec'       : [],
+        'ranks'          : 1,
+        'cores_per_rank' : ${cores_per_rank}
+    }))
+

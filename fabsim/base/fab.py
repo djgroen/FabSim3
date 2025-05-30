@@ -844,16 +844,23 @@ def job_preparation(*job_args):
                     )
                 )
 
-        # this is a tricky situation,
-        # in case of ensemble runs, or simple job, we need to add env.label
-        # to generated job script name,
-        # however, for PJ_PYheader and PJ_header header script, nothing should
-        # be added at the end of script file name, so, here we pass a empty
-        # string as label
-        if hasattr(env, "NoEnvScript") and env.NoEnvScript:
-            tmp_job_script = script_templates(env.batch_header)
+        # Handle PilotJob vs Traditional job script generation
+        if hasattr(env, "PJ_TYPE"):
+            # PilotJob mode: Different logic for headers vs task scripts
+            if hasattr(env, "NoEnvScript") and env.NoEnvScript:
+                # This is a PilotJob header script (qcg-PJ-header)
+                # These DO need SLURM headers since they're the main scripts
+                tmp_job_script = script_templates(env.batch_header)
+            else:
+                # This is a PilotJob task script
+                # These should NOT have SLURM headers
+                tmp_job_script = script_templates("bash_header", env.script)
         else:
-            tmp_job_script = script_templates(env.batch_header, env.script)
+            # Traditional FabSim3 mode: All scripts get SLURM headers
+            if hasattr(env, "NoEnvScript") and env.NoEnvScript:
+                tmp_job_script = script_templates(env.batch_header)
+            else:
+                tmp_job_script = script_templates(env.batch_header, env.script)
 
         # Separate base from extension
         base, extension = os.path.splitext(env.pather.basename(tmp_job_script))
@@ -876,7 +883,7 @@ def job_preparation(*job_args):
             script_path = env.pather.join(env.job_results, dst_script_name)
         return_job_scripts.append((script_path, (env.label, str(i))))
 
-        # Store mapping for QCG
+        # Store mapping for QCG/RADICAL
         env.job_script_info[script_path] = (env.label, str(i))
 
         copy(tmp_job_script, dst_job_script)
@@ -888,14 +895,9 @@ def job_preparation(*job_args):
         os.makedirs(tmp_job_results, exist_ok=True)
         copy(dst_job_script, env.pather.join(tmp_job_results, dst_script_name))
 
-        # TODO: these env variables are not used anywhere
-        # TODO: maybe it is better to remove them
-        # job_name_template_sh
-        # job_results_contents
-        # job_results_contents_local
         with open(
-            env.pather.join(tmp_job_results, "env.yml"
-                            ), "w") as env_yml_file:
+            env.pather.join(tmp_job_results, "env.yml"), "w"
+        ) as env_yml_file:
             yaml.dump(
                 dict(
                     env,
@@ -1378,118 +1380,163 @@ def run_ensemble(
         rich_print("[INFO] Ensemble submission complete")
 
 
-def run_radical(job_scripts_to_submit: list, venv="False"):
+def run_radical():
+    """
+    Submit RADICAL-Pilot jobs using generated job scripts.
+    """
     rich_print(
         Panel.fit(
-            "NOW, we are submitting RADICAL-Pilot Jobs",
+            "NOW, we are submitting RADICAL-PilotJobs",
             title="[orange_red1]PJ job submission phase[/orange_red1]",
             border_style="orange_red1",
         )
     )
+    update_environment()
 
-    # Set task model to default
-    if not hasattr(env, "task_model"):
-        env.task_model = "default"
+    # Get SLURM resource parameters from configuration
+    env.corespernode = getattr(env, "corespernode", 128)
+    env.cpuspertask = getattr(env, "cpuspertask", 1)
+    # Calculate nodes through standard FabSim3 method (cores/corespernode)
+    calc_nodes()
 
-    # Create a temprary working directory for Radical runtime files
-    local_working_dir = path.join(
-        env.tmp_results_path, "radical_{}_{}_{}".format(
-            env.config, env.machine_name, env.cores
-        )
+    # Calculate total available resources
+    env.total_cores = env.nodes * env.corespernode
+
+    # Set RADICAL-Pilot specific parameters
+    env.RP_PJ_NODES = env.nodes
+    env.RP_PJ_CORES_PER_NODE = env.corespernode
+    env.RP_PJ_TOTAL_CORES = env.total_cores
+    env.RP_PJ_CORES_PER_TASK = getattr(env, "corespertask", env.cpuspertask)
+    env.RP_PJ_GPUS_PER_TASK = getattr(env, "gpuspertask", 0)
+    env.task_model = getattr(env, "task_model", "default")
+
+    # RADICAL-Pilot specific configurations
+    env.RP_PROJECT_ID = getattr(env, "project", None)
+    env.RP_PARTITION_NAME = getattr(env, "partition", "standard")
+    env.RP_QUEUE_NAME = getattr(env, "queue", "standard")
+    env.RP_RUNTIME = getattr(env, "runtime", 30)
+
+    # Display resource configuration
+    rich_print(Panel.fit(
+        f"[SLURM Resources]\n"
+        f"Nodes: {env.nodes}\n"
+        f"Cores per node: {env.corespernode}\n"
+        f"CPUs per task: {env.cpuspertask}\n"
+        f"Total cores: {env.total_cores}\n\n"
+        f"[Radical-PJ Resources]\n"
+        f"RP_PJ_NODES: {env.RP_PJ_NODES}\n"
+        f"RP_PJ_CORES_PER_NODE: {env.RP_PJ_CORES_PER_NODE}\n"
+        f"RP_PJ_TOTAL_CORES: {env.RP_PJ_TOTAL_CORES}",
+        title="[bold blue]Radical-PilotJob Configuration[/bold blue]",
+        border_style="blue"
+    ))
+
+    # Retrieve the job scripts to submit
+    job_scripts_to_submit = getattr(env, "job_scripts_to_submit", [])
+    if not job_scripts_to_submit:
+        raise RuntimeError("[ERROR] No job scripts found to submit")
+
+    print(f"[INFO] Found {job_scripts_to_submit} job scripts to submit")
+
+    # Create run name from job name template (consistent with run_qcg)
+    run_name = env.job_name_template_sh[:-3]
+
+    # Generate task descriptions for each job using the template approach
+    # This follows the exact same pattern as run_qcg()
+    task_blocks = []
+    for index, job_script in enumerate(job_scripts_to_submit, start=1):
+        env.idsID = index
+        env.idsPath = job_script
+
+        # Set RADICAL-specific task parameters for the template
+        env.task_descriptions = [env.idsPath]
+        env.ranks = 1
+        env.cores_per_rank = env.RP_PJ_CORES_PER_TASK
+        # NOTE: No individual sandbox - all tasks use the pilot's shared
+
+        # Generate the task description block using the template
+        script_content = script_template_content("radical-PJ-task-template")
+        task_blocks.append(script_content)
+
+    rich_print(f"[INFO] Created {len(task_blocks)} RADICAL-Pilot tasks")
+
+    # Indent and join all task blocks for the RADICAL manager script (like QCG)
+    env.JOB_DESCRIPTIONS = textwrap.indent("\n".join(task_blocks), "    ")
+
+    # Create a temporary working directory for RADICAL-Pilot runtime files
+    rp_tmp_dir = Path(env.tmp_scripts_path) / "RP"
+    rp_tmp_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create the unified sandbox directory for the entire RADICAL-Pilot session
+    # This follows the RADICAL experts' recommendation
+    env.rp_remote_dir = Path(env.results_path) / run_name / "RP"
+    run("mkdir -p {}".format(env.rp_remote_dir))
+    env.rp_remote_py = str(
+        Path(env.rp_remote_dir) / f"rp_manager_{run_name}.py"
     )
-    remote_working_dir = path.join(
-        env.results_path, "radical_{}_{}_{}".format(
-            env.config, env.machine_name, env.cores
-        )
-    )
-    os.makedirs(local_working_dir, exist_ok=True)
 
-    # Prepare the environment for Radical TaskDescription
-    task_descriptions = []
-    for index, task_script in enumerate(job_scripts_to_submit, start=1):
-        env.update(
-            {
-                "task_name": f"{env.get('task_name_prefix', 'task')}.{index}",
-                "executable": task_script,
-            }
-        )
-        task_descriptions.append(task_script)
+    # Define the PILOT's unified sandbox directory
+    env.RP_PILOT_SANDBOX = str(env.rp_remote_dir)
 
-    # Prepare the environment for Radical pd_init
-    env.update(
-        {
-            "task_descriptions": task_descriptions,
-            "sandbox": remote_working_dir,
-        }
-    )
+    # Create the RADICAL resource configuration directory structure
+    # (following your original approach)
+    sandbox_resources_path = rp_tmp_dir / ".radical" / "pilot" / "configs"
+    sandbox_resources_path.mkdir(parents=True, exist_ok=True)
 
-    # Locate and copy the radical resources script to the sandbox directory
+    # Handle resource configuration file in the proper RADICAL directory
     radical_resources_content = script_template_content("radical-resources")
-    sandbox_resources_path = path.join(
-        local_working_dir, ".radical", "pilot", "configs"
-    )
-    os.makedirs(sandbox_resources_path, exist_ok=True)
-    with open(
-        path.join(sandbox_resources_path, "resource_fabsim.json"), "w"
-    ) as f:
+    local_rp_config_path = sandbox_resources_path / "resource_fabsim.json"
+    with open(local_rp_config_path, "w") as f:
         f.write(radical_resources_content)
 
-    # Generate the radical-PJ-py script using the template
-    radical_script_content = script_template_content("radical-PJ-py")
-    radical_script_name = "{}_{}_{}_radical.py".format(
-        env.config, env.machine_name, env.cores
+    # Prepare and generate the RADICAL-Pilot main Python script
+    rp_local_py = rp_tmp_dir / f"rp_manager_{run_name}.py"
+    rp_pilot_script_content = script_template_content("radical-PJ-py")
+    with open(rp_local_py, "w") as f:
+        f.write(rp_pilot_script_content)
+    os.chmod(rp_local_py, 0o755)
+
+    # Create SLURM submission script
+    rp_local_sh = rp_tmp_dir / f"rp_submit_{run_name}.sh"
+    env.rp_remote_sh = Path(env.rp_remote_dir) / f"rp_submit_{run_name}.sh"
+
+    # Define command to run RADICAL-Pilot script
+    PJ_CMD = []
+    PJ_CMD.append("# Run the Radical manager script")
+    PJ_CMD.append(f"python3 {env.rp_remote_py}")
+    env.run_radical_PilotJob = "\n".join(PJ_CMD)
+
+    # Set job_results to the RP remote directory for this run
+    env.job_results = env.rp_remote_dir
+
+    # Render the RP submit bash script (SLURM header)
+    rp_submit_content = script_template_content("radical-PJ-header")
+    with open(rp_local_sh, "w") as f:
+        f.write(rp_submit_content)
+    os.chmod(rp_local_sh, 0o755)
+
+    # Sync all RP files (pilot script, resource config, SLURM script)
+    rsync_project(
+        local_dir=str(rp_tmp_dir) + "/",
+        remote_dir=str(env.rp_remote_dir) + "/",
     )
-    radical_local_script_path = path.join(
-        local_working_dir, radical_script_name
-    )
-    radical_remote_script_path = path.join(
-        remote_working_dir, radical_script_name
-    )
 
-    # Create a temporary local file with the radical script content
-    with open(radical_local_script_path, "w") as f:
-        f.write(radical_script_content)
-
-    # Transfer Radical configuration script to remote machine
-    local(
-        template(
-            "rsync -pthrvz {}/ $username@$remote:{}/".format(
-                local_working_dir, remote_working_dir
-            )
-        )
-    )
-
-    # Construct the run_Radical_PilotJob command
-    RP_CMD = []
-    if hasattr(env, "venv") and str(env.venv).lower() == "true":
-        RP_CMD.append("# Activate the virtual environment")
-        RP_CMD.append(f"source {env.virtual_env_path}/bin/activate\n")
-
-    RP_CMD.append("# Check if Job is installed")
-    RP_CMD.append(
-        "python3 -c 'import radical.pilot' 2>/dev/null || "
-        "pip3 install --upgrade radical.pilot\n"
-    )
-    RP_CMD.append("# Python command for task submission")
-    RP_CMD.append(f"python3 {radical_remote_script_path}\n")
-
-    env.run_Radical_PilotJob = "\n".join(RP_CMD)
-
-    # Avoid apply replicas functionality on PilotJob folders
-    env.replicas = "1"
-    backup_header = env.batch_header
-    env.batch_header = env.radical_PJ_header
-    env.submit_job = True
-
-    job(dict(ensemble_mode=False, label="radical-PJ-header", NoEnvScript=True))
-    env.batch_header = backup_header
-    env.NoEnvScript = False
+    # Submit the RP pilot job (via the SLURM script) to the scheduler
+    job_submission(dict(job_script=str(env.rp_remote_sh)))
+    rich_print("[INFO] RADICAL-Pilot job submitted successfully")
 
 
 def run_qcg():
     """
     Submit QCG Pilot jobs using generated job scripts.
     """
+    rich_print(
+        Panel.fit(
+            "NOW, we are submitting QCG-PilotJobs",
+            title="[orange_red1]PJ job submission phase[/orange_red1]",
+            border_style="orange_red1",
+        )
+    )
     update_environment()
     # Get SLURM resource parameters from configuration
     # Note: set cores in machines_user.yml to determine correct node count
@@ -1594,7 +1641,7 @@ def run_qcg():
     env.job_results = env.qcg_remote_dir
 
     # Render the QCG submit bash script (SLURM header)
-    qcg_submit_content = script_template_content("archer2-PJ-header")
+    qcg_submit_content = script_template_content("qcg-PJ-header")
     with open(qcg_local_sh, "w") as f:
         f.write(qcg_submit_content)
     os.chmod(qcg_local_sh, 0o755)
@@ -1846,7 +1893,9 @@ def install_app(name="", external_connexion="no", venv="False"):
         local(
             template(
                 "rsync -pthrvz -e 'ssh -p $port'  {}/{} "
-                "$username@$remote:$app_repository".format(tmp_app_dir, whl)
+                "$username@$remote:$app_repository".format(
+                    tmp_app_dir, whl
+                )
             )
         )
 
