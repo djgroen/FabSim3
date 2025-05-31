@@ -1356,6 +1356,9 @@ def run_ensemble(
         pj_dispatch = {
             "rp": run_radical,
             "qcg": run_qcg,
+            "slurm-array": run_slurm_array,
+            "slurm-manager": run_slurm_manager,
+            "slurm": run_slurm_manager,
         }
         pilot_job_fn = pj_dispatch.get(pj_type)
         if pilot_job_fn:
@@ -1655,6 +1658,221 @@ def run_qcg():
     # Submit the QCG job to the scheduler
     job_submission(dict(job_script=env.qcg_remote_sh))
     rich_print("[INFO] QCG-PilotJob job submitted successfully")
+
+
+def run_slurm_array():
+    """
+    Submit native SLURM job array using generated job scripts.
+    """
+    rich_print(
+        Panel.fit(
+            "NOW, we are submitting SLURM Job Arrays",
+            title="[blue]SLURM Array job submission phase[/blue]",
+            border_style="blue",
+        )
+    )
+
+    # Standard FabSim3 environment and resource calculation
+    update_environment()
+    calc_nodes()
+
+    # SLURM Array specific parameters
+    env.SLURM_ARRAY_CORES_PER_TASK = getattr(env, "cpuspertask", 1)
+    env.SLURM_ARRAY_MAX_CONCURRENT = getattr(env, "max_concurrent", 50)
+
+    # Display resource configuration (following QCG pattern)
+    rich_print(Panel.fit(
+        f"[SLURM Resources]\n"
+        f"Nodes: {env.nodes}\n"
+        f"Cores per node: {env.corespernode}\n"
+        f"[SLURM Array Resources]\n"
+        f"Array size: {len(getattr(env, 'job_scripts_to_submit', []))}\n"
+        f"Max concurrent: {env.SLURM_ARRAY_MAX_CONCURRENT}\n"
+        f"Cores per task: {env.SLURM_ARRAY_CORES_PER_TASK}",
+        title="[bold blue]SLURM Array Configuration[/bold blue]",
+        border_style="blue"
+    ))
+
+    # Get job scripts from run_ensemble (same as QCG)
+    job_scripts_to_submit = getattr(env, "job_scripts_to_submit", [])
+    if not job_scripts_to_submit:
+        raise RuntimeError("[ERROR] No job scripts found to submit")
+
+    # Create run name (following QCG pattern)
+    run_name = env.job_name_template_sh[:-3]
+
+    # Create task file (key difference from QCG - simpler!)
+    env.SLURM_ARRAY_SIZE = len(job_scripts_to_submit)
+
+    # Create temporary working directory (following QCG pattern)
+    array_tmp_dir = Path(env.tmp_scripts_path) / "SLURM_ARRAY"
+    array_tmp_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create task list file (core of SLURM array approach)
+    task_list_content = []
+    for index, job_script in enumerate(job_scripts_to_submit, start=1):
+        # Extract job information
+        label, replica = env.job_script_info.get(job_script, ("", ""))
+
+        # Set correct output path (following QCG pattern)
+        if str(replica) == "1" and \
+                env.replica_counts[env.sweepdir_items.index(label)] == 1:
+            output_dir = os.path.join(
+                env.results_path, run_name, "RUNS", label
+            )
+        else:
+            output_dir = os.path.join(
+                env.results_path, run_name, "RUNS", f"{label}_{replica}"
+            )
+
+        # Create task command (much simpler than QCG!)
+        task_cmd = f"cd {output_dir} && bash {job_script}"
+        task_list_content.append(task_cmd)
+
+    # Write task list file
+    task_list_file = array_tmp_dir / f"task_list_{run_name}.txt"
+    with open(task_list_file, "w") as f:
+        for task in task_list_content:
+            f.write(f"{task}\n")
+
+    # Set environment variables for template
+    env.array_remote_dir = Path(env.results_path) / run_name / "SLURM_ARRAY"
+    run("mkdir -p {}".format(env.array_remote_dir))
+    array_task_list_filename = f"task_list_{run_name}.txt"
+    array_task_list_path = Path(env.array_remote_dir)
+    array_task_list_path = array_task_list_path / array_task_list_filename
+    env.array_task_list = str(array_task_list_path)
+
+    # Create SLURM submission script (following QCG template pattern)
+    array_local_sh = array_tmp_dir / f"slurm_array_submit_{run_name}.sh"
+    array_sh_name = f"slurm_array_submit_{run_name}.sh"
+    env.array_remote_sh = Path(env.array_remote_dir) / array_sh_name
+
+    # Set job_results for template processing
+    env.job_results = env.array_remote_dir
+
+    # Generate SLURM array script using template
+    array_submit_content = script_template_content("slurm-array-PJ-header")
+    with open(array_local_sh, "w") as f:
+        f.write(array_submit_content)
+    os.chmod(array_local_sh, 0o755)
+
+    # Sync files to remote (following QCG pattern)
+    rsync_project(
+        local_dir=str(array_tmp_dir) + "/",
+        remote_dir=str(env.array_remote_dir) + "/",
+    )
+
+    # Submit the SLURM array job (following QCG pattern)
+    job_submission(dict(job_script=str(env.array_remote_sh)))
+    rich_print("[INFO] SLURM Array job submitted successfully")
+
+
+def run_slurm_manager():
+    """
+    Submit single SLURM job that internally manages multiple tasks.
+    Similar to QCG but without Python dependencies.
+    """
+    rich_print(
+        Panel.fit(
+            "NOW, we are submitting SLURM Manager Job",
+            title="[blue]SLURM Manager job submission phase[/blue]",
+            border_style="blue",
+        )
+    )
+
+    # Standard FabSim3 environment and resource calculation
+    update_environment()
+    calc_nodes()
+
+    # Get job scripts from run_ensemble
+    job_scripts_to_submit = getattr(env, "job_scripts_to_submit", [])
+    if not job_scripts_to_submit:
+        raise RuntimeError("[ERROR] No job scripts found to submit")
+
+    # Create run name
+    run_name = env.job_name_template_sh[:-3]
+
+    # SLURM Manager specific parameters
+    env.SLURM_MANAGER_CORES_PER_TASK = getattr(env, "cpuspertask", 1)
+    env.SLURM_MANAGER_MAX_CONCURRENT = getattr(env, "max_concurrent", 4)
+    env.SLURM_MANAGER_TOTAL_TASKS = len(job_scripts_to_submit)
+
+    # Display resource configuration
+    rich_print(Panel.fit(
+        f"[SLURM Resources]\n"
+        f"Nodes: {env.nodes}\n"
+        f"Cores per node: {env.corespernode}\n"
+        f"Total cores: {env.nodes * env.corespernode}\n\n"
+        f"[SLURM Manager Resources]\n"
+        f"Total tasks: {env.SLURM_MANAGER_TOTAL_TASKS}\n"
+        f"Max concurrent: {env.SLURM_MANAGER_MAX_CONCURRENT}\n"
+        f"Cores per task: {env.SLURM_MANAGER_CORES_PER_TASK}",
+        title="[bold blue]SLURM Manager Configuration[/bold blue]",
+        border_style="blue"
+    ))
+
+    # Create temporary working directory
+    manager_tmp_dir = Path(env.tmp_scripts_path) / "SLURM_MANAGER"
+    manager_tmp_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create task list file with full commands
+    task_list_content = []
+    for index, job_script in enumerate(job_scripts_to_submit, start=1):
+        label, replica = env.job_script_info.get(job_script, ("", ""))
+
+        # Set correct output path
+        if str(replica) == "1" and \
+                env.replica_counts[env.sweepdir_items.index(label)] == 1:
+            output_dir = os.path.join(
+                env.results_path, run_name, "RUNS", label
+            )
+        else:
+            output_dir = os.path.join(
+                env.results_path, run_name, "RUNS", f"{label}_{replica}"
+            )
+
+        # Create task command
+        task_cmd = f"cd {output_dir} && bash {job_script}"
+        task_list_content.append(task_cmd)
+
+    # Write task list file
+    task_list_file = manager_tmp_dir / f"task_list_{run_name}.txt"
+    with open(task_list_file, "w") as f:
+        for i, task in enumerate(task_list_content, 1):
+            f.write(f"{i}: {task}\n")
+
+    # Set environment variables for template
+    manager_remote_dir = Path(env.results_path) / run_name / "SLURM_MANAGER"
+    env.manager_remote_dir = manager_remote_dir
+    run("mkdir -p {}".format(env.manager_remote_dir))
+    task_list_filename = f"task_list_{run_name}.txt"
+    env.manager_task_list = Path(env.manager_remote_dir) / task_list_filename
+    env.manager_task_list = str(env.manager_task_list)
+
+    # Create SLURM submission script
+    manager_local_sh = manager_tmp_dir / f"slurm_manager_submit_{run_name}.sh"
+    manager_sh_name = f"slurm_manager_submit_{run_name}.sh"
+    env.manager_remote_sh = Path(env.manager_remote_dir) / manager_sh_name
+
+    # Set job_results for template processing
+    env.job_results = env.manager_remote_dir
+
+    # Generate SLURM manager script using template
+    manager_submit_content = script_template_content("slurm-manager-PJ-header")
+    with open(manager_local_sh, "w") as f:
+        f.write(manager_submit_content)
+    os.chmod(manager_local_sh, 0o755)
+
+    # Sync files to remote
+    rsync_project(
+        local_dir=str(manager_tmp_dir) + "/",
+        remote_dir=str(env.manager_remote_dir) + "/",
+    )
+
+    # Submit the SLURM manager job
+    job_submission(dict(job_script=str(env.manager_remote_sh)))
+    rich_print("[INFO] SLURM Manager job submitted successfully")
 
 
 def input_to_range(arg, default):

@@ -1,0 +1,66 @@
+#!/bin/bash
+#SBATCH --job-name=slurm_manager_${config}
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --cpus-per-task=1
+#SBATCH --time=$job_wall_time
+#SBATCH --account=$budget
+#SBATCH --partition=$partition_name
+#SBATCH --qos=$qos_name
+#SBATCH --output=$job_results/manager_%j.output
+#SBATCH --error=$job_results/manager_%j.error
+#SBATCH --chdir=$job_results
+
+# Activate virtual environment
+if [ -d "$virtual_env_path" ]; then
+  source "$virtual_env_path/bin/activate"
+fi
+
+# Simple task manager function
+run_task() {
+    local task_id=$1
+    local task_cmd=$(sed -n "${task_id}s/^[0-9]*: //p" $manager_task_list)
+    
+    echo "INFO: Starting task $task_id at $(date)"
+    echo "INFO: Command: $task_cmd"
+    
+    # Execute task and capture return code
+    eval $task_cmd
+    local ret_code=$?
+    
+    echo "INFO: Task $task_id completed with code $ret_code at $(date)"
+    return $ret_code
+}
+
+# Main execution
+echo "INFO: SLURM Manager starting at $(date)"
+echo "INFO: Managing $SLURM_MANAGER_TOTAL_TASKS tasks"
+echo "INFO: Max concurrent tasks: $SLURM_MANAGER_MAX_CONCURRENT"
+echo "INFO: Available cores: $((SLURM_NNODES * SLURM_NTASKS_PER_NODE))"
+
+# Simple parallel task execution using background processes
+active_jobs=0
+completed_tasks=0
+failed_tasks=0
+
+for task_id in $(seq 1 $SLURM_MANAGER_TOTAL_TASKS); do
+    # Wait if we've reached max concurrent tasks
+    while [ $active_jobs -ge $SLURM_MANAGER_MAX_CONCURRENT ]; do
+        wait -n  # Wait for any background job to complete
+        active_jobs=$((active_jobs - 1))
+        completed_tasks=$((completed_tasks + 1))
+        echo "INFO: Task completed. Active: $active_jobs, Completed: $completed_tasks"
+    done
+    
+    # Start new task in background
+    run_task $task_id &
+    active_jobs=$((active_jobs + 1))
+    echo "INFO: Started task $task_id. Active jobs: $active_jobs"
+done
+
+# Wait for all remaining tasks to complete
+echo "INFO: Waiting for final $active_jobs tasks to complete..."
+wait
+
+echo "INFO: SLURM Manager completed at $(date)"
+echo "INFO: All $SLURM_MANAGER_TOTAL_TASKS tasks finished"
