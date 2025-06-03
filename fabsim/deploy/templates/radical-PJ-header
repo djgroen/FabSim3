@@ -1,3 +1,101 @@
 #!/bin/bash
+#SBATCH --job-name=rp_${config}
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --cpus-per-task=$cpuspertask
 
-$run_Radical_PilotJob
+## wall time in format MINUTES:SECONDS
+#SBATCH --time=$job_wall_time
+
+## grant
+#SBATCH --account=$budget
+
+## stdout file
+#SBATCH --output=$job_results/JobID-%j.output
+
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
+
+## Set the initial working directory
+#SBATCH --chdir=$job_results
+
+#SBATCH --partition=$partition_name
+#SBATCH --qos=$qos_name
+
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
+
+# Important for Radical-PilotJob to be aware of SLURM allocation
+export SLURM_NTASKS=$((SLURM_JOB_NUM_NODES * SLURM_NTASKS_PER_NODE))
+export RP_PJ_NODES=$SLURM_JOB_NUM_NODES
+export RP_PJ_CORES_PER_NODE=$SLURM_NTASKS_PER_NODE
+
+# Make SLURM allocation visible to Radical-PilotJob
+export RP_PM_SRUN_CORES=$SLURM_NTASKS
+export RP_PM_SRUN_NODES=$SLURM_JOB_NUM_NODES
+
+# Use SLURM temporary directory for all temporary operations
+export TMPDIR=${SLURM_TMPDIR:-$job_results/tmp}
+export TMP=$TMPDIR
+export TEMP=$TMPDIR
+mkdir -p "$TMPDIR"
+
+# Override HOME-based paths to use /work directories
+export XDG_CACHE_HOME="$job_results/.cache"
+export XDG_CONFIG_HOME="$job_results/.config"
+export XDG_DATA_HOME="$job_results/.local/share"
+mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME"
+
+# Set pip cache to use /work-based directory
+export PIP_CACHE_DIR="$job_results/.pip_cache"
+mkdir -p "$PIP_CACHE_DIR"
+
+# Set RADICAL directories to use /work-based paths
+export RADICAL_CONFIG_USER_DIR="$job_results/.radical"
+export RADICAL_PILOT_BASE="$job_results/.radical"
+export RADICAL_BASE="$job_results/.radical"
+mkdir -p "$RADICAL_CONFIG_USER_DIR"
+
+# KEY FIX: Set PSI/J working directory to use /work instead of /home
+export PSIJ_WORK_DIR="$job_results/.psij"
+mkdir -p "$PSIJ_WORK_DIR"
+
+# Python environment and Radical-PilotJob setup
+if [ -d "$virtual_env_path" ]; then
+  echo "INFO: Activating virtual environment: $virtual_env_path"
+  source "$virtual_env_path/bin/activate"
+  
+  echo "INFO: Environment directories set to:"
+  echo "  TMPDIR: $TMPDIR"
+  echo "  PIP_CACHE_DIR: $PIP_CACHE_DIR"
+  echo "  RADICAL_CONFIG_USER_DIR: $RADICAL_CONFIG_USER_DIR"
+  echo "  PSIJ_WORK_DIR: $PSIJ_WORK_DIR"
+  
+  # Check if Radical-PilotJob is already installed
+  if python3 -c "import radical.pilot" 2>/dev/null; then
+    echo "INFO: Radical-PilotJob is already installed in virtual environment."
+    python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+  else
+    echo "INFO: Radical-PilotJob not found in virtual environment. Attempting installation..."
+    
+    echo "INFO: Using PIP_CACHE_DIR: $PIP_CACHE_DIR"
+    pip3 install radical.pilot
+    
+    # Verify installation
+    if python3 -c "import radical.pilot" 2>/dev/null; then
+      echo "INFO: Radical-PilotJob installed successfully in virtual environment."
+      python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+    else
+      echo "ERROR: Failed to install or import Radical-PilotJob after attempting installation."
+      echo "Please ensure Radical-PilotJob can be installed (check pip, network, package availability) or is pre-installed in '$virtual_env_path'."
+      exit 1
+    fi
+  fi
+else
+  echo "ERROR: Virtual environment path does not exist: $virtual_env_path"
+  echo "Please ensure the virtual environment is correctly specified and accessible."
+  exit 1
+fi
+
+## Execute RADICAL-PilotJob
+$run_radical_PilotJob

@@ -1,41 +1,45 @@
 # FabSim3 and RADICAL-Pilot Integration Documentation
 
 ## Introduction
+
 This documentation provides detailed instructions on how to configure, use, and troubleshoot the RADICAL-Pilot (RP) integration in FabSim3.
 
 ### Prerequisites
+
 - Python 3.6 or higher
 - RADICAL-Pilot
 - FabSim3
 
 ### Installing FabSim3 and RADICAL-Pilot
+
 1. **Set up and Activate your Python virtual environment (optional but recommended):**
-    ```bash
-    mkdir -p ~/workspace
-    cd ~/workspace
-    python3 -m venv VirtualEnv
-    source VirtualEnv/bin/activate
+```bash
+mkdir -p ~/workspace
+cd ~/workspace
+python3 -m venv VirtualEnv
+source VirtualEnv/bin/activate
     ```
 
 2. **Clone FabSim3 repository:**
-    ```bash
-    git clone https://github.com/djgroen/FabSim3.git
-    cd FabSim3
-    ```
+```bash
+git clone https://github.com/djgroen/FabSim3.git
+cd FabSim3
+```
 
 3. **Install FabSim3 dependencies:**
-    ```bash
-    python3 configure_fabsim.py
+```bash
+python3 configure_fabsim.py
     ```
 
 4. **Install RADICAL-Pilot:**
-    ```bash
-    fabsim <machine> install_app:RADICAL-Pilot,venv=True
-    ```
+```bash
+fabsim <machine> install_app:RADICAL-Pilot,venv=True
+```
 
 ## Configuration
 
 ### Example Parameters Configuration for RADICAL
+
 Although these parameters belong to RADICAL, not all of them need to be configured. The required ones are noted in the following section.
 
 ```yaml
@@ -53,6 +57,7 @@ sandbox: ''            # The working directory where job-related files will be s
 ```
 
 ### Adding RADICAL Parameters to machines_user.yml
+
 In your `machines_user.yml`, add the RADICAL-Pilot parameters under the appropriate machine section. For example, for `archer2`:
 
 ```yaml
@@ -70,7 +75,7 @@ archer2:
     - 'export PATH=$PYTHONUSERBASE/bin:$PATH'
     - 'export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH'
   partition_name: "standard" # RADICAL-Pilot partition name
-  qos_name: "short"          # RADICAL-Pilot qos name
+  qos_name: "standard"       # RADICAL-Pilot qos name
   runtime: 10                # RADICAL-Pilot runtime in minutes
   nodes: 1                   # RADICAL-Pilot nodes 
   ranks: 1                   # RADICAL-Pilot ranks 
@@ -80,30 +85,33 @@ archer2:
 ## Usage
 
 ### Running Jobs with RADICAL-Pilot
+
 To submit jobs using RADICAL-Pilot, use the PJ and PJ_TYPE arguments in your command. Here’s an example command to run an ensemble job with RADICAL-Pilot (RP):
 
 ```bash
-fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ=true,PJ_TYPE=RP,venv=true
+fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ_TYPE=RP,venv=true
 ```
 
 ### Running Specific Jobs with RADICAL-Pilot
+
 For running jobs like FabDummy in ensemble and replica mode:
 
 ```bash
-fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ=true,PJ_TYPE=RP,venv=true
+fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ_TYPE=RP,venv=true
 ```
 
 ## Troubleshooting
 
 ### Common Issues and Solutions
+
 1. Job Submission Fails Due to Time Limit:
 
     - Ensure that the job_wall_time is correctly set in the machines_user.yml file.
     - Check if the qos setting allows for the specified wall time.
 
-2. Missing or Incorrect 'PJ', 'PJ_TYPE' Argument:
+2. Missing or Incorrect 'PJ_TYPE' Argument:
 
-    - Ensure that you have included PJ=true and PJ_TYPE=RP or PJ_TYPE=QCG-PJ in your command.
+    - Ensure that you have included PJ_TYPE=RP in your command.
 
 3. Python Package Installation Issues:
 
@@ -118,7 +126,9 @@ python3 -c 'import radical.pilot' && echo "RADICAL-Pilot is installed." || echo 
 ```
 
 ## Contributing
+
 We welcome contributions to improve the RADICAL-Pilot integration in FabSim3. Please follow the standard GitHub pull request process.
 
 ## Contact
+
 For any questions or support, please contact FabSim3 Support.

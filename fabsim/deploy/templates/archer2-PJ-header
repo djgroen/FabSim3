@@ -1,10 +1,8 @@
 #!/bin/bash
-## slurm-archer2
-## number of nodes
-#SBATCH --nodes $PJ_size
-
-## task per node
-#SBATCH --tasks-per-node=$corespernode
+#SBATCH --job-name=pj_${config}
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --cpus-per-task=$cpuspertask
 
 ## wall time in format MINUTES:SECONDS
 #SBATCH --time=$job_wall_time
@@ -18,21 +16,14 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory
+#SBATCH --chdir=$job_results
+
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
-## create sub-directory to save output job log
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
 
-cd /work/$project/$project/$username/
-logJob_dir="tasks-log"
-if [ -d "$$logJob_dir" ]; then
-  rm -rf $$logJob_dir
-fi  
-mkdir $$logJob_dir
-
-$run_prefix
-
-## load QCG-PilotJob
-
-$run_QCG_PilotJob
-
+# Important for pilot job to be aware of SLURM allocation
+export SLURM_NTASKS=$((SLURM_JOB_NUM_NODES * SLURM_NTASKS_PER_NODE))

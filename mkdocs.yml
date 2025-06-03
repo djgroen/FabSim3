@@ -196,7 +196,9 @@ nav:
       - Advanced Topics : advanced_topics.md
       - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
-      - Remote QCG PilotJob Installation: qcg-pilotjob_installation.md
+      - Remote QCG PilotJob: qcg-pilot.md
+      - Remote SLURM PilotJob: slurm-pilot.md
+      - Remote RADICAL PilotJob: radical-pilot.md
       - Containerized versions : containerized_versions.md
       - Additional links : additional_links.md
       - Literature / cite us : FabSim3_Literature.md

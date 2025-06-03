@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=slurm_${config}
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --cpus-per-task=$SLURM_ARRAY_CORES_PER_TASK
+#SBATCH --time=$job_wall_time
+#SBATCH --account=$budget
+#SBATCH --partition=$partition_name
+#SBATCH --qos=$qos_name
+#SBATCH --array=1-$SLURM_ARRAY_SIZE%$SLURM_ARRAY_MAX_CONCURRENT
+
+#SBATCH --output=$job_results/TaskID_%A_%a.output
+#SBATCH --error=$job_results/TaskID_%A_%a.error
+#SBATCH --chdir=$job_results
+
+# Activate virtual environment (following existing pattern)
+if [ -d "$virtual_env_path" ]; then
+  source "$virtual_env_path/bin/activate"
+fi
+
+# Get task ID and execute corresponding task
+TASK_ID=$SLURM_ARRAY_TASK_ID
+TASK_CMD=$(sed -n "${TASK_ID}p" $array_task_list)
+
+echo "INFO: Executing task $TASK_ID: $TASK_CMD"
+eval $TASK_CMD
