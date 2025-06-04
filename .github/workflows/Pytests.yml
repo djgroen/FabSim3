@@ -18,16 +18,20 @@ jobs:
         os: [ "ubuntu-latest", "macOS-latest" ]
         python-version: [ "3.8", "3.9", "3.10", "3.11" ]
 
+    env:  # Define once for the whole job
+      PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
+      PYTHONPATH: ${{ github.workspace }}/fabsim
+
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }} 🐍
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup System & Info 💻
+      - name: Setup System & Info
         run: |
           python -c "from multiprocessing import cpu_count ; print('cpu_count={}'.format(cpu_count()))"
 
@@ -42,14 +46,14 @@ jobs:
               echo "***************************"
           fi
 
-          # Add useful paths to environment for next steps
+          # Add local pip binary path
           echo "PATH=$PATH:/Users/runner/.local/bin" >> $GITHUB_ENV
 
           python3 --version
           python --version
           ls -la ~
 
-      - name: Setup SSH 🔐
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           rm -f ~/.ssh/id_rsa || true
@@ -62,7 +66,7 @@ jobs:
             chmod o-w $HOME
           fi
 
-      - name: Install Python Dependencies 📥
+      - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade \
@@ -72,6 +76,7 @@ jobs:
             pep8 \
             pytest-timeout \
             rich \
+            numpy \
             beartype \
             fabric2 \
             PyYAML \
@@ -81,9 +86,9 @@ jobs:
         run: |
           python3 configure_fabsim.py
 
-          # Set environment variables for next steps
+          # Set environment variables for future steps (already handled in env block)
           echo "PATH=$(pwd)/fabsim/bin:$PATH" >> $GITHUB_ENV
-          echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+          echo "PYTHONPATH=$(pwd)/fabsim" >> $GITHUB_ENV
 
       - name: Debug plugin install directly
         run: |
@@ -92,24 +97,14 @@ jobs:
             cat ./fabsim/deploy/machines_user.yml || echo "Missing"
             exit 1
           }
-        env:
-          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
-          PYTHONPATH: ${{ github.workspace }}
 
       - name: Install FabDummy Plugin
-        env:
-          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
-          PYTHONPATH: ${{ github.workspace }}
         run: |
           fabsim localhost install_plugin:FabDummy
           pip freeze
 
-      - name: Test with pytest 🚀
-        env:
-          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
-          PYTHONPATH: ${{ github.workspace }}
+      - name: Test with pytest
         run: |
-          # Verify environment
           which fabsim || echo "fabsim not found in PATH"
           echo "PATH: $PATH"
           echo "PYTHONPATH: $PYTHONPATH"
@@ -117,8 +112,6 @@ jobs:
           python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
           pycodestyle fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
 
-      - name: Run isort 🚀
-        env:
-          PYTHONPATH: ${{ github.workspace }}
+      - name: Run isort
         run: |
           isort --profile hug --check --diff -l 80 fabsim/
