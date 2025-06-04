@@ -77,9 +77,8 @@ jobs:
 
       - name: Install Python Dependencies  📥
         run: |
-          python3 -m pip install --upgrade pip      
-          python3 -m pip install --upgrade ruamel.yaml pytest pycodestyle pep8 pytest-timeout rich
-          python3 -m pip install isort
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade ruamel.yaml pytest pycodestyle pep8 pytest-timeout rich beartype fabric isort
 
       - name: Setup FabSim  🚦🚦🚦
         run: |
