@@ -85,6 +85,17 @@ jobs:
           echo "PATH=$(pwd)/fabsim/bin:$PATH" >> $GITHUB_ENV
           echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
+      - name: Debug plugin install directly
+        run: |
+          fabsim localhost install_plugin:FabDummy || {
+            echo "FAILED - Dumping machines_user.yml:"
+            cat ./fabsim/deploy/machines_user.yml || echo "Missing"
+            exit 1
+          }
+        env:
+          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
+          PYTHONPATH: ${{ github.workspace }}
+
       - name: Install FabDummy Plugin
         env:
           PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}

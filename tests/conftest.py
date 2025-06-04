@@ -4,7 +4,6 @@ import subprocess
 
 @pytest.fixture
 def execute_cmd(request):
-    cmds = request.param.split()
     try:
         proc = subprocess.Popen(
             request.param,
@@ -13,15 +12,19 @@ def execute_cmd(request):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
-        (stdout, stderr) = proc.communicate()
+        stdout, _ = proc.communicate()
+        output = stdout.decode("utf-8")
     except Exception as e:
-        raise RuntimeError("Unexpected error: {}".format(e))
+        raise RuntimeError(f"Unexpected error while executing '{request.param}': {e}")
 
-    acceptable_err_subprocesse_ret_codes = [0]
-    if proc.returncode not in acceptable_err_subprocesse_ret_codes:
+    if proc.returncode != 0:
+        # Print stdout even if it fails, for CI visibility
+        print(f"Command output:\n{output}")
         raise RuntimeError(
-            "\njob execution encountered an error (return code {})"
-            "while executing '{}'".format(proc.returncode, request.param)
+            f"\njob execution encountered an error (return code {proc.returncode})"
+            f"\nwhile executing: '{request.param}'"
+            f"\n\nOutput:\n{output}"
         )
-    yield stdout.decode("utf-8")
+
+    yield output
     proc.terminate()
