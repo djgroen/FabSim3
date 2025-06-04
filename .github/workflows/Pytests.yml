@@ -82,12 +82,15 @@ jobs:
 
       - name: Setup FabSim  🚦🚦🚦
         run: |
+          # Configure FabSim3 first
           python3 configure_fabsim.py
+          
+          # Set environment variables for future steps
+          echo "PATH=$(pwd)/fabsim/bin:$PATH" >> $GITHUB_ENV
+          echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
-          echo "export PATH=$(pwd)/fabsim/bin:$PATH" >> ~/.bash_profile
-          echo "export PYTHONPATH=$(pwd):$PYTHONPATH" >> ~/.bash_profile
-          source ~/.bash_profile
-          fabsim localhost install_plugin:FabDummy
+      - name: Install FabDummy Plugin
+        run: |
           fabsim localhost install_plugin:FabDummy
           pip freeze
 
