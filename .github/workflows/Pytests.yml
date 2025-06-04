@@ -3,32 +3,31 @@ name: Run Tests
 on:
   push:
   pull_request:
-    branches: ["master"]   
+    branches: ["master"]
 
 env:
   PY_COLORS: 1
 
-  
 jobs:
   build:
-    name: Python ${{ matrix.python-version }}  ${{ matrix.os }}
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:        
+      matrix:
         os: [ "ubuntu-latest", "macOS-latest" ]
-        python-version: ["3.8", "3.9", "3.10", "3.11" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11" ]
 
     steps:
-      - name: Checkout  🛎️
-        uses: "actions/checkout@v2"    
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}  🐍
+      - name: Set up Python ${{ matrix.python-version }} 🐍
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup System & Info  💻
+      - name: Setup System & Info 💻
         run: |
           python -c "from multiprocessing import cpu_count ; print('cpu_count={}'.format(cpu_count()))"
 
@@ -38,25 +37,21 @@ jobs:
               echo "***************************"
           elif [ "$RUNNER_OS" == "Linux" ]; then
               echo "***************************"          
-              lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
-              lshw -short -C memory
+              lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\\(s\\)'
+              lshw -short -C memory || true  # lshw might not be installed
               echo "***************************"
           fi
 
-          if [ "$RUNNER_OS" == "macOS" ]; then
-              echo "export PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin" >> ~/.bash_profile
-              echo "export PATH=$PATH:/Users/runner/.local/bin >>" ~/.bash_profile
-              echo "sw_vers" >> ~/.bash_profile
-              source ~/.bash_profile
-              which ssh-copy-id
-          fi
-          echo "export PATH=$PATH:~/.local/bin/" >> ~/.bash_profile
-          source ~/.bash_profile
+          # Add useful paths to environment for next steps
+          echo "PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin" >> $GITHUB_ENV
+          echo "PATH=$PATH:/Users/runner/.local/bin" >> $GITHUB_ENV
+          echo "PATH=$PATH:~/.local/bin/" >> $GITHUB_ENV
+
           python3 --version
           python --version
-          ls -la ~/
+          ls -la ~
 
-      - name: Setup SSH  🔐
+      - name: Setup SSH 🔐
         run: |
           mkdir -p ~/.ssh
           rm -f ~/.ssh/id_rsa || true
@@ -66,40 +61,55 @@ jobs:
             chmod o-w ~/.ssh
           elif [ "$RUNNER_OS" == "Linux" ]; then
             chmod g-w $HOME
-            chmod o-w $HOME          
+            chmod o-w $HOME
           fi
 
-          # ssh-keygen -t rsa -b 4096 -C "$(whoami)@localhost" -f ~/.ssh/id_rsa
-          # cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-          # chmod og-wx ~/.ssh/authorized_keys
-          # ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-          # cat ~/.ssh/authorized_keys
-
-      - name: Install Python Dependencies  📥
+      - name: Install Python Dependencies 📥
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade ruamel.yaml pytest pycodestyle pep8 pytest-timeout rich beartype fabric2 PyYAML isort
+          python3 -m pip install --upgrade \
+            ruamel.yaml \
+            pytest \
+            pycodestyle \
+            pep8 \
+            pytest-timeout \
+            rich \
+            beartype \
+            fabric2 \
+            PyYAML \
+            isort
 
-      - name: Setup FabSim  🚦🚦🚦
+      - name: Setup FabSim 🚦
         run: |
-          # Configure FabSim3 first
           python3 configure_fabsim.py
-          
-          # Set environment variables for future steps
+
+          # Set environment variables for next steps
           echo "PATH=$(pwd)/fabsim/bin:$PATH" >> $GITHUB_ENV
           echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
       - name: Install FabDummy Plugin
+        env:
+          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          fabsim localhost install_plugin:FabDummy
+          ./fabsim/bin/fabsim localhost install_plugin:FabDummy
           pip freeze
 
       - name: Test with pytest 🚀
+        env:
+          PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          source ~/.bash_profile
+          # Verify environment
+          which fabsim || echo "fabsim not found in PATH"
+          echo "PATH: $PATH"
+          echo "PYTHONPATH: $PYTHONPATH"
+          
           python3 -m pytest --timeout=60 -vv --log-cli-level=10 tests/
           pycodestyle fabsim/base/ fabsim/deploy/ fabsim/lib/ fabsim/UQP/ fabsim/VVP/
 
       - name: Run isort 🚀
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           isort --profile hug --check --diff -l 80 fabsim/
