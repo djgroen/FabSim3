@@ -17,11 +17,6 @@ jobs:
       matrix:
         os: [ "ubuntu-latest", "macOS-latest" ]
         python-version: [ "3.8", "3.9", "3.10", "3.11" ]
-
-    env:  # Define once for the whole job
-      PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
-      PYTHONPATH: ${{ github.workspace }}/fabsim
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,6 +25,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Setup Environment Variables
+        run: |
+          echo "PATH=${{ github.workspace }}/fabsim/bin:$PATH" >> $GITHUB_ENV
+          echo "PYTHONPATH=${{ github.workspace }}/fabsim" >> $GITHUB_ENV
+          echo "PATH=$PATH:/Users/runner/.local/bin" >> $GITHUB_ENV
 
       - name: Setup System & Info
         run: |
@@ -42,12 +43,9 @@ jobs:
           elif [ "$RUNNER_OS" == "Linux" ]; then
               echo "***************************"          
               lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\\(s\\)'
-              lshw -short -C memory || true  # lshw might not be installed
+              lshw -short -C memory || true
               echo "***************************"
           fi
-
-          # Add local pip binary path
-          echo "PATH=$PATH:/Users/runner/.local/bin" >> $GITHUB_ENV
 
           python3 --version
           python --version
@@ -85,10 +83,6 @@ jobs:
       - name: Setup FabSim 🚦
         run: |
           python3 configure_fabsim.py
-
-          # Set environment variables for future steps (already handled in env block)
-          echo "PATH=$(pwd)/fabsim/bin:$PATH" >> $GITHUB_ENV
-          echo "PYTHONPATH=$(pwd)/fabsim" >> $GITHUB_ENV
 
       - name: Debug plugin install directly
         run: |
