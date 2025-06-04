@@ -13,7 +13,11 @@ default:
 
 localhost:
   username: <your-username>
-  virtual_env_path: $home_path/VirtualEnv
+  cores: 1              # Total cores user requests
+  corespernode: 1       # Local hardware: 4-8 cores/system
+  cpuspertask: 1        # Cores allocated per task
+  taskspernode: 1       # Tasks running per system
+  virtual_env_path: path/to/FabSim3/VirtualEnv
 
 supermuc2:
   username: ab12cde

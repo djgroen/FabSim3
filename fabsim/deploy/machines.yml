@@ -43,6 +43,11 @@ localhost:
   home_path_template: /home/$username
   manual_ssh: true
   batch_header: bash_header
+  cores: 1
+  corespernode: 1
+  cpuspertask: 1
+  taskspernode: 1
+  virtual_env_path: path/to/FabSim3/VirtualEnv
 
 cartesius:
   max_job_name_chars: 15
@@ -466,12 +471,7 @@ archer2:
   modules:
     all:
       - load cray-python
-  run_prefix_commands:
-    - export PYTHONUSERBASE=/work/$project/$project/$username/.local
-    - 'export PATH=$PYTHONUSERBASE/bin:$PATH'
-    - 'export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH'
-    - export SLURM_CPU_FREQ_REQ=2250000
-    - export ENV_DIR=/work/$project/$project/$username/VirtualEnv
+  run_prefix_commands: ""
 
 marenostrum4:
   stat: >-

@@ -128,7 +128,7 @@ Results include:
 - Individual task outputs in `RUNS/` subdirectories
 - `QCG_PILOT_OUT` file with execution details
 - SLURM job logs (`JobID-*.output`, `JobID-*.error`)
-- SLRUM logs (`qcg_service.log`, `nl-agent-*.log`)
+- QCG logs (`qcg_service.log`, `nl-agent-*.log`)
 
 ### Troubleshooting
 

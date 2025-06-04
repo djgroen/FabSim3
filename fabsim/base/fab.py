@@ -10,7 +10,6 @@ from pathlib import Path
 from pprint import pformat, pprint
 from shutil import copy, copyfile, rmtree
 
-import numpy as np
 from beartype import beartype
 from beartype.typing import Callable, Optional, Tuple, Union
 from rich import print as rich_print
@@ -1885,7 +1884,14 @@ def input_to_range(arg, default):
         if ttype == int:
             return range(*vals)
         else:
-            return np.arange(*vals)
+            # Pure Python implementation for float ranges
+            start, stop, step = vals
+            result = []
+            current = start
+            while current < stop:
+                result.append(ttype(current))
+                current += step
+            return result
     return [ttype(arg)]
 
 
