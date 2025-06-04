@@ -43,9 +43,7 @@ jobs:
           fi
 
           # Add useful paths to environment for next steps
-          echo "PATH=$PATH:/Users/runner/Library/Python/${{ matrix.python-version }}/bin" >> $GITHUB_ENV
           echo "PATH=$PATH:/Users/runner/.local/bin" >> $GITHUB_ENV
-          echo "PATH=$PATH:~/.local/bin/" >> $GITHUB_ENV
 
           python3 --version
           python --version
@@ -92,7 +90,7 @@ jobs:
           PATH: ${{ github.workspace }}/fabsim/bin:${{ env.PATH }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          ./fabsim/bin/fabsim localhost install_plugin:FabDummy
+          fabsim localhost install_plugin:FabDummy
           pip freeze
 
       - name: Test with pytest 🚀
