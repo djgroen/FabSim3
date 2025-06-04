@@ -5,6 +5,6 @@ jobs.add(
     stdout='${dirPath}/TaskID${idsID}_${uniq}.stdout',
     stderr='${dirPath}/TaskID${idsID}_${uniq}.stderr',
     wd='${dirPath}',
-    numCores={'exact': ${PJ_cores}},
+    numCores={'exact': ${cpuspertask}},
     model='${task_model}',
 )

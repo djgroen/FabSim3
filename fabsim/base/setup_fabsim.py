@@ -52,7 +52,7 @@ def install_plugin(plugin_name, branch=None):
     if env.host != "localhost":
         raise RuntimeError(
             "This task should be run on the localhost.\n"
-            f"Please run 'fabsim localhost install_plugin:{plugin_name}'"
+            "Please run 'fabsim localhost install_plugin:" + plugin_name + "'"
         )
 
     fname = path.join(env.fabsim_root, "deploy", "plugins.yml")
@@ -171,8 +171,8 @@ def get_clean_fabsim_dirs_string(prefix):
     performance overhead.
     """
     return (
-        f"rm -rf $config_path/{prefix}*; "
-        f"rm -rf $results_path/{prefix}*; "
+        f"rm -rf $config_path/{prefix}* && "
+        f"rm -rf $results_path/{prefix}* && "
         f"rm -rf $scripts_path/{prefix}*"
     )
 

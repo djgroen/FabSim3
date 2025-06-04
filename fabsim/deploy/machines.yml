@@ -19,7 +19,6 @@ default:
   work_path_template: $runtime_path/$fabric_dir
   batch_header: no_batch
   run_command: /usr/bin/mpirun
-#/home/bssn029/Documents/GitHub/FabSim3/mpirun -np $cores
   temp_path_template: /tmp
   job_desc: ''
   job_name_template: '${config}_${machine_name}_${cores}${job_desc}'
@@ -37,12 +36,14 @@ default:
   prevent_results_overwrite: ignore
   rich_console: true
   dry_run: false
+
 localhost:
   remote: localhost
   python_build: lib/python2.7
   home_path_template: /home/$username
   manual_ssh: true
   batch_header: bash_header
+
 cartesius:
   max_job_name_chars: 15
   job_dispatch: sbatch
@@ -60,6 +61,7 @@ cartesius:
   queue: normal
   python_build: python2.7
   corespernode: 24
+
 prometheus:
   max_job_name_chars: 15
   job_dispatch: sbatch
@@ -77,6 +79,7 @@ prometheus:
   python_build: python2.7
   corespernode: 24
   nodes: 4
+
 cirrus:
   max_job_name_chars: 15
   job_dispatch: sbatch
@@ -99,6 +102,7 @@ cirrus:
   job_wall_time: '00:20:00'
   partition_name: standard
   qos_name: standard
+
 supermuc2:
   max_job_name_chars: 15
   job_dispatch: llsubmit
@@ -116,6 +120,7 @@ supermuc2:
   queue: standard
   python_build: lib64/python2.6
   corespernode: 28
+
 ohm:
   home_path_template: /home/$username
   remote: ohm.chem.ucl.ac.uk
@@ -127,11 +132,13 @@ Kathleen:
     all:
       - load python/3.7.4
       - load lammps/16Mar18/userintel/intel-2018
+
 myriad:
   home_path_template: /home/$username
   remote: myriad.rc.ucl.ac.uk
   batch_header: myriad-header
   job_dispatch: qsub
+
 bluejoule:
   job_dispatch: llsubmit
   run_command: 'runjob --env-all -p $corespernode -n $cores :'
@@ -146,6 +153,7 @@ bluejoule:
   corespernode: 16
   pwd: '#'
   stat: llq -u $username
+
 bluewonder2:
   job_dispatch: bsub <
   run_command: mpiexec.hydra -n $cores
@@ -162,6 +170,7 @@ bluewonder2:
   queue: standard
   corespernode: 24
   pwd: '#'
+
 oppenheimer:
   remote: oppenheimer.chem.ucl.ac.uk
   run_command: /opt/openmpi/gfortran/1.4.3/bin/mpirun -np $cores
@@ -169,6 +178,7 @@ oppenheimer:
   no_hg: true
   job_dispatch: qsub
   python_build: lib/python2.6
+
 QCG_PJ:
   virtual_env_path: $home_path/VirtualEnv
   app_repository: $home_path/App_repo
@@ -251,6 +261,7 @@ qcg:
     - RUNNING
     - STOPPED
     - POSTPROCESSING
+
 eagle_vecma:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -285,6 +296,7 @@ eagle_vecma:
       - openmpi/4.0.0_gcc620
     unloaded:
       - python
+
 eagle_hidalgo:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -353,6 +365,7 @@ eagle_seavea:
       - openmpi/4.0.0_gcc620
     unloaded:
       - python
+
 supermuc_vecma:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -385,6 +398,7 @@ supermuc_vecma:
       - python/3.6_intel
     unloaded:
       - python
+
 genji:
   home_path_template: /home_nfs_robin_ib/$username/$project
   runtime_path_template: /home_nfs_robin_ib/$username/$project
@@ -432,13 +446,16 @@ training_hidalgo:
       - openmpi/1.8.1-1_gcc482
     unloaded:
       - python
+      
 archer2:
   virtual_env_path: /work/$project/$project/$username/VirtualEnv
   app_repository: $home_path/App_repo
   remote: archer2
   budget: e723-brunel
   project: e723
-  corespernode: 128
+  cores: 1  # Total cores requested
+  corespernode: 128  # Fixed value for ARCHER2 (128 cores/node)
+  cpuspertask: 1  # Typically 1 for most jobs (non-MPI)
   run_command: 'srun --distribution=block:block --hint=nomultithread'
   qos_name: standard
   partition_name: standard
@@ -455,6 +472,7 @@ archer2:
     - 'export PYTHONPATH=$PYTHONUSERBASE/lib/python3.8/site-packages:$PYTHONPATH'
     - export SLURM_CPU_FREQ_REQ=2250000
     - export ENV_DIR=/work/$project/$project/$username/VirtualEnv
+
 marenostrum4:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -484,6 +502,7 @@ marenostrum4:
       - python/3.8.2
     unloaded:
       - python
+
 piz_daint:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -506,8 +525,10 @@ piz_daint:
   app_repository: $home_path/App_repo
   job_name: QCG_PilotJob_installation
   remote: daint.cscs.ch
+
 monsoonfab:
   remote: “monsoonfab”
+
 hsuper:
   remote: "hsuper-login01.hsu-hh.de"
   cores: 1
@@ -522,6 +543,7 @@ hsuper:
   stat: >-
     squeue -u $username --Format=JobID:.10,Partition:.11,Name:.70,UserName:.10,State:.8,TimeUsed:.13,TimeLimit:.9,NumNodes:.6,Reason
     --noheader
+    
 snellius:
   remote: "snellius.surf.nl"
   cores: 1

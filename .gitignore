@@ -18,6 +18,8 @@ plugins/
 
 results/
 
+VirtualEnv/
+
 ssh_copy_id.log
 
 tmp_app/

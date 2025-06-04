@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=pj_${config}
 #SBATCH --nodes=$nodes
-#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --ntasks-per-node=$taskspernode
 #SBATCH --cpus-per-task=$cpuspertask
 
 ## wall time in format MINUTES:SECONDS

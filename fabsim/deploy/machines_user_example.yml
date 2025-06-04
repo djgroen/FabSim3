@@ -13,7 +13,7 @@ default:
 
 localhost:
   username: <your-username>
-  virtual_env_path: ~/FabSim3/VirtualEnv
+  virtual_env_path: $home_path/VirtualEnv
 
 supermuc2:
   username: ab12cde
@@ -52,16 +52,16 @@ archer2:
   job_dispatch: 'sbatch'
   partition_name: "standard"
   qos_name: "standard"
-  # SLURM job allocation - user only needs to set this
-  cores: 1               # Total cores requested (will use 2 nodes)
-  # These values are typically fixed for the system
-  corespernode: 128      # Fixed value for ARCHER2 (128 cores/node)
-  cpuspertask: 1         # Typically 1 for most jobs (non-MPI)
+  # SLURM resources allocation
+  cores: 256            # Total cores user requests
+  corespernode: 128     # ARCHER2 hardware: 128 cores/node
+  cpuspertask: 2        # Cores allocated per task
+  taskspernode: 64      # Tasks running per node (128 ÷ 2 = 64)
   # Radical task allocation
   ranks: 1
   coresperrank: 1
   runtime: 60
-  virtual_env_path: /work/<budget>/<project>/<username>/VirtualEnv
+  virtual_env_path: /work/<project>/<project>/<username>/VirtualEnv
  
 marenostrum4:
   username: pr1emk01

@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=qcg_pj_${config}
 #SBATCH --nodes=$nodes
-#SBATCH --ntasks-per-node=$corespernode
+#SBATCH --ntasks-per-node=$taskspernode
 #SBATCH --cpus-per-task=$cpuspertask
 
 ## wall time in format MINUTES:SECONDS
@@ -34,34 +34,34 @@ export QCG_PJ_CORES_PER_NODE=$SLURM_NTASKS_PER_NODE
 export QCG_PM_SRUN_CORES=$SLURM_NTASKS
 export QCG_PM_SRUN_NODES=$SLURM_JOB_NUM_NODES
 
-# Python environment and Radical-PilotJob setup
+# Python environment and QCG-PilotJob setup
 if [ -d "$virtual_env_path" ]; then
   echo "INFO: Activating virtual environment: $virtual_env_path"
   source "$virtual_env_path/bin/activate"
   
-  # Check if Radical-PilotJob is already installed
-  if python3 -c "import radical.pilot" 2>/dev/null; then
-    echo "INFO: Radical-PilotJob is already installed in virtual environment."
-    python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+  # Check if QCG-PilotJob is already installed
+  if python3 -c "import qcg.pilotjob.api.manager" 2>/dev/null; then
+    echo "INFO: QCG-PilotJob is already installed in virtual environment."
+    python3 -c "import qcg.pilotjob; print('INFO: QCG-PilotJob version:', getattr(qcg.pilotjob, '__version__', 'unknown'))"
   else
-    echo "INFO: Radical-PilotJob not found in virtual environment. Attempting installation..."
+    echo "INFO: QCG-PilotJob not found in virtual environment. Attempting installation..."
     
-    # Attempt to install Radical-PilotJob
+    # Attempt to install QCG-PilotJob
     # Use job_results (which should be in /work) instead of SLURM_SUBMIT_DIR for cache
-    export PIP_CACHE_DIR="$job_results/.pip_cache_rp"
+    export PIP_CACHE_DIR="$job_results/.pip_cache_qcg"
     mkdir -p "$PIP_CACHE_DIR"
     echo "INFO: Using PIP_CACHE_DIR: $PIP_CACHE_DIR"
     
     # When installing into an active virtual environment, --user is not needed.
-    pip3 install radical.pilot
+    pip3 install qcg-pilotjob
     
     # Verify installation
-    if python3 -c "import radical.pilot" 2>/dev/null; then
-      echo "INFO: Radical-PilotJob installed successfully in virtual environment."
-      python3 -c "import radical.pilot; print('INFO: Radical-PilotJob version:', getattr(radical.pilot, '__version__', 'unknown'), 'Path:', radical.pilot.__file__)"
+    if python3 -c "import qcg.pilotjob.api.manager" 2>/dev/null; then
+      echo "INFO: QCG-PilotJob installed successfully in virtual environment."
+      python3 -c "import qcg.pilotjob; print('INFO: QCG-PilotJob version:', getattr(qcg.pilotjob, '__version__', 'unknown'))"
     else
-      echo "ERROR: Failed to install or import Radical-PilotJob after attempting installation."
-      echo "Please ensure Radical-PilotJob can be installed (check pip, network, package availability) or is pre-installed in '$virtual_env_path'."
+      echo "ERROR: Failed to install or import QCG-PilotJob after attempting installation."
+      echo "Please ensure QCG-PilotJob can be installed (check pip, network, package availability) or is pre-installed in '$virtual_env_path'."
       exit 1
     fi
   fi

@@ -53,7 +53,7 @@ def get_plugin_path(name: str) -> str:
         raise RuntimeError(
             f"The requested plugin {name} does not exist ({plugin_path}).\n"
             "you can install it by typing:\n\t"
-            f"fabsim localhost install_plugin:{name}"
+            f"fabsim localhost install_plugin: {name}"
         )
     return plugin_path
 
@@ -282,7 +282,7 @@ def put_configs(config: str) -> None:
         sshpass_args = "-e" if env.env_sshpass else "-f $sshpass"
         local(
             template(
-                f"rsync -pthrvz --rsh='sshpass {sshpass_args} ssh  -p 22  ' "
+                f"rsync -pthrvz --rsh='sshpass {sshpass_args} ssh -p 22  ' "
                 "$job_config_path_local/ "
                 "$username@$remote:$job_config_path/"
             )
@@ -845,7 +845,7 @@ def job_preparation(*job_args):
                 )
 
         # Handle PilotJob vs Traditional job script generation
-        if hasattr(env, "PJ_TYPE"):
+        if hasattr(env, "pj_type"):
             # PilotJob mode: Different logic for headers vs task scripts
             if hasattr(env, "NoEnvScript") and env.NoEnvScript:
                 # This is a PilotJob header script (qcg-PJ-header)
@@ -877,7 +877,7 @@ def job_preparation(*job_args):
         dst_job_script = env.pather.join(env.tmp_scripts_path, dst_script_name)
 
         # Add target job script to return list (safe mode)
-        if hasattr(env, "PJ_TYPE"):
+        if hasattr(env, "pj_type"):
             script_path = env.pather.join(env.scripts_path, dst_script_name)
         else:
             script_path = env.pather.join(env.job_results, dst_script_name)
@@ -1021,7 +1021,7 @@ def job_transmission(*job_args):
             local(
                 template(
                     "rsync -pthrvz "
-                    f"--rsh='sshpass {sshpass_args} ssh  -p 22  ' "
+                    f"--rsh='sshpass {sshpass_args} ssh -p 22  ' "
                     "{}/ $username@$remote:{}/ ".format(sync_src, sync_dst)
                 )
             )
@@ -1341,7 +1341,7 @@ def run_ensemble(
         execute(put_configs, config)
 
     # Submit via PilotJob
-    if hasattr(env, "PJ_TYPE"):
+    if hasattr(env, "pj_type"):
         env.submit_job = False  # Only prepare, do not submit jobs directly
         job_args = dict(
             ensemble_mode=True,
@@ -1351,7 +1351,7 @@ def run_ensemble(
             replica_counts=replica_counts,
         )
         env.job_scripts_to_submit = job(job_args)
-        pj_type = getattr(env, "PJ_TYPE", "").lower()
+        pj_type = getattr(env, "pj_type", "").lower()
         rich_print(f"[INFO] Using PilotJob mode: {pj_type}")
         pj_dispatch = {
             "rp": run_radical,
@@ -1365,10 +1365,10 @@ def run_ensemble(
             pilot_job_fn()
         else:
             supported_types = ', '.join(pj_dispatch.keys())
-            error_prefix = f"[ERROR] Unsupported PJ_TYPE '{pj_type}'."
-            error_suffix = f"Supported types are: {supported_types}"
-            error_message = f"{error_prefix} {error_suffix}"
-            raise RuntimeError(error_message)
+            raise RuntimeError(
+                f"[ERROR] Unsupported pj_type '{pj_type}'. "
+                f"Supported types are: {supported_types}"
+            )
     else:
         env.submit_job = True  # Prepare and submit jobs
         job_args = dict(
@@ -1543,8 +1543,9 @@ def run_qcg():
     update_environment()
     # Get SLURM resource parameters from configuration
     # Note: set cores in machines_user.yml to determine correct node count
-    env.corespernode = getattr(env, "corespernode", 128)
+    env.corespernode = getattr(env, "corespernode", 4)
     env.cpuspertask = getattr(env, "cpuspertask", 1)
+    env.taskspernode = getattr(env, "taskspernode", 1)
     # Calculate nodes through standard FabSim3 method (cores/corespernode)
     calc_nodes()
 
@@ -1556,20 +1557,20 @@ def run_qcg():
     env.QCG_PJ_CORES_PER_NODE = env.corespernode
     env.QCG_PJ_TOTAL_CORES = env.total_cores
     env.task_model = getattr(env, "task_model", "default")
-    env.PJ_cores = getattr(env, "coresponsetask", env.cpuspertask)
 
     # Display resource configuration
     rich_print(Panel.fit(
         f"[SLURM Resources]\n"
         f"Nodes: {env.nodes}\n"
+        f"Cores: {env.cores}\n"
         f"Cores per node: {env.corespernode}\n"
         f"CPUs per task: {env.cpuspertask}\n"
+        f"Tasks per node: {env.taskspernode}\n"
         f"Total cores: {env.total_cores}\n\n"
         f"[QCG-PJ Resources]\n"
         f"QCG_PJ_NODES: {env.QCG_PJ_NODES}\n"
         f"QCG_PJ_CORES_PER_NODE: {env.QCG_PJ_CORES_PER_NODE}\n"
-        f"QCG_PJ_TOTAL_CORES: {env.QCG_PJ_TOTAL_CORES}\n"
-        f"Cores per task: {env.PJ_cores}",
+        f"QCG_PJ_TOTAL_CORES: {env.QCG_PJ_TOTAL_CORES}",
         title="[bold blue]QCG-PilotJob Configuration[/bold blue]",
         border_style="blue"
     ))
@@ -1599,9 +1600,6 @@ def run_qcg():
             env.dirPath = os.path.join(
                 env.results_path, run_name, "RUNS", f"{label}_{replica}"
             )
-
-        # Set core count for task
-        env.PJ_cores = env.cpuspertask
 
         # Generate the task description from template
         script_content = script_template_content("qcg-PJ-task-template")
@@ -2268,142 +2266,93 @@ def count_folders(dir_path: str, prefix: str):
 @task
 def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
     """
-    Check for an existing Python virtual environment on the remote machine.
-    If none exists, create one with HPC system awareness.
-
-    Args:
-        path_suffix (str): Suffix to append to the project directory
-        for the virtual environment. Default is "VirtualEnv".
-        system_packages (bool): Whether to include system site packages
-        in the environment. Default is True, recommended for HPC systems.
-
-    Returns:
-        Displays the path of the found or created virtual environment.
+    Create or verify Python virtual environment with HPC awareness.
     """
     update_environment()
 
-    # If already specified in config, use that
+    # Check if already configured and verify it exists
     if hasattr(env, "virtual_env_path") and env.virtual_env_path:
-        rich_print(
-            Panel.fit(
-                f"venv path is already set: {env.virtual_env_path}",
-                title="[blue]Using Configured Virtual Environment[/blue]",
-                border_style="blue",
-            ))
-        return env.virtual_env_path
-
-    # Set up machine-specific configurations
-    machine_configs = {
-        "archer2": {
-            "modules": ["cray-python"],
-            "base_path": (
-                f"/work/"
-                f"{env.get('project', env.get('budget', 'ERROR'))}/"
-                f"{env.get('project', env.get('budget', 'ERROR'))}/"
-                f"{env.username}"
-            ),
-            "cmd_prefix": "module load cray-python && ",
-        },
-        "localhost": {
-            "modules": [],
-            "base_path": f"$localroot",
-            "cmd_prefix": "",
-        },
-        # Add more HPC systems as needed
-    }
-
-    # Get configuration for the current machine or use default
-    machine_config = machine_configs.get(env.machine_name, {
-        "modules": [],
-        "base_path": "$localroot",
-        "cmd_prefix": "",
-    })
-
-    # Determine the path for the virtual environment
-    venv_path = template(f"{machine_config['base_path']}/{path_suffix}")
-
-    # Check if the environment already exists
-    check_cmd = template(
-        f"{machine_config['cmd_prefix']} "
-        f"test -f {venv_path}/bin/activate "
-        f"&& echo 'EXISTS' || echo 'NOT_EXISTS'"
-    )
-
-    check_result = run(check_cmd, capture=True)
-
-    if "EXISTS" in check_result:
-        rich_print(
-            Panel.fit(
-                f"Found existing virtual environment at: {venv_path}\n\n"
-                f"In machines_user.yml, under '{env.machine_name}':\n\n"
-                f"  add virtual_env_path: \"{venv_path}\"\n\n"
-                f"After updating machines_user.yml, install applications:\n"
-                f"  using direct_install_app and (QCG-PilotJob,venv=True)",
-                title="[green]Existing Virtual Environment Found[/green]",
-                border_style="green",
+        verify_cmd = f"test -f {env.virtual_env_path}/bin/activate"
+        try:
+            result = run(
+                f"{verify_cmd} && echo 'EXISTS' || echo 'MISSING'",
+                capture=True,
+                warn_only=True
             )
-        )
-        return venv_path
 
-    # If we get here, the environment doesn't exist, so create it
-    rich_print(
-        f"[INFO] No existing virtual environment found at {venv_path}."
-        " Creating new environment..."
-    )
+            if "EXISTS" in result:
+                # Test that it can be activated
+                activate_cmd = f"source {env.virtual_env_path}/bin/activate"
+                test_cmd = "python --version"
+                test_result = run(
+                    f"{activate_cmd} && {test_cmd}",
+                    capture=True,
+                    warn_only=True
+                )
+                if test_result.succeeded:
+                    rich_print(
+                        Panel.fit(
+                            f"Virtual environment: {env.virtual_env_path}\n"
+                            f"Python: {test_result.strip()}",
+                            title="[green]Virtual Environment Ready[/green]",
+                            border_style="green",
+                        ))
+                    return env.virtual_env_path
+        except Exception:
+            pass
 
-    # Prepare the command
+    # Generic HPC configuration (cray-python works on most systems)
+    if env.machine_name == "localhost":
+        base_path = env.localroot
+        modules = []
+    else:
+        # Generic HPC path structure and modules
+        base_path = f"/work/{env.project}/{env.project}/{env.username}"
+        modules = ["cray-python"]  # Default for most HPC systems
+
+    venv_path = f"{base_path}/{path_suffix}"
+
+    # Create the virtual environment
+    cmd_parts = []
+    if modules:
+        cmd_parts.extend([f"module load {mod}" for mod in modules])
+
     system_pkg_flag = "--system-site-packages" if system_packages else ""
-    module_load_cmds = "\n".join(
-        [f"module load {module}" for module in machine_config["modules"]])
+    cmd_parts.extend([
+        f"mkdir -p {base_path}",
+        f"python3 -m venv {system_pkg_flag} {venv_path}",
+        f"test -f {venv_path}/bin/activate && echo 'SUCCESS' || echo 'FAILED'"
+    ])
 
-    # Create the virtual environment on the remote machine
-    run(template(f"""
-        # Set up environment
-        {module_load_cmds}
+    try:
+        result = run(" && ".join(cmd_parts), capture=True)
+        if "SUCCESS" in result:
+            rich_print(
+                Panel.fit(
+                    f"Virtual environment created: {venv_path}\n\n"
+                    f"Add to machines_user.yml under '{env.machine_name}': \n"
+                    f"  virtual_env_path: \"{venv_path}\"\n\n"
+                    f"Then install applications: \n"
+                    f"  fabsim {env.machine_name} install_app: QCG-PilotJob",
+                    title="[green]Virtual Environment Created[/green]",
+                    border_style="green",
+                ))
+            return venv_path
+        else:
+            raise RuntimeError("Virtual environment creation failed")
 
-        # Ensure directory exists
-        mkdir -p {machine_config['base_path']}
-
-        # Check if Python and venv module are available
-        if ! python3 -m venv --help >/dev/null 2>&1; then
-            echo "ERROR: Python venv is not available on {env.remote}"
-            echo "Please ensure the correct Python module is loaded"
-            exit 1
-        fi
-
-        # Create the virtual environment
-        echo "Creating virtual environment at {venv_path}..."
-        python3 -m venv {system_pkg_flag} {venv_path}
-
-        # Verify the environment
-        if [ -f {venv_path}/bin/activate ]; then
-            echo "Virtual environment created successfully!"
-        else
-            echo "ERROR: Failed to create virtual environment"
-            exit 1
-        fi
-    """))
-
-    # Get the actual full path from the remote system (handling variable
-    # expansion)
-    full_path = template(f"{venv_path}")
-
-    # Display the path and instructions
-    rich_print(
-        Panel.fit(
-            f"Virtual environment created at: {full_path}\n\n"
-            "Add the following to your machines_user.yml, under the "
-            f"{env.remote}:\n\n"
-            f"  virtual_env_path: \"{full_path}\"\n\n"
-            "After updating your machines_user.yml, you can install "
-            "applications with:\n"
-            f"  fabsim {env.remote} install_app:QCG-PilotJob,venv=True",
-            title="[green]Virtual Environment Created[/green]",
-            border_style="green",
-        )
-    )
-
-    return full_path
+    except Exception as e:
+        rich_print(
+            Panel.fit(
+                f"Failed to create virtual environment: {str(e)}\n\n"
+                f"This usually means: \n"
+                f"1. Python3 not available - try different modules\n"
+                f"2. No write permissions to {base_path}\n"
+                f"3. Insufficient disk space",
+                title="[red]Creation Failed[/red]",
+                border_style="red",
+            ))
+        return None
 
 
 @task

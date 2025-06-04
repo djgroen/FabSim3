@@ -1,183 +1,125 @@
-# FabSim3 SLURM Pilot Jobs Documentation
+# SLURM Pilot Jobs with FabSim3
 
-## Introduction
+FabSim3 provides native SLURM-based pilot job implementations that leverage SLURM's built-in capabilities without requiring additional software installations.
 
-FabSim3 provides native SLURM-based pilot job implementations that offer reliable, dependency-free alternatives to third-party pilot job frameworks. These implementations leverage SLURM's native capabilities without requiring additional software installations.
+## Quick Start
 
-### Key Advantages
+### 1. Configure Machine Resources
 
-- **No External Dependencies** - Works on any SLURM system
-- **Native SLURM Integration** - Familiar tools (`squeue`, `scancel`, etc.)
-- **High Scalability** - Supports thousands of tasks
-- **Reliable Performance** - No installation or compatibility issues
-- **Optimal Resource Usage** - Choose between array and manager approaches
-
-### Prerequisites
-
-- SLURM-based HPC system
-- FabSim3 configured for your target machine
-- Python virtual environment (recommended)
-
-## Two SLURM Approaches
-
-FabSim3 offers two complementary SLURM-based pilot job strategies:
-
-### 1. SLURM Job Arrays (`PJ_TYPE=SLURM-ARRAY`)
-
-**Best for:** Independent tasks, mixed durations, fault tolerance
-
-**How it works:** Each task becomes a separate SLURM job within a job array.
-
-**Advantages:**
-
-- True parallel execution
-- Fault isolation (one task failure doesn't affect others)
-- Independent scheduling per task
-- Full wall time available per task
-
-**Limitations:**
-
-- Uses multiple job slots in scheduler
-- Resource fragmentation for small tasks
-- SLURM array size limits (typically 1000-32000)
-
-### 2. SLURM Manager (`PJ_TYPE=SLURM-MANAGER`)
-
-**Best for:** Uniform tasks, large ensembles, resource efficiency
-
-**How it works:** Single SLURM job that internally manages and executes multiple tasks.
-
-**Advantages:**
-
-- Single job slot in scheduler
-- Efficient resource utilization
-- No array size limitations
-- Lower scheduler overhead
-
-**Limitations:**
-
-- All tasks fail if main job fails
-- Long tasks can block shorter ones
-- Shared wall time across all tasks
-
-## Configuration
-
-### Basic Setup in machines_user.yml
-
-Add SLURM-specific parameters to your machine configuration:
+Add SLURM parameters to your `machines_user.yml`:
 
 ```yaml
 archer2:
   username: your_username
-  remote: archer2
-  project: your_project
-  budget: your_budget
-  job_wall_time: '1:00:00'
-  virtual_env_path: /work/your_project/your_project/your_username/VirtualEnv
-  
-  # SLURM Pilot Job Configuration
-  partition_name: "standard"     # SLURM partition
-  qos_name: "short"             # Quality of service (optional)
-  max_concurrent: 10            # Max parallel tasks for MANAGER mode
-  cores_per_task: 1             # Cores per individual task
+  cores: 256            # Total cores to request
+  corespernode: 128     # Hardware cores per node
+  cpuspertask: 2        # Cores per individual task
+  taskspernode: 64      # Calculated: 128 ÷ 2 = 64
 ```
 
-### Advanced Configuration Options
+### 2. Run Your Ensemble
 
-```yaml
-# Additional SLURM parameters (optional)
-slurm_array_options:
-  max_array_size: 1000          # Override system default
-  array_throttle: 50            # Max concurrent array jobs
-  
-slurm_manager_options:
-  task_timeout: 3600            # Timeout per task (seconds)
-  retry_failed: true            # Retry failed tasks
-  log_level: "INFO"             # Logging verbosity
+```bash
+# SLURM Job Arrays (recommended for < 1000 tasks)
+fabsim <machine> <app>_ensemble:<config>,pj_type=slurm-array
+
+# SLURM Manager (recommended for > 1000 tasks)
+fabsim <machine> <app>_ensemble:<config>,pj_type=slurm-manager
 ```
+
+## Two SLURM Approaches
+
+### SLURM Job Arrays (`pj_type=slurm-array`)
+
+**Best for:** Independent tasks, fault tolerance, mixed durations
+
+Each task becomes a separate SLURM job within a job array.
+
+**Advantages:**
+- ✅ Independent execution (one failure doesn't affect others)
+- ✅ Full wall time per task
+- ✅ Better for long-running tasks
+
+**Limitations:**
+- ❌ Limited by SLURM array size (typically 1000-32000)
+- ❌ Uses multiple scheduler slots
+
+### SLURM Manager (`pj_type=slurm-manager`)
+
+**Best for:** Large ensembles, uniform tasks, resource efficiency
+
+Single SLURM job that internally manages multiple tasks.
+
+**Advantages:**
+- ✅ No array size limitations
+- ✅ Single scheduler slot
+- ✅ Efficient resource utilization
+
+**Limitations:**
+- ❌ All tasks fail if main job fails
+- ❌ Shared wall time across tasks
 
 ## Usage Examples
 
-### Basic Usage
+### Basic Examples
 
 ```bash
+# Small parameter sweep (50 tasks)
+fabsim archer2 dummy_ensemble:dummy_test,pj_type=slurm-array
 
-# Explicitly use SLURM arrays
-fabsim archer2 run_ensemble:config=config,PJ_TYPE=SLURM-ARRAY,venv=true
+# Large Monte Carlo study (5000 tasks)
+fabsim archer2 dummy_ensemble:monte_carlo,pj_type=slurm-manager
 
-# Explicitly use SLURM manager
-fabsim archer2 run_ensemble:config=config,PJ_TYPE=SLURM-MANAGER
+# Custom resource allocation
+fabsim archer2 dummy_ensemble:config,cores=512,cpuspertask=4,pj_type=slurm-array
 ```
 
-### Real-World Examples
+### Advanced Configuration
 
-#### Small Parameter Sweep (Arrays Recommended)
-
-```bash
-# 50 parameter combinations, each ~30 minutes
-fabsim archer2 run_ensemble:config=config,PJ_TYPE=SLURM-ARRAY
-```
-
-#### Large Monte Carlo Ensemble (Manager Recommended)
-
-```bash
-# 5000 realizations, each ~10 minutes
-fabsim archer2 run_ensemble:config=monte_carlo,PJ_TYPE=SLURM-MANAGER,max_concurrent=20
-```
-
-#### Mixed Duration Tasks (Arrays Recommended)
-
-```bash
-# Tasks ranging from 5 minutes to 3 hours
-fabsim archer2 sensitivity_analysis:config=mixed_runs,PJ_TYPE=SLURM-ARRAY
-```
-
-#### Very Large Ensemble (Manager Required)
-
-```bash
-# 10,000+ tasks (exceeds array limits)
-fabsim archer2 massive_ensemble:config=large_study,PJ_TYPE=SLURM-MANAGER,max_concurrent=50
+```yaml
+# In machines_user.yml
+archer2:
+  # Basic SLURM config
+  cores: 256
+  corespernode: 128
+  cpuspertask: 2
+  taskspernode: 64
+  
+  # Advanced options
+  max_concurrent: 20        # For manager mode
 ```
 
 ## Choosing the Right Approach
 
-### Decision Matrix
+| Scenario | Task Count | Duration | Recommended |
+|----------|------------|----------|-------------|
+| Parameter sweep | < 100 | Mixed | `slurm-array` |
+| Monte Carlo | > 1000 | Uniform | `slurm-manager` |
+| Long simulations | Any | > 2 hours | `slurm-array` |
+| Quick analysis | > 100 | < 30 min | `slurm-manager` |
 
-| Scenario | Task Count | Duration | Recommended | Reason |
-|----------|------------|----------|-------------|---------|
-| Parameter sweep | < 100 | Mixed | `SLURM-ARRAY` | Independent scheduling |
-| Monte Carlo | > 1000 | Uniform | `SLURM-MANAGER` | Resource efficiency |
-| Long simulations | Any | > 2 hours | `SLURM-ARRAY` | Fault tolerance |
-| Quick analysis | > 100 | < 30 min | `SLURM-MANAGER` | Low overhead |
+**Auto-selection:** If you don't specify `pj_type`, FabSim3 automatically chooses based on task count and system limits.
 
-### Auto-Selection Logic
+## System Limits and Information
 
-Chooses the optimal approach based on:
+Before choosing your approach, check your system's capabilities:
 
-```python
-# Simplified auto-selection rules:
-if task_count > max_array_size:
-    use SLURM-MANAGER  # Required
-elif task_duration > 2_hours and task_count < 100:
-    use SLURM-ARRAY    # Better fault tolerance
-elif task_count > 100 and task_duration < 1_hour:
-    use SLURM-MANAGER  # Better efficiency
-else:
-    use SLURM-MANAGER  # Default choice
+```bash
+# Check current array limits
+scontrol show config | grep -i array
+# Typical output: MaxArraySize=32001
+
+# Check queue limits and node information
+sinfo -o "%P %l %D %c %m %a %S"
+# Shows: Partition, TimeLimit, Nodes, CPUs, Memory, Availability, NodeSize
 ```
 
-## Monitoring and Management
+## Monitoring Jobs
 
-### Checking Job Status
-
-#### SLURM Arrays
-
+### SLURM Arrays
 ```bash
 # View all array jobs
 squeue -u $USER
-
-# View specific array job details
-squeue -j JOBID --array
 
 # Cancel specific array task
 scancel JOBID_TASKID
@@ -186,69 +128,57 @@ scancel JOBID_TASKID
 scancel JOBID
 ```
 
-#### SLURM Manager
-
+### SLURM Manager
 ```bash
 # View manager job
-squeue -u $USER
+squeue -u $USER -j JOBID
 
-# Monitor manager progress
-tail -f /path/to/results/manager_JOBID.output
+# Monitor progress
+tail -f results/manager_output.log
 
-# Cancel manager job
+# Cancel manager
 scancel JOBID
 ```
 
-### Debugging Commands
+## Key Parameters
 
-#### Check SLURM Limits
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `pj_type=slurm-array` | Use SLURM job arrays | For < 1000 tasks |
+| `pj_type=slurm-manager` | Use SLURM manager | For > 1000 tasks |
+| `cores=N` | Total cores to allocate | `cores=256` |
+| `cpuspertask=N` | Cores per task | `cpuspertask=2` |
+| `max_concurrent=N` | Parallel tasks (manager) | `max_concurrent=20` |
 
+## Troubleshooting
+
+**Common Issues:**
+
+1. **Array size exceeded** → Use `slurm-manager` instead
+2. **Resource allocation errors** → Check `cpuspertask ≤ corespernode`
+3. **Tasks timing out** → Increase `job_wall_time` or `task_timeout`
+
+**Debug Commands:**
 ```bash
-# Check maximum array size
+# Check SLURM limits
 scontrol show config | grep -i array
 
-# Check partition information
-sinfo -o "%P %l %D %c %m %a %S"
+# Test configuration
+fabsim <machine> stat
 
-# Check queue limits
-squeue -u $USER | wc -l
+# View detailed logs
+fabsim <machine> fetch_results
 ```
 
-#### Validate Configuration
+## Performance Comparison
 
-```bash
-# Test SLURM environment
-fabsim archer2 test_slurm_config
+Example on ARCHER2 (256 cores, 2 nodes):
 
-# Validate task generation
-fabsim archer2 dry_run:config=my_config,PJ_TYPE=SLURM-MANAGER
-```
+| Approach | Tasks | Completion Time | Efficiency |
+|----------|-------|-----------------|------------|
+| `slurm-array` | 100 × 30min | 30 minutes | 85% |
+| `slurm-manager` | 100 × 30min | 15 minutes | 95% |
+| `slurm-array` | 1000 × 10min | 2 hours | 60% |
+| `slurm-manager` | 1000 × 10min | 45 minutes | 90% |
 
-## Performance Optimization
-
-### Best Practices
-
-#### For SLURM Arrays
-
-- Use for < 1000 tasks
-- Set appropriate `--array` throttling
-- Consider node sharing for small tasks
-- Use separate partitions for different task types
-
-#### For SLURM Manager
-
-- Set `max_concurrent` to match available cores
-- Use uniform task durations when possible
-- Monitor task completion patterns
-- Adjust timeout values for specific workloads
-
-### Benchmarking Results
-
-Example performance comparison on ARCHER2:
-
-| Approach | Tasks | Duration | Throughput | Resource Efficiency |
-|----------|-------|----------|------------|-------------------|
-| SLURM-ARRAY | 100 | 30min | 100 tasks/30min | 85% |
-| SLURM-MANAGER | 100 | 30min | 100 tasks/15min | 95% |
-| SLURM-ARRAY | 1000 | 10min | 1000 tasks/2h | 60% |
-| SLURM-MANAGER | 1000 | 10min | 1000 tasks/45min | 90% |
+**Key Takeaway:** SLURM manager is generally more efficient for large numbers of uniform tasks, while arrays are better for fault tolerance and mixed workloads.

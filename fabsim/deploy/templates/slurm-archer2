@@ -1,12 +1,10 @@
 #!/bin/bash
 ## slurm-archer2
 ## number of nodes
-#SBATCH --nodes $nodes
+#SBATCH --nodes=$nodes
 
-## task per node
-#SBATCH --tasks-per-node=$corespernode
+#SBATCH --ntasks-per-node=$taskspernode
 
-## number of cpus per task
 #SBATCH --cpus-per-task=$cpuspertask
 
 ## wall time in format MINUTES:SECONDS
@@ -21,8 +19,18 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory to work filesystem (fixes the warning!)
+#SBATCH --chdir=$job_results
+
 #SBATCH --partition=$partition_name
 #SBATCH --qos=$qos_name
 
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
+
 # Ensure the cpus-per-task option is propagated to srun commands
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
+
+# Important for resource awareness
+export SLURM_NTASKS=$((SLURM_JOB_NUM_NODES * SLURM_NTASKS_PER_NODE))
+
