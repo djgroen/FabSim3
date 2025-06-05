@@ -4,12 +4,16 @@ import subprocess
 
 @pytest.fixture
 def execute_cmd(request):
-    cmd = request.param
+    raw_cmd = request.param.strip()
 
-    # If using 'fabsim' at beginning, replace with full path
-    if cmd.strip().startswith("fabsim "):
+    # Replace 'fabsim' with full path if needed
+    cmd_parts = raw_cmd.split()
+    if cmd_parts and cmd_parts[0] == "fabsim":
         fabsim_path = os.path.join(os.getcwd(), "fabsim", "bin", "fabsim")
-        cmd = cmd.replace("fabsim", fabsim_path, 1)
+        cmd_parts[0] = fabsim_path
+        cmd = " ".join(cmd_parts)
+    else:
+        cmd = raw_cmd
 
     try:
         proc = subprocess.Popen(

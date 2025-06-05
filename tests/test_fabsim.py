@@ -10,42 +10,42 @@ import re
     "execute_cmd,search_for,cnt",
     [
         (
-            "fabsim  localhost install_plugin:FabDummy",
+            "fabsim localhost install_plugin:FabDummy",
             "FabDummy plugin installed",
             1,
         ),
         (
-            "fabsim  localhost dummy:dummy_test,manual_ssh=false",
+            "fabsim localhost dummy:dummy_test,manual_ssh=false",
             "dummy test has been concluded",
             1,
         ),
         (
-            "fabsim  localhost dummy:dummy_test,manual_ssh=true",
+            "fabsim localhost dummy:dummy_test,manual_ssh=true",
             "dummy test has been concluded",
             1,
         ),
         (
-            "fabsim  localhost dummy:dummy_test,replicas=5,nb_process=2,manual_ssh=false",
+            "fabsim localhost dummy:dummy_test,replicas=5,nb_process=2,manual_ssh=false",
             "dummy test has been concluded",
             5,
         ),
         (
-            "fabsim  localhost dummy_ensemble:dummy_test,nb_process=2,manual_ssh=false",
+            "fabsim localhost dummy_ensemble:dummy_test,nb_process=2,manual_ssh=false",
             "dummy test has been concluded",
             3,
         ),
         (
-            "fabsim  localhost dummy_ensemble:dummy_test,nb_process=2,manual_ssh=true",
+            "fabsim localhost dummy_ensemble:dummy_test,nb_process=2,manual_ssh=true",
             "dummy test has been concluded",
             3,
         ),
         (
-            "fabsim  localhost dummy_ensemble:dummy_test,replicas=5,nb_process=2,manual_ssh=false",
+            "fabsim localhost dummy_ensemble:dummy_test,replicas=5,nb_process=2,manual_ssh=false",
             "dummy test has been concluded",
             15,
         ),
         (
-            "fabsim  localhost dummy_ensemble:dummy_test,replicas=5,nb_process=2,manual_ssh=true",
+            "fabsim localhost dummy_ensemble:dummy_test,replicas=5,nb_process=2,manual_ssh=true",
             "dummy test has been concluded",
             15,
         ),
