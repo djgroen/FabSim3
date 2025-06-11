@@ -265,7 +265,7 @@ Update your `machines_user.yml` to use system MPI:
 
 ```yaml
 <machine>
-  run_command: "mpirun -n $cores" # or the full path to mpirun (e.g., /usr/bin/mpirun) 
+  run_command: "mpirun -np $cores" # or the full path to mpirun (e.g., /usr/bin/mpirun) 
 ```
 
 ## Known Issues
