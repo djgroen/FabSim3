@@ -5,13 +5,14 @@ default:
   nb_process: 1
   venv: false
   module_load_at_connect: true
-  cores: 4
   run_prefix_commands: []
   home_path_template: /home/$username
   fabric_dir: FabSim
   runtime_path_template: $home_path
-  corespernode: 1
+  cores: 4
+  corespernode: 4
   cpuspertask: 1
+  taskspernode: 1
   nodes: 1
   cores_per_replica: '${cores}'
   job_dispatch: ''
@@ -43,10 +44,10 @@ localhost:
   home_path_template: /home/$username
   manual_ssh: true
   batch_header: bash_header
-  cores: 1
-  corespernode: 1
-  cpuspertask: 1
-  taskspernode: 1
+  cores: 4              # Match default for consistency
+  corespernode: 4       # Match default
+  cpuspertask: 1        # Match default
+  taskspernode: 1       # Match default
   virtual_env_path: path/to/FabSim3/VirtualEnv
 
 cartesius:
@@ -188,6 +189,7 @@ QCG_PJ:
   virtual_env_path: $home_path/VirtualEnv
   app_repository: $home_path/App_repo
   job_name: QCG_PilotJob_installation
+
 Eagle:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -222,6 +224,7 @@ Eagle:
     - REQUEUED
     - STOPPED
     - SUSPENDED
+
 qcg:
   virtual_env_path: $home_path/VirtualEnv
   app_repository: $home_path/App_repo
@@ -336,6 +339,7 @@ eagle_hidalgo:
       - openmpi/4.0.0_gcc620
     unloaded:
       - python
+
 eagle_seavea:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -415,6 +419,7 @@ genji:
   PJ_header: slurm-genji-PJ-header
   PJ_PYheader: slurm-genji-PJ-py
   PJ_size: '3'
+
 training_hidalgo:
   stat: >-
     squeue -u $username --Format=jobid,state,account,timeleft,timeused,username
@@ -458,9 +463,10 @@ archer2:
   remote: archer2
   budget: e723-brunel
   project: e723
-  cores: 1  # Total cores requested
-  corespernode: 128  # Fixed value for ARCHER2 (128 cores/node)
-  cpuspertask: 1  # Typically 1 for most jobs (non-MPI)
+  cores: 256            # Request 2 nodes
+  corespernode: 128     # ARCHER2 hardware
+  cpuspertask: 2        # 2 core per task
+  taskspernode: 64      # 64 tasks per node
   run_command: 'srun --distribution=block:block --hint=nomultithread'
   qos_name: standard
   partition_name: standard

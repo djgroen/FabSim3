@@ -57,10 +57,10 @@ archer2:
   partition_name: "standard"
   qos_name: "standard"
   # SLURM resources allocation
-  cores: 256            # Total cores user requests
+  cores: 128            # Total cores user requests
   corespernode: 128     # ARCHER2 hardware: 128 cores/node
-  cpuspertask: 2        # Cores allocated per task
-  taskspernode: 64      # Tasks running per node (128 ÷ 2 = 64)
+  cpuspertask: 2        # 2 cores per task (safer)
+  taskspernode: 64      # 64 tasks per node (128 ÷ 2 = 64)
   # Radical task allocation
   ranks: 1
   coresperrank: 1
