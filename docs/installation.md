@@ -49,8 +49,8 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	In order to use fabsim command anywhere in your PC, you need to update the PATH
 	and PYTHONPATH environmental variables.
 	
-		export PATH=/home/hamid/FabSim3/fabsim/bin:$PATH
-		export PYTHONPATH=/home/hamid/FabSim3:$PYTHONPATH
+		export PATH=/path/to/FabSim3/fabsim/bin:$PATH
+		export PYTHONPATH=/path/to/FabSim3:$PYTHONPATH
 
 		export PATH=~/.local/bin:$PATH
 	
@@ -69,7 +69,6 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 
 4. To make the fabsim command available in your system, please restart the shell by opening a new terminal or just re-load your bash profile by `source` command.
 
-
 ## Updating FabSim3
 
 If you have already installed FabSim3 and want to update to the latest version, simply type `git pull` in your local FabSim3 directory.
@@ -84,7 +83,7 @@ The basic syntax of any FabSim3 command is the following:
 fabsim <machine_name> <task_name>:<task_argument_list>
 ```
 
-where 
+where
 
 - `task_name` is the name of the task to be executed.
 
@@ -105,6 +104,169 @@ fabsim -l tasks
 ```
 
 which gives a table with the plugin names and their associated `task_names`.
+
+## OpenMPI Installation for MPI Parallelized Plugins
+
+Some FabSim3 plugins (like **FLEE** and **FACS**) require MPI parallelization. This section explains how to install OpenMPI and configure it for use with FabSim3.
+
+### Why OpenMPI is Needed
+
+MPI (Message Passing Interface) plugins in FabSim3 use `mpirun` commands to execute parallel simulations across multiple cores or nodes. Without OpenMPI, these plugins will fail with errors like:
+
+- `mpirun: command not found`
+- `No MPI implementation found`
+
+### Quick Installation (Recommended)
+
+!!! tip "Virtual Environment Recommendation"
+    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. FabSim3's `configure_fabsim.py` script automatically creates a virtual environment in the `VirtualEnv` directory for this purpose.
+
+#### Ubuntu/Debian
+
+Option 1: Ubuntu Package Manager (Recommended for Ubuntu)
+
+```bash
+# Install OpenMPI and mpi4py together
+sudo apt-get update
+sudo apt-get install openmpi-bin openmpi-common libopenmpi-dev python3-mpi4py
+```
+
+Option 2: pip (More Universal)
+
+```bash
+# Install OpenMPI first
+sudo apt-get install openmpi-bin openmpi-common libopenmpi-dev
+
+# Then install mpi4py via pip
+pip install mpi4py
+```
+
+#### CentOS/RHEL/Fedora
+
+```bash
+# CentOS/RHEL
+sudo yum install openmpi openmpi-devel
+
+# Fedora
+sudo dnf install openmpi openmpi-devel
+```
+
+#### macOS
+
+```bash
+# Using Homebrew
+brew install open-mpi
+
+# Using MacPorts
+sudo port install openmpi
+```
+
+### Custom Installation from Source (No Admin Privileges Required)
+
+If you need a specific OpenMPI version or custom configuration:
+
+#### 1. Create Installation Directory
+
+```bash
+mkdir -p $HOME/opt/openmpi
+```
+
+#### 2. Download OpenMPI
+
+```bash
+cd $HOME/Downloads
+wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.2.tar.gz
+tar -xf openmpi-4.1.2.tar.gz
+cd openmpi-4.1.2
+```
+
+#### 3. Configure and Build
+
+```bash
+./configure --prefix=$HOME/opt/openmpi
+make all && make install
+```
+
+#### 4. Update Environment Variables
+
+Add to your `~/.bashrc`, `~/.bash_profile`, or `~/.zshrc`:
+
+```bash
+export PATH=$HOME/opt/openmpi/bin:$PATH
+export LD_LIBRARY_PATH=$HOME/opt/openmpi/lib:$LD_LIBRARY_PATH
+export CC=$HOME/opt/openmpi/bin/mpicc
+export CXX=$HOME/opt/openmpi/bin/mpicxx
+```
+
+#### 5. Reload Shell Configuration
+
+```bash
+source ~/.bashrc  # or ~/.bash_profile or ~/.zshrc
+```
+
+### Installing Python MPI Support
+
+Many FabSim3 MPI plugins also require Python MPI bindings:
+
+```bash
+pip install mpi4py
+```
+
+!!! note
+    If you installed OpenMPI from source, make sure your environment variables are set correctly before installing `mpi4py`, as it needs to find the MPI compiler wrappers.
+
+### Verification
+
+Test your OpenMPI installation:
+
+#### 1. Check OpenMPI Installation
+
+```bash
+mpirun --version
+which mpirun
+```
+
+Expected output:
+
+```bash
+mpirun (Open MPI) 4.1.2
+/usr/bin/mpirun  # or your custom path
+```
+
+#### 2. Test MPI Functionality
+
+```bash
+mpirun -np 4 echo "Hello from MPI process"
+```
+
+Expected output:
+
+```bash
+Hello from MPI process
+Hello from MPI process
+Hello from MPI process
+Hello from MPI process
+```
+
+#### 3. Test Python MPI4Py (if installed)
+
+```bash
+mpirun -np 2 python -c "from mpi4py import MPI; print(f'Rank {MPI.COMM_WORLD.Get_rank()} of {MPI.COMM_WORLD.Get_size()}')"
+```
+
+Expected output:
+
+```bash
+Rank 0 of 2
+Rank 1 of 2
+```
+
+Update your `machines_user.yml` to use system MPI:
+
+```yaml
+<machine>
+  run_command: "mpirun -np $cores" # or the full path to mpirun (e.g., /usr/bin/mpirun) 
+```
 
 ## Known Issues
 

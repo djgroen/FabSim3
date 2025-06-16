@@ -1544,7 +1544,16 @@ def run_qcg():
     # Note: set cores in machines_user.yml to determine correct node count
     env.corespernode = getattr(env, "corespernode", 4)
     env.cpuspertask = getattr(env, "cpuspertask", 1)
-    env.taskspernode = getattr(env, "taskspernode", 1)
+
+    if hasattr(env, "machine_name") and env.machine_name != "localhost":
+        # Remote HPC systems - maximize node utilization by default
+        default_taskspernode = getattr(env, "corespernode", 128)
+    else:
+        # Localhost - conservative default
+        default_taskspernode = 1
+
+    env.taskspernode = getattr(env, "taskspernode", default_taskspernode)
+
     # Calculate nodes through standard FabSim3 method (cores/corespernode)
     calc_nodes()
 
