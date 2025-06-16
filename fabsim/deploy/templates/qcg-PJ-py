@@ -68,7 +68,7 @@ $JOB_DESCRIPTIONS
     # Wait for jobs with periodic status updates
     logger.info("Waiting for jobs to complete...")
     completion_start = time.time()
-    manager.wait4(ids, timeout=3600)  # 1 hour timeout
+    manager.wait4(ids, timeout=180000)  # 50 hour timeout
     completion_time = time.time() - completion_start
     
     # Get job summary statistics - but don't log the full response
