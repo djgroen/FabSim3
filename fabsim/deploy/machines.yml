@@ -458,7 +458,7 @@ archer2:
   remote: archer2
   budget: e723-brunel
   project: e723
-  cores: 1  # Total cores requested
+  cores: 128  # Total cores requested
   corespernode: 128  # Fixed value for ARCHER2 (128 cores/node)
   cpuspertask: 1  # Typically 1 for most jobs (non-MPI)
   run_command: 'srun --distribution=block:block --hint=nomultithread'
