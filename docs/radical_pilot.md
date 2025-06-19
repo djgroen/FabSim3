@@ -86,10 +86,10 @@ archer2:
 
 ### Running Jobs with RADICAL-Pilot
 
-To submit jobs using RADICAL-Pilot, use the PJ and PJ_TYPE arguments in your command. Here’s an example command to run an ensemble job with RADICAL-Pilot (RP):
+To submit jobs using RADICAL-Pilot, use the PJ and pj_type arguments in your command. Here’s an example command to run an ensemble job with RADICAL-Pilot (RP):
 
 ```bash
-fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ_TYPE=RP,venv=true
+fabsim <machine> <function>:config=<config_files>,<additional_arguments>,pj_type=RP,venv=true
 ```
 
 ### Running Specific Jobs with RADICAL-Pilot
@@ -97,7 +97,7 @@ fabsim <machine> <function>:config=<config_files>,<additional_arguments>,PJ_TYPE
 For running jobs like FabDummy in ensemble and replica mode:
 
 ```bash
-fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ_TYPE=RP,venv=true
+fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,pj_type=RP,venv=true
 ```
 
 ## Troubleshooting
@@ -109,9 +109,9 @@ fabsim archer2 dummy_ensemble:config=dummy_test,replicas=2,cores=4,PJ_TYPE=RP,ve
     - Ensure that the job_wall_time is correctly set in the machines_user.yml file.
     - Check if the qos setting allows for the specified wall time.
 
-2. Missing or Incorrect 'PJ_TYPE' Argument:
+2. Missing or Incorrect 'pj_type' Argument:
 
-    - Ensure that you have included PJ_TYPE=RP in your command.
+    - Ensure that you have included `pj_type=rp` in your command.
 
 3. Python Package Installation Issues:
 

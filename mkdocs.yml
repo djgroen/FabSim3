@@ -196,9 +196,10 @@ nav:
       - Advanced Topics : advanced_topics.md
       - Multiplex Setup : multiplex_setup.md
       - Remote Machine Configuration : remote_machine_configuration.md
-      - Remote QCG PilotJob: qcg-pilot.md
-      - Remote SLURM PilotJob: slurm-pilot.md
-      - Remote RADICAL PilotJob: radical-pilot.md
+      - Remote QCG PilotJob: qcg_pilot.md
+      - Remote SLURM PilotJob: slurm_pilot.md
+      - Remote RADICAL PilotJob: radical_pilot.md
+      - Template Caching: template_caching.md
       - Containerized versions : containerized_versions.md
       - Additional links : additional_links.md
       - Literature / cite us : FabSim3_Literature.md

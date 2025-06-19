@@ -631,7 +631,16 @@ def job(*job_args):
     #####################################
     #       job preparation phase       #
     #####################################
-    msg = "tmp_work_path = {}".format(env.tmp_work_path)
+
+    # Show template cache status once per job (main process only)
+    from fabsim.deploy.templates import _get_cache_setting
+    cache_enabled = _get_cache_setting()
+    cache_status = "ENABLED" if cache_enabled else "DISABLED"
+
+    msg = "tmp_work_path = {}\nTemplate cache: {}".format(
+        env.tmp_work_path,
+        cache_status
+    )
     rich_print(
         Panel.fit(
             msg,
@@ -689,12 +698,19 @@ def job(*job_args):
         """Display a simple progress bar showing script generation progress."""
         # Calculate total scripts correctly for ensemble/sweep jobs
         total_scripts = 0
-        
-        if hasattr(env, 'replica_counts') and isinstance(env.replica_counts, list) and len(env.replica_counts) > 0:
-            # For ensemble jobs: sum all replica counts across all upsamples/sweep items
+
+        replica_counts_check = (
+            hasattr(env, 'replica_counts') and
+            isinstance(env.replica_counts, list) and
+            len(env.replica_counts) > 0
+        )
+        if replica_counts_check:
+            # For ensemble jobs: sum all replica counts across all
+            # upsamples/sweep items
             total_scripts = sum(env.replica_counts)
         elif hasattr(env, 'replicas') and env.replicas:
-            # For simple replica jobs: use replicas directly, ensure it's an integer
+            # For simple replica jobs: use replicas directly, ensure it's
+            # an integer
             try:
                 total_scripts = int(env.replicas)
             except (ValueError, TypeError):
@@ -705,7 +721,7 @@ def job(*job_args):
                 total_scripts = int(getattr(env, 'replicas', 0))
             except (ValueError, TypeError):
                 total_scripts = 0
-        
+
         if total_scripts <= 0:
             # Fallback to simple spinner if we don't know the total
             chars = ["|", "/", "-", "\\"]
@@ -725,10 +741,10 @@ def job(*job_args):
         last_count = 0
         last_check_time = time.time()
         check_interval = 0.1  # Base check interval
-        
+
         while not progress_indicator.done:
             current_time = time.time()
-            
+
             # Dynamic check interval based on total scripts to reduce overhead
             if total_scripts > 500:
                 check_interval = 0.5  # Slower updates for large jobs
@@ -736,39 +752,81 @@ def job(*job_args):
                 check_interval = 0.3
             else:
                 check_interval = 0.1  # Fast updates for small jobs
-            
+
             # Only check file count if enough time has passed
             if current_time - last_check_time >= check_interval:
                 last_check_time = current_time
                 current_scripts = 0
-                
+
                 try:
-                    if hasattr(env, 'tmp_scripts_path') and os.path.exists(env.tmp_scripts_path):
-                        # Optimized counting: use glob for better performance with large directories
+                    script_path_exists = (
+                        hasattr(env, 'tmp_scripts_path') and
+                        os.path.exists(env.tmp_scripts_path)
+                    )
+                    if script_path_exists:
+                        # Optimized counting: use glob for better performance
+                        # with large directories
                         import glob
-                        script_pattern = os.path.join(env.tmp_scripts_path, "*.sh")
+                        script_pattern = os.path.join(env.tmp_scripts_path,
+                                                      "*.sh")
                         current_scripts = len(glob.glob(script_pattern))
-                except:
+                except Exception:
                     current_scripts = last_count
 
-                # Only update display if count changed significantly or at completion
+                # Only update display if count changed significantly or at
+                # completion
                 count_diff = current_scripts - last_count
-                if count_diff > 0 or (current_scripts == total_scripts and last_count != total_scripts):
+                completion_check = (
+                    current_scripts == total_scripts and
+                    last_count != total_scripts
+                )
+
+                # Smooth progress bar updates based on percentage milestones
+                # and time intervals for a more natural feel
+                current_percentage = (
+                    (current_scripts / max(1, total_scripts)) * 100
+                )
+                last_percentage = (last_count / max(1, total_scripts)) * 100
+
+                # Update on meaningful percentage increases or time
+                percentage_diff = current_percentage - last_percentage
+                min_time_update = 0.5  # Force update every 500ms minimum
+                time_since_last_update = (
+                    current_time - getattr(progress_indicator,
+                                           'last_update_time', 0)
+                )
+
+                should_update = (
+                    count_diff > 0 and (
+                        percentage_diff >= 1.0 or  # Every 1% smooth progress
+                        time_since_last_update >= min_time_update or  # Time
+                        completion_check or
+                        current_scripts == total_scripts
+                    )
+                )
+
+                if should_update:
+                    progress_indicator.last_update_time = current_time
                     last_count = current_scripts
-                    percentage = min(100, (current_scripts / total_scripts) * 100)
-                    
+                    percentage = min(100,
+                                     (current_scripts / total_scripts) * 100)
+
                     # Simple progress bar: [####    ] 4/10 (40%)
                     bar_width = 20
                     filled = int(bar_width * current_scripts / total_scripts)
                     bar = '█' * filled + '░' * (bar_width - filled)
-                    
-                    print(f"\rGenerating scripts: [{bar}] {current_scripts}/{total_scripts} ({percentage:.0f}%)", 
+
+                    print(f"\rGenerating scripts: [{bar}] "
+                          f"{current_scripts}/{total_scripts} "
+                          f"({percentage:.0f}%)",
                           end="", flush=True)
-            
-            time.sleep(0.05)  # Short sleep to prevent excessive CPU usage
-        
+
+            time.sleep(0.05)  # Sleep to prevent excessive CPU usage
+
         # Final update
-        print(f"\rScript generation complete: [{('█' * 20)}] {total_scripts}/{total_scripts} (100%)           ")
+        final_bar = '█' * 20
+        print(f"\rScript generation complete: [{final_bar}] "
+              f"{total_scripts}/{total_scripts} (100%)           ")
         print()  # Add a newline
 
     progress_indicator.done = False
@@ -1515,7 +1573,7 @@ def run_radical():
     # Create run name from job name template (consistent with run_qcg)
     run_name = env.job_name_template_sh[:-3]
 
-    # Generate task descriptions for each job using the template approach
+    # Generate task descriptions for each job using the template
     # This follows the exact same pattern as run_qcg()
     task_blocks = []
     for index, job_script in enumerate(job_scripts_to_submit, start=1):
@@ -1763,6 +1821,7 @@ def run_slurm_array():
         f"[SLURM Resources]\n"
         f"Nodes: {env.nodes}\n"
         f"Cores per node: {env.corespernode}\n"
+        f"Total cores: {env.nodes * env.corespernode}\n\n"
         f"[SLURM Array Resources]\n"
         f"Array size: {len(getattr(env, 'job_scripts_to_submit', []))}\n"
         f"Max concurrent: {env.SLURM_ARRAY_MAX_CONCURRENT}\n"
@@ -2117,8 +2176,8 @@ def install_packages(venv: bool = "False"):
     put(env.job_script, env.dest_name)
     #
     run(template("mkdir -p $job_results"))
-    with cd(env.pather.dirname(env.job_results)):
-        run(template("{} {}".format(env.job_dispatch, env.dest_name)))
+    run(template("{} {}".format(env.job_dispatch, env.dest_name)),
+        cd=env.pather.dirname(env.job_results))
 
     local("rm -rf {}".format(tmp_app_dir))
 

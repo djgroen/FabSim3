@@ -36,13 +36,13 @@ fabsim <machine> <app>_ensemble:<config>,pj_type=slurm-manager
 Each task becomes a separate SLURM job within a job array.
 
 **Advantages:**
-- ✅ Independent execution (one failure doesn't affect others)
-- ✅ Full wall time per task
-- ✅ Better for long-running tasks
+- Independent execution (one failure doesn't affect others)
+- Full wall time per task
+- Better for long-running tasks
 
 **Limitations:**
-- ❌ Limited by SLURM array size (typically 1000-32000)
-- ❌ Uses multiple scheduler slots
+- Limited by SLURM array size (typically 1000-32000)
+- Uses multiple scheduler slots
 
 ### SLURM Manager (`pj_type=slurm-manager`)
 
@@ -51,13 +51,13 @@ Each task becomes a separate SLURM job within a job array.
 Single SLURM job that internally manages multiple tasks.
 
 **Advantages:**
-- ✅ No array size limitations
-- ✅ Single scheduler slot
-- ✅ Efficient resource utilization
+- No array size limitations
+- Single scheduler slot
+- Efficient resource utilization
 
 **Limitations:**
-- ❌ All tasks fail if main job fails
-- ❌ Shared wall time across tasks
+- All tasks fail if main job fails
+- Shared wall time across tasks
 
 ## Usage Examples
 

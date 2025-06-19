@@ -37,6 +37,8 @@ default:
   prevent_results_overwrite: ignore
   rich_console: true
   dry_run: false
+  enable_template_cache: true
+  template_cache_size: 2000
 
 localhost:
   remote: localhost
@@ -44,10 +46,14 @@ localhost:
   home_path_template: /home/$username
   manual_ssh: true
   batch_header: bash_header
-  cores: 4              # Match default for consistency
-  corespernode: 4       # Match default
-  cpuspertask: 1        # Match default
-  taskspernode: 1       # Match default
+  # Resources allocation for local testing
+  cores: 4            # Total cores user requests
+  corespernode: 4     # System hardware: 4-12 cores/system
+  cpuspertask: 1      # Cores allocated per task
+  taskspernode: 1     # Tasks running per system
+  nb_process: 4       # Good starting point (2/3 of CPU cores)
+  enable_template_cache: false
+  template_cache_size: 2000
   virtual_env_path: path/to/FabSim3/VirtualEnv
 
 cartesius:
@@ -478,6 +484,7 @@ archer2:
     all:
       - load cray-python
   run_prefix_commands: ""
+  nb_process: 4       # Good starting point (2/3 of CPU cores
 
 marenostrum4:
   stat: >-
