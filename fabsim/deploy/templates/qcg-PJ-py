@@ -65,19 +65,43 @@ $JOB_DESCRIPTIONS
     job_count = len(ids) if ids else 0
     logger.info(f"Submitted {job_count} jobs")
     
-    # Wait for jobs with periodic status updates
+    # Wait for jobs to complete with minimal progress updates
     logger.info("Waiting for jobs to complete...")
     completion_start = time.time()
-    manager.wait4(ids, timeout=180000)  # 50 hour timeout
+    
+    # Simplified progress tracking with less frequent updates
+    total_jobs = len(ids)
+    last_reported_percentage = -1
+    
+    # Use standard blocking wait with timeout
+    try:
+        # Wait for all jobs with timeout (50 hours)
+        manager.wait4(ids, timeout=180000)
+        logger.info("All jobs completed successfully")
+    except Exception as e:
+        # If wait fails, check final status
+        try:
+            job_info = manager.info(ids)
+            completed_jobs = sum(1 for job in job_info.values() 
+                               if job.get('status') in ['SUCCEED', 'FAILED'])
+            failed_jobs = sum(1 for job in job_info.values() 
+                            if job.get('status') == 'FAILED')
+            
+            if completed_jobs == total_jobs:
+                logger.info("All jobs completed")
+                if failed_jobs > 0:
+                    logger.warning(f"{failed_jobs} jobs failed")
+            else:
+                logger.error(f"Only {completed_jobs}/{total_jobs} jobs completed")
+        except:
+            logger.error(f"Error during job execution: {e}")
+    
     completion_time = time.time() - completion_start
     
-    # Get job summary statistics - but don't log the full response
-    logger.info(f"Execution statistics:")
-    logger.info(f"- Total runtime: {time.time() - start_time:.2f} seconds")
-    logger.info(f"- Job execution time: {completion_time:.2f} seconds")
+    # Brief summary
+    logger.info(f"Execution completed in {completion_time:.1f} seconds")
     
-    # Explicitly finish the manager and exit
-    logger.info("Shutting down QCG-PilotJob manager")
+    # Clean shutdown
     manager.finish()
         
 except Exception as e:

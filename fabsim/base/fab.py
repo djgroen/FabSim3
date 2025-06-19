@@ -687,7 +687,25 @@ def job(*job_args):
 
     def progress_indicator():
         """Display a simple progress bar showing script generation progress."""
-        total_scripts = getattr(env, 'replicas', 0)
+        # Calculate total scripts correctly for ensemble/sweep jobs
+        total_scripts = 0
+        
+        if hasattr(env, 'replica_counts') and isinstance(env.replica_counts, list) and len(env.replica_counts) > 0:
+            # For ensemble jobs: sum all replica counts across all upsamples/sweep items
+            total_scripts = sum(env.replica_counts)
+        elif hasattr(env, 'replicas') and env.replicas:
+            # For simple replica jobs: use replicas directly, ensure it's an integer
+            try:
+                total_scripts = int(env.replicas)
+            except (ValueError, TypeError):
+                total_scripts = 0
+        else:
+            # Try to get from environment as fallback
+            try:
+                total_scripts = int(getattr(env, 'replicas', 0))
+            except (ValueError, TypeError):
+                total_scripts = 0
+        
         if total_scripts <= 0:
             # Fallback to simple spinner if we don't know the total
             chars = ["|", "/", "-", "\\"]
@@ -705,33 +723,49 @@ def job(*job_args):
 
         # Progress bar implementation
         last_count = 0
+        last_check_time = time.time()
+        check_interval = 0.1  # Base check interval
+        
         while not progress_indicator.done:
-            # Count scripts in the temp directory
-            current_scripts = 0
-            try:
-                if hasattr(env, 'tmp_scripts_path') and os.path.exists(env.tmp_scripts_path):
-                    # Count script files (exclude directories)
-                    script_files = [f for f in os.listdir(env.tmp_scripts_path) 
-                                  if os.path.isfile(os.path.join(env.tmp_scripts_path, f)) 
-                                  and f.endswith('.sh')]
-                    current_scripts = len(script_files)
-            except:
-                current_scripts = last_count
-
-            # Only update display if count changed
-            if current_scripts != last_count:
-                last_count = current_scripts
-                percentage = min(100, (current_scripts / total_scripts) * 100)
-                
-                # Simple progress bar: [####    ] 4/10 (40%)
-                bar_width = 20
-                filled = int(bar_width * current_scripts / total_scripts)
-                bar = '█' * filled + '░' * (bar_width - filled)
-                
-                print(f"\rGenerating scripts: [{bar}] {current_scripts}/{total_scripts} ({percentage:.0f}%)", 
-                      end="", flush=True)
+            current_time = time.time()
             
-            time.sleep(0.2)  # Check more frequently for better responsiveness
+            # Dynamic check interval based on total scripts to reduce overhead
+            if total_scripts > 500:
+                check_interval = 0.5  # Slower updates for large jobs
+            elif total_scripts > 100:
+                check_interval = 0.3
+            else:
+                check_interval = 0.1  # Fast updates for small jobs
+            
+            # Only check file count if enough time has passed
+            if current_time - last_check_time >= check_interval:
+                last_check_time = current_time
+                current_scripts = 0
+                
+                try:
+                    if hasattr(env, 'tmp_scripts_path') and os.path.exists(env.tmp_scripts_path):
+                        # Optimized counting: use glob for better performance with large directories
+                        import glob
+                        script_pattern = os.path.join(env.tmp_scripts_path, "*.sh")
+                        current_scripts = len(glob.glob(script_pattern))
+                except:
+                    current_scripts = last_count
+
+                # Only update display if count changed significantly or at completion
+                count_diff = current_scripts - last_count
+                if count_diff > 0 or (current_scripts == total_scripts and last_count != total_scripts):
+                    last_count = current_scripts
+                    percentage = min(100, (current_scripts / total_scripts) * 100)
+                    
+                    # Simple progress bar: [####    ] 4/10 (40%)
+                    bar_width = 20
+                    filled = int(bar_width * current_scripts / total_scripts)
+                    bar = '█' * filled + '░' * (bar_width - filled)
+                    
+                    print(f"\rGenerating scripts: [{bar}] {current_scripts}/{total_scripts} ({percentage:.0f}%)", 
+                          end="", flush=True)
+            
+            time.sleep(0.05)  # Short sleep to prevent excessive CPU usage
         
         # Final update
         print(f"\rScript generation complete: [{('█' * 20)}] {total_scripts}/{total_scripts} (100%)           ")
