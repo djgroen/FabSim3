@@ -101,7 +101,6 @@ class MultiProcessingPool:
         tasks and return the outputs
         """
         results = []
-        print("Waiting for tasks to be completed ...")
         # tells the pool not to accept any new job
         self.Pool.close()
         # tells the pool to wait until all jobs finished then exit,

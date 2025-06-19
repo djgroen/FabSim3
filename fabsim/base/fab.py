@@ -686,18 +686,56 @@ def job(*job_args):
     print("Submit tasks to multiprocessingPool : done ...")
 
     def progress_indicator():
-        """Display a simple progress indicator while waiting."""
-        chars = ["|", "/", "-", "\\"]
-        count = 0
+        """Display a simple progress bar showing script generation progress."""
+        total_scripts = getattr(env, 'replicas', 0)
+        if total_scripts <= 0:
+            # Fallback to simple spinner if we don't know the total
+            chars = ["|", "/", "-", "\\"]
+            count = 0
+            while not progress_indicator.done:
+                print(
+                    f"\rGenerating job scripts... {chars[count % 4]} ",
+                    end="",
+                    flush=True
+                )
+                count += 1
+                time.sleep(0.5)
+            print("\rJob preparation complete!                   ")
+            return
+
+        # Progress bar implementation
+        last_count = 0
         while not progress_indicator.done:
-            print(
-                f"\rGenerating job scripts... {chars[count % 4]} ",
-                end="",
-                flush=True
-            )
-            count += 1
-            time.sleep(0.5)
-        print("\rJob preparation complete!                   ")
+            # Count scripts in the temp directory
+            current_scripts = 0
+            try:
+                if hasattr(env, 'tmp_scripts_path') and os.path.exists(env.tmp_scripts_path):
+                    # Count script files (exclude directories)
+                    script_files = [f for f in os.listdir(env.tmp_scripts_path) 
+                                  if os.path.isfile(os.path.join(env.tmp_scripts_path, f)) 
+                                  and f.endswith('.sh')]
+                    current_scripts = len(script_files)
+            except:
+                current_scripts = last_count
+
+            # Only update display if count changed
+            if current_scripts != last_count:
+                last_count = current_scripts
+                percentage = min(100, (current_scripts / total_scripts) * 100)
+                
+                # Simple progress bar: [####    ] 4/10 (40%)
+                bar_width = 20
+                filled = int(bar_width * current_scripts / total_scripts)
+                bar = '█' * filled + '░' * (bar_width - filled)
+                
+                print(f"\rGenerating scripts: [{bar}] {current_scripts}/{total_scripts} ({percentage:.0f}%)", 
+                      end="", flush=True)
+            
+            time.sleep(0.2)  # Check more frequently for better responsiveness
+        
+        # Final update
+        print(f"\rScript generation complete: [{('█' * 20)}] {total_scripts}/{total_scripts} (100%)           ")
+        print()  # Add a newline
 
     progress_indicator.done = False
     indicator_thread = threading.Thread(target=progress_indicator)
