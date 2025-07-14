@@ -1,6 +1,6 @@
 # change directory to where application is stored
 cd ~/FabSim3/results/cannon_app_localhost_1
-/bin/true || true
+true
 
 OUTPUT_DIR="output_files"
 INPUT_DIR="input_files"
