@@ -111,6 +111,15 @@ def load_machine(machine_name: str) -> None:
     Completes additional paths and interpolates them, via
     `complete_environment`.
     """
+    # Check if the machine exists in config before proceeding
+    if machine_name not in config:
+        raise ValueError(
+            f'The requested remote machine "{machine_name}" is not '
+            "listed in `machines.yml`. It cannot be used as a host.\n"
+            f"Available remote machines are: {list(config.keys())}"
+        )
+
+    # If the machine exists in `config`, proceed with loading
     if "import" in config[machine_name]:
         # Config for this machine is based on another
         env.update(config[config[machine_name]["import"]])
@@ -119,12 +128,20 @@ def load_machine(machine_name: str) -> None:
             env.update(user_config[config[machine_name]["import"]])
 
     env.update(config[machine_name])
+
+    # Check if the machine exists in `user_config`
     if machine_name in user_config:
         env.update(user_config[machine_name])
+    else:
+        # Raise a descriptive error if it's missing in `machines_user.yml`
+        raise ValueError(
+            f'"{machine_name}" is listed in `machines.yml` but is not '
+            'configured in `machines_user.yml`. Please add it before using it.'
+        )
+
     env.machine_name = machine_name
 
-    # Construct modules environment: update, not replace when overrides are
-    # done.
+    # Construct modules environment, not replace when overrides are done
     env.modules = config["default"]["modules"]
     if "import" in config[machine_name]:
         env.modules.update(config[config[machine_name]["import"]].modules)
@@ -136,7 +153,10 @@ def load_machine(machine_name: str) -> None:
                 user_config[config[machine_name]["import"]].modules
             )
 
-    env.modules.update(user_config[machine_name].get("modules", {}))
+    # Add modules from user_config if available
+    if machine_name in user_config:
+        env.modules.update(user_config[machine_name].get("modules", {}))
+
     complete_environment()
 
 

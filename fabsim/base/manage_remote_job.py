@@ -118,8 +118,8 @@ def cancel_job(jobID: Optional[str] = None) -> None:
 def check_jobs_dispatched_on_remote_machine() -> None:
     if env.remote == "localhost":
         print(
-            "ERROR: This functionality can be used only when"
-            "jobs are submitted on the remote machine"
+            "ERROR: This functionality can be used only when "
+            "jobs are submitted on the remote machine."
         )
         sys.exit()
 
