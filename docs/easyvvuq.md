@@ -1,6 +1,6 @@
 # Sensitivity analysis using FabSim3 and EasyVVUQ
 
-FabSim3 is very useful when submitting a large number of jobs at together. One of the cases where this becomes especially useful is for sensitivity analysis. Sensitivity analysis can be breifly described as the process of evaluating the extent to which various input parameters affect the output of a simulation. One of the popular ways of quantifying this effect of parameters on the simulations is throgh Sobol Indices. Computation of Sobol Indices involves running the simulation for a large number of parameter sets and then comuting the variances among the various subsets of results obtained. Given the large number of computations required, this becomes a suitable candidate for simplification using FabSim3.
+FabSim3 is very useful when submitting a large number of jobs at together. One of the cases where this becomes especially useful is for sensitivity analysis. Sensitivity analysis can be briefly described as the process of evaluating the extent to which various input parameters affect the output of a simulation. One of the popular ways of quantifying this effect of parameters on the simulations is through Sobol Indices. Computation of Sobol Indices involves running the simulation for a large number of parameter sets and then computing the variances among the various subsets of results obtained. Given the large number of computations required, this becomes a suitable candidate for simplification using FabSim3.
 
 In this tutorial, we showcase how to conduct sensitivity analysis using FabSim3 and the python packages EasyVVUQ and QCG-PilotJob. The tutorial will use a simple plugin called `FabDynamics` which has been tailored for this purpose.
 
@@ -48,7 +48,7 @@ In order to install the `Dynamics` software:
     This should result in a plot similar to the one shown below.
 
 <figure>
-    <img src="../images/fhn_plot.png" width="600"> 
+    <img src="../images/fhn_plot.png" width="600">
 </figure>
 
 ## Installing FabDynamics
@@ -158,25 +158,25 @@ In this directory
 - The plot of the first-order Sobol indices is stored in `plot_sobols_first[x].png`. The plot should look similar to:
 
 <figure>
-    <img src="../images/plot_sobols_first[x]" width="600"> 
+    <img src="../images/plot_sobols_first[x].png" width="600">
 </figure>
 
-- Similar plot showing all Sobol indices (inclding the higher order indices) is stored in `plot_all_sobol[x].png`. The plot should look similar to:
+- Similar plot showing all Sobol indices (including the higher order indices) is stored in `plot_all_sobol[x].png`. The plot should look similar to:
 
 <figure>
-    <img src="../images/plot_all_sobol[x].png" width="600"> 
+    <img src="../images/plot_all_sobol[x].png" width="600">
 </figure>
 
 - The command also creates other plots related to the results of the simulation runs, namely `raw[x].png` and `plot_statistical_moments[x].png`.
 
 <figure>
-    <img src="../images/raw[x].png" width="600"> 
-    <img src="../images/plot_statistical_moments[x].png" width="600"> 
+    <img src="../images/raw[x].png" width="600">
+    <img src="../images/plot_statistical_moments[x].png" width="600">
 </figure>
 
 ## Configuring sensitivity analysis
 
-After the steps taken above, the dirctory structure of the FabDynamics plugin should look like:
+After the steps taken above, the directory structure of the FabDynamics plugin should look like:
 
 ```
 FabDynamics
