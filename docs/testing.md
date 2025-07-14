@@ -140,7 +140,9 @@ FabDummy contains a minimal demonstrator script of VECMA VVP 2, which compares a
 3. Add QCG-PilotJob arguments by typing:
 
 ```sh
-fabsim <machine_name> dummy_ensemble:dummy_test,replicas=5,cores=1,PJ=true,PJ_TYPE=QCG
+fabsim <machine_name> dummy_ensemble:dummy_test,replicas=5,cores=1,pj_type=qcg,venv=true
 ```
 
-Here, `PJ` indicates the job is a pilot job, and `PJ_TYPE` indicates the use of QCG-PilotJob.
+Here, `pj` indicates the job is a pilot job, and `pj_type` indicates the use of QCG-PilotJob.
+
+More information for advanced PilotJobs is available in "Remote QCG PilotJob" section.
