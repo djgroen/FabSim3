@@ -87,6 +87,7 @@ def install_plugin(plugin_name, branch=None):
         print("Plugin requirements installed successfully.")
     else:
         print(f"No requirements.txt file found for {plugin_name} plugin")
+        print("No additional Python packages were installed for this plugin.")
 
     print(f"Plugin {plugin_name} installed successfully.")
 
