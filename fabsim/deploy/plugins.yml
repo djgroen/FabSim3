@@ -77,10 +77,8 @@ FabGPDR:
 
 FUMEplot:
   repository: https://github.com/djgroen/FUMEplot.git
-
-  
-FabCannonsim:
-  repository: <empty>
   
 FabHomecoming:
     repository: https://github.com/djgroen/FabHomecoming.git
+
+

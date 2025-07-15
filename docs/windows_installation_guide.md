@@ -325,10 +325,10 @@ FabSim3 uses SSH for communication, even with localhost:
 
 **What Works:**
 
-- ✅ Basic FabSim3 commands
-- ✅ Plugin installation
-- ✅ Local job execution (limited)
-- ✅ Configuration management
+- ✓ Basic FabSim3 commands
+- ✓ Plugin installation
+- ✓ Local job execution (limited)
+- ✓ Configuration management
 
 **What Doesn't Work:**
 
