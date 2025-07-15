@@ -5,6 +5,13 @@ machine** (e.g. laptop or desktop). It requires a Linux-like environment, and
 has been used extensively on e.g. Ubuntu And Mac OS X. If you wish to use
 FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 
+!!! info "Windows Users"
+    For comprehensive Windows installation instructions, including FabSim3 + EasyVVUQ integration, see:
+    
+    - [FabSim3 + EasyVVUQ on Windows](windows_installation_guide.md) - Complete guide with WSL setup
+    - [Install WSL for Windows](install_wsl.md) - WSL installation details
+    - [Windows Quick Reference](windows_quick_reference.md) - Command cheat sheet
+
 ## Dependencies
 
 1. FabSim3 requires the following Python modules
@@ -29,21 +36,20 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 
 3. To install FabSim3 plugins, [git](https://git-scm.com/) needs to be installed in your machine.
 
-
 ## Installing FabSim3
 
 1. Clone FabSim3 from the GitHub repository:
-	```sh
+	```bash
 	git clone https://github.com/djgroen/FabSim3.git
 	```
 2. To install **all** packages automatically and configure yml files, please go to your `FabSim3` directory, and type
-	```sh
+	```bash
 	python3 configure_fabsim.py
 	```
 
 3. After installation process, the root FabSim3 directory should be added to both `PATH` and `PYTHONPATH` environment variables. The instruction to do that will be shown at the end of output of `python3 configure_fabsim.py` command.
 	```bash
-	Congratulation 🍻
+	Congratulation 
 	FabSim3 installation was successful ✔
 	
 	In order to use fabsim command anywhere in your PC, you need to update the PATH
@@ -58,12 +64,11 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	"--user" which makes pip install packages in your your home instead instead 
 	of system directory.
 
-
 	Tip: To make these updates permanent, you can add the following command at the 
 	end of your bash shell script which could be one of ['~/.bashrc', '~/.bash_profile', 
 	'~/.zshrc', '~/.bash_aliases'] files, depends on your OS System.
 
-	🛎 To load the new updates in PATH and PYTHONPATH you need to reload your bash shell 
+	To load the new updates in PATH and PYTHONPATH you need to reload your bash shell 
 	script, e.g., source ~/.bashrc, or lunch a new terminal.
 	```
 
@@ -79,7 +84,7 @@ If you have already installed FabSim3 and want to update to the latest version, 
 ## List of available machines and tasks
 
 The basic syntax of any FabSim3 command is the following:
-```sh
+```bssh
 fabsim <machine_name> <task_name>:<task_argument_list>
 ```
 
@@ -92,14 +97,16 @@ where
 - `machine_name` is the name of the machine on which the task is to be executed.
 
 You can see the list of available FabSim3 machines by typing:
-```sh
+
+```bash
 fabsim -l machines
 ```
 
 which gives a table with the `machine_names` and their addresses,
 
 You can see the list of available FabSim3 machines by typing:
-```sh
+
+```bash
 fabsim -l tasks
 ```
 
@@ -275,6 +282,7 @@ Here is the list of known issue that reported by our users so far:
 ### ssh: connect to host localhost port 22: Connection refused
 
 #### Linux
+
 This is a common issue on Linux system, and it will be solved by re-installing openssh server, to do that
 
 1. Remove SSH with the following command

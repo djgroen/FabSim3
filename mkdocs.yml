@@ -185,6 +185,8 @@ nav:
       - Installation:
         - Install FabSim3: installation.md
         - Install WSL for Windows: install_wsl.md
+        - FabSim3 + EasyVVUQ on Windows: windows_installation_guide.md
+        - Windows Quick Reference: windows_quick_reference.md
       - Testing: testing.md
       - Testing Examples:
         - Testing Guide: testing_guide.md
