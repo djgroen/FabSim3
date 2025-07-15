@@ -69,7 +69,7 @@ except ImportError as e:
 
 ## Using the Comprehensive Notebook
 
-1. **Open the notebook**: `docs/notebooks/fabsim3_path_configure.ipynb`
+1. **Open the notebook**: `docs/notebooks/fabSim3_path_configure.ipynb`
 2. **Run all cells**: This will automatically detect your environment and set up paths
 3. **Modify the path**: In Section 4, update the `FABSIM_ROOT` path to your actual FabSim3 installation
 4. **Verify setup**: The notebook will test that everything is working correctly
@@ -148,11 +148,6 @@ This workaround should be referenced in:
 - Jupyter notebook tutorials
 - VSCode/PyCharm setup guides
 - Troubleshooting sections
-
-## Files Created
-
-- `docs/notebooks/fabsim3_path_workaround.ipynb` - Comprehensive setup notebook
-- `docs/jupyter_notebook_setup.md` - This guide
 
 ## Future Improvements
 

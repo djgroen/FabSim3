@@ -186,6 +186,13 @@ nav:
         - Install FabSim3: installation.md
         - Install WSL for Windows: install_wsl.md
       - Testing: testing.md
+      - Testing Examples:
+        - Testing Guide: testing_guide.md
+        - Testing Template: testing_template.md
+        - FabDummy Installation Test: fabdummy_installation_test.md
+      - Notebooks:
+        - Jupyter Notebook Setup: jupyter_notebook_setup.md
+        - Path Configuration: fabSim3_path_configure.ipynb
       - Getting Started: getting_started.md
       - Plugins: plugins.md
       - Create new plugin: create_new_plugin.md

@@ -56,6 +56,13 @@ cd $FABSIM3_HOME
 fabsim localhost -h
 ```
 
+The full path to fabsim executable can be used:
+```bash
+# Verify FabSim3 setup
+cd $FABSIM3_HOME
+fabsim/bin/fabsim localhost -h
+```
+
 ---
 
 ## Test Execution
@@ -101,12 +108,23 @@ FabDummy plugin installed successfully.
 
 ### Expected Files/Directories
 
-```
-plugins/
-└── FabDummy/
-    ├── FabDummy.py
-    ├── README.md
-    └── requirements.txt
+```bash
+plugins/FabDummy/
+├── FabDummy.py
+├── LICENSE
+├── README.md
+├── config_files
+│   └── dummy_test
+│       ├── SWEEP
+│       │   ├── d1
+│       │   │   └── dummy.txt
+│       │   ├── d2
+│       │   │   └── dummy.txt
+│       │   └── d3
+│       │       └── dummy.txt
+│       └── dummy.txt
+└── templates
+    ├── dummy
 ```
 
 ---
@@ -117,7 +135,7 @@ plugins/
 
 ### Actual Output
 
-```
+```bash
 Installing FabDummy plugin...
 Cloning into 'plugins/FabDummy'...
 FabDummy plugin installed successfully.
@@ -127,9 +145,9 @@ FabDummy plugin installed successfully.
 
 | Aspect | Expected | Actual | Match |
 |--------|----------|---------|-------|
-| Exit code | 0 | 0 | ✅ |
-| Output contains | "FabDummy plugin installed successfully" | "FabDummy plugin installed successfully" | ✅ |
-| Directory created | plugins/FabDummy/ | plugins/FabDummy/ | ✅ |
+| Exit code | 0 | 0 | ✓ |
+| Output contains | "FabDummy plugin installed successfully" | "FabDummy plugin installed successfully" | ✓ |
+| Directory created | plugins/FabDummy/ | plugins/FabDummy/ | ✓ |
 
 ### Verification Steps
 
