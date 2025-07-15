@@ -945,6 +945,16 @@ def job_preparation(*job_args):
 
         env.run_command = template(env.run_command)
 
+        # Store the current run_prefix (module_commands + user_commands)
+        original_run_prefix = env.run_prefix
+
+        # Start with module commands only (extract from complete_environment)
+        module_commands = generate_module_commands(
+            script=env.get("script", None)
+        )
+        env.run_prefix = " \n".join(module_commands) or "true"
+
+        # Add rsync commands BEFORE user commands (Fix for Issue #221)
         if env.label not in ["PJ_PYheader", "PJ_header"]:
             env.run_prefix += (
                 "\n\n"
@@ -961,6 +971,20 @@ def job_preparation(*job_args):
                 "rsync -pthrvz --inplace $config_dir/SWEEP/{}/ .".format(
                     env.label
                 )
+            )
+
+        # Re-add user commands AFTER rsync commands (Fix for Issue #221)
+        user_commands = []
+        if hasattr(env, 'run_prefix_commands') and env.run_prefix_commands:
+            user_commands = [
+                template(template(command))
+                for command in env.run_prefix_commands
+            ]
+
+        if user_commands:
+            env.run_prefix += (
+                "\n\n# user run_prefix_commands\n" +
+                " \n".join(user_commands)
             )
 
         if not (hasattr(env, "venv") and str(env.venv).lower() == "true"):
