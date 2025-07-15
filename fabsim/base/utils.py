@@ -100,9 +100,7 @@ def show_avail_plugins() -> None:
     """
     Print the available plugins with their installation status
     """
-    import os
     import yaml
-    from pathlib import Path
 
     # Read plugins configuration
     plugins_file = Path(env.fabsim_root) / "deploy" / "plugins.yml"
