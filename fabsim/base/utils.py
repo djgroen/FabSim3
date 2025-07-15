@@ -96,6 +96,53 @@ def show_avail_tasks() -> None:
     console.print(table)
 
 
+def show_avail_plugins() -> None:
+    """
+    Print the available plugins with their installation status
+    """
+    import os
+    import yaml
+    from pathlib import Path
+    
+    # Read plugins configuration
+    plugins_file = Path(env.fabsim_root) / "deploy" / "plugins.yml"
+    try:
+        with open(plugins_file, encoding="utf-8") as file:
+            config = yaml.load(file, Loader=yaml.SafeLoader)
+    except FileNotFoundError:
+        print("Error: plugins.yml file not found")
+        return
+    except Exception as e:
+        print(f"Error reading plugins.yml: {e}")
+        return
+    
+    table = Table(
+        title="\n\nList of available plugins",
+        show_header=True,
+        box=box.ROUNDED,
+        header_style="dark_cyan",
+    )
+    table.add_column("Plugin Name", style="blue")
+    table.add_column("Repository", style="magenta")
+    table.add_column("Installed", style="green")
+    
+    for plugin_name, repo in config.items():
+        plugin_path = Path(env.localroot) / "plugins" / plugin_name
+        if plugin_path.exists():
+            installed = "✓"
+        else:
+            installed = "✗"
+        
+        table.add_row(
+            plugin_name,
+            repo.get('repository', 'Unknown'),
+            installed
+        )
+    
+    console = Console()
+    console.print(table)
+
+
 class Prefixer(object):
     def __init__(self, prefix, orig):
         self.prefix = prefix

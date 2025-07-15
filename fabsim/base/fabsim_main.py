@@ -16,6 +16,7 @@ from fabsim.base.utils import (
     OpenVPNContext,
     find_all_avail_tasks,
     show_avail_machines,
+    show_avail_plugins,
     show_avail_tasks,
 )
 from fabsim.deploy.machines import (
@@ -55,10 +56,10 @@ def main():
             "--list",
             action="store",
             type="choice",
-            choices=("tasks", "machines"),
+            choices=("tasks", "machines", "plugins"),
             dest="list",
             # default=None,
-            help="list available tasks or machines",
+            help="list available tasks, machines, or plugins",
         ),
     ]
 
@@ -90,6 +91,10 @@ def main():
         elif options.list.lower() == "machines":
             # fabsim5 --list machines
             show_avail_machines()
+            sys.exit()
+        elif options.list.lower() == "plugins":
+            # fabsim5 --list plugins
+            show_avail_plugins()
             sys.exit()
 
     ##########################################################################

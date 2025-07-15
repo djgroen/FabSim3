@@ -2,6 +2,14 @@
 
 The easiest way to test FabSim3 is by installing the FabDummy plugin, and to try out its various features.
 
+## Testing Documentation
+
+For comprehensive test documentation and standardized testing procedures, see:
+
+- **[Testing Template](testing_template.md)** - Standardized template for documenting tests
+- **[Testing Guide](testing_guide.md)** - How to use the testing template and best practices
+- **[Test Examples](test_examples/)** - Sample test cases using the template
+
 ## FabDummy testing on localhost
 
 ### FabDummy Plugin Installation

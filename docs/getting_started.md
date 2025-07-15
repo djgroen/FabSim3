@@ -59,6 +59,12 @@ The `<task>` argument is the name of the python function in a plugin to be execu
 fabsim -l tasks
 ```
 
+or, '<plugins>` to show available plugins:
+
+```bash
+fabsim -l plugins
+```
+
 ## The essential structure of a plugin
 
 A FabSim3 plugin is essentially a python package that resides in the `FabSim3/plugins` directory. The name of the plugin is the name of the python package. For example, the FabDummy plugin is a python package named `FabDummy`.
