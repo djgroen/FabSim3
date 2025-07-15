@@ -5,6 +5,7 @@ This guide explains how to use the FabSim3 testing template to create standardiz
 ## Overview
 
 The FabSim3 testing template provides a consistent structure for documenting tests, making it easier to:
+
 - **Maintain Test Quality:** Ensure all tests follow the same documentation standards
 - **Improve Test Coverage:** Identify gaps in testing through systematic documentation
 - **Facilitate Reviews:** Standardized format makes code reviews more efficient
@@ -16,11 +17,12 @@ The FabSim3 testing template provides a consistent structure for documenting tes
 
 - **Main Template:** Use `testing_template.md` for comprehensive test documentation
 - **Quick Tests:** For simple verification tests, you can use abbreviated sections
-- **Example Reference:** See `test_examples/fabdummy_installation_test.md` for a complete example
+- **Example Reference:** See `fabdummy_installation_test.md` for a complete example
 
 ### 2. Fill Out Required Sections
 
 #### Essential Sections (Always Required)
+
 - **Test ID:** Unique identifier (e.g., CORE-001, PLUGIN-FABDUMMY-001)
 - **Test Name:** Clear, descriptive name
 - **Test Description:** What the test verifies
@@ -29,6 +31,7 @@ The FabSim3 testing template provides a consistent structure for documenting tes
 - **Test Results:** Actual outcome
 
 #### Optional Sections (Use When Applicable)
+
 - **Test Environment:** For environment-specific tests
 - **Setup Steps:** For tests requiring special setup
 - **Issues & Notes:** For known limitations or special considerations
@@ -39,6 +42,7 @@ The FabSim3 testing template provides a consistent structure for documenting tes
 Use the following format: `[CATEGORY]-[COMPONENT]-[NUMBER]`
 
 Examples:
+
 - `CORE-001` - Core functionality test #1
 - `PLUGIN-FABDUMMY-001` - FabDummy plugin test #1
 - `INSTALL-001` - Installation test #1
@@ -60,7 +64,7 @@ Examples:
 
 ```bash
 # Create a new test document
-cp docs/testing_template.md docs/test_cases/my_new_test.md
+cp testing_template.md docs/test_cases/my_new_test.md
 ```
 
 ### Step 2: Fill in the Details
@@ -131,7 +135,7 @@ def test_your_function(execute_cmd, search_for, cnt):
 
 ## File Organization
 
-```
+```bash
 docs/
 ├── testing_template.md          # Main template
 ├── testing_guide.md            # This guide

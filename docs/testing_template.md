@@ -23,12 +23,15 @@ This document provides a standardized template for documenting tests in FabSim3.
 ## Test Description
 
 ### Purpose
+
 [Clear explanation of what this test is designed to verify]
 
 ### Scope
+
 [What aspects of FabSim3 does this test cover?]
 
 ### Dependencies
+
 - **Prerequisites:** [List any required setup, plugins, or configurations]
 - **Related Tests:** [Reference to other tests that should pass first]
 
@@ -37,17 +40,19 @@ This document provides a standardized template for documenting tests in FabSim3.
 ## Test Environment
 
 ### System Requirements
+
 - **Operating System:** [e.g., Linux, macOS, Windows]
 - **Python Version:** [e.g., 3.8+]
 - **FabSim3 Version:** [e.g., latest, v3.x.x]
 
 ### Setup Steps
+
 1. [Step-by-step setup instructions]
 2. [Include any configuration changes needed]
 3. [List any test data or files required]
 
 ```bash
-# Example setup commands
+# Example setup commands (MODIFY PATH!)
 cd /path/to/FabSim3
 python configure_fabsim.py
 # Additional setup commands...
@@ -58,6 +63,7 @@ python configure_fabsim.py
 ## Test Execution
 
 ### Test Command(s)
+
 ```bash
 # Primary test command
 fabsim localhost [command]:[config_dir]
@@ -67,16 +73,19 @@ fabsim localhost [command]:[config_dir],[additional_command]
 ```
 
 ### Test Steps
+
 1. [Detailed step-by-step execution]
 2. [Include any manual verification steps]
 3. [Note any timing considerations]
 
 ### Input Data
+
 - **Test Files:** [List any required test files]
 - **Configuration:** [Any specific settings needed]
 - **Parameters:** [Command-line parameters or config values]
 
 ### Fetch Results
+
 ```bash
 fabsim localhost fetch_results
 ```
@@ -84,17 +93,20 @@ fabsim localhost fetch_results
 ## Expected Results
 
 ### Success Criteria
+
 - [Specific output strings to look for]
 - [Files that should be created]
 - [System state changes expected]
 
 ### Expected Output
-```
+
+```bash
 [Example of expected terminal output]
 ```
 
 ### Example of Expected Files/Directories
-```
+
+```bash
 localhost_exe/FabSim/
 ├── config_files
 │   └── dummy_test
@@ -130,18 +142,21 @@ localhost_exe/FabSim/
 ### Status: [PASS/FAIL/SKIP/PENDING]
 
 ### Actual Output
-```
+
+```bash
 [Copy actual terminal output here]
 ```
 
 ### Actual vs Expected
+
 | Aspect | Expected | Actual | Match |
 |--------|----------|---------|-------|
-| Exit code | 0 | 0 | ✅ |
-| Output contains | "test completed" | "test completed" | ✅ |
-| Files created | 3 files | 3 files | ✅ |
+| Exit code | 0 | 0 | ✓ |
+| Output contains | "test completed" | "test completed" | ✓ |
+| Files created | 3 files | 3 files | ✓ |
 
 ### Verification Steps
+
 - [ ] Command executed successfully (exit code 0)
 - [ ] Expected output messages present
 - [ ] Required files created
@@ -153,12 +168,15 @@ localhost_exe/FabSim/
 ## Issues & Notes
 
 ### Known Issues
+
 - [List any known problems or limitations]
 
 ### Workarounds
+
 - [Any temporary fixes or alternative approaches]
 
 ### Notes
+
 - [Additional observations or context]
 
 ---
@@ -178,12 +196,14 @@ localhost_exe/FabSim/
 ## Quick Reference
 
 ### One-Line Test Summary
+
 ```bash
 # Test: [brief description]
 fabsim localhost [command]:[config_dir] && echo "PASS" || echo "FAIL"
 ```
 
 ### Common Issues
+
 1. **Issue:** [Common problem]
    **Solution:** [Quick fix]
 

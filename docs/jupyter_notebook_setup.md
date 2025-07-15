@@ -15,7 +15,9 @@ When running Jupyter notebooks in IDEs, you may encounter:
 
 ## The Solution
 
-We've created a comprehensive notebook (`docs/notebooks/fabsim3_path_configure.ipynb`) that provides workarounds for these issues. This notebook demonstrates how to:
+We've created a comprehensive notebook (`docs/fabSim3_path_configure.md`) that provides workarounds for these issues.
+
+This notebook demonstrates how to:
 
 1. **Detect the IDE environment** - Identify whether you're running in VSCode, PyCharm, or another IDE
 2. **Set explicit path variables** - Configure FabSim3 paths manually to bypass IDE limitations
@@ -49,7 +51,7 @@ import sys
 from pathlib import Path
 
 # MODIFY THIS PATH TO YOUR FABSIM3 INSTALLATION!
-FABSIM_ROOT = Path("/path/to/your/FabSim3") # MODIFY THIS!
+FABSIM_ROOT = Path("/path/to/your/FabSim3") # MODIFY PATH!
 
 # Add to Python path
 sys.path.insert(0, str(FABSIM_ROOT / "fabsim"))
@@ -73,6 +75,36 @@ except ImportError as e:
 2. **Run all cells**: This will automatically detect your environment and set up paths
 3. **Modify the path**: In Section 4, update the `FABSIM_ROOT` path to your actual FabSim3 installation
 4. **Verify setup**: The notebook will test that everything is working correctly
+
+## Converting Between Formats
+
+### From Markdown to Jupyter Notebook
+
+If you have the markdown version (`fabSim3_path_configure.md`) and want to convert it to a proper Jupyter notebook:
+
+```bash
+# Install jupytext if not already installed
+pip install jupytext
+
+# Convert markdown to notebook
+jupytext --to notebook fabSim3_path_configure.md
+```
+
+This will create `fabSim3_path_configure.ipynb` which you can then open in your IDE's Jupyter environment.
+
+### From Jupyter Notebook to Markdown
+
+If you want to convert a notebook back to markdown format:
+
+```bash
+# Using jupyter nbconvert
+jupyter nbconvert --to markdown fabSim3_path_configure.ipynb
+
+# Or using jupytext (preserves more metadata)
+jupytext --to markdown fabSim3_path_configure.ipynb
+```
+
+**Note**: The markdown format is useful for documentation and version control, while the `.ipynb` format is better for interactive execution in IDEs.
 
 ## IDE-Specific Notes
 

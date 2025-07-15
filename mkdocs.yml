@@ -192,7 +192,7 @@ nav:
         - FabDummy Installation Test: fabdummy_installation_test.md
       - Notebooks:
         - Jupyter Notebook Setup: jupyter_notebook_setup.md
-        - Path Configuration: fabSim3_path_configure.ipynb
+        - Jupyter Path Configuration: fabSim3_path_configure.md
       - Getting Started: getting_started.md
       - Plugins: plugins.md
       - Create new plugin: create_new_plugin.md
