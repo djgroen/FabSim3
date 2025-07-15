@@ -103,7 +103,7 @@ def show_avail_plugins() -> None:
     import os
     import yaml
     from pathlib import Path
-    
+
     # Read plugins configuration
     plugins_file = Path(env.fabsim_root) / "deploy" / "plugins.yml"
     try:
@@ -115,7 +115,7 @@ def show_avail_plugins() -> None:
     except Exception as e:
         print(f"Error reading plugins.yml: {e}")
         return
-    
+
     table = Table(
         title="\n\nList of available plugins",
         show_header=True,
@@ -125,20 +125,20 @@ def show_avail_plugins() -> None:
     table.add_column("Plugin Name", style="blue")
     table.add_column("Repository", style="magenta")
     table.add_column("Installed", style="green")
-    
+
     for plugin_name, repo in config.items():
         plugin_path = Path(env.localroot) / "plugins" / plugin_name
         if plugin_path.exists():
             installed = "✓"
         else:
             installed = "✗"
-        
+
         table.add_row(
             plugin_name,
             repo.get('repository', 'Unknown'),
             installed
         )
-    
+
     console = Console()
     console.print(table)
 
