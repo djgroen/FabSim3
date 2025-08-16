@@ -268,6 +268,12 @@ Rank 0 of 2
 Rank 1 of 2
 ```
 
+Useful commands:
+```bash
+pip uninstall -y mpi4py
+MPICC=/path/to/mpicc python -m pip install --no-binary=:all: --force-reinstall mpi4py
+```
+
 Update your `machines_user.yml` to use system MPI:
 
 ```yaml
@@ -334,6 +340,18 @@ To fix this issue, you need to add the executable path of `fab` to your system `
 	```
 
 Please make sure that you used the same executable path for `fab` as it mentioned in the warning message.
+
+### `numpy` not known
+On ssh connections to the localhost, sometimes the environment variables in `~/.zshrc` or `VirtualEnv` are not initialized. In this scenario, please add the following yaml parameters to your localhost section of `machines_user.yml`:
+
+	```bash
+	localhost:
+	  run_prefix_commands:
+		- source ~/.zshrc
+		- source /path/to/VirtualEnv/bin/activate
+	```
+
+The `run_prefix_commands` ensures the environment variables are initialized on ssh connections.
 
 !!! note
 	If you are having a problem which is not listed here, please raise a [github issue](https://github.com/djgroen/FabSim3/issues/new/choose) in FabSim3 repository, and provide a full output log, so we can have a look and provide a solution or address your issue.

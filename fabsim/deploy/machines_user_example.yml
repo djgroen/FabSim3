@@ -22,6 +22,9 @@ localhost:
   virtual_env_path: path/to/FabSim3/VirtualEnv
   enable_template_cache: false     # Disable for testing
   template_cache_size: 2000        # Optional cache size
+  # run_prefix_commands:           # Startup commands on ssh connection
+  #  - command 1                   # e.g., source ~/.bashrc
+  #  - command 2                   # e.g., source ~/.zshrc
 
 supermuc2:
   username: ab12cde
