@@ -256,3 +256,75 @@ class OpenVPNContext(object):
                 self._p = None
             except Exception as e:
                 pass
+
+
+def get_fabsim_version():
+    """
+    Get FabSim3 version information from git.
+    
+    Returns:
+        str: Version string containing tag, commit count, and hash
+    """
+    try:
+        # Try to get version from git describe
+        result = subprocess.run(
+            ["git", "describe", "--tags", "--always", "--dirty"],
+            capture_output=True,
+            text=True,
+            cwd=env.fabsim_root
+        )
+        
+        if result.returncode == 0:
+            version = result.stdout.strip()
+            # If it's just a hash (no tags), prefix with 'dev-'
+            if not version.startswith('v'):
+                version = f"dev-{version}"
+            return version
+        else:
+            # Fallback to commit hash only
+            result = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True,
+                text=True,
+                cwd=env.fabsim_root
+            )
+            if result.returncode == 0:
+                return f"dev-{result.stdout.strip()}"
+            else:
+                return "unknown"
+    except Exception:
+        return "unknown"
+
+
+def show_fabsim_version():
+    """
+    Display FabSim3 version information in a formatted way.
+    """
+    version = get_fabsim_version()
+    
+    # Additional information
+    try:
+        # Get Python version
+        python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        
+        # Get installation path
+        install_path = env.fabsim_root
+        
+        # Create version info panel
+        version_info = f"""[bold cyan]FabSim3[/bold cyan] version: [bold green]{version}[/bold green]
+
+[dim]Installation:[/dim] {install_path}
+[dim]Python:[/dim] {python_version}
+[dim]Platform:[/dim] {platform.system()} {platform.release()}"""
+
+        console = Console()
+        console.print(Panel(
+            version_info,
+            title="[bold blue]FabSim3 Version Information[/bold blue]",
+            border_style="blue",
+            padding=(1, 2)
+        ))
+        
+    except Exception:
+        # Simple fallback
+        rich_print(f"[bold cyan]FabSim3[/bold cyan] version: [bold green]{version}[/bold green]")

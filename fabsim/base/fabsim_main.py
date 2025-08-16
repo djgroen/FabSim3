@@ -18,6 +18,7 @@ from fabsim.base.utils import (
     show_avail_machines,
     show_avail_plugins,
     show_avail_tasks,
+    show_fabsim_version,
 )
 from fabsim.deploy.machines import (
     available_remote_machines,
@@ -61,6 +62,13 @@ def main():
             # default=None,
             help="list available tasks, machines, or plugins",
         ),
+        make_option(
+            "-v",
+            "--version",
+            action="store_true",
+            dest="version",
+            help="show FabSim3 version information",
+        ),
     ]
 
     # Add in fabsim input optional arguments
@@ -83,17 +91,22 @@ def main():
     #####################################
     # checking input optional arguments #
     #####################################
+    if options.version:
+        # fabsim --version or fabsim -v
+        show_fabsim_version()
+        sys.exit()
+    
     if options.list is not None:
         if options.list.lower() == "tasks":
-            # fabsim5 --list tasks
+            # fabsim --list tasks
             show_avail_tasks()
             sys.exit()
         elif options.list.lower() == "machines":
-            # fabsim5 --list machines
+            # fabsim --list machines
             show_avail_machines()
             sys.exit()
         elif options.list.lower() == "plugins":
-            # fabsim5 --list plugins
+            # fabsim --list plugins
             show_avail_plugins()
             sys.exit()
 
