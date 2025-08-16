@@ -261,7 +261,7 @@ class OpenVPNContext(object):
 def get_fabsim_version():
     """
     Get FabSim3 version information from git.
-    
+
     Returns:
         str: Version string containing tag, commit count, and hash
     """
@@ -273,7 +273,7 @@ def get_fabsim_version():
             text=True,
             cwd=env.fabsim_root
         )
-        
+
         if result.returncode == 0:
             version = result.stdout.strip()
             # If it's just a hash (no tags), prefix with 'dev-'
@@ -301,21 +301,24 @@ def show_fabsim_version():
     Display FabSim3 version information in a formatted way.
     """
     version = get_fabsim_version()
-    
+
     # Additional information
     try:
         # Get Python version
-        python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        
+        python_version = (f"{sys.version_info.major}."
+                          f"{sys.version_info.minor}."
+                          f"{sys.version_info.micro}")
+
         # Get installation path
         install_path = env.fabsim_root
-        
-        # Create version info panel
-        version_info = f"""[bold cyan]FabSim3[/bold cyan] version: [bold green]{version}[/bold green]
 
-[dim]Installation:[/dim] {install_path}
-[dim]Python:[/dim] {python_version}
-[dim]Platform:[/dim] {platform.system()} {platform.release()}"""
+        # Create version info panel
+        version_info = (f"[bold cyan]FabSim3[/bold cyan] version: "
+                        f"[bold green]{version}[/bold green]\n\n"
+                        f"[dim]Installation:[/dim] {install_path}\n"
+                        f"[dim]Python:[/dim] {python_version}\n"
+                        f"[dim]Platform:[/dim] {platform.system()} "
+                        f"{platform.release()}")
 
         console = Console()
         console.print(Panel(
@@ -324,7 +327,8 @@ def show_fabsim_version():
             border_style="blue",
             padding=(1, 2)
         ))
-        
+
     except Exception:
         # Simple fallback
-        rich_print(f"[bold cyan]FabSim3[/bold cyan] version: [bold green]{version}[/bold green]")
+        rich_print(f"[bold cyan]FabSim3[/bold cyan] version: "
+                   f"[bold green]{version}[/bold green]")

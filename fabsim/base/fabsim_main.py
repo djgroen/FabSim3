@@ -95,7 +95,7 @@ def main():
         # fabsim --version or fabsim -v
         show_fabsim_version()
         sys.exit()
-    
+
     if options.list is not None:
         if options.list.lower() == "tasks":
             # fabsim --list tasks
