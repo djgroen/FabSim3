@@ -1,4 +1,4 @@
-# FabSim3 + E### Overview of Installation Methods
+# FabSim3 + EasyVVUQ Overview of Installation Methods
 
 There are three primary ways to run FabSim3 + EasyVVUQ on Windows:
 
@@ -581,7 +581,7 @@ sudo service ssh status
 
 ```bash
 # Add to PATH permanently
-echo 'export PATH="$HOME/FabSim3/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="$HOME/FabSim3/fabsim/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
