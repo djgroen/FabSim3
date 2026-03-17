@@ -81,4 +81,8 @@ FUMEplot:
 FabHomecoming:
     repository: https://github.com/djgroen/FabHomecoming.git
 
+FabCRS:
+    repository: https://github.com/farzeennadeem/FabCRS.git
+    
+
 
