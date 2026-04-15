@@ -996,6 +996,15 @@ def job_preparation(*job_args):
                         " ".join(pkg for pkg in env.py_pkg)
                     )
                 )
+        else:
+            if hasattr(env, "virtual_env_path") and env.virtual_env_path:
+                env.run_prefix += (
+                    "\n\n"
+                    "# Activate Python virtual environment\n"
+                    f"if [ -f \"{env.virtual_env_path}/bin/activate\" ]; then\n"
+                    f"    source {env.virtual_env_path}/bin/activate\n"
+                    "fi\n"
+                )
 
         # Handle PilotJob vs Traditional job script generation
         if hasattr(env, "pj_type"):
@@ -2488,8 +2497,16 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         cmd_parts.extend([f"module load {mod}" for mod in modules])
 
     system_pkg_flag = "--system-site-packages" if system_packages else ""
+    
+    # 1. Create base directory and upload requirements
+    run(f"mkdir -p {base_path}")
+    req_local = os.path.join(env.localroot, "requirements.txt")
+    req_remote = f"{base_path}/requirements.txt"
+    
+    if os.path.isfile(req_local) and env.machine_name != "localhost":
+        put(req_local, req_remote)
+
     cmd_parts.extend([
-        f"mkdir -p {base_path}",
         f"python3 -m venv {system_pkg_flag} {venv_path}",
         f"test -f {venv_path}/bin/activate && echo 'SUCCESS' || echo 'FAILED'"
     ])
@@ -2497,13 +2514,26 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
     try:
         result = run(" && ".join(cmd_parts), capture=True)
         if "SUCCESS" in result:
+            if os.path.isfile(req_local) and env.machine_name != "localhost":
+                rich_print("[INFO] Installing packages from local requirements.txt on remote machine...")
+                req_cmd = []
+                if modules:
+                    req_cmd.extend([f"module load {mod}" for mod in modules])
+                req_cmd.extend([
+                    f"source {venv_path}/bin/activate",
+                    "pip config set global.disable-pip-version-check true || true",
+                    "python3 -m pip install --upgrade pip",
+                    f"python3 -m pip install -r {req_remote}"
+                ])
+                run(" && ".join(req_cmd))
+
             rich_print(
                 Panel.fit(
                     f"Virtual environment created: {venv_path}\n\n"
                     f"Add to machines_user.yml under '{env.machine_name}': \n"
                     f"  virtual_env_path: \"{venv_path}\"\n\n"
                     f"Then install applications: \n"
-                    f"  fabsim {env.machine_name} install_app: QCG-PilotJob",
+                    f"  fabsim {env.machine_name} direct_install_app:QCG-PilotJob",
                     title="[green]Virtual Environment Created[/green]",
                     border_style="green",
                 ))

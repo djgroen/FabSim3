@@ -1,7 +1,7 @@
 jobs.add(
     name='TaskID${idsID}',
     exec='bash',
-    args=['-l', '${idsPath}'],
+    args=['${idsPath}'],
     stdout='${dirPath}/TaskID${idsID}_${uniq}.stdout',
     stderr='${dirPath}/TaskID${idsID}_${uniq}.stderr',
     wd='${dirPath}',
