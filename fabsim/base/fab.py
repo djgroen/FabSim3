@@ -1001,7 +1001,8 @@ def job_preparation(*job_args):
                 env.run_prefix += (
                     "\n\n"
                     "# Activate Python virtual environment\n"
-                    f"if [ -f \"{env.virtual_env_path}/bin/activate\" ]; then\n"
+                    f"if [ -f \"{env.virtual_env_path}"
+                    "/bin/activate\" ]; then\n"
                     f"    source {env.virtual_env_path}/bin/activate\n"
                     "fi\n"
                 )
@@ -2497,12 +2498,12 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         cmd_parts.extend([f"module load {mod}" for mod in modules])
 
     system_pkg_flag = "--system-site-packages" if system_packages else ""
-    
+
     # 1. Create base directory and upload requirements
     run(f"mkdir -p {base_path}")
     req_local = os.path.join(env.localroot, "requirements.txt")
     req_remote = f"{base_path}/requirements.txt"
-    
+
     if os.path.isfile(req_local) and env.machine_name != "localhost":
         put(req_local, req_remote)
 
@@ -2515,13 +2516,17 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         result = run(" && ".join(cmd_parts), capture=True)
         if "SUCCESS" in result:
             if os.path.isfile(req_local) and env.machine_name != "localhost":
-                rich_print("[INFO] Installing packages from local requirements.txt on remote machine...")
+                rich_print(
+                    "[INFO] Installing packages from local "
+                    "requirements.txt on remote machine..."
+                )
                 req_cmd = []
                 if modules:
                     req_cmd.extend([f"module load {mod}" for mod in modules])
                 req_cmd.extend([
                     f"source {venv_path}/bin/activate",
-                    "pip config set global.disable-pip-version-check true || true",
+                    "pip config set global.disable-pip-version-check "
+                    "true || true",
                     "python3 -m pip install --upgrade pip",
                     f"python3 -m pip install -r {req_remote}"
                 ])
@@ -2533,7 +2538,8 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
                     f"Add to machines_user.yml under '{env.machine_name}': \n"
                     f"  virtual_env_path: \"{venv_path}\"\n\n"
                     f"Then install applications: \n"
-                    f"  fabsim {env.machine_name} direct_install_app:QCG-PilotJob",
+                    f"  fabsim {env.machine_name} "
+                    "direct_install_app:QCG-PilotJob",
                     title="[green]Virtual Environment Created[/green]",
                     border_style="green",
                 ))

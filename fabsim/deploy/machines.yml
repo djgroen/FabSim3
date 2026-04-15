@@ -471,8 +471,8 @@ archer2:
   project: e723
   cores: 128  # Total cores requested
   corespernode: 128  # Fixed value for ARCHER2 (128 cores/node)
-  cpuspertask: 1  # Typically 1 for most jobs (non-MPI)
-  taskspernode: 128      # 128 tasks per node
+  cpuspertask: 2  # 2 cores per task (safer)
+  taskspernode: 64       # 64 tasks per node (128 ÷ 2 = 64)
   run_command: 'srun --distribution=block:block --hint=nomultithread'
   qos_name: standard
   partition_name: standard
@@ -484,7 +484,12 @@ archer2:
     all:
       - load cray-python
   run_prefix_commands: ""
-  nb_process: 4       # Good starting point (2/3 of CPU cores
+  nb_process: 4       # Good starting point (2/3 of CPU cores)
+  ranks: 1
+  coresperrank: 1
+  runtime: 60
+  enable_template_cache: true      # Enable for HPC jobs
+  template_cache_size: 10000       # Cache for big jobs 10,000-50,000
 
 marenostrum4:
   stat: >-
