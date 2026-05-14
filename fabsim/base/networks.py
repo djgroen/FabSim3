@@ -235,7 +235,7 @@ def rsync_project(
     exclude: List[str] = [],
     delete: Optional[bool] = False,
     ssh_opts: Optional[str] = "",
-    default_opts: Optional[str] = "-pthrvz",
+    default_opts: Optional[str] = "-pthrvz --progress",
     capture: Optional[bool] = False,
     quiet: Optional[bool] = False,
 ) -> Tuple[str, str]:
