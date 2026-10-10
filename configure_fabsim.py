@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import subprocess
 import platform
@@ -19,6 +20,72 @@ except ImportError:
     print = print
 
 console = Console() if Console else None
+
+
+_ANSI_STYLES = {
+    "black": "30",
+    "red": "31",
+    "red1": "31",
+    "green": "32",
+    "dark_green": "32",
+    "yellow": "33",
+    "blue": "34",
+    "magenta": "35",
+    "cyan": "36",
+    "dark_cyan": "36",
+    "light_sea_green": "36",
+    "white": "37",
+    "orange_red1": "38;5;202",
+}
+
+_MARKUP_RE = re.compile(r"\[(/?)([A-Za-z0-9_]+(?: +[A-Za-z0-9_]+)*)\]")
+
+_COLOR_SUPPORTED = (
+    hasattr(sys.stdout, "isatty")
+    and sys.stdout.isatty()
+    and os.environ.get("NO_COLOR") is None
+    and os.environ.get("TERM", "") != "dumb"
+    and (os.name != "nt" or "WT_SESSION" in os.environ or "ANSICON" in os.environ)
+)
+
+
+def render_markup(text: str) -> str:
+    """Render a small subset of rich markup using ANSI escape codes.
+
+    This lets FabSim3 print coloured output on both Linux and macOS even
+    when ``rich`` is not installed, instead of dumping the raw ``[tag]``
+    sequences. Colour is disabled automatically for non-interactive output
+    (pipes, CI) or when ``NO_COLOR`` is set.
+    """
+    def _tag(match):
+        if not _COLOR_SUPPORTED:
+            return ""
+        closing, tag = match.group(1), match.group(2)
+        if closing:
+            return "\033[0m"
+        codes = []
+        for token in tag.split():
+            if token == "bold":
+                codes.append("1")
+            elif token in _ANSI_STYLES:
+                codes.append(_ANSI_STYLES[token])
+        return "\033[{}m".format(";".join(codes)) if codes else ""
+
+    return _MARKUP_RE.sub(_tag, text)
+
+
+def _emit(message: str, title: str = None, border_style: str = "orange_red1"):
+    """Print a message using rich when available, ANSI colours otherwise."""
+    if console:
+        if title is not None:
+            console.print(Panel.fit(message, title=title, border_style=border_style))
+        else:
+            console.print(message)
+        return
+    rendered = render_markup(message)
+    if title is not None:
+        rendered = render_markup(title) + "\n" + rendered
+    print(rendered)
 
 
 class AttributeDict(dict):
@@ -59,28 +126,48 @@ def create_virtualenv(path: Path) -> Path:
 
 def _print_activation_reminder(venv_path: Path):
     activate_cmd = get_activation_command(venv_path)
-    msg = f"Virtual environment already exists.\nTo activate: {activate_cmd}"
-    if console:
-        console.print(Panel.fit(
-            f"[yellow]Virtual environment already exists.[/yellow]\n[cyan]{activate_cmd}[/cyan]", title="[green]Virtual Environment[/green]")
-        )
-    else:
-        print(msg)
+    msg = f"[yellow]Virtual environment already exists.[/yellow]\n[cyan]{activate_cmd}[/cyan]"
+    _emit(msg, title="[green]Virtual Environment[/green]")
 
 
 def _print_activation_success(venv_path: Path):
     activate_cmd = get_activation_command(venv_path)
-    msg = f"Virtual environment created!\nActivate: {activate_cmd}"
-    if console:
-        console.print(Panel.fit(f"[green]Virtual environment created![/green]\nActivate: [cyan]{activate_cmd}[/cyan]", title="[blue]Setup Success[/blue]"))
-    else:
-        print(msg)
+    msg = f"[green]Virtual environment created![/green]\nActivate: [cyan]{activate_cmd}[/cyan]"
+    _emit(msg, title="[blue]Setup Success[/blue]")
 
 
 def get_activation_command(venv_path: Path):
     if platform.system() == "Windows":
         return str(venv_path / "Scripts" / "activate")
     return f"source {venv_path}/bin/activate"
+
+
+def get_shell_config_file() -> Path:
+    """Return the shell startup file for the user's current shell.
+
+    On macOS the default login shell is zsh, so ~/.bashrc usually does not
+    exist. We detect the shell from $SHELL and fall back to a sensible
+    default that will be created if it is missing.
+    """
+    home = Path.home()
+    shell = os.environ.get("SHELL", "").lower()
+
+    if "zsh" in shell:
+        candidates = [home / ".zshrc"]
+    elif "bash" in shell:
+        if platform.system() == "Darwin":
+            candidates = [home / ".bash_profile", home / ".bashrc"]
+        else:
+            candidates = [home / ".bashrc"]
+    elif "fish" in shell:
+        candidates = [home / ".config" / "fish" / "config.fish"]
+    else:
+        candidates = [home / ".profile"]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def get_venv_python(venv_path: Path) -> str:
@@ -230,9 +317,9 @@ def main():
 
     for pkg, pip_name in required.items():
         installed = install_module(pkg, pip_name, FS3_env["venv_path"])
-        if console:
-            style = "green" if installed else "yellow"
-            console.print(f"Package {pkg} {'already' if installed else 'just'} installed", style=style)
+        status = "already" if installed else "just"
+        color = "green" if installed else "yellow"
+        _emit(f"[{color}]Package {pkg} {status} installed[/{color}]")
 
     # Set up YAML configuration files using the virtual environment
     if not setup_yaml_in_venv(FS3_env["venv_path"], FS3_env["FabSim3_PATH"]):
@@ -258,13 +345,13 @@ def main():
         "~/.zshrc",
         "~/.bash_aliases",
     ]
-    title = "[orange_red1]Congratulation :clinking_beer_mugs:[/orange_red1]\n"
-    msg = "[dark_cyan]FabSim3 installation was successful :heavy_check_mark:[/dark_cyan]\n\n"
+    title = "[orange_red1]Congratulation[/orange_red1]\n"
+    msg = "[dark_cyan]FabSim3 installation was successful.[/dark_cyan]\n\n"
     
     # Add virtual environment information
     if FS3_env.venv_path:
         activate_cmd = get_activation_command(FS3_env.venv_path)
-        msg += "[yellow]:bulb: Virtual Environment Setup Complete![/yellow]\n"
+        msg += "[yellow]Virtual Environment Setup Complete![/yellow]\n"
         msg += f"[green]Activate your virtual environment:[/green] [bold cyan]{activate_cmd}[/bold cyan]\n\n"
     
     msg += "In order to use fabsim command anywhere in your PC, you need to "
@@ -285,10 +372,7 @@ def main():
     msg += 'installed with flag "--user" which makes pip install packages '
     msg += "in your home directory instead of system directory."
 
-    if console:
-        console.print(Panel.fit(msg, title=title, border_style="orange_red1"))
-    else:
-        print(msg)
+    _emit(msg, title=title, border_style="orange_red1")
 
     title = "[dark_green]Tip[/dark_green]"
     msg = "\nTo make these updates permanent, you can add the export commands "
@@ -301,43 +385,43 @@ def main():
             ]
         )
     )
-    msg += ":bellhop_bell: To load the new updates in [blue]PATH[/blue] and [blue]PYTHONPATH[/blue] "
-    msg += "you need to reload your bash shell script, e.g., "
+    msg += "To load the new updates in [blue]PATH[/blue] and [blue]PYTHONPATH[/blue] "
+    msg += "you need to reload your shell script, e.g., "
     msg += (
-        "[red1]source[/red1] [light_sea_green]~/.bashrc[/light_sea_green], or "
+        "[red1]source[/red1] [light_sea_green]{}[/light_sea_green], or ".format(
+            "~/" + str(get_shell_config_file().relative_to(Path.home()))
+        )
     )
     msg += "launch a new terminal."
 
-    if console:
-        console.print(Panel.fit(msg, title=title, border_style="dark_green"))
-    else:
-        print(msg)
+    _emit(msg, title=title, border_style="dark_green")
 
     # check if fabsim command is already available or not
     if which("fabsim") is not None:
         warning_msg = ("fabsim command is already added to the PATH variable. "
                       "Please make sure you remove the old FabSim3 directory "
                       "from your bash shell script.")
-        if console:
-            console.print(Panel.fit(warning_msg, title="[orange_red1]WARNING[/orange_red1]"))
-        else:
-            print(f"WARNING: {warning_msg}")
+        _emit(warning_msg, title="[orange_red1]WARNING[/orange_red1]")
         
     # Set the FABSIM3_HOME environment variable
     os.environ["FABSIM3_HOME"] = str(FS3_env.FabSim3_PATH)  # Convert Path to string
     export_cmd = f'export FABSIM3_HOME="{FS3_env.FabSim3_PATH}"'
 
     # Check if the export command already exists in the shell configuration file
-    shell_config_file = os.path.expanduser("~/.bashrc")
+    shell_config_file = get_shell_config_file()
     try:
-        with open(shell_config_file, "r") as f:
-            shell_config_content = f.read()
+        shell_config_content = (
+            shell_config_file.read_text() if shell_config_file.exists() else ""
+        )
         if export_cmd not in shell_config_content:
+            shell_config_file.parent.mkdir(parents=True, exist_ok=True)
             with open(shell_config_file, "a") as f:
                 f.write("\n" + export_cmd + "\n")
-                print(f"Added FABSIM3_HOME export to {shell_config_file}")
-    except FileNotFoundError:
-        print(f"Warning: Could not find shell configuration file: {shell_config_file}")
+            print(f"Added FABSIM3_HOME export to {shell_config_file}")
+        else:
+            print(f"FABSIM3_HOME export already present in {shell_config_file}")
+    except OSError as e:
+        print(f"Warning: Could not update shell configuration file {shell_config_file}: {e}")
 
     print("FabSim3 setup complete.")
 
