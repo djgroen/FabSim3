@@ -100,6 +100,6 @@ archer2:
   remote: archer2
   manual_ssh: true
   project: <project>
-  budget: <budget>   # SLURM account, e.g. "e283-maziar" (note the hyphen)
+  budget: <budget>   # SLURM account, e.g. "<project>-<username>" (note the hyphen)
 ```
 
