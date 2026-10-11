@@ -218,6 +218,9 @@ This document briefly details how user/developers can set up multiplexing for a 
 !!! note
 	The example below is given for a specific HPC resource, but one can reuse this approach for other machines by changing the `User`, `Host` and `Hostname` variables in step 1, and the name and `remote:` field of the YML entries in step 3.
 
+!!! tip
+        For the full, up-to-date walkthrough — including the ARCHER2 example and the multi-factor authentication (MFA) handshake — see [Multiplex Setup](multiplex_setup.md).
+
 #### Step 1
 
 Create a local file named `~/.ssh/config`, or append to it.
