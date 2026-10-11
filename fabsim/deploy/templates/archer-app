@@ -18,8 +18,13 @@
 ## stderr file
 #SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory to the work filesystem
+## (otherwise sbatch warns when submitted from the ARCHER2 home filesystem)
+#SBATCH --chdir=$job_results
+
 ## Request a specific partition ("queue") for the resource allocation
 #SBATCH --partition=$partition_name
+#SBATCH --qos=$qos_name
 
 
 $run_prefix
