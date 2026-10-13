@@ -64,11 +64,29 @@ Configure your machine resources in `machines_user.yml`:
   taskspernode: 64      # Calculated: 128 ÷ 2 = 64
 ```
 
-This example creates **128 parallel tasks** across **2 nodes**:
+Fabric computes the node count from these values:
 
-- Node 1: 64 tasks × 2 cores = 128 cores
-- Node 2: 64 tasks × 2 cores = 128 cores
-- Total: 128 tasks using 256 cores
+```
+nodes = ceil(cores / corespernode)
+```
+
+and the SLURM header requests `--nodes=$nodes --ntasks-per-node=$taskspernode
+--cpus-per-task=$cpuspertask`.
+
+!!! warning "`cpuspertask` divides your concurrency"
+    Each task asks QCG-PilotJob for `numCores = cpuspertask`, while the pool of
+    schedulable slots is `nodes × taskspernode`. The number of **concurrently
+    running** tasks is therefore
+
+    ```
+    concurrent_tasks = nodes × taskspernode ÷ cpuspertask
+    ```
+
+    With the block above (`cores=256`, `taskspernode=64`, `cpuspertask=2`) you get
+    **2 nodes and 64 concurrent tasks** (32 per node) — *not* 128. If your
+    application is single-threaded, set `cpuspertask=1` and cap the per-node load
+    with `taskspernode` instead (see [Multi-node execution and resource
+    tuning](#multi-node-execution-and-resource-tuning)).
 
 ## Usage Examples
 
@@ -185,6 +203,76 @@ fabsim <machine> <app>_ensemble:<config>,upsample="d0089;d0234;d0567",replicas="
 
 d0567 will be prioritized in job execution order.
 
+## Multi-node execution and resource tuning
+
+QCG-PilotJob can drive several nodes from a single SLURM allocation, and
+FabSim3 wires this up already — no changes to the FabSim3 core are required.
+You only choose how many nodes to ask for (via `cores`).
+
+### How a SLURM allocation becomes QCG resources
+
+1. Fabric computes the node count: `nodes = ceil(cores / corespernode)`
+   (`calc_nodes()` in `fabsim/base/fab.py`).
+2. The QCG header (`fabsim/deploy/templates/qcg-PJ-header`) submits
+   `#SBATCH --nodes=$nodes --ntasks-per-node=$taskspernode --cpus-per-task=$cpuspertask`.
+3. The manager is started as a `LocalManager` (`fabsim/deploy/templates/qcg-PJ-py`).
+   With the default `resources='auto'`, QCG-PilotJob 0.14.x selects the SLURM
+   allocation whenever `SLURM_NODELIST` and `SLURM_JOB_CPUS_PER_NODE` are set
+   (`qcg/pilotjob/parseres.py`) — which is always true inside a batch job. It
+   then sees the *whole* allocation (`total_nodes`, and
+   `total_cores = nodes × taskspernode`).
+4. For each allocated node, QCG fires a node agent with `srun -w <node> …`
+   (`qcg/pilotjob/launcher/launcher.py`, `_fire_slurm_agent`). Every agent
+   leaves a `QCG/nl-agent-<node>.log`, which is the quickest way to confirm
+   that multiple nodes are actually being used.
+
+!!! note
+    The header also exports `QCG_PM_SRUN_CORES` and `QCG_PM_SRUN_NODES`. These
+    are **not read** by QCG-PilotJob 0.14.x and can be ignored.
+
+### Concurrency
+
+```
+concurrent_tasks = nodes × taskspernode ÷ cpuspertask
+```
+
+| nodes | taskspernode | cpuspertask | concurrent tasks |
+|-------|--------------|-------------|------------------|
+| 1     | 64           | 2           | 32               |
+| 1     | 64           | 1           | 64               |
+| 2     | 64           | 1           | 128              |
+| 3     | 64           | 1           | 192              |
+
+### Worked example: 3 nodes on ARCHER2
+
+A 135-run ensemble finished in a **single wave** on 3 nodes:
+
+```bash
+fabsim archer2 <app>_ensemble:<config>,pj_type=qcg,venv=true,label=v3sweep \
+       ,cores=384,cpuspertask=1,taskspernode=64,job_wall_time=0-12:00:00
+```
+
+- `cores / corespernode = 384 / 128 = 3` nodes.
+- QCG logs confirmed one agent per node (`QCG/nl-agent-<node>.log`) and
+  `Submitted 135 jobs`.
+
+### Wall time
+
+`job_wall_time` is a machine-level setting in `machines_user.yml`. The shipped
+default for some machines is very short (minutes), so set it explicitly for real
+workloads (override per run with `job_wall_time=H:M:S` or `D-HH:MM:SS`). For
+reference, a single agent-based migration simulation in the
+[FabFlee external-model case study](https://github.com/djgroen/FabFlee/blob/master/doc/RunningExternalModelOnARCHER2.md)
+took ≈4.5 h.
+
+### Choosing a layout
+
+- **Single-threaded applications:** use `cpuspertask: 1` and set `taskspernode`
+  to the largest number of processes a node can hold *safely* (bounded by
+  memory), e.g. `64`.
+- **Scale out, don't oversubscribe:** increase `cores` (i.e. add nodes) rather
+  than multiplying processes per node beyond what memory allows.
+
 ## Troubleshooting
 
 **Common Issues:**
@@ -192,6 +280,10 @@ d0567 will be prioritized in job execution order.
 1. **"QCG not found"** → Check `virtual_env_path` in `machines_user.yml`
 2. **Resource allocation errors** → Verify `cpuspertask ≤ corespernode`
 3. **Job submission fails** → Check machine-specific SLURM parameters
+4. **Job killed after a few minutes** → `job_wall_time` is too small; set it in
+   `machines_user.yml` or pass `job_wall_time=...`
+5. **Only half as many tasks run at once as expected** → `cpuspertask` divides
+   your concurrency; see [Concurrency](#concurrency)
 
 **Debug Commands:**
 
