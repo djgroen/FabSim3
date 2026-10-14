@@ -80,7 +80,7 @@ archer2:
 cirrus:
   username: <your-username>
   manual_ssh: true
-  remote: cirrus   # add `Host cirrus` -> `HostName login.cirrus.ac.uk` to ~/.ssh/config
+  remote: cirrus   # SSH alias; see docs/multiplex_setup.md (Host cirrus -> login.cirrus.ac.uk)
   budget: <your-budget>   # Slurm account/project code, e.g. t01
   project: <your-project>
   job_wall_time: '0-02:00:00'
