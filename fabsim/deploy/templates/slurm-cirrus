@@ -1,21 +1,36 @@
 #!/bin/bash --login
+## slurm-cirrus (Cirrus EX4000)
 
 # Slurm job options (name, compute nodes, job time)
 #SBATCH --job-name=$job_name
-#SBATCH --time=$job_wall_time
-#SBATCH --exclusive
 #SBATCH --nodes=$nodes
-#SBATCH --tasks-per-node=$corespernode
+#SBATCH --ntasks-per-node=$taskspernode
 #SBATCH --cpus-per-task=$cpuspertask
+
+# --exclusive is required for multi-node jobs on Cirrus and recommended for
+# parallel jobs. Note: it charges the full node (all 288 cores).
+#SBATCH --exclusive
+
+#SBATCH --time=$job_wall_time
 
 # Replace [budget code] below with your project code (e.g. t01)
 #SBATCH --account=$budget
-# Replace [partition name] below with your partition name (e.g. standard,gpu-skylake)
+# Replace [partition name] below (e.g. standard, highmem)
 #SBATCH --partition=$partition_name
-# Replace [qos name] below with your qos name (e.g. standard,long,gpu)
+# Replace [qos name] below (e.g. standard, long, short)
 #SBATCH --qos=$qos_name
-#SBATCH --error=$job_results/JobID-%j.error
+
 ## stdout file
 #SBATCH --output=$job_results/JobID-%j.output
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
 
+## Set the initial working directory
+#SBATCH --chdir=$job_results
+
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
+
+# Ensure the cpus-per-task option is propagated to srun commands
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
