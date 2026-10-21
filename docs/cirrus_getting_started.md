@@ -4,9 +4,12 @@ A step-by-step guide for people who have never used a supercomputer before.
 
 It covers how to log in to Cirrus, how the machine is organised, how to run
 your first job, and how to avoid wasting compute time (Cirrus is charged per
-core-hour). The last section is only needed if you want to use
-[FabSim3](https://github.com/djgroen/FabSim3) from Cirrus; everything before it
-is plain Cirrus usage and works with any terminal.
+core-hour). Everything before section 9 is plain Cirrus usage and works with
+any terminal.
+
+Section 9 is only needed if you want to use
+[FabSim3](https://fabsim3.readthedocs.io) from Cirrus: it links to the
+FabSim3 documentation and lists the three settings that differ on Cirrus.
 
 ---
 
@@ -65,6 +68,13 @@ Three things to remember:
 3. **Your files live on a *network filesystem*** (`/epccfs`), which is visible
    from the login node and from the compute nodes. A file you create on the
    login node can be read by your job.
+
+!!! tip
+        If the workshop uses **FabSim3** to submit the jobs, read
+        [section 9](#9-using-fabsim3-from-cirrus) as well: FabSim3 hides
+        most of what is described below, but it needs three extra
+        settings for Cirrus, and the login details in sections 1-4 still
+        apply.
 
 ---
 
@@ -543,8 +553,33 @@ transfers because it only sends what is new.)
 
 *This section is optional — skip it if the workshop only uses plain Cirrus.*
 
-FabSim3 needs to know your username and project. Add a `cirrus` block to
-`fabsim/deploy/machines_user.yml` in your FabSim3 installation:
+[FabSim3](https://github.com/djgroen/FabSim3) is the automation toolkit used
+in this project: it writes the job script, copies your input files to the
+remote machine, submits the job and collects the results. The workflow itself
+is documented in the FabSim3 documentation — read that first, then apply it to
+Cirrus.
+
+### 9.1 FabSim3 documentation
+
+| You want to | Go to |
+|---|---|
+| Install FabSim3, create the virtual environment, install an application, configure resources, run ensembles, collect results, troubleshoot | **[QCG Pilot-Job on Remote Machines](qcg_pilot.md)** — the most complete walk-through, and it applies to any SLURM machine |
+| Install FabSim3 itself | [Installation guide](installation.md) (Windows/WSL: [Windows installation guide](windows_installation_guide.md)) |
+| All Cirrus-specific settings: paths, partitions, batch headers, virtual environment | [Remote Machine Configuration → Notes for the Cirrus supercomputer](remote_machine_configuration.md) |
+| Set up the SSH connection and multiplex the MFA login | [Multiplex Setup → Multiplexing for Cirrus](multiplex_setup.md) |
+| Available plugins (FabFlee, FabDummy, ...) | [Plugins](plugins.md) |
+| A worked example with the dummy plugin | [FabDummy Installation Test](fabdummy_installation_test.md) |
+| The documentation online | <https://fabsim3.readthedocs.io> |
+| Source code, issues and questions | <https://github.com/djgroen/FabSim3> and its [issue tracker](https://github.com/djgroen/FabSim3/issues) |
+
+### 9.2 The three Cirrus-specific settings
+
+Everything in the FabSim3 documentation applies as it is, except for three
+things, which are specific to Cirrus:
+
+**1. The machine block.** FabSim3 needs to know your username and project.
+Add a `cirrus` block to `fabsim/deploy/machines_user.yml` in your FabSim3
+installation:
 
 ```yaml
 cirrus:
@@ -561,7 +596,27 @@ cirrus:
   manual_ssh: true
 ```
 
-Then, with the background connection from step 4 active:
+**2. The virtual environment.** FabSim3 creates it in the home path of the
+machine, which on Cirrus is under `/epccfs` (see
+[Remote Machine Configuration](remote_machine_configuration.md)):
+
+```sh
+fabsim cirrus create_virtual_env
+```
+
+**3. The batch header.** Cirrus offers two, and the choice affects what you
+are charged for:
+
+* `slurm-cirrus` (default) — shares nodes, you pay only for the cores you
+  request. Use this for single-node jobs.
+* `slurm-cirrus-exclusive` — reserves whole nodes, and is required for
+  multi-node jobs (see section 7.2).
+
+### 9.3 Try it
+
+With the background connection from step 4 active, the quickest way to check
+that everything is wired up is the dummy plugin, as described in the
+[FabDummy Installation Test](fabdummy_installation_test.md):
 
 ```sh
 fabsim cirrus stat                       # what is running on Cirrus?
@@ -569,15 +624,10 @@ fabsim cirrus dummy:dummy_test           # submit a small test job
 fabsim cirrus fetch_results              # collect the results
 ```
 
-`fabsim cirrus dummy:dummy_test` submits a trivial job, which is the
-quickest way to check that everything is wired up. See
-[Remote Machine Configuration](remote_machine_configuration.md) for the full
-set of Cirrus options, including the two batch headers:
-
-* `slurm-cirrus` (default) — shares nodes, you pay only for the cores you
-  request. Use this for single-node jobs.
-* `slurm-cirrus-exclusive` — reserves whole nodes, required for multi-node
-  jobs.
+From there, follow the FabSim3 documentation for the plugin you need — the
+[Plugins](plugins.md) page lists what is available, and
+[QCG Pilot-Job on Remote Machines](qcg_pilot.md) shows how to run many jobs
+at once.
 
 !!! tip
         FabSim3 makes many SSH calls in a row. Without the multiplexed
@@ -587,6 +637,9 @@ set of Cirrus options, including the two batch headers:
 ---
 
 ## 10. Troubleshooting
+
+The Cirrus-specific messages are listed first; the FabSim3 rows at the
+end point at the FabSim3 documentation.
 
 | Message | What it means | What to do |
 |---|---|---|
@@ -602,6 +655,9 @@ set of Cirrus options, including the two batch headers:
 | `slurmstepd: error: Exceeded job memory limit` | Your job asked for more memory than the node has | Use the `highmem` partition, or use fewer tasks |
 | Job reaches the time limit | The job ran longer than `--time` | Raise `--time` (within your QoS limit) or make the job shorter; the output written up to that point is still in the output file |
 | `ssh cirrus` hangs with no output | Network hiccup, or the MFA prompt is waiting | Press Enter; check with `ssh -O check cirrus` |
+| FabSim3 asks for the one-time code on every command | The multiplexed connection is not running, or it has expired | Run `ssh cirrus` once more, then `ssh -O check cirrus`; see [Multiplexing for Cirrus](multiplex_setup.md) |
+| FabSim3 says the machine is `not configured in machines_user.yml` | There is no `cirrus` block in your `machines_user.yml` | Add it - see [section 9.2](#92-the-three-cirrus-specific-settings) |
+| FabSim3 job fails with `No module named ...` | The application is not installed in the virtual environment | See [QCG Pilot-Job on Remote Machines -> Troubleshooting](qcg_pilot.md#troubleshooting) |
 
 ---
 
@@ -657,8 +713,11 @@ rsync -avP ./local cirrus:/epccfs/<project>/<project>/<username>/
 
 ## Getting help
 
-* EPCC support: <helpdesk@epcc.ed.ac.uk>
-* The workshop organisers, for anything about accounts, project codes or
-  allocations.
-* FabSim3-specific questions: the FabSim3 issue tracker at
-  <https://github.com/djgroen/FabSim3/issues>.
+* **Cirrus itself** (accounts, access, the machine misbehaving): EPCC support
+  at <helpdesk@epcc.ed.ac.uk>.
+* **The workshop**: the organisers, for anything about accounts, project codes
+  or allocations.
+* **FabSim3**: the documentation at <https://fabsim3.readthedocs.io>, the
+  source code and the
+  [issue tracker](https://github.com/djgroen/FabSim3/issues) at
+  <https://github.com/djgroen/FabSim3>.
