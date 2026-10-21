@@ -139,3 +139,78 @@ and then type
 ```sh
 fabsim <remote machine name> install_packages:venv=True
 ```
+
+## Notes for the Cirrus supercomputer (EPCC)
+
+Cirrus is EPCC's national compute resource, currently an HPE Cray EX4000 with
+288 physical cores per node (2 x 144 AMD EPYC 9825) and 768 GB (standard) or
+1536 GB (highmem) of memory per node.
+
+The `cirrus` machine is pre-defined in `FabSim3/fabsim/deploy/machines.yml`, so
+only the user-specific parts have to be added to `machines_user.yml`:
+
+```yaml
+cirrus:
+  username: <cirrus-username>
+  remote: cirrus
+  manual_ssh: true
+  project: <project>      # e.g. t01
+  budget: <budget>        # Slurm account/project code, e.g. t01
+  cores: 288              # request only what the job needs, e.g. 64
+```
+
+### Connecting to Cirrus
+
+Cirrus requires multi-factor authentication (SSH key **plus** a TOTP
+passcode), so set up multiplexing as described in
+[Multiplex Setup](multiplex_setup.md), then use `remote: cirrus` together with
+`manual_ssh: true`.
+
+### Where the job files go
+
+Batch jobs cannot write to `/home` (mounted on login nodes only) and `/work` is
+deprecated, so FabSim3 places the job directory under
+`/epccfs/<project>/<project>/<username>/FabSim`. This follows automatically from
+the `home_path_template` setting.
+
+### Node sharing vs exclusive nodes
+
+Cirrus charges per allocated core-hour. The default batch header
+(`slurm-cirrus`) shares nodes, so only the requested cores are charged.
+Multi-node jobs have to be exclusive on Cirrus; use the
+`slurm-cirrus-exclusive` header for those, either per job
+
+```sh
+fabsim cirrus <task>,batch_header=slurm-cirrus-exclusive
+```
+
+or permanently for the machine in `machines_user.yml`
+
+```yaml
+cirrus:
+  batch_header: slurm-cirrus-exclusive
+```
+
+!!! note
+        `--exclusive` reserves the whole node, i.e. all 288 cores of a standard
+        Cirrus node, even if the job only uses a few of them.
+
+### Python environments
+
+The default `virtual_env_path`
+(`/epccfs/<project>/<project>/<username>/VirtualEnv`) does not exist on a new
+account. It is created by
+
+```sh
+fabsim cirrus install_app:<plugin>,venv=True
+```
+
+### Partitions and QoS
+
+* partitions: `standard` (default), `highmem` (1536 GB per node)
+* QoS: `standard` (48 h), `long` (4 days, max 16 nodes), `short` (20 min, max
+  2 nodes), `lowpriority` (24 h, uncharged, UKRI-funded projects only)
+
+See the [Cirrus user guide](https://www.cirrus.ac.uk/) for the authoritative
+list and the current allocation rules.
+

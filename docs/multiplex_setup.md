@@ -117,7 +117,7 @@ prompting on every SSH call.
 Create a local file named `~/.ssh/config`, or append to it.
 
 In this file, you need the following block (replace `<cirrus-username>` with
-your Cirrus username, e.g. `s1234567`):
+your Cirrus username):
 ```sh
 Host cirrus
    User <cirrus-username>
@@ -130,6 +130,16 @@ Host cirrus
 
 !!! note
         The duration of ControlPersist can be modified to suit your needs. Note however that shorter durations are more secure.
+
+!!! note
+        SSH only tries keys with the default names (e.g. `id_ed25519`, `id_rsa`)
+        unless you name them explicitly. If your Cirrus key has a custom name,
+        add these two lines to the block above:
+
+        ```sh
+           IdentityFile ~/.ssh/<your-cirrus-key>
+           IdentitiesOnly yes
+        ```
 
 #### Step 2
 

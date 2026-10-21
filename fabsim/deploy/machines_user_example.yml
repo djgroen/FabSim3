@@ -88,12 +88,20 @@ cirrus:
   partition_name: "standard"   # or "highmem"
   qos_name: "standard"         # or "long", "short", "lowpriority"
   # SLURM resources allocation (Cirrus EX4000: 288 physical cores/node)
+  # Cirrus charges per allocated core-hour: request what the job needs
+  # (e.g. cores=64) rather than the full node.
   cores: 288            # Total cores user requests (default: one full node)
   corespernode: 288     # Cirrus hardware: 288 cores/node
   cpuspertask: 1        # 1 core per task by default
   taskspernode: 288     # 288 tasks per node (288 / 1)
+  # Multi-node jobs must be exclusive on Cirrus; that reserves and charges
+  # the whole node. Enable per job with, e.g.
+  #   fabsim cirrus <task>,batch_header=slurm-cirrus-exclusive
+  # batch_header: slurm-cirrus-exclusive
   enable_template_cache: true      # Enable for HPC jobs
   template_cache_size: 10000       # Cache for big jobs 10,000-50,000
+  # This path does not exist on a fresh account: it is created by
+  # `fabsim cirrus install_app:<plugin>,venv=True`
   virtual_env_path: /epccfs/<project>/<project>/<username>/VirtualEnv
  
 marenostrum4:

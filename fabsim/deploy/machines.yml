@@ -98,12 +98,18 @@ cirrus:
   # Login at login.cirrus.ac.uk with MFA (SSH key + TOTP). Batch jobs MUST write
   # to /epccfs: /home is mounted on login nodes only and /work is deprecated
   # read-only (until at least 21 Nov 2026).
+  # Cirrus charges per allocated core-hour, so request only what the job needs
+  # (e.g. cores=64) instead of the full node.
   max_job_name_chars: 15
   job_dispatch: sbatch
   manual_ssh: true
   stat: squeue -u $username
   remote: login.cirrus.ac.uk
   run_command: 'srun --hint=nomultithread --distribution=block:block'
+  # Node-sharing header: only the cores that are requested are charged.
+  # Cirrus requires multi-node jobs to be exclusive; use the
+  # 'slurm-cirrus-exclusive' header for those (it reserves and charges the
+  # whole node, i.e. all 288 cores).
   batch_header: slurm-cirrus
   partition_name: standard
   qos_name: standard
