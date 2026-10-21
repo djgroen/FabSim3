@@ -2486,11 +2486,12 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         base_path = env.localroot
         modules = []
     else:
-        # Use the home path and the module commands that are configured for the
-        # target machine, instead of assuming a generic layout. For example
-        # ARCHER2 uses /work/$project/$project/$username with cray-python, while
-        # Cirrus uses /epccfs/$project/$project/$username and no extra modules
-        # (the module command is not available in a non-login shell there).
+        # Use the home path and the module commands that are configured for
+        # the target machine, instead of assuming a generic layout. For
+        # example ARCHER2 uses /work/$project/$project/$username with
+        # cray-python, while Cirrus uses /epccfs/$project/$project/$username
+        # and no extra modules (the module command is not available in a
+        # non-login shell there).
         base_path = getattr(env, "home_path", None) or (
             f"/work/{env.project}/{env.project}/{env.username}"
         )
