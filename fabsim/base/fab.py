@@ -2486,16 +2486,20 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
         base_path = env.localroot
         modules = []
     else:
-        # Generic HPC path structure and modules
-        base_path = f"/work/{env.project}/{env.project}/{env.username}"
-        modules = ["cray-python"]  # Default for most HPC systems
+        # Use the home path and the module commands that are configured for the
+        # target machine, instead of assuming a generic layout. For example
+        # ARCHER2 uses /work/$project/$project/$username with cray-python, while
+        # Cirrus uses /epccfs/$project/$project/$username and no extra modules
+        # (the module command is not available in a non-login shell there).
+        base_path = getattr(env, "home_path", None) or (
+            f"/work/{env.project}/{env.project}/{env.username}"
+        )
+        modules = generate_module_commands()
 
     venv_path = f"{base_path}/{path_suffix}"
 
     # Create the virtual environment
-    cmd_parts = []
-    if modules:
-        cmd_parts.extend([f"module load {mod}" for mod in modules])
+    cmd_parts = list(modules)
 
     system_pkg_flag = "--system-site-packages" if system_packages else ""
 
@@ -2520,9 +2524,7 @@ def create_virtual_env(path_suffix="VirtualEnv", system_packages=True):
                     "[INFO] Installing packages from local "
                     "requirements.txt on remote machine..."
                 )
-                req_cmd = []
-                if modules:
-                    req_cmd.extend([f"module load {mod}" for mod in modules])
+                req_cmd = list(modules)
                 req_cmd.extend([
                     f"source {venv_path}/bin/activate",
                     "pip config set global.disable-pip-version-check "

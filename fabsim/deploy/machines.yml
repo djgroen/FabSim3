@@ -102,6 +102,7 @@ cirrus:
   # (e.g. cores=64) instead of the full node.
   max_job_name_chars: 15
   job_dispatch: sbatch
+  cancel_job_command: scancel $jobID
   manual_ssh: true
   stat: squeue -u $username
   remote: login.cirrus.ac.uk
