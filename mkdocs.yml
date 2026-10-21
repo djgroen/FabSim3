@@ -196,6 +196,7 @@ nav:
         - Jupyter Notebook Setup: jupyter_notebook_setup.md
         - Jupyter Path Configuration: fabSim3_path_configure.md
       - Getting Started: getting_started.md
+      - Cirrus Getting Started: cirrus_getting_started.md
       - Plugins: plugins.md
       - Create new plugin: create_new_plugin.md
       - APIs for Plugin Developers : APIs_for_plugin_developers.md
