@@ -193,17 +193,43 @@ cirrus:
 
 !!! note
         `--exclusive` reserves the whole node, i.e. all 288 cores of a standard
-        Cirrus node, even if the job only uses a few of them.
+        Cirrus node, even if the job only uses a few of them. A two-node job is
+        therefore charged for 576 cores.
+
+Cirrus rejects a job that requests several nodes without `--exclusive`:
+
+```
+sbatch: error: Job rejected: Nodes specified but the --exclusive flag is not
+specifed. Please use the --exclusive flag if you need to specify nodes, or
+specify tasks or cpus(cores) if not.
+```
+
+A single-node job without `--exclusive` is accepted, and is only charged for
+the cores it requests.
 
 ### Python environments
 
 The default `virtual_env_path`
 (`/epccfs/<project>/<project>/<username>/VirtualEnv`) does not exist on a new
-account. It is created by
+account. Create it with
 
 ```sh
-fabsim cirrus install_app:<plugin>,venv=True
+fabsim cirrus create_virtual_env
 ```
+
+which creates the environment in the home path of the machine (so on Cirrus in
+`/epccfs/<project>/<project>/<username>/VirtualEnv`, matching the
+`virtual_env_path` above) and installs the packages of your local
+`requirements.txt` into it. `fabsim cirrus direct_install_app:<plugin>` does
+the same and additionally installs the application itself.
+
+### Waiting for a node
+
+Cirrus periodically drains its nodes for maintenance, and a job submitted
+during such a window can stay pending with a reason such as
+`ReqNodeNotAvail, UnavailableNodes:cs-n[...]`. This is a cluster state rather
+than a configuration problem; the job starts as soon as a node becomes
+available again.
 
 ### Partitions and QoS
 

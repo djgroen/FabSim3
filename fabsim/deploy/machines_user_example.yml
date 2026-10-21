@@ -100,8 +100,8 @@ cirrus:
   # batch_header: slurm-cirrus-exclusive
   enable_template_cache: true      # Enable for HPC jobs
   template_cache_size: 10000       # Cache for big jobs 10,000-50,000
-  # This path does not exist on a fresh account: it is created by
-  # `fabsim cirrus install_app:<plugin>,venv=True`
+  # This path does not exist on a fresh account: create it with
+  # `fabsim cirrus create_virtual_env` (or `fabsim cirrus direct_install_app:<plugin>`)
   virtual_env_path: /epccfs/<project>/<project>/<username>/VirtualEnv
  
 marenostrum4:
