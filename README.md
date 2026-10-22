@@ -52,7 +52,7 @@ the source code of that).
 
 ## Installation and usage 
 
-For instructions on how to install and test FabSim, please refer to `docs/installation.md`.
+For instructions on how to install and test FabSim3, please refer to `docs/installation.md`.
 
 ## Known issues
 
@@ -60,7 +60,7 @@ For instructions on how to install and test FabSim, please refer to `docs/instal
 
 ### Citing FabSim
 
-Please find the BibTex reference below of our FabSim software paper in _Computer Physics Communications_:
+Please find the BibTex reference below of our FabSim3 software paper in _Computer Physics Communications_:
 
 ```
 @article{groen2023fabsim3,
