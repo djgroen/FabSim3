@@ -142,7 +142,10 @@ def load_machine(machine_name: str) -> None:
     env.machine_name = machine_name
 
     # Construct modules environment, not replace when overrides are done
-    env.modules = config["default"]["modules"]
+    # Copy the default modules, so that updating them does not modify the
+    # shared default definition (which would leak the modules of one machine
+    # into the next one loaded in the same process).
+    env.modules = dict(config["default"]["modules"])
     if "import" in config[machine_name]:
         env.modules.update(config[config[machine_name]["import"]].modules)
     env.modules.update(config[machine_name].get("modules", {}))

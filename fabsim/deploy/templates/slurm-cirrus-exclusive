@@ -1,0 +1,44 @@
+#!/bin/bash --login
+## slurm-cirrus-exclusive (Cirrus EX4000)
+##
+## Same as slurm-cirrus, but with --exclusive: every node is dedicated to
+## the job. Cirrus requires this for multi-node jobs.
+## Be aware that this reserves (and charges for) the whole node, i.e. all
+## 288 cores of a standard Cirrus node, even if the job uses fewer.
+## Use it per job with, e.g.
+##   fabsim cirrus <task>,batch_header=slurm-cirrus-exclusive
+## or set it in your machines_user.yml as
+##   cirrus:
+##     batch_header: slurm-cirrus-exclusive
+
+# Slurm job options (name, compute nodes, job time)
+#SBATCH --job-name=$job_name
+#SBATCH --nodes=$nodes
+#SBATCH --ntasks-per-node=$taskspernode
+#SBATCH --cpus-per-task=$cpuspertask
+
+# Reserve the whole node for this job
+#SBATCH --exclusive
+
+#SBATCH --time=$job_wall_time
+
+# Slurm account/project code (e.g. t01)
+#SBATCH --account=$budget
+# Partition (e.g. standard, highmem)
+#SBATCH --partition=$partition_name
+# QoS (e.g. standard, long, short, lowpriority)
+#SBATCH --qos=$qos_name
+
+## stdout file
+#SBATCH --output=$job_results/JobID-%j.output
+## stderr file
+#SBATCH --error=$job_results/JobID-%j.error
+
+## Set the initial working directory to the work filesystem
+#SBATCH --chdir=$job_results
+
+# Set the number of threads to 1 (prevents automatic threading)
+export OMP_NUM_THREADS=1
+
+# Ensure the cpus-per-task option is propagated to srun commands
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK

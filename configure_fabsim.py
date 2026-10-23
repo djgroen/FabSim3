@@ -4,10 +4,10 @@ import sys
 import subprocess
 import platform
 import getpass
+from datetime import datetime
 from shutil import which
 from pathlib import Path
 import venv
-import importlib
 from pprint import pprint
 
 try:
@@ -109,6 +109,29 @@ def get_platform_info():
 
 FS3_env = AttributeDict(get_platform_info())
 
+
+def _python_in_env(env_path):
+    """Return the Python executable inside an environment, if present.
+
+    The location differs between venv/virtualenv (``bin/python`` or
+    ``Scripts/python.exe``) and conda (``python.exe`` in the prefix root on
+    Windows), so look for the actual executable instead of assuming a layout.
+    """
+    if env_path is None:
+        return None
+
+    env_path = Path(env_path)
+    if os.name == "nt":
+        candidates = [env_path / "Scripts" / "python.exe", env_path / "python.exe"]
+    else:
+        candidates = [env_path / "bin" / "python", env_path / "bin" / "python3"]
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def create_virtualenv(path: Path) -> Path:
     if path.exists():
         _print_activation_reminder(path)
@@ -171,66 +194,272 @@ def get_shell_config_file() -> Path:
 
 
 def get_venv_python(venv_path: Path) -> str:
+    """Return the Python interpreter for an environment.
+
+    If no environment path is given, the interpreter running this script is
+    used. This keeps the no-environment fallback independent of how ``python``
+    or ``python3`` happens to be installed.
+    """
     if venv_path is None:
-        return "python3"
-    if platform.system() == "Windows":
-        return str(venv_path / "Scripts" / "python.exe")
-    return str(venv_path / "bin" / "python")
+        return sys.executable or "python3"
+
+    python_exe = _python_in_env(venv_path)
+    if python_exe is not None:
+        return str(python_exe)
+
+    if os.name == "nt":
+        return str(Path(venv_path) / "Scripts" / "python.exe")
+    return str(Path(venv_path) / "bin" / "python")
 
 
-def install_module(pkg: str, pip_name: str = None, venv_path: Path = None) -> bool:
+def _is_conda_env(path: Path) -> bool:
+    return (Path(path) / "conda-meta").is_dir()
+
+
+def _is_valid_project_env(path: Path) -> bool:
+    """Check that ``path`` is an environment FabSim3 can safely reuse."""
+    path = Path(path)
+    if not path.is_dir():
+        return False
+    has_marker = (path / "pyvenv.cfg").is_file() or _is_conda_env(path)
+    return has_marker and _python_in_env(path) is not None
+
+
+def detect_active_env():
+    """Return the Python environment the user has activated, if any.
+
+    The result is an ``AttributeDict`` with ``path``, ``python``, ``kind`` and
+    ``source`` keys, or ``None`` when no environment is active.
+
+    ``sys.prefix`` is checked first because it describes the interpreter that
+    is actually running the installer. The shell variables are only a fallback
+    for the case where the script was started by a different interpreter (for
+    example ``/usr/bin/python3 configure_fabsim.py`` inside an activated env).
+    """
+    def _from_prefix(prefix, source):
+        path = Path(prefix).expanduser().resolve()
+        python_exe = _python_in_env(path)
+        if python_exe is None:
+            return None
+
+        kind = "conda" if _is_conda_env(path) else "venv"
+        return AttributeDict(
+            path=path,
+            python=str(python_exe),
+            kind=kind,
+            source=source,
+        )
+
+    base_prefix = getattr(
+        sys,
+        "base_prefix",
+        getattr(sys, "real_prefix", sys.prefix),
+    )
+    running_prefix = Path(sys.prefix)
+    if sys.prefix != base_prefix or _is_conda_env(running_prefix):
+        info = _from_prefix(sys.prefix, "interpreter")
+        if info is not None:
+            return info
+
+    virtual_env = os.environ.get("VIRTUAL_ENV")
+    if virtual_env:
+        info = _from_prefix(virtual_env, "VIRTUAL_ENV")
+        if info is not None:
+            return info
+
+    conda_prefix = os.environ.get("CONDA_PREFIX")
+    if conda_prefix:
+        info = _from_prefix(conda_prefix, "CONDA_PREFIX")
+        if info is not None:
+            return info
+
+    return None
+
+
+def _is_conda_base(env_info) -> bool:
+    return (
+        env_info.kind == "conda"
+        and os.environ.get("CONDA_DEFAULT_ENV") == "base"
+    )
+
+
+def prepare_python_environment(fabsim_path: Path):
+    """Choose the Python environment automatically.
+
+    Priority:
+      1. the environment the user has already activated,
+      2. an existing, valid ``FabSim3/VirtualEnv``,
+      3. create ``FabSim3/VirtualEnv``.
+    """
+    project_env = (Path(fabsim_path) / "VirtualEnv").resolve()
+    active = detect_active_env()
+
+    if active is not None:
+        if active.path == project_env:
+            _emit(
+                f"[green]Using active virtual environment:[/green] "
+                f"[cyan]{active.path}[/cyan]"
+            )
+        else:
+            if project_env.exists():
+                _emit(
+                    f"[green]Detected active virtual environment:[/green] "
+                    f"[cyan]{active.path}[/cyan]\n"
+                    f"Using it and ignoring the existing "
+                    f"[cyan]{project_env}[/cyan]."
+                )
+            else:
+                _emit(
+                    f"[green]Detected active virtual environment:[/green] "
+                    f"[cyan]{active.path}[/cyan]\n"
+                    f"Using it instead of creating FabSim3/VirtualEnv."
+                )
+
+            if active.source != "interpreter":
+                _emit(
+                    f"[yellow]Note:[/yellow] the environment was detected from "
+                    f"[cyan]{active.source}[/cyan], so its Python will be used "
+                    f"instead of the interpreter that started this script."
+                )
+
+        if _is_conda_base(active):
+            _emit(
+                "[yellow]Warning:[/yellow] FabSim3 is using the conda "
+                "[cyan]base[/cyan] environment. Installing into it can affect "
+                "other projects; consider activating a dedicated environment."
+            )
+        return active
+
+    if project_env.exists():
+        if _is_valid_project_env(project_env):
+            _emit(
+                f"[green]No active environment detected.[/green]\n"
+                f"Reusing existing [cyan]{project_env}[/cyan]."
+            )
+            return AttributeDict(
+                path=project_env,
+                python=get_venv_python(project_env),
+                kind="venv",
+                source="project",
+            )
+
+        backup = project_env.with_name(
+            f"{project_env.name}.bak."
+            f"{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        )
+        try:
+            project_env.rename(backup)
+        except OSError as e:
+            _emit(
+                f"[red]Could not move the invalid environment "
+                f"[cyan]{project_env}[/cyan]: {e}[/red]"
+            )
+            return AttributeDict(
+                path=None,
+                python=sys.executable,
+                kind="system",
+                source="fallback",
+            )
+        _emit(
+            f"[yellow]The existing [cyan]{project_env}[/cyan] is not a valid "
+            f"Python environment. It was moved to [cyan]{backup}[/cyan].[/yellow]"
+        )
+
+    _emit(
+        f"[cyan]No active environment detected.[/cyan]\n"
+        f"Creating [cyan]{project_env}[/cyan]."
+    )
+    created = create_virtualenv(project_env)
+    if created is None:
+        _emit(
+            "[red]Could not create a virtual environment.[/red]\n"
+            f"Falling back to the interpreter running this script: "
+            f"[cyan]{sys.executable}[/cyan]"
+        )
+        return AttributeDict(
+            path=None,
+            python=sys.executable,
+            kind="system",
+            source="fallback",
+        )
+
+    return AttributeDict(
+        path=Path(created),
+        python=get_venv_python(created),
+        kind="venv",
+        source="project",
+    )
+
+
+def _module_available(python_exe: str, pkg: str) -> bool:
+    try:
+        subprocess.run(
+            [python_exe, "-c", f"import {pkg}"],
+            check=True,
+            capture_output=True,
+        )
+        return True
+    except (subprocess.CalledProcessError, OSError):
+        return False
+
+
+def _pip_available(python_exe: str) -> bool:
+    try:
+        subprocess.run(
+            [python_exe, "-m", "pip", "--version"],
+            check=True,
+            capture_output=True,
+        )
+        return True
+    except (subprocess.CalledProcessError, OSError):
+        return False
+
+
+def install_module(
+    pkg: str,
+    pip_name: str = None,
+    python_exe: str = None,
+    use_user_site: bool = False,
+) -> str:
+    """Install a package into ``python_exe`` when it is not already importable.
+
+    Returns ``"already"``, ``"installed"`` or ``"failed"`` so callers can
+    report the real outcome.
+    """
     pip_name = pip_name or pkg
-    
-    if venv_path is None:
-        # No venv - install to current environment with --user
-        try:
-            importlib.import_module(pkg)
-            return True
-        except ImportError:
-            install_cmd = ["python3", "-m", "pip", "install", "--user", pip_name]
-            if pip_name == "fabric2":
-                install_cmd.append("invoke==2.2.0")
-            
-            print(f"Installing {pkg} package...")
-            try:
-                subprocess.check_call(install_cmd)
-                return False  # Just installed
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to install {pkg}: {e}")
-                return False
-    else:
-        # Check if package is installed in the virtual environment
-        python_exe = get_venv_python(venv_path)
-        
-        # Test if package is available in the venv
-        check_cmd = [python_exe, "-c", f"import {pkg}"]
-        try:
-            subprocess.run(check_cmd, check=True, capture_output=True)
-            return True  # Already installed in venv
-        except subprocess.CalledProcessError:
-            # Package not in venv, install it
-            install_cmd = [python_exe, "-m", "pip", "install", pip_name]
-            if pip_name == "fabric2":
-                install_cmd.append("invoke==2.2.0")
-            
-            print(f"Installing {pkg} package in virtual environment...")
-            try:
-                subprocess.check_call(install_cmd)
-                return False  # Just installed
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to install {pkg} in venv: {e}")
-                return False
+    python_exe = python_exe or sys.executable
+
+    if _module_available(python_exe, pkg):
+        return "already"
+
+    install_cmd = [python_exe, "-m", "pip", "install"]
+    if use_user_site:
+        install_cmd.append("--user")
+    install_cmd.append(pip_name)
+    if pip_name == "fabric2":
+        install_cmd.append("invoke==2.2.0")
+
+    print(f"Installing {pkg} package...")
+    try:
+        subprocess.check_call(install_cmd)
+        return "installed"
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to install {pkg}: {e}")
+        return "failed"
 
 
-def setup_yaml_in_venv(venv_path: Path, fabsim_path: Path):
-    """Run YAML setup in the virtual environment"""
-    if venv_path is None:
-        return setup_yaml_local(fabsim_path)
-    
+def setup_yaml_config(venv_path: Path, fabsim_path: Path):
+    """Create machines_user.yml using the selected Python interpreter.
+
+    ``venv_path`` may be ``None`` when no virtual environment could be
+    created; in that case the current interpreter is used and the
+    ``virtual_env_path`` entries are left empty.
+    """
     python_exe = get_venv_python(venv_path)
+    venv_path_str = str(venv_path) if venv_path else ""
     script_content = f'''
 import sys
-sys.path.insert(0, "{fabsim_path}")
+sys.path.insert(0, {str(fabsim_path)!r})
 import ruamel.yaml
 from pathlib import Path
 
@@ -239,8 +468,8 @@ yaml.allow_duplicate_keys = None
 yaml.preserve_quotes = True
 yaml.width = 4096
 
-path = Path("{fabsim_path}")
-venv_path = Path("{venv_path}") 
+path = Path({str(fabsim_path)!r})
+venv_path = Path({venv_path_str!r}) if {venv_path_str!r} else None
 yml_path = path / "fabsim" / "deploy" / "machines_user_example.yml"
 with open(yml_path) as f:
     data = yaml.load(f)
@@ -257,9 +486,15 @@ user = getpass.getuser()
 for key in ["localhost", "default"]:
     data[key]["home_path_template"] = S(str(exe_path))
     data[key]["username"] = user
-    
-data["default"]["virtual_env_path"] = str(venv_path)
-data["localhost"]["virtual_env_path"] = str(venv_path)
+
+if venv_path is not None:
+    data["default"]["virtual_env_path"] = str(venv_path)
+    data["localhost"]["virtual_env_path"] = str(venv_path)
+    # Make local job scripts activate the selected environment.
+    data["localhost"]["venv"] = True
+else:
+    data["default"]["virtual_env_path"] = ""
+    data["localhost"]["virtual_env_path"] = ""
 
 data["default"]["local_configs"] = str(config_path)
 data["default"]["local_results"] = str(result_path)
@@ -273,7 +508,7 @@ if machines_yml.exists():
 with open(machines_yml, "w") as f:
     yaml.dump(data, f)
 print("Created machines_user.yml with user-specific configurations")
-print(f"Set virtual_env_path to: {{venv_path}}")
+print(f"Set virtual_env_path to: {{venv_path or ''}}")
 
 # Create directories
 exe_path.mkdir(exist_ok=True)
@@ -281,19 +516,23 @@ config_path.mkdir(exist_ok=True)
 result_path.mkdir(exist_ok=True)
 print("Created directories: localhost_exe, config_files, results")
 '''
-    
+
     try:
-        result = subprocess.run([python_exe, "-c", script_content], 
-                               capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            [python_exe, "-c", script_content],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         print(result.stdout)
-        
+
         # Double-check that the file was actually created
         machines_yml_path = fabsim_path / "fabsim" / "deploy" / "machines_user.yml"
         if not machines_yml_path.exists():
             print("ERROR: machines_user.yml was not created successfully!")
             print("FabSim3 cannot function without this critical configuration file.")
             sys.exit(1)
-        
+
         return True
     except subprocess.CalledProcessError as e:
         print(f"CRITICAL ERROR: Failed to set up YAML configuration: {e}")
@@ -301,8 +540,29 @@ print("Created directories: localhost_exe, config_files, results")
         print("FabSim3 setup cannot continue without machines_user.yml")
         sys.exit(1)
 
+
 def main():
-    FS3_env["venv_path"] = create_virtualenv(FS3_env["FabSim3_PATH"] / "VirtualEnv")
+    env_info = prepare_python_environment(FS3_env["FabSim3_PATH"])
+    FS3_env["venv_path"] = env_info.path
+    FS3_env["venv_python"] = env_info.python
+    FS3_env["venv_active"] = env_info.source in (
+        "interpreter",
+        "VIRTUAL_ENV",
+        "CONDA_PREFIX",
+    )
+
+    python_exe = FS3_env["venv_python"]
+    if not _pip_available(python_exe):
+        print(f"pip is not available for {python_exe}; trying to bootstrap it...")
+        try:
+            subprocess.check_call([python_exe, "-m", "ensurepip", "--upgrade"])
+        except (subprocess.CalledProcessError, OSError) as e:
+            _emit(
+                f"[red]pip is not available for {python_exe}.[/red]\n"
+                f"Please install pip in that environment and run the installer "
+                f"again.\n[red]{e}[/red]"
+            )
+            sys.exit(1)
 
     required = {
         "wheel": None,
@@ -315,14 +575,30 @@ def main():
         "beartype": "beartype",
     }
 
+    failures = []
     for pkg, pip_name in required.items():
-        installed = install_module(pkg, pip_name, FS3_env["venv_path"])
-        status = "already" if installed else "just"
-        color = "green" if installed else "yellow"
-        _emit(f"[{color}]Package {pkg} {status} installed[/{color}]")
+        status = install_module(
+            pkg,
+            pip_name,
+            python_exe,
+            use_user_site=FS3_env["venv_path"] is None,
+        )
+        if status == "already":
+            _emit(f"[green]Package {pkg} is already installed[/green]")
+        elif status == "installed":
+            _emit(f"[yellow]Package {pkg} installed[/yellow]")
+        else:
+            failures.append(pkg)
+            _emit(f"[red]Failed to install package {pkg}[/red]")
 
-    # Set up YAML configuration files using the virtual environment
-    if not setup_yaml_in_venv(FS3_env["venv_path"], FS3_env["FabSim3_PATH"]):
+    if failures:
+        _emit(
+            "[red]These packages could not be installed:[/red] "
+            + ", ".join(failures)
+        )
+
+    # Set up YAML configuration files using the selected environment
+    if not setup_yaml_config(FS3_env["venv_path"], FS3_env["FabSim3_PATH"]):
         print("Failed to set up configuration files")
 
     # setup ssh localhost
@@ -341,19 +617,33 @@ def main():
 
     bash_scripts = [
         "~/.bashrc",
-        "~/.bash_profile", 
+        "~/.bash_profile",
         "~/.zshrc",
         "~/.bash_aliases",
     ]
     title = "[orange_red1]Congratulation[/orange_red1]\n"
     msg = "[dark_cyan]FabSim3 installation was successful.[/dark_cyan]\n\n"
-    
+
     # Add virtual environment information
-    if FS3_env.venv_path:
-        activate_cmd = get_activation_command(FS3_env.venv_path)
+    if FS3_env["venv_active"]:
+        msg += (
+            "[yellow]Using your active virtual environment:[/yellow] "
+            f"[bold cyan]{FS3_env['venv_path']}[/bold cyan]\n\n"
+        )
+    elif FS3_env["venv_path"]:
+        activate_cmd = get_activation_command(FS3_env["venv_path"])
         msg += "[yellow]Virtual Environment Setup Complete![/yellow]\n"
-        msg += f"[green]Activate your virtual environment:[/green] [bold cyan]{activate_cmd}[/bold cyan]\n\n"
-    
+        msg += (
+            "[green]Activate your virtual environment:[/green] "
+            f"[bold cyan]{activate_cmd}[/bold cyan]\n\n"
+        )
+    else:
+        msg += (
+            "[yellow]No virtual environment is in use.[/yellow]\n"
+            "The required packages were installed into the current Python "
+            "environment.\n\n"
+        )
+
     msg += "In order to use fabsim command anywhere in your PC, you need to "
     msg += "update the [blue]PATH[/blue] and [blue]PYTHONPATH[/blue] environmental variables.\n\n"
     msg += "\t[red1]export[/red1] [blue]PATH[/blue]={}/fabsim/bin:[blue]$PATH[/blue]\n".format(
@@ -362,15 +652,16 @@ def main():
     msg += "\t[red1]export[/red1] [blue]PYTHONPATH[/blue]={}:[blue]$PYTHONPATH[/blue]\n\n".format(
         FS3_env.FabSim3_PATH
     )
-    
-    # Check if ~/.local/bin is already in PATH
-    local_bin_path = os.path.expanduser("~/.local/bin")
-    if local_bin_path not in os.environ["PATH"]:
-        msg += "\t[red1]export[/red1] [blue]PATH[/blue]=~/.local/bin:[blue]$PATH[/blue]\n"
 
-    msg += "\nThe last list is added because the required packages are "
-    msg += 'installed with flag "--user" which makes pip install packages '
-    msg += "in your home directory instead of system directory."
+    # The --user fallback is only used when no environment is available.
+    if FS3_env["venv_path"] is None:
+        local_bin_path = os.path.expanduser("~/.local/bin")
+        if local_bin_path not in os.environ["PATH"]:
+            msg += "\t[red1]export[/red1] [blue]PATH[/blue]=~/.local/bin:[blue]$PATH[/blue]\n"
+
+        msg += "\nThe last list is added because the required packages are "
+        msg += 'installed with flag "--user" which makes pip install packages '
+        msg += "in your home directory instead of system directory."
 
     _emit(msg, title=title, border_style="orange_red1")
 
@@ -398,11 +689,13 @@ def main():
 
     # check if fabsim command is already available or not
     if which("fabsim") is not None:
-        warning_msg = ("fabsim command is already added to the PATH variable. "
-                      "Please make sure you remove the old FabSim3 directory "
-                      "from your bash shell script.")
+        warning_msg = (
+            "fabsim command is already added to the PATH variable. "
+            "Please make sure you remove the old FabSim3 directory "
+            "from your bash shell script."
+        )
         _emit(warning_msg, title="[orange_red1]WARNING[/orange_red1]")
-        
+
     # Set the FABSIM3_HOME environment variable
     os.environ["FABSIM3_HOME"] = str(FS3_env.FabSim3_PATH)  # Convert Path to string
     export_cmd = f'export FABSIM3_HOME="{FS3_env.FabSim3_PATH}"'

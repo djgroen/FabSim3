@@ -93,27 +93,39 @@ prometheus:
   nodes: 4
 
 cirrus:
+  # Cirrus (EPCC) - HPE Cray EX4000, AMD EPYC 9825. 288 physical cores per node
+  # (2 x 144), 768 GB (standard) or 1536 GB (highmem) per node.
+  # Login at login.cirrus.ac.uk with MFA (SSH key + TOTP). Batch jobs MUST write
+  # to /epccfs: /home is mounted on login nodes only and /work is deprecated
+  # read-only (until at least 21 Nov 2026).
+  # Cirrus charges per allocated core-hour, so request only what the job needs
+  # (e.g. cores=64) instead of the full node.
   max_job_name_chars: 15
   job_dispatch: sbatch
-  budget: ec190-kbronik
-  sshpass: ''
-  manual_sshpass: true
+  cancel_job_command: scancel $jobID
+  manual_ssh: true
   stat: squeue -u $username
-  run_command: srun -n $cores --kill-on-bad-exit
-  batch_header: slurm-cirrus
   remote: login.cirrus.ac.uk
-  home_path_template: /lustre/home/ec190/kbronik
-  runtime_path_template: /lustre/home/ec190/kbronik
-  modules:
-    all:
-      - load lammps
-  temp_path_template: $work_path/tmp
-  corespernode: 36
-  cpuspertask: 1
-  job_name: lammps_Example
-  job_wall_time: '00:20:00'
+  run_command: 'srun --hint=nomultithread --distribution=block:block'
+  # Node-sharing header: only the cores that are requested are charged.
+  # Cirrus requires multi-node jobs to be exclusive; use the
+  # 'slurm-cirrus-exclusive' header for those (it reserves and charges the
+  # whole node, i.e. all 288 cores).
+  batch_header: slurm-cirrus
   partition_name: standard
   qos_name: standard
+  # SLURM resources allocation
+  cores: 288              # Total cores requested (default: one full node)
+  corespernode: 288       # Hardware: 288 physical cores per node
+  cpuspertask: 1          # Cores allocated per task
+  taskspernode: 288       # Tasks running per node (288 / 1)
+  nb_process: 4           # Good starting point (2/3 of CPU cores)
+  ranks: 1
+  coresperrank: 1
+  runtime: 60
+  job_wall_time: '0-02:00:00'
+  home_path_template: /epccfs/$project/$project/$username
+  temp_path_template: $work_path/tmp
 
 supermuc2:
   max_job_name_chars: 15
