@@ -26,7 +26,7 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	* beartype
 
 	!!! note
-		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) and  [rich](https://pypi.org/project/rich/)  packages, other packages are installed by FabSim3.
+		You **ONLY** need to install [ruamel.yaml](https://pypi.org/project/ruamel.yaml) and  [rich](https://pypi.org/project/rich/)  packages, because these are needed for the FabSim3 install script. Other packages are installed automatically later on.
 		To install both `ruamel.yaml` and `rich` packages, simply type
 		```sh
 		pip3 install ruamel.yaml rich
@@ -42,6 +42,10 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	```bash
 	git clone https://github.com/djgroen/FabSim3.git
 	```
+
+!!! tip "Virtual Environment Recommendation"
+    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. FabSim3's `configure_fabsim.py` script (used in the next step) automatically creates a virtual environment in the `VirtualEnv` directory for this purpose.
+ 
 2. To install **all** packages automatically and configure yml files, please go to your `FabSim3` directory, and type
 	```bash
 	python3 configure_fabsim.py

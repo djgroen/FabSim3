@@ -42,7 +42,7 @@ default:
 
 localhost:
   remote: localhost
-  python_build: lib/python2.7
+  python_build: lib/python3.11
   home_path_template: /home/$username
   manual_ssh: true
   batch_header: bash_header
@@ -483,8 +483,8 @@ archer2:
   project: e723
   cores: 128  # Total cores requested
   corespernode: 128  # Fixed value for ARCHER2 (128 cores/node)
-  cpuspertask: 2  # 2 cores per task (safer)
-  taskspernode: 64       # 64 tasks per node (128 ÷ 2 = 64)
+  cpuspertask: 1
+  taskspernode: 128      
   run_command: 'srun --distribution=block:block --hint=nomultithread'
   qos_name: standard
   partition_name: standard
