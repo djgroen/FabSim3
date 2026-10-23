@@ -188,6 +188,7 @@ mkdir -p $HOME/opt/openmpi
 #### 2. Download OpenMPI
 
 ```bash
+mkdir -p $HOME/Downloads
 cd $HOME/Downloads
 wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.2.tar.gz
 tar -xf openmpi-4.1.2.tar.gz
