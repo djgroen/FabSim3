@@ -42,6 +42,10 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	```bash
 	git clone https://github.com/djgroen/FabSim3.git
 	```
+
+!!! tip "Virtual Environment Recommendation"
+    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. FabSim3's `configure_fabsim.py` script (used in the next step) automatically creates a virtual environment in the `VirtualEnv` directory for this purpose.
+ 
 2. To install **all** packages automatically and configure yml files, please go to your `FabSim3` directory, and type
 	```bash
 	python3 configure_fabsim.py
@@ -124,9 +128,6 @@ MPI (Message Passing Interface) plugins in FabSim3 use `mpirun` commands to exec
 - `No MPI implementation found`
 
 ### Quick Installation (Recommended)
-
-!!! tip "Virtual Environment Recommendation"
-    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. FabSim3's `configure_fabsim.py` script automatically creates a virtual environment in the `VirtualEnv` directory for this purpose.
 
 #### Ubuntu/Debian
 
