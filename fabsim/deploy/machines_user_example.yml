@@ -66,8 +66,8 @@ archer2:
   # SLURM resources allocation
   cores: 128            # Total cores user requests
   corespernode: 128     # ARCHER2 hardware: 128 cores/node
-  cpuspertask: 2        # 2 cores per task (safer)
-  taskspernode: 64      # 64 tasks per node (128 ÷ 2 = 64)
+  cpuspertask: 1        # 2 cores per task (safer)
+  taskspernode: 128      # 64 tasks per node (128 ÷ 2 = 64)
   nb_process: 4         # Good starting point (2/3 of CPU cores)
   # Radical task allocation
   ranks: 1
