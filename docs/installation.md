@@ -275,7 +275,7 @@ Rank 0 of 2
 Rank 1 of 2
 ```
 
-Useful commands:
+Useful command if, for any reason, you wish to reinstall `mpi4py`:
 ```bash
 pip uninstall -y mpi4py
 MPICC=/path/to/mpicc python -m pip install --no-binary=:all: --force-reinstall mpi4py
