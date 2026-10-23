@@ -47,6 +47,9 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 	python3 configure_fabsim.py
 	```
 
+	!!! note "Using an existing Python environment"
+	    If you activate a Python environment (virtualenv or conda) before running the installer, FabSim3 installs its dependencies into that environment instead of creating a new one. If no environment is active, the installer reuses or creates the `VirtualEnv` directory inside the FabSim3 checkout.
+
 3. After installation process, the root FabSim3 directory should be added to both `PATH` and `PYTHONPATH` environment variables. The instruction to do that will be shown at the end of output of `python3 configure_fabsim.py` command.
 	```bash
 	Congratulation 
@@ -60,9 +63,9 @@ FabSim3 on Windows then we recommend using the Linux Subsystem for Windows.
 
 		export PATH=~/.local/bin:$PATH
 	
-	The last list is added because the required packages are installed with flag 
-	"--user" which makes pip install packages in your your home instead instead 
-	of system directory.
+	The `~/.local/bin` entry is only shown when the installer had to fall back
+	to installing packages with the `--user` flag (when no virtual environment
+	was available).
 
 	Tip: To make these updates permanent, you can add the following command at the 
 	end of your bash shell script which could be one of ['~/.bashrc', '~/.bash_profile', 
@@ -126,7 +129,7 @@ MPI (Message Passing Interface) plugins in FabSim3 use `mpirun` commands to exec
 ### Quick Installation (Recommended)
 
 !!! tip "Virtual Environment Recommendation"
-    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. FabSim3's `configure_fabsim.py` script automatically creates a virtual environment in the `VirtualEnv` directory for this purpose.
+    For better dependency management and to avoid conflicts with system packages, it's recommended to install Python packages (including `mpi4py`) within a Python virtual environment. If a virtualenv or conda environment is active when `configure_fabsim.py` runs, FabSim3 uses it; otherwise the script reuses or creates the `VirtualEnv` directory.
 
 #### Ubuntu/Debian
 
