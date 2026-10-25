@@ -8,7 +8,7 @@ core-hour). Everything before section 9 is plain Cirrus usage and works with
 any terminal.
 
 Section 9 is only needed if you want to use
-[FabSim3](https://fabsim3.readthedocs.io) from Cirrus: it links to the
+[FabSim3](https://fabsim3.readthedocs.io) and Cirrus: it links to the
 FabSim3 documentation and lists the three settings that differ on Cirrus.
 
 ---
@@ -38,24 +38,24 @@ the "multi-factor authentication" section of your account email.
 
 ```
       your laptop                 Cirrus
- ┌────────────────┐          ┌──────────────────────────────┐
- │  terminal      │  ssh     │  login node (login.cirrus.ac.uk)
- │  ssh client    │ ───────► │  - you type here              │
- └────────────────┘          │  - shared by many users       │
-                             │  - do NOT run big jobs here   │
-                             └───────────┬──────────────────┘
+ ┌────────────────┐          ┌──────────────────────────────────┐
+ │  terminal      │  ssh     │  login node (login.cirrus.ac.uk) │
+ │  ssh client    │ ───────► │  - you type here                 │
+ └────────────────┘          │  - shared by many users          │
+                             │  - do NOT run big jobs here      │
+                             └───────────┬──────────────────────┘
                                          │  you ask the scheduler for resources
                                          ▼
                              ┌──────────────────────────────┐
-                             │  Slurm scheduler              │
-                             │  - queues your job            │
-                             │  - allocates nodes + cores    │
+                             │  Slurm scheduler             │
+                             │  - queues your job           │
+                             │  - allocates nodes + cores   │
                              └───────────┬──────────────────┘
                                          │
                              ┌───────────▼──────────────────┐
-                             │  compute node (cs-n0123)      │
-                             │  - runs your job              │
-                             │  - 288 cores each              │
+                             │  compute node (cs-n0123)     │
+                             │  - runs your job             │
+                             │  - 288 cores each            │
                              └──────────────────────────────┘
 ```
 
@@ -549,7 +549,7 @@ transfers because it only sends what is new.)
 
 ---
 
-## 9. Using FabSim3 from Cirrus
+## 9. Using FabSim3 and Cirrus
 
 *This section is optional — skip it if the workshop only uses plain Cirrus.*
 
